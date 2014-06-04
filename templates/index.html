@@ -1,0 +1,75 @@
+<html>
+<head>
+    <title></title>
+    <style type="text/css">
+    form{padding:20px;border:1px solid #d4d4d4;}
+    .success{background:#CDD973;padding:5px;}
+    .fail{background:#BF4346;padding:5px;}
+    </style>
+</head>
+<body>
+
+{%if message %}
+<div class="success">    
+{{message}}
+</div>
+{% endif %}
+{%if error %}
+<div class="fail">    
+{{error}}
+</div>
+{% endif %}
+<form method="POST" action="/access_token">
+    <h3>Generate access token</h3>
+    <p>
+        <input type="text" id="username_input" name="username" value="tim@sayhello.com" placeholder="someone@sayhello.com" />
+    </p>
+    <p>
+        <input type="password" id="password_input" name="password" value="tim" placeholder="super secure" autocomplete="off"/>
+    </p>
+    <p>
+        <input type="submit" value="Generate access token" />
+    </p>
+</form>
+
+
+<form method="POST" action="/create_account">
+    <h3>Create account</h3>
+
+    <p>
+        <input type="text" id="firstname_input" name="firstname" value="" placeholder="firstname" />
+    </p>
+    <p>
+        <input type="text" id="lastname_input" name="lastname" value="" placeholder="lastname" />
+    </p>
+    <p>
+        <input type="text" id="email_input" name="email" value="" placeholder="someone@sayhello.com" />
+    </p>
+    <p>
+        <input type="password" id="password_input" name="password" placeholder="super secure" autocomplete="off"/>
+    </p>
+    <p>
+        <select name="gender">
+            <option value="FEMALE">female</option>
+            <option value="MALE">male</option>
+            <option value="OTHER">other</option>
+        </select>
+    </p>
+    
+    <input type="hidden" name="height" value="0" />
+    <input type="hidden" name="weight" value="0" />
+    
+    <p>
+        <select name="tz">
+            <option value="America/Los_Angeles">America/Los_Angeles</option>
+        </select>
+    </p>
+    
+    <p>
+        <input type="submit" value="Create account" />
+    </p>
+</form>
+
+
+</body>
+</html>
