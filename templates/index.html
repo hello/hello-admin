@@ -22,6 +22,13 @@
 <form method="POST" action="/access_token">
     <h3>Generate access token</h3>
     <p>
+        <select name="client_id">
+        {% for application in applications %}
+        <option value={{application.client_id}}>{{application.name}} - {{application.scopes}}</option>
+        {% endfor %}
+        </select>
+    </p>
+    <p>
         <input type="text" id="username_input" name="username" value="tim@sayhello.com" placeholder="someone@sayhello.com" />
     </p>
     <p>
@@ -30,6 +37,9 @@
     <p>
         <input type="submit" value="Generate access token" />
     </p>
+    {% if access_token %}
+        <div class="success"> {{access_token}}</div>
+    {% endif %}
 </form>
 
 
@@ -70,6 +80,6 @@
     </p>
 </form>
 
-
+<p><a href="/update"> Update access token</a></p>
 </body>
 </html>
