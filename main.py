@@ -169,8 +169,7 @@ class CreateTokenHandler(BaseRequestHandler):
 
 class CreateAccountHandler(BaseRequestHandler):
     def post(self):
-        firstname = self.request.get("firstname")
-        lastname = self.request.get("lastname")
+        name = self.request.get("name")
         email = self.request.get("email")
         password = self.request.get("password")
         gender = self.request.get("gender")
@@ -180,8 +179,7 @@ class CreateAccountHandler(BaseRequestHandler):
 
 
         data = {
-            "firstname": firstname,
-            "lastname": lastname,
+            "name": name,
             "email": email,
             "password": password,
             "gender": gender,
@@ -190,7 +188,7 @@ class CreateAccountHandler(BaseRequestHandler):
             "tz": tz
         }
 
-        if not all([firstname, lastname, email, password, gender, height, weight, tz]):
+        if not all([name, email, password, gender, height, weight, tz]):
             self.error(400)
             self.response.write("All fields not specified")
             self.response.write(json.dumps(data))
@@ -212,6 +210,8 @@ class CreateAccountHandler(BaseRequestHandler):
         hello = make_oauth2_service(app_info_model)
         
         session = hello.get_session(app_info_model.access_token)
+        logging.info("Submitting data")
+        logging.info(data)
         resp = session.post('account', data=json.dumps(data), headers=headers)
 
         logging.info(resp.url)
