@@ -387,7 +387,7 @@ class ProxyHandler(BaseRequestHandler):
         
         session = hello.get_session(self.request.get('access_token'))
 
-        resp = session.get('/v1/' + path)
+        resp = session.get('/v1/' + path + '?groupby=10&threshold=30')
         if resp.status_code != 200:
             self.error(resp.status_code)
             self.response.write(resp.content)
