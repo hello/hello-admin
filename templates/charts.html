@@ -1,0 +1,93 @@
+<html>
+<head>
+    <title></title>
+    <style type="text/css">
+    form{padding:20px;border:1px solid #d4d4d4;}
+    .success{background:#CDD973;padding:5px;}
+    .fail{background:#BF4346;padding:5px;}
+    </style>
+</head>
+<body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+
+      // Load the Visualization API and the piechart package.
+      google.load('visualization', '1.0', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.setOnLoadCallback(enableForm);
+      
+      // barsVisualization must be global in our script tag to be able
+      // to get and set selection.
+      var barsVisualization;
+
+      function enableForm() {
+
+        console.log("enabling form");
+        $('#submit').removeAttr('disabled');
+
+          $("form" ).on("submit", function( event ) {
+            event.preventDefault();
+            console.log( $( this ).serialize() );
+            drawGraph($(this).serialize());
+          });
+      }
+
+  function drawGraph(form_data) {
+    var jqhxr = $.ajax(
+        {
+          url : '/proxy/timeline/' + $('#chart-day').val(),
+          data: form_data,
+          dataType: "json",
+          success: function(msg) {
+
+            var dataView = new google.visualization.DataTable();
+            dataView.addColumn('date', 'minutes');
+            dataView.addColumn('number', 'Sleep depth');
+            var rows =[];
+            console.log(msg.length);
+            for(var i=0; i < msg.length; i++) {
+                var local_ts = msg[i]['timestamp'];
+                console.log(local_ts)
+                rows.push([new Date(local_ts), Math.max(1, msg[i]['sleep_depth'])]);
+            }
+            dataView.addRows(rows);
+
+            var options = {
+              hAxis: {format: 'MMM dd, y'}
+            };
+
+            // Format the data
+            var formatter = new google.visualization.DateFormat({pattern:'EEEE, MM d, HH:mm'});
+            formatter.format(dataView,0);
+
+            barsVisualization = new google.visualization.ColumnChart(document.getElementById('mouseoverdiv'));
+            // dataView.setColumns([{calc: function(data, row) { return data.getFormattedValue(row, 0); }, type:'string'}, 1]);
+            barsVisualization.draw(dataView, options);
+
+            // Add our over/out handlers.
+            google.visualization.events.addListener(barsVisualization, 'onmouseover', barMouseOver);
+            google.visualization.events.addListener(barsVisualization, 'onmouseout', barMouseOut);
+      }
+    }); 
+  };
+
+
+  function barMouseOver(e) {
+    barsVisualization.setSelection([e]);
+  }
+
+  function barMouseOut(e) {
+    barsVisualization.setSelection([{'row': null, 'column': null}]);
+  }
+
+</script>
+<form id="chart-form">
+  <input type="text" name="access_token" id="access_token" placeholder="access token" value="" />
+  <input type="text" id="chart-day" name="day" placeholder="2014-09-08" value="2014-08-09" />
+  <input type="submit" id="submit" value="show data" disabled="disabled"/>
+</form>
+<div id="mouseoverdiv"></div>
+</body>
+</html>

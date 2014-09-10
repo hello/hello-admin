@@ -41,10 +41,10 @@ class BaseRequestHandler(webapp2.RequestHandler):
     def log_and_redirect(self, redirect_path, redirect_message):
         pass
 
-    def display_error(self, error_message):
+    def display_error(self, error_message, status_code=500):
         template = JINJA_ENVIRONMENT.get_template('templates/error.html')
-        self.error(500)
-        template_values = {'error_message' : error_message}
+        self.error(status_code)
+        template_values = {'error_message' : error_message, 'status_code': status_code}
         self.response.write(template.render(template_values))
         return
 
@@ -312,10 +312,75 @@ class UpdateAdminAccessToken(BaseRequestHandler):
         logging.info("updated app (client_id = %s) successfully." % app_info_model.client_id)
         self.redirect('/')
 
+
+class RegisterPillHandler(BaseRequestHandler):
+    def post(self):
+
+        info_query = AppInfo.query().order(-AppInfo.created)
+        results = info_query.fetch(1)
+        logging.info("Querying datastore for most recent AppInfo")
+
+        if not results:
+            self.error(500)
+            self.response.write("Missing AppInfo. Bailing.")
+            return
+
+        headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+        app_info_model = results[0]
+        hello = make_oauth2_service(app_info_model)
+        
+        session = hello.get_session(app_info_model.access_token)
+        data = dict(pill_id=self.request.get('pill_id'), account_id=self.request.get('account_id'))
+        logging.info(data)
+
+        resp = session.post('devices/pill', data=json.dumps(data), headers=headers)
+        if resp.status_code not in [200, 204]:
+            logging.error("%s - %s", resp.status_code, resp.content)
+            error_message = "%s" % (resp.content)
+            self.display_error(error_message, status_code=resp.status_code)
+            return
+
+        self.redirect('/')
+
+class ChartHandler(BaseRequestHandler):
+    def get(self):
+        template = JINJA_ENVIRONMENT.get_template('templates/charts.html')
+        self.response.write(template.render({}))
+
+class ProxyHandler(BaseRequestHandler):
+    def get(self, path):
+        
+        logging.info(self.request)
+        data = []
+        info_query = AppInfo.query().order(-AppInfo.created)
+        results = info_query.fetch(1)
+        logging.info("Querying datastore for most recent AppInfo")
+
+        if not results:
+            self.error(500)
+            self.response.write("Missing AppInfo. Bailing.")
+            return
+
+        headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+        app_info_model = results[0]
+        hello = make_oauth2_service(app_info_model)
+        
+        session = hello.get_session(self.request.get('access_token'))
+        resp = session.get('/v1/' + path)
+        logging.info(resp.status_code)
+        data = resp.json()
+        logging.info(data)
+        segments = data[0]['segments']
+        logging.info("Received %d segments" % len(segments))
+        self.response.write(json.dumps(segments))
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/access_token', CreateTokenHandler),
     ('/create_account', CreateAccountHandler),
+    ('/register_pill', RegisterPillHandler),
     ('/create/app', CreateApplicationHandler),
     ('/update', UpdateAdminAccessToken),
+    ('/charts', ChartHandler),
+    ('/proxy/(.*)', ProxyHandler),
 ], settings.DEBUG)
