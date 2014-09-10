@@ -22,6 +22,7 @@ import settings
 import json
 import logging
 import os
+import datetime as dt
 import urllib
 from rauth import OAuth2Service
 import requests
@@ -32,10 +33,12 @@ class AppInfo(ndb.Model):
     access_token = ndb.StringProperty(required=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
 
+
 class AdminUser(ndb.Model):
     username = ndb.StringProperty(required=True)
     password = ndb.StringProperty(required=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
+
 
 class BaseRequestHandler(webapp2.RequestHandler):
     def log_and_redirect(self, redirect_path, redirect_message):
@@ -47,6 +50,17 @@ class BaseRequestHandler(webapp2.RequestHandler):
         template_values = {'error_message' : error_message, 'status_code': status_code}
         self.response.write(template.render(template_values))
         return
+
+
+class AccessToken(ndb.Model):
+    username = ndb.StringProperty(required=True)
+    app = ndb.StringProperty(required=True)
+    token = ndb.StringProperty(required=True)
+    created = ndb.DateTimeProperty(auto_now_add=True)
+
+    @classmethod
+    def query_tokens(cls):
+        return cls.query().order(-cls.created).fetch(20)
 
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -65,6 +79,9 @@ def make_oauth2_service(app_info_model):
         base_url=app_info_model.endpoint)
     return service
 
+
+def get_most_recent_tokens(n=10):
+    return AccessToken.query_tokens()
 
 class MainHandler(BaseRequestHandler):
     def get(self):
@@ -161,7 +178,8 @@ class CreateTokenHandler(BaseRequestHandler):
         template_values = {
             'message': "Access token = %s" % access_token
         }
-
+        token = AccessToken(username=username, token=access_token, app=client_id)
+        token.put()
         # template = JINJA_ENVIRONMENT.get_template('templates/index.html')
         # self.response.write(template.render(template_values))
         self.redirect('/?' + urllib.urlencode({'access_token' : access_token}))
@@ -345,12 +363,14 @@ class RegisterPillHandler(BaseRequestHandler):
 class ChartHandler(BaseRequestHandler):
     def get(self):
         template = JINJA_ENVIRONMENT.get_template('templates/charts.html')
-        self.response.write(template.render({}))
+        tokens = get_most_recent_tokens()
+        day = dt.datetime.strftime(dt.datetime.now(), "%Y-%m-%d")
+
+        self.response.write(template.render({'tokens' : tokens, 'day' : day}))
 
 class ProxyHandler(BaseRequestHandler):
     def get(self, path):
         
-        logging.info(self.request)
         data = []
         info_query = AppInfo.query().order(-AppInfo.created)
         results = info_query.fetch(1)
@@ -366,7 +386,13 @@ class ProxyHandler(BaseRequestHandler):
         hello = make_oauth2_service(app_info_model)
         
         session = hello.get_session(self.request.get('access_token'))
+
         resp = session.get('/v1/' + path)
+        if resp.status_code != 200:
+            self.error(resp.status_code)
+            self.response.write(resp.content)
+            logging.error(resp.content)
+            return
         logging.info(resp.status_code)
         data = resp.json()
         logging.info(data)
