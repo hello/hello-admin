@@ -90,8 +90,13 @@ def get_most_recent_tokens(n=10):
 
 class MainHandler(BaseRequestHandler):
     def get(self):
-        access_token = self.request.get('access_token', default_value='')
-        error_message = self.request.get('error_message', default_value='')
+        template_values = {}
+        template = JINJA_ENVIRONMENT.get_template('templates/index.html')
+        self.response.write(template.render(template_values))
+
+
+class CreateTokenHandler(BaseRequestHandler):
+    def get(self):
         app_info_model = AppInfo.get_by_id(settings.ENVIRONMENT)
         logging.info("Querying datastore for most recent AppInfo")
 
@@ -108,29 +113,15 @@ class MainHandler(BaseRequestHandler):
 
         session = hello.get_session(app_info_model.access_token)
         resp = session.get('applications', headers=headers)
+        self.response.write(resp.content)
 
-        template_values = {
-            'applications': resp.json(),
-            'access_token': access_token,
-            'error': error_message
-        }
-
-        if resp.status_code != 200:
-            err = resp.json()
-            template_values['error'] = "API CALL %s - HTTP %s. Check the logs \
-                 for details." % (err['code'], err['message'])
-
-        template = JINJA_ENVIRONMENT.get_template('templates/index.html')
-        self.response.write(template.render(template_values))
-
-
-class CreateTokenHandler(BaseRequestHandler):
     def post(self):
         username = self.request.get("username", default_value="x@sayhello.com")
-        password = self.request.get("password", default_value="tim")
+        password = self.request.get("password", default_value="x")
         client_id = self.request.get('client_id', default_value="unknown")
 
-        logging.info(username)
+        logging.info("username: %s, password:%s, client_id:%s"
+                     % (username, password, client_id))
 
         app_info_model = AppInfo.get_by_id(settings.ENVIRONMENT)
 
@@ -178,27 +169,15 @@ class CreateTokenHandler(BaseRequestHandler):
             return
 
         access_token = json_data['access_token']
-        # session = hello.get_session(access_token)
-        # account_resp = session.get('account')
-        # if account_resp.status_code != 200:
-        #     logging.error("Could not fetch account info")
-        #     logging.error("Status code was: %s and response was: %s" \
-        #    % (account_resp.status_code, account_resp.content))
-        #     self.error(500)
-        #     return
 
-        # template_values = {
-        #     'message': "Access token = %s" % access_token
-        # }
         token = AccessToken(
             username=username,
             token=access_token,
             app=client_id
         )
         token.put()
-        # template = JINJA_ENVIRONMENT.get_template('templates/index.html')
-        # self.response.write(template.render(template_values))
-        self.redirect('/?' + urllib.urlencode({'access_token': access_token}))
+
+        self.response.write(json.dumps({'access_token': access_token}))
 
 
 class CreateAccountHandler(BaseRequestHandler):
@@ -263,8 +242,7 @@ class CreateAccountHandler(BaseRequestHandler):
             template_values['error'] = '[HTTP %s] Response: %s' \
                 % (resp.status_code, resp.content)
 
-        template = JINJA_ENVIRONMENT.get_template('templates/index.html')
-        self.response.write(template.render(template_values))
+        self.response.write(json.dumps(template_values))
 
 
 class CreateApplicationHandler(BaseRequestHandler):
@@ -447,12 +425,6 @@ class ProxyHandler(BaseRequestHandler):
         logging.info("Received %d segments" % len(segments))
         self.response.write(json.dumps(segments))
 
-
-class HomeRequestHandler(webapp2.RequestHandler):
-    def get(self):
-        template = JINJA_ENVIRONMENT.get_template('templates/home.html')
-
-        self.response.write(template.render({}))
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),

@@ -1,0 +1,8 @@
+body{background:#f2f7fb;font-family: 'Helvetica Neue', arial; color:#396f97}
+#content{width:400px;}
+.row{overflow: hidden;background: white;}
+#token, #account{width:45%;float:left;}
+.tokenBox,.accountBox{background:white;padding:10px;}
+.tokenForm,.accountForm{background:#f2f7fb;border:1px solid rgba(0,0,0,0.1);padding: 10px;}
+
+/*hr {clear:left;border:0;height:0;background: rgba(0,0,0,0.1);margin:10px 0;}*/
