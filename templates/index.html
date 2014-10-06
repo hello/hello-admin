@@ -1,96 +1,24 @@
 <html>
 <head>
-    <title></title>
-    <style type="text/css">
-    form{padding:20px;border:1px solid #d4d4d4;}
-    .success{background:#CDD973;padding:5px;}
-    .fail{background:#BF4346;padding:5px;}
-    </style>
+    <title>Hello Admin tool</title>
+    <script src="/static/js/jquery-1.11.1.min.js"></script>
+    <script src="/static/js/react-0.11.2.js"></script>
+    <script src="/static/js/JSXTransformer-0.11.2.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
 </head>
 <body>
+<div id="header"> </div>
 
-{%if message %}
-<div class="success">    
-{{message}}
+<div class="row">
+    <div id="token"></div>
+    <div id="account"></div>
 </div>
-{% endif %}
-{%if error %}
-<div class="fail">    
-{{error}}
-</div>
-{% endif %}
-<form method="POST" action="/access_token">
-    <h3>Generate access token</h3>
-    <p>
-        <select name="client_id">
-        {% for application in applications %}
-        <option value={{application.client_id}}>{{application.name}} - {{application.scopes}}</option>
-        {% endfor %}
-        </select>
-    </p>
-    <p>
-        <input type="text" id="username_input" name="username" value="tim@sayhello.com" placeholder="someone@sayhello.com" />
-    </p>
-    <p>
-        <input type="password" id="password_input" name="password" value="tim" placeholder="super secure" autocomplete="off"/>
-    </p>
-    <p>
-        <input type="submit" value="Generate access token" />
-    </p>
-    {% if access_token %}
-        <div class="success"> {{access_token}}</div>
-    {% endif %}
-</form>
 
 
-<form method="POST" action="/create_account">
-    <h3>Create account</h3>
+<script type="text/jsx" src="/static/js/token.js"></script>
+<script type="text/jsx" src="/static/js/account.js"></script>
 
-    <p>
-        <input type="text" id="name" name="name" value="" placeholder="firstname lastname" />
-    </p>
-    <p>
-        <input type="text" id="email_input" name="email" value="" placeholder="someone@sayhello.com" />
-    </p>
-    <p>
-        <input type="password" id="password_input" name="password" placeholder="super secure" autocomplete="off"/>
-    </p>
-    <p>
-        <select name="gender">
-            <option value="FEMALE">female</option>
-            <option value="MALE">male</option>
-            <option value="OTHER">other</option>
-        </select>
-    </p>
-    
-    <input type="hidden" name="height" value="0" />
-    <input type="hidden" name="weight" value="0" />
-    
-    <p>
-        <select name="tz">
-            <option value="-252000">America/Los_Angeles</option>
-        </select>
-    </p>
-    
-    <p>
-        <input type="submit" value="Create account" />
-    </p>
-</form>
-
-<form method="POST" action="/register_pill">
-    <h3>Register pill</h3>
-
-    <p>
-        <input type="text" id="pill_id" name="pill_id" value="" placeholder="pill id" />
-    </p>
-    <p>
-        <input type="text" id="account_id" name="account_id" value="" placeholder="account id" />
-    </p>
-    
-    <p>
-        <input type="submit" value="Register pill" />
-    </p>
-</form>
 
 <p><a href="/update"> Update access token</a></p>
 <p><a href="/charts"> See charts</a></p>
