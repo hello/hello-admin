@@ -25,7 +25,7 @@ import os
 import datetime as dt
 import urllib
 from rauth import OAuth2Service
-import requests
+
 
 class AppInfo(ndb.Model):
     client_id = ndb.StringProperty(required=True)
@@ -47,7 +47,10 @@ class BaseRequestHandler(webapp2.RequestHandler):
     def display_error(self, error_message, status_code=500):
         template = JINJA_ENVIRONMENT.get_template('templates/error.html')
         self.error(status_code)
-        template_values = {'error_message' : error_message, 'status_code': status_code}
+        template_values = {
+            'error_message': error_message,
+            'status_code': status_code
+        }
         self.response.write(template.render(template_values))
         return
 
@@ -71,17 +74,19 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 def make_oauth2_service(app_info_model):
     service = OAuth2Service(
-        client_id= app_info_model.client_id,
+        client_id=app_info_model.client_id,
         client_secret='',
         name='hello',
-        authorize_url= app_info_model.endpoint + 'oauth2/authorize',
-        access_token_url= app_info_model.endpoint + 'oauth2/token',
-        base_url=app_info_model.endpoint)
+        authorize_url=app_info_model.endpoint + 'oauth2/authorize',
+        access_token_url=app_info_model.endpoint + 'oauth2/token',
+        base_url=app_info_model.endpoint
+    )
     return service
 
 
 def get_most_recent_tokens(n=10):
     return AccessToken.query_tokens()
+
 
 class MainHandler(BaseRequestHandler):
     def get(self):
@@ -96,33 +101,37 @@ class MainHandler(BaseRequestHandler):
             return
 
         hello = make_oauth2_service(app_info_model)
-        headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+        headers = {
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+        }
 
         session = hello.get_session(app_info_model.access_token)
         resp = session.get('applications', headers=headers)
 
         template_values = {
-            'applications' : resp.json(),
-            'access_token' : access_token,
-            'error' : error_message, 
+            'applications': resp.json(),
+            'access_token': access_token,
+            'error': error_message
         }
 
         if resp.status_code != 200:
             err = resp.json()
-            template_values['error'] = "API CALL %s - HTTP %s. Check the logs for details." % (err['code'], err['message'])
+            template_values['error'] = "API CALL %s - HTTP %s. Check the logs \
+                 for details." % (err['code'], err['message'])
 
         template = JINJA_ENVIRONMENT.get_template('templates/index.html')
         self.response.write(template.render(template_values))
 
+
 class CreateTokenHandler(BaseRequestHandler):
     def post(self):
-        username = self.request.get("username", default_value="tim@sayhello.com")
+        username = self.request.get("username", default_value="x@sayhello.com")
         password = self.request.get("password", default_value="tim")
         client_id = self.request.get('client_id', default_value="unknown")
-        
+
         logging.info(username)
 
-        
         app_info_model = AppInfo.get_by_id(settings.ENVIRONMENT)
 
         if app_info_model is None:
@@ -130,16 +139,17 @@ class CreateTokenHandler(BaseRequestHandler):
             self.response.write("Missing AppInfo. Bailing.")
             return
 
-        # override here because we want to generate a token for a given app, not necessarily the admin one
+        # override here because we want to generate a token for a given app,
+        # not necessarily the admin one
         app_info_model.client_id = client_id
         hello = make_oauth2_service(app_info_model)
 
         data = {
-            "grant_type" : "password",
-            "client_id" : app_info_model.client_id,
-            "client_secret" : '',
-            "username" : username,
-            "password" : password
+            "grant_type": "password",
+            "client_id": app_info_model.client_id,
+            "client_secret": '',
+            "username": username,
+            "password": password
         }
 
         resp = hello.get_raw_access_token(data=data)
@@ -151,6 +161,7 @@ class CreateTokenHandler(BaseRequestHandler):
             logging.error("Failed to decode JSON. Bailing")
             logging.error("For username: %s" % username)
             logging.error("Json was: %s" % resp.content)
+            logging.error("Error was: %s" % e)
             self.error(500)
             return
         logging.warn(resp.content)
@@ -167,22 +178,27 @@ class CreateTokenHandler(BaseRequestHandler):
             return
 
         access_token = json_data['access_token']
-        session = hello.get_session(access_token)
+        # session = hello.get_session(access_token)
         # account_resp = session.get('account')
         # if account_resp.status_code != 200:
         #     logging.error("Could not fetch account info")
-        #     logging.error("Status code was: %s and response was: %s" % (account_resp.status_code, account_resp.content))
+        #     logging.error("Status code was: %s and response was: %s" \
+        #    % (account_resp.status_code, account_resp.content))
         #     self.error(500)
         #     return
 
-        template_values = {
-            'message': "Access token = %s" % access_token
-        }
-        token = AccessToken(username=username, token=access_token, app=client_id)
+        # template_values = {
+        #     'message': "Access token = %s" % access_token
+        # }
+        token = AccessToken(
+            username=username,
+            token=access_token,
+            app=client_id
+        )
         token.put()
         # template = JINJA_ENVIRONMENT.get_template('templates/index.html')
         # self.response.write(template.render(template_values))
-        self.redirect('/?' + urllib.urlencode({'access_token' : access_token}))
+        self.redirect('/?' + urllib.urlencode({'access_token': access_token}))
 
 
 class CreateAccountHandler(BaseRequestHandler):
@@ -194,7 +210,6 @@ class CreateAccountHandler(BaseRequestHandler):
         height = self.request.get("height")
         weight = self.request.get("weight")
         tz = self.request.get("tz")
-
 
         data = {
             "name": name,
@@ -212,8 +227,10 @@ class CreateAccountHandler(BaseRequestHandler):
             self.response.write(json.dumps(data))
             return
 
-        
-        headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+        headers = {
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+        }
 
         info_query = AppInfo.query().order(-AppInfo.created)
         results = info_query.fetch(1)
@@ -226,7 +243,7 @@ class CreateAccountHandler(BaseRequestHandler):
 
         app_info_model = results[0]
         hello = make_oauth2_service(app_info_model)
-        
+
         session = hello.get_session(app_info_model.access_token)
         logging.info("Submitting data")
         logging.info(data)
@@ -238,22 +255,34 @@ class CreateAccountHandler(BaseRequestHandler):
 
         template_values = {}
         if resp.status_code == 409:
-            template_values['error'] = '[HTTP %s] Account already exists. Response: %s ' % (resp.status_code, resp.content)
+            template_values['error'] = '[HTTP %s] Account already exists.\
+             Response: %s ' % (resp.status_code, resp.content)
         elif resp.status_code == 200:
             template_values['message'] = "User %s created successfully" % email
         else:
-            template_values['error'] = '[HTTP %s] Response: %s ' % (resp.status_code, resp.content)
+            template_values['error'] = '[HTTP %s] Response: %s' \
+                % (resp.status_code, resp.content)
 
         template = JINJA_ENVIRONMENT.get_template('templates/index.html')
         self.response.write(template.render(template_values))
 
+
 class CreateApplicationHandler(BaseRequestHandler):
     def get(self):
 
-        admin_user = AdminUser(id=settings.ENVIRONMENT, username='username', password='password')
+        admin_user = AdminUser(
+            id=settings.ENVIRONMENT,
+            username='username',
+            password='password'
+        )
         admin_user.put()
 
-        app_info = AppInfo(id=settings.ENVIRONMENT, client_id = settings.CLIENT_ID, endpoint = 'updateme', access_token = 'updateme')
+        app_info = AppInfo(
+            id=settings.ENVIRONMENT,
+            client_id=settings.CLIENT_ID,
+            endpoint='updateme',
+            access_token='updateme'
+        )
         app_info.put()
 
 
@@ -264,13 +293,15 @@ class UpdateAdminAccessToken(BaseRequestHandler):
 
         if admin_user is None:
 
-            friendly_user_message = "User not found for id = %s" % settings.ENVIRONMENT
+            friendly_user_message = "User not found for id = %s" \
+                % settings.ENVIRONMENT
             logging.warn(friendly_user_message)
             self.display_error(friendly_user_message)
             return
 
         if app_info_model is None:
-            friendly_user_message = "AppInfo not found for id = %s" % settings.ENVIRONMENT
+            friendly_user_message = "AppInfo not found for id = %s" \
+                % settings.ENVIRONMENT
             logging.warn(friendly_user_message)
             self.display_error(friendly_user_message)
             return
@@ -278,31 +309,34 @@ class UpdateAdminAccessToken(BaseRequestHandler):
         hello = make_oauth2_service(app_info_model)
 
         data = {
-            "grant_type" : "password",
-            "client_id" : app_info_model.client_id,
-            "client_secret" : '',
-            "username" : admin_user.username,
-            "password" : admin_user.password
+            "grant_type": "password",
+            "client_id": app_info_model.client_id,
+            "client_secret": '',
+            "username": admin_user.username,
+            "password": admin_user.password
         }
 
         resp = hello.get_raw_access_token(data=data)
         logging.info(resp.url)
 
         if resp.status_code != 200:
-            logging.error("Status code %s for url = %s" % (resp.status_code, resp.url))
+            logging.error("Status code %s for url = %s"
+                          % (resp.status_code, resp.url))
             logging.error(data)
             logging.error("Response body = %s" % resp.content)
             logging.error("Redirecting to homepage with error message")
-            self.redirect('/?=%s' % (urllib.urlencode({'error_message' : 'Failed to generate access token'})))
+            params = {'error_message': 'Failed to generate access token'}
+            self.redirect('/?=%s' % (urllib.urlencode(params)))
             return
 
         try:
             json_data = json.loads(resp.content)
         except ValueError, e:
-            friendly_user_message = "Failed to decode JSON. Bailing" 
-            logging.error(user_message)
-            logging.error("For username: %s" % username)
+            friendly_user_message = "Failed to decode JSON. Bailing"
+            logging.error(friendly_user_message)
+            logging.error("For username: %s" % admin_user.username)
             logging.error("Json was: %s" % resp.content)
+            logging.error("Error was: %s", e)
 
             error_message = "%s - %s" % (friendly_user_message, resp.content)
             self.display_error(error_message)
@@ -317,7 +351,8 @@ class UpdateAdminAccessToken(BaseRequestHandler):
             return
 
         if 'access_token' not in json_data:
-            friendly_user_message = "The key access_token was not found in the response"
+            friendly_user_message = "The key access_token was not found \
+                in the response"
             logging.error(friendly_user_message)
             logging.error(resp.content)
             error_message = "%s - %s" % (friendly_user_message, resp.content)
@@ -327,7 +362,9 @@ class UpdateAdminAccessToken(BaseRequestHandler):
         access_token = json_data['access_token']
         app_info_model.access_token = access_token
         app_info_model.put()
-        logging.info("updated app (client_id = %s) successfully." % app_info_model.client_id)
+        msg = "updated app client_id = %s successfully." % \
+            app_info_model.client_id
+        logging.info(msg)
         self.redirect('/')
 
 
@@ -343,15 +380,25 @@ class RegisterPillHandler(BaseRequestHandler):
             self.response.write("Missing AppInfo. Bailing.")
             return
 
-        headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+        headers = {
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+        }
         app_info_model = results[0]
         hello = make_oauth2_service(app_info_model)
-        
+
         session = hello.get_session(app_info_model.access_token)
-        data = dict(pill_id=self.request.get('pill_id'), account_id=self.request.get('account_id'))
+        data = dict(
+            pill_id=self.request.get('pill_id'),
+            account_id=self.request.get('account_id')
+        )
         logging.info(data)
 
-        resp = session.post('devices/pill', data=json.dumps(data), headers=headers)
+        resp = session.post(
+            'devices/pill',
+            data=json.dumps(data),
+            headers=headers
+        )
         if resp.status_code not in [200, 204]:
             logging.error("%s - %s", resp.status_code, resp.content)
             error_message = "%s" % (resp.content)
@@ -360,17 +407,18 @@ class RegisterPillHandler(BaseRequestHandler):
 
         self.redirect('/')
 
+
 class ChartHandler(BaseRequestHandler):
     def get(self):
         template = JINJA_ENVIRONMENT.get_template('templates/charts.html')
         tokens = get_most_recent_tokens()
         day = dt.datetime.strftime(dt.datetime.now(), "%Y-%m-%d")
 
-        self.response.write(template.render({'tokens' : tokens, 'day' : day}))
+        self.response.write(template.render({'tokens': tokens, 'day': day}))
+
 
 class ProxyHandler(BaseRequestHandler):
     def get(self, path):
-        
         data = []
         info_query = AppInfo.query().order(-AppInfo.created)
         results = info_query.fetch(1)
@@ -381,10 +429,9 @@ class ProxyHandler(BaseRequestHandler):
             self.response.write("Missing AppInfo. Bailing.")
             return
 
-        headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
         app_info_model = results[0]
         hello = make_oauth2_service(app_info_model)
-        
+
         session = hello.get_session(self.request.get('access_token'))
 
         resp = session.get('/v1/' + path)
@@ -399,6 +446,13 @@ class ProxyHandler(BaseRequestHandler):
         segments = data[0]['segments']
         logging.info("Received %d segments" % len(segments))
         self.response.write(json.dumps(segments))
+
+
+class HomeRequestHandler(webapp2.RequestHandler):
+    def get(self):
+        template = JINJA_ENVIRONMENT.get_template('templates/home.html')
+
+        self.response.write(template.render({}))
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
