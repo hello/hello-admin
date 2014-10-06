@@ -3,6 +3,14 @@
 
 
 var AccountForm = React.createClass({
+  getInitialState : function() {
+    return {'success' : false, 'failure' : false}
+  },
+  
+  fade : function() {
+    this.setState({'failure' : false, 'success': false})
+  },
+
   handleSubmit: function(e) {
     e.preventDefault();
     var name = this.refs.name.getDOMNode().value.trim();
@@ -19,20 +27,23 @@ var AccountForm = React.createClass({
       return;
     }
 
-
     $.ajax({
       url: this.props.url,
       dataType: 'json',
       type: 'POST',
       data: {name:name,email:email,password:password,gender:gender,height:height,weight:weight,tz:tz},
       success: function(data) {
-        alert("boom");
         this.refs.name.getDOMNode().value = '';
         this.refs.email.getDOMNode().value = '';
         this.refs.password.getDOMNode().value = '';
+        this.setState({'success' : true})
+        setTimeout(this.fade, 2000);
+
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(this.props.url, status, err.toString());
+        this.setState({'failure' : true})
+        setTimeout(this.fade, 2000);
       }.bind(this)
     });
 
@@ -42,9 +53,18 @@ var AccountForm = React.createClass({
 
 
   render: function() {
+
+    var cx = React.addons.classSet;
+    var classes = cx({
+      'accountForm': true,
+      'success': this.state.success,
+      'failure' : this.state.failure,
+      'normal' : !this.state.success && !this.state.failure
+    });
+  
     return (
 
-      <form className="accountForm" onSubmit={this.handleSubmit}>
+      <form className={classes} onSubmit={this.handleSubmit}>
         <p>
           <input type="text" placeholder="firstname lastname" ref="name"/>
         </p>
@@ -72,8 +92,9 @@ var AccountForm = React.createClass({
         </p>
     
         <p>
-          <input type="submit" value="Create account" />
+          <input type="submit" value="Create account" /> {this.state.success}
         </p>
+        
       </form>
     );
   }

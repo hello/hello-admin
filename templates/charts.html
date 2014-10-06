@@ -43,11 +43,10 @@
             var dataView = new google.visualization.DataTable();
             dataView.addColumn('date', 'minutes');
             dataView.addColumn('number', 'Sleep depth');
-            var rows =[];
-            console.log(msg.length);
+            var rows = [];
             for(var i=0; i < msg.length; i++) {
                 var local_ts = msg[i]['timestamp'];
-                rows.push([new Date(local_ts), Math.max(1, msg[i]['sleep_depth'])]);
+                rows.push([new Date(local_ts), msg[i]['sleep_depth']]);
             }
             dataView.addRows(rows);
 

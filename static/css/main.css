@@ -1,8 +1,21 @@
-body{background:#f2f7fb;font-family: 'Helvetica Neue', arial; color:#396f97}
+body{background:#f2f7fb;font-family: 'Helvetica Neue', arial; color:#396f97;padding:0;margin:0;}
 #content{width:400px;}
 .row{overflow: hidden;background: white;}
 #token, #account{width:45%;float:left;}
 .tokenBox,.accountBox{background:white;padding:10px;}
-.tokenForm,.accountForm{background:#f2f7fb;border:1px solid rgba(0,0,0,0.1);padding: 10px;}
+.tokenForm,.accountForm{background:#f2f7fb;padding: 10px;border-radius: 5px;}
+#header{background:#475f7d;padding:10px;color:#f2f7fb;text-align: right;}
+#header a {margin-left: 10px;}
+
+.normal {border:1px solid rgba(0,0,0,0.1);transition: all 1s;}
+.success{
+    border:1px solid #61c4bd;
+    transition: all 1s ease-in;
+}
+
+.failure{
+ border:1px solid #ce4c40;
+ transition: all 1s ease-in;
+}
 
 /*hr {clear:left;border:0;height:0;background: rgba(0,0,0,0.1);margin:10px 0;}*/

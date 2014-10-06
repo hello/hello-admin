@@ -34,7 +34,10 @@ var ApplicationForm = React.createClass({
     });
   },
   getInitialState: function() {
-    return {data: [{name:'Loading...',value:''}], username: ''};
+    return {data: [{name:'Loading...',value:''}], username: '', success : false, failure: false, token :'Token will appear here'};
+  },
+  fade : function() {
+    this.setState({'failure' : false, 'success': false})
   },
   componentDidMount: function() {
     this.loadCommentsFromServer();
@@ -48,9 +51,25 @@ var ApplicationForm = React.createClass({
     if (!username || !password) {
       return;
     }
+
     var stuff = {username: username, password: password, client_id:client_id}
     this.setState(stuff)
-    this.props.onCommentSubmit(stuff);
+    
+    $.ajax({
+      url: this.props.url,
+      dataType: 'json',
+      type: 'POST',
+      data: stuff,
+      success: function(data) {
+        this.setState({token: data, success : true});
+        setTimeout(this.fade, 2000);
+      }.bind(this),
+      error: function(xhr, status, err) {
+        this.setState({token: 'error generating token. check the credentials for', failure: true})
+        setTimeout(this.fade, 2000);
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });
     this.refs.username.getDOMNode().value = '';
     this.refs.password.getDOMNode().value = '';
     return;
@@ -58,16 +77,24 @@ var ApplicationForm = React.createClass({
 
 
   render: function() {
+
+
+    var cx = React.addons.classSet;
+    var classes = cx({
+      'tokenForm': true,
+      'success': this.state.success,
+      'failure' : this.state.failure,
+      'normal' : !this.state.success && !this.state.failure
+    });
+
     return (
-      <div>
-      <form className="tokenForm" onSubmit={this.handleSubmit}>
+      <form className={classes} onSubmit={this.handleSubmit}>
         <ApplicationList data={this.state.data} ref="apps" />
         <input type="text" placeholder="username@email.com" ref="username" />
         <input type="text" placeholder="your password" ref="password"/>
         <input type="submit" value="Post" />
+        <p>{this.state.token} {this.state.username}</p>
       </form>
-      <p>{this.props.token} {this.state.username}</p>
-      </div>
     );
   }
 });
@@ -82,35 +109,12 @@ var Application = React.createClass({
 
 
 var ApplicationBox = React.createClass({
-  getInitialState : function() {
-    return {token : 'Token will appear here'}
-  },
-  handleCommentSubmit: function(comment) {
-
-    // var comments = this.state.data;
-    // var newComments = comments.concat([comment]);
-    // this.setState({data: newComments});
-
-    $.ajax({
-      url: this.props.url,
-      dataType: 'json',
-      type: 'POST',
-      data: comment,
-      success: function(data) {
-        this.setState({token: data});
-        this.props.token = this.state.token
-      }.bind(this),
-      error: function(xhr, status, err) {
-        this.setState({token: 'error generating token. check the credentials'})
-        console.error(this.props.url, status, err.toString());
-      }.bind(this)
-    });
-  },
+  
   render: function() {
     return (
       <div className="tokenBox">
         <h2>Token</h2>
-        <ApplicationForm onCommentSubmit={this.handleCommentSubmit} url={this.props.url} token={this.state.token}/>
+        <ApplicationForm url={this.props.url} />
       </div>
     );
   }

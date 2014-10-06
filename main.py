@@ -18,6 +18,7 @@ import webapp2
 import jinja2
 
 from google.appengine.ext import ndb
+from google.appengine.api import users
 import settings
 import json
 import logging
@@ -25,6 +26,7 @@ import os
 import datetime as dt
 import urllib
 from rauth import OAuth2Service
+import copy
 
 
 class AppInfo(ndb.Model):
@@ -53,6 +55,28 @@ class BaseRequestHandler(webapp2.RequestHandler):
         }
         self.response.write(template.render(template_values))
         return
+
+    def _extra_context(self, context):
+        extras = {
+            "logout_url": users.create_logout_url('/'),
+            "user": self.current_user
+        }
+
+        context.update(extras)
+        return context
+
+    def render(self, template_file, template_values=None):
+        context = {} if template_values is None else copy.copy(template_values)
+        template = JINJA_ENVIRONMENT.get_template(template_file)
+        return template.render(self._extra_context(context))
+
+    def render_to_response(self, template_file, context={}):
+        s = self.render(template_file, template_values=context)
+        self.response.out.write(s)
+
+    @property
+    def current_user(self):
+        return users.get_current_user()
 
 
 class AccessToken(ndb.Model):
@@ -90,9 +114,7 @@ def get_most_recent_tokens(n=10):
 
 class MainHandler(BaseRequestHandler):
     def get(self):
-        template_values = {}
-        template = JINJA_ENVIRONMENT.get_template('templates/index.html')
-        self.response.write(template.render(template_values))
+        self.render_to_response('templates/index.html')
 
 
 class CreateTokenHandler(BaseRequestHandler):
@@ -241,7 +263,7 @@ class CreateAccountHandler(BaseRequestHandler):
         else:
             template_values['error'] = '[HTTP %s] Response: %s' \
                 % (resp.status_code, resp.content)
-
+        self.error(resp.status_code)
         self.response.write(json.dumps(template_values))
 
 

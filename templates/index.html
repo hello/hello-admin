@@ -2,13 +2,13 @@
 <head>
     <title>Hello Admin tool</title>
     <script src="/static/js/jquery-1.11.1.min.js"></script>
-    <script src="/static/js/react-0.11.2.js"></script>
+    <script src="/static/js/react-with-addons-0.11.2.min.js"></script>
     <script src="/static/js/JSXTransformer-0.11.2.js"></script>
     
     <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
 </head>
 <body>
-<div id="header"> </div>
+<div id="header"> Welcome {{user.email()}} <a href="{{logout_url}}">Logout</a></div>
 
 <div class="row">
     <div id="token"></div>
