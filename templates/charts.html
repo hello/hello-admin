@@ -5,11 +5,17 @@
     form{padding:20px;border:1px solid #d4d4d4;}
     .success{background:#CDD973;padding:5px;}
     .fail{background:#BF4346;padding:5px;}
+    #object{background:red; height:10px;width:100px;}
+    #mouseoverdiv{font-family: 'Helvetica Neue';font-size: 12px; color:rgba(0,0,0,0.4);text-align: left;}
+    #mouseoverdiv div {border-top:1px solid rgba(0,0,0,0.1);width:300px;}
+    .light {background: #c6dbf1;width:30%; color:"white";}
+    .medium {background: #c0d7ee;width:70%;color:"white";}
+    .high {background: #bccde8;width:100%;color:"white";}
     </style>
 </head>
 <body>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<!-- <script type="text/javascript" src="https://www.google.com/jsapi"></script> -->
 <script type="text/javascript">
 
       // Load the Visualization API and the piechart package.
@@ -32,6 +38,46 @@
           });
       }
 
+  // function drawGraph(form_data) {
+  //   var jqhxr = $.ajax(
+  //       {
+  //         url : '/proxy/timeline/' + $('#chart-day').val(),
+  //         data: form_data,
+  //         dataType: "json",
+  //         success: function(msg) {
+
+  //           var dataView = new google.visualization.DataTable();
+  //           dataView.addColumn('date', 'minutes');
+  //           dataView.addColumn('number', 'Sleep depth');
+  //           var rows = [];
+  //           for(var i=0; i < msg.length; i++) {
+  //               var local_ts = msg[i]['timestamp'];
+  //               rows.push([new Date(local_ts), msg[i]['sleep_depth']]);
+  //           }
+  //           dataView.addRows(rows);
+
+  //           var options = {
+  //             hAxis: {format: 'MMM dd, y'}
+  //           };
+
+  //           // Format the data
+  //           var formatter = new google.visualization.DateFormat({pattern:'EEEE, MM d, HH:mm'});
+  //           formatter.format(dataView,0);
+
+  //           barsVisualization = new google.visualization.ColumnChart(document.getElementById('mouseoverdiv'));
+  //           // dataView.setColumns([{calc: function(data, row) { return data.getFormattedValue(row, 0); }, type:'string'}, 1]);
+  //           barsVisualization.draw(dataView, options);
+
+  //           // Add our over/out handlers.
+  //           google.visualization.events.addListener(barsVisualization, 'onmouseover', barMouseOver);
+  //           google.visualization.events.addListener(barsVisualization, 'onmouseout', barMouseOut);
+  //     },
+  //     error: function(jqxhr, text, blah) {
+  //       alert("Failed: " + blah);
+  //     }
+  //   }); 
+  // };
+
   function drawGraph(form_data) {
     var jqhxr = $.ajax(
         {
@@ -40,31 +86,36 @@
           dataType: "json",
           success: function(msg) {
 
-            var dataView = new google.visualization.DataTable();
-            dataView.addColumn('date', 'minutes');
-            dataView.addColumn('number', 'Sleep depth');
-            var rows = [];
             for(var i=0; i < msg.length; i++) {
                 var local_ts = msg[i]['timestamp'];
-                rows.push([new Date(local_ts), msg[i]['sleep_depth']]);
+                var sleep_depth = msg[i]['sleep_depth'];
+                var dt = new Date(local_ts);
+                
+                var eventType = (msg[i]['event_type'] == null) ? '' : '[' + msg[i]['event_type'] +']';
+                var scale = (eventType == '') ? 20 : 10;
+                
+
+                className = "light";
+                if(sleep_depth == 100) {
+                  className = "high"
+                } else if (sleep_depth > 50) {
+                  className = "medium";
+                }
+                
+                $('<div/>', {
+                  id: 'foo-' + i,
+                  height: Math.max(msg[i]['duration']/scale, 15),
+                  width: sleep_depth * 10,
+                  'data-duration': msg[i]['duration']/60,
+                  'class': className,
+                  text: dt.getHours() + ":" + ((dt.getMinutes() < 9) ? "0" + dt.getMinutes() : dt.getMinutes()) + " " + eventType,
+                  
+                }).appendTo('#mouseoverdiv');
             }
-            dataView.addRows(rows);
 
-            var options = {
-              hAxis: {format: 'MMM dd, y'}
-            };
-
-            // Format the data
-            var formatter = new google.visualization.DateFormat({pattern:'EEEE, MM d, HH:mm'});
-            formatter.format(dataView,0);
-
-            barsVisualization = new google.visualization.ColumnChart(document.getElementById('mouseoverdiv'));
-            // dataView.setColumns([{calc: function(data, row) { return data.getFormattedValue(row, 0); }, type:'string'}, 1]);
-            barsVisualization.draw(dataView, options);
-
-            // Add our over/out handlers.
-            google.visualization.events.addListener(barsVisualization, 'onmouseover', barMouseOver);
-            google.visualization.events.addListener(barsVisualization, 'onmouseout', barMouseOut);
+            $('#mouseoverdiv div').click(function() {
+              alert($(this).data('duration'));
+            })
       },
       error: function(jqxhr, text, blah) {
         alert("Failed: " + blah);
