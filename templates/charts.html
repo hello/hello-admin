@@ -11,11 +11,11 @@
     .light {background: #c6dbf1;width:30%; color:"white";}
     .medium {background: #c0d7ee;width:70%;color:"white";}
     .high {background: #bccde8;width:100%;color:"white";}
-    </style>
+</style>
 </head>
 <body>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<!-- <script type="text/javascript" src="https://www.google.com/jsapi"></script> -->
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript">
 
       // Load the Visualization API and the piechart package.
@@ -86,12 +86,19 @@
           dataType: "json",
           success: function(msg) {
 
-            for(var i=0; i < msg.length; i++) {
-                var local_ts = msg[i]['timestamp'];
-                var sleep_depth = msg[i]['sleep_depth'];
+
+            console.log(msg)
+
+            $('#score').text("Score: " + msg['score']);
+            $('#message').text("Score: " + msg['message']);
+
+            for(var i=0; i < msg['segments'].length; i++) {
+                var segment = msg['segments'][i]
+                var local_ts = segment['timestamp'];
+                var sleep_depth = segment['sleep_depth'];
                 var dt = new Date(local_ts);
                 
-                var eventType = (msg[i]['event_type'] == null) ? '' : '[' + msg[i]['event_type'] +']';
+                var eventType = (segment['event_type'] == null) ? '' : '[' + segment['event_type'] +']';
                 var scale = (eventType == '') ? 20 : 10;
                 
 
@@ -104,9 +111,9 @@
                 
                 $('<div/>', {
                   id: 'foo-' + i,
-                  height: Math.max(msg[i]['duration']/scale, 15),
+                  height: Math.max(segment['duration']/scale, 15),
                   width: sleep_depth * 10,
-                  'data-duration': msg[i]['duration']/60,
+                  'data-duration': segment['duration']/60,
                   'class': className,
                   text: dt.getHours() + ":" + ((dt.getMinutes() < 9) ? "0" + dt.getMinutes() : dt.getMinutes()) + " " + eventType,
                   
@@ -133,6 +140,8 @@
   }
 
 </script>
+
+
 <form id="chart-form">
   <select id="access_token" name="access_token">
   {% for token in tokens: %}
@@ -140,9 +149,12 @@
   {% endfor %}
 </select>
   <!-- <input type="text" name="access_token" id="access_token" placeholder="access token" value="" /> -->
-  <input type="text" id="chart-day" name="day" placeholder="2014-09-08" value="{{day}}" />
+  <input type="text" id="chart-day" name="day" placeholder="2014-09-22" value="{{day}}" />
   <input type="submit" id="submit" value="show data" disabled="disabled"/>
 </form>
+<div id="score"></div>
+<div id="message"></div>
+
 <div id="mouseoverdiv"></div>
 </body>
 </html>

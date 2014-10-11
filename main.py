@@ -443,8 +443,8 @@ class ProxyHandler(BaseRequestHandler):
         logging.info(resp.status_code)
         data = resp.json()
         logging.info(data)
-        segments = data[0]['segments']
-        logging.info("Received %d segments" % len(segments))
+        segments = data[0]
+        logging.info("Received %d segments" % len(segments['segments']))
         self.response.write(json.dumps(segments))
 
 
