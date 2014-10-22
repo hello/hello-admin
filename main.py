@@ -16,30 +16,21 @@
 #
 import webapp2
 import jinja2
-
-from google.appengine.ext import ndb
-from google.appengine.api import users
+import copy
 import settings
 import json
 import logging
 import os
 import datetime as dt
 import urllib
+from google.appengine.api import users
 from rauth import OAuth2Service
-import copy
+from models import AppInfo, AdminUser, AccessToken, User
 
-
-class AppInfo(ndb.Model):
-    client_id = ndb.StringProperty(required=True)
-    endpoint = ndb.StringProperty(required=True)
-    access_token = ndb.StringProperty(required=True)
-    created = ndb.DateTimeProperty(auto_now_add=True)
-
-
-class AdminUser(ndb.Model):
-    username = ndb.StringProperty(required=True)
-    password = ndb.StringProperty(required=True)
-    created = ndb.DateTimeProperty(auto_now_add=True)
+JINJA_ENVIRONMENT = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions=['jinja2.ext.autoescape'],
+    autoescape=True)
 
 
 class BaseRequestHandler(webapp2.RequestHandler):
@@ -77,23 +68,6 @@ class BaseRequestHandler(webapp2.RequestHandler):
     @property
     def current_user(self):
         return users.get_current_user()
-
-
-class AccessToken(ndb.Model):
-    username = ndb.StringProperty(required=True)
-    app = ndb.StringProperty(required=True)
-    token = ndb.StringProperty(required=True)
-    created = ndb.DateTimeProperty(auto_now_add=True)
-
-    @classmethod
-    def query_tokens(cls):
-        return cls.query().order(-cls.created).fetch(20)
-
-
-JINJA_ENVIRONMENT = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
-    extensions=['jinja2.ext.autoescape'],
-    autoescape=True)
 
 
 def make_oauth2_service(app_info_model):
@@ -269,7 +243,6 @@ class CreateAccountHandler(BaseRequestHandler):
 
 class CreateApplicationHandler(BaseRequestHandler):
     def get(self):
-
         admin_user = AdminUser(
             id=settings.ENVIRONMENT,
             username='username',
@@ -281,6 +254,24 @@ class CreateApplicationHandler(BaseRequestHandler):
             id=settings.ENVIRONMENT,
             client_id=settings.CLIENT_ID,
             endpoint='updateme',
+            access_token='updateme'
+        )
+        app_info.put()
+
+
+class CreateApplicationAgainstProdHandler(BaseRequestHandler):
+    def get(self):
+        admin_user = AdminUser(
+            id='dev',
+            username='replace me with a real user',
+            password='with with correct pw'
+        )
+        admin_user.put()
+
+        app_info = AppInfo(
+            id='dev',
+            client_id=settings.PROD_CLIENT,
+            endpoint=settings.PROD_API,
             access_token='updateme'
         )
         app_info.put()
@@ -448,13 +439,29 @@ class ProxyHandler(BaseRequestHandler):
         self.response.write(json.dumps(segments))
 
 
-app = webapp2.WSGIApplication([
-    ('/', MainHandler),
-    ('/access_token', CreateTokenHandler),
-    ('/create_account', CreateAccountHandler),
-    ('/register_pill', RegisterPillHandler),
-    ('/create/app', CreateApplicationHandler),
-    ('/update', UpdateAdminAccessToken),
-    ('/charts', ChartHandler),
-    ('/proxy/(.*)', ProxyHandler),
-], settings.DEBUG)
+class UserDashboardHandler(BaseRequestHandler):
+    def get(self):
+        ## For testing only
+        # user = User(name='Long1', email='long@long.com')
+        # user.put()
+        info_query = AppInfo.query().order(-AppInfo.created)
+        results = info_query.fetch(1)
+        logging.info("Querying datastore for most recent AppInfo")
+
+        if not results:
+            self.error(500)
+            self.response.write("Missing AppInfo. Bailing.")
+            return
+
+        app_info_model = results[0]
+        hello = make_oauth2_service(app_info_model)
+        session = hello.get_session(app_info_model.access_token)
+        response = session.get("/account/q", params={'email': 'long@long.com'})
+        template = JINJA_ENVIRONMENT.get_template('templates/user_dashboard.html')
+        if response.status_code == 200:
+            logging.info(response.content)
+            data = {'random_users': response.json(), 'error': ''}
+            logging.info('success')
+        else:
+            data = {'random_users': [], 'error': '{}: fail to retrieve users'.format(response.status_code)}
+            self.response.write(template.render(data))

@@ -66,13 +66,13 @@ var AccountForm = React.createClass({
 
       <form className={classes} onSubmit={this.handleSubmit}>
         <p>
-          <input type="text" placeholder="firstname lastname" ref="name"/>
+          <input type="text" placeholder="firstname lastname" ref="name" className="form-control"/>
         </p>
         <p>
-          <input type="text" placeholder="someone@sayhello.com" ref="email"/>
+          <input type="text" placeholder="someone@sayhello.com" ref="email" className="form-control"/>
         </p>
         <p>
-          <input type="password" placeholder="super secure"  ref="password"/>
+          <input type="password" placeholder="super secure"  ref="password" className="form-control"/>
         </p>
         <p>
           <select ref="gender">
@@ -92,7 +92,7 @@ var AccountForm = React.createClass({
         </p>
     
         <p>
-          <input type="submit" value="Create account" /> {this.state.success}
+          <input type="submit" value="Create account" className="btn btn-default"/> {this.state.success}
         </p>
         
       </form>

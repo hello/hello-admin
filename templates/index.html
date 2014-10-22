@@ -4,23 +4,33 @@
     <script src="/static/js/jquery-1.11.1.min.js"></script>
     <script src="/static/js/react-with-addons-0.11.2.min.js"></script>
     <script src="/static/js/JSXTransformer-0.11.2.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/underscore.min.js"></script>
     
     <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css" />
 </head>
 <body>
 <div id="header"> Welcome {{user.email()}} <a href="{{logout_url}}">Logout</a></div>
 
 <div class="row">
-    <div id="token"></div>
-    <div id="account"></div>
+    <div id="token" class="col-md-6"></div>
+    <div id="account" class="col-md-6"></div>
 </div>
 
+<div class="row">
+	<div id="search" class="col-md-11"></div>
+</div>
+<div class="tools">
+    <h2>Tools</h2>
+    <p><a href="/update"> Update access token</a></p>
+    <p><a href="/charts"> See charts</a></p>
+    <p><a href="/user_dashboard"> User dashboard</a></p>
+</div>
 
 <script type="text/jsx" src="/static/js/token.js"></script>
 <script type="text/jsx" src="/static/js/account.js"></script>
+<script type="text/jsx" src="/static/js/search.js"></script>
 
-
-<p><a href="/update"> Update access token</a></p>
-<p><a href="/charts"> See charts</a></p>
 </body>
 </html>
