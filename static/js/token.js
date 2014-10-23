@@ -90,9 +90,9 @@ var ApplicationForm = React.createClass({
     return (
       <form className={classes} onSubmit={this.handleSubmit}>
         <ApplicationList data={this.state.data} ref="apps" />
-        <input type="text" placeholder="username@email.com" ref="username" />
-        <input type="text" placeholder="your password" ref="password"/>
-        <input type="submit" value="Post" />
+        <input type="text" placeholder="username@email.com" ref="username" className="input-box form-control"/>
+        <input type="text" placeholder="your password" ref="password" className="input-box form-control"/>
+        <input type="submit" value="Post" className="btn btn-default"/>
         <p>{this.state.token} {this.state.username}</p>
       </form>
     );
