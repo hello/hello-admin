@@ -19,13 +19,14 @@ import jinja2
 import copy
 import settings
 import json
-import logging
+import logging as log
 import os
 import datetime as dt
 import urllib
 from google.appengine.api import users
 from rauth import OAuth2Service
-from models import AppInfo, AdminUser, AccessToken, User
+from models import AppInfo, AdminUser, AccessToken
+from helpers import display_error
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -82,6 +83,18 @@ def make_oauth2_service(app_info_model):
     return service
 
 
+def get_user(app_info_model):
+    service = OAuth2Service(
+        client_id=app_info_model.client_id,
+        client_secret='',
+        name='hello',
+        authorize_url=app_info_model.endpoint + 'oauth2/authorize',
+        access_token_url=app_info_model.endpoint + 'oauth2/token',
+        base_url=app_info_model.endpoint
+    )
+    return service
+
+
 def get_most_recent_tokens(n=10):
     return AccessToken.query_tokens()
 
@@ -94,7 +107,7 @@ class MainHandler(BaseRequestHandler):
 class CreateTokenHandler(BaseRequestHandler):
     def get(self):
         app_info_model = AppInfo.get_by_id(settings.ENVIRONMENT)
-        logging.info("Querying datastore for most recent AppInfo")
+        log.info("Querying datastore for most recent AppInfo")
 
         if app_info_model is None:
             self.error(500)
@@ -116,8 +129,7 @@ class CreateTokenHandler(BaseRequestHandler):
         password = self.request.get("password", default_value="x")
         client_id = self.request.get('client_id', default_value="unknown")
 
-        logging.info("username: %s, password:%s, client_id:%s"
-                     % (username, password, client_id))
+        log.info("username: %s, password:%s, client_id:%s" % (username, password, client_id))
 
         app_info_model = AppInfo.get_by_id(settings.ENVIRONMENT)
 
@@ -140,27 +152,27 @@ class CreateTokenHandler(BaseRequestHandler):
         }
 
         resp = hello.get_raw_access_token(data=data)
-        logging.info(resp.url)
+        log.info(resp.url)
 
         try:
             json_data = json.loads(resp.content)
         except ValueError, e:
-            logging.error("Failed to decode JSON. Bailing")
-            logging.error("For username: %s" % username)
-            logging.error("Json was: %s" % resp.content)
-            logging.error("Error was: %s" % e)
+            log.error("Failed to decode JSON. Bailing")
+            log.error("For username: %s" % username)
+            log.error("Json was: %s" % resp.content)
+            log.error("Error was: %s" % e)
             self.error(500)
             return
-        logging.warn(resp.content)
+        log.warn(resp.content)
         if not isinstance(json_data, dict):
-            logging.error("json_data is not a dict. bailing.")
-            logging.error(resp.content)
+            log.error("json_data is not a dict. bailing.")
+            log.error(resp.content)
             self.error(500)
             return
 
         if 'access_token' not in json_data:
-            logging.error("The key access_token was not found in the response")
-            logging.error(resp.content)
+            log.error("The key access_token was not found in the response")
+            log.error(resp.content)
             self.error(500)
             return
 
@@ -209,7 +221,7 @@ class CreateAccountHandler(BaseRequestHandler):
 
         info_query = AppInfo.query().order(-AppInfo.created)
         results = info_query.fetch(1)
-        logging.info("Querying datastore for most recent AppInfo")
+        log.info("Querying datastore for most recent AppInfo")
 
         if not results:
             self.error(500)
@@ -220,13 +232,13 @@ class CreateAccountHandler(BaseRequestHandler):
         hello = make_oauth2_service(app_info_model)
 
         session = hello.get_session(app_info_model.access_token)
-        logging.info("Submitting data")
-        logging.info(data)
+        log.info("Submitting data")
+        log.info(data)
         resp = session.post('account', data=json.dumps(data), headers=headers)
 
-        logging.info(resp.url)
-        logging.info(resp.status_code)
-        logging.info(resp.content)
+        log.info(resp.url)
+        log.info(resp.status_code)
+        log.info(resp.content)
 
         template_values = {}
         if resp.status_code == 409:
@@ -286,14 +298,14 @@ class UpdateAdminAccessToken(BaseRequestHandler):
 
             friendly_user_message = "User not found for id = %s" \
                 % settings.ENVIRONMENT
-            logging.warn(friendly_user_message)
+            log.warn(friendly_user_message)
             self.display_error(friendly_user_message)
             return
 
         if app_info_model is None:
             friendly_user_message = "AppInfo not found for id = %s" \
                 % settings.ENVIRONMENT
-            logging.warn(friendly_user_message)
+            log.warn(friendly_user_message)
             self.display_error(friendly_user_message)
             return
 
@@ -308,14 +320,13 @@ class UpdateAdminAccessToken(BaseRequestHandler):
         }
 
         resp = hello.get_raw_access_token(data=data)
-        logging.info(resp.url)
+        log.info(resp.url)
 
         if resp.status_code != 200:
-            logging.error("Status code %s for url = %s"
-                          % (resp.status_code, resp.url))
-            logging.error(data)
-            logging.error("Response body = %s" % resp.content)
-            logging.error("Redirecting to homepage with error message")
+            log.error("Status code %s for url = %s" % (resp.status_code, resp.url))
+            log.error(data)
+            log.error("Response body = %s" % resp.content)
+            log.error("Redirecting to homepage with error message")
             params = {'error_message': 'Failed to generate access token'}
             self.redirect('/?=%s' % (urllib.urlencode(params)))
             return
@@ -324,10 +335,10 @@ class UpdateAdminAccessToken(BaseRequestHandler):
             json_data = json.loads(resp.content)
         except ValueError, e:
             friendly_user_message = "Failed to decode JSON. Bailing"
-            logging.error(friendly_user_message)
-            logging.error("For username: %s" % admin_user.username)
-            logging.error("Json was: %s" % resp.content)
-            logging.error("Error was: %s", e)
+            log.error(friendly_user_message)
+            log.error("For username: %s" % admin_user.username)
+            log.error("Json was: %s" % resp.content)
+            log.error("Error was: %s", e)
 
             error_message = "%s - %s" % (friendly_user_message, resp.content)
             self.display_error(error_message)
@@ -335,8 +346,8 @@ class UpdateAdminAccessToken(BaseRequestHandler):
 
         if not isinstance(json_data, dict):
             friendly_user_message = "json_data is not a dict. bailing."
-            logging.error(friendly_user_message)
-            logging.error(resp.content)
+            log.error(friendly_user_message)
+            log.error(resp.content)
             error_message = "%s - %s" % (friendly_user_message, resp.content)
             self.display_error(error_message)
             return
@@ -344,8 +355,8 @@ class UpdateAdminAccessToken(BaseRequestHandler):
         if 'access_token' not in json_data:
             friendly_user_message = "The key access_token was not found \
                 in the response"
-            logging.error(friendly_user_message)
-            logging.error(resp.content)
+            log.error(friendly_user_message)
+            log.error(resp.content)
             error_message = "%s - %s" % (friendly_user_message, resp.content)
             self.display_error(error_message)
             return
@@ -355,7 +366,7 @@ class UpdateAdminAccessToken(BaseRequestHandler):
         app_info_model.put()
         msg = "updated app client_id = %s successfully." % \
             app_info_model.client_id
-        logging.info(msg)
+        log.info(msg)
         self.redirect('/')
 
 
@@ -364,7 +375,7 @@ class RegisterPillHandler(BaseRequestHandler):
 
         info_query = AppInfo.query().order(-AppInfo.created)
         results = info_query.fetch(1)
-        logging.info("Querying datastore for most recent AppInfo")
+        log.info("Querying datastore for most recent AppInfo")
 
         if not results:
             self.error(500)
@@ -383,7 +394,7 @@ class RegisterPillHandler(BaseRequestHandler):
             pill_id=self.request.get('pill_id'),
             account_id=self.request.get('account_id')
         )
-        logging.info(data)
+        log.info(data)
 
         resp = session.post(
             'devices/pill',
@@ -391,7 +402,7 @@ class RegisterPillHandler(BaseRequestHandler):
             headers=headers
         )
         if resp.status_code not in [200, 204]:
-            logging.error("%s - %s", resp.status_code, resp.content)
+            log.error("%s - %s", resp.status_code, resp.content)
             error_message = "%s" % (resp.content)
             self.display_error(error_message, status_code=resp.status_code)
             return
@@ -413,7 +424,7 @@ class ProxyHandler(BaseRequestHandler):
         data = []
         info_query = AppInfo.query().order(-AppInfo.created)
         results = info_query.fetch(1)
-        logging.info("Querying datastore for most recent AppInfo")
+        log.info("Querying datastore for most recent AppInfo")
 
         if not results:
             self.error(500)
@@ -429,39 +440,50 @@ class ProxyHandler(BaseRequestHandler):
         if resp.status_code != 200:
             self.error(resp.status_code)
             self.response.write(resp.content)
-            logging.error(resp.content)
+            log.error(resp.content)
             return
-        logging.info(resp.status_code)
+        log.info(resp.status_code)
         data = resp.json()
-        logging.info(data)
+        log.info(data)
         segments = data[0]
-        logging.info("Received %d segments" % len(segments['segments']))
+        log.info("Received %d segments" % len(segments['segments']))
         self.response.write(json.dumps(segments))
+
+
+class FetchUserAPI(BaseRequestHandler):
+    def get(self):
+        output = {'user_profile': {}, 'error': ''}
+        try:
+            email = self.request.get('email', default_value='long@sayhello.com')
+            log.info('EMAIL INPUT: {}'.format(email))
+            info_query = AppInfo.query().order(-AppInfo.created)
+            results = info_query.fetch(1)
+            log.info("Querying datastore for most recent AppInfo")
+
+            if not results:
+                self.error(500)
+                self.response.write("Missing AppInfo. Bailing.")
+                return
+
+            app_info_model = results[0]
+            hello = make_oauth2_service(app_info_model)
+            session = hello.get_session(app_info_model.access_token)
+            response = session.get("account/q", params={'email': email})
+            log.info(app_info_model)
+            log.info(response.url)
+
+            if response.status_code == 200:
+                log.info('SUCCESS - {}'.format(response.content))
+                output['user_profile'] = response.json()
+            else:
+                raise RuntimeError('{}: fail to retrieve user'.format(response.status_code))
+        except Exception as e:
+            output['error'] = display_error(e)
+        log.info('OUTPUT: {}'.format(output['user_profile']))
+        self.response.write(json.dumps(output))
 
 
 class UserDashboardHandler(BaseRequestHandler):
     def get(self):
-        ## For testing only
-        # user = User(name='Long1', email='long@long.com')
-        # user.put()
-        info_query = AppInfo.query().order(-AppInfo.created)
-        results = info_query.fetch(1)
-        logging.info("Querying datastore for most recent AppInfo")
-
-        if not results:
-            self.error(500)
-            self.response.write("Missing AppInfo. Bailing.")
-            return
-
-        app_info_model = results[0]
-        hello = make_oauth2_service(app_info_model)
-        session = hello.get_session(app_info_model.access_token)
-        response = session.get("/account/q", params={'email': 'long@long.com'})
         template = JINJA_ENVIRONMENT.get_template('templates/user_dashboard.html')
-        if response.status_code == 200:
-            logging.info(response.content)
-            data = {'random_users': response.json(), 'error': ''}
-            logging.info('success')
-        else:
-            data = {'random_users': [], 'error': '{}: fail to retrieve users'.format(response.status_code)}
-            self.response.write(template.render(data))
+        self.response.write(template.render({}))

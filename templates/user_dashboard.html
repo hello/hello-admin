@@ -1,22 +1,19 @@
 <html>
 <head>
     <title>Hello Admin tool</title>
-    <script src="/static/js/jquery-1.11.1.min.js"></script>
-    <script src="/static/js/react-with-addons-0.11.2.min.js"></script>
-    <script src="/static/js/JSXTransformer-0.11.2.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/underscore.min.js"></script>
+        <script src="/static/js/third-party/jquery-1.11.1.min.js"></script>
+        <script src="/static/js/third-party/react-with-addons-0.11.2.min.js"></script>
+        <script src="/static/js/third-party/JSXTransformer-0.11.2.js"></script>
+        <script src="/static/js/third-party/bootstrap.min.js"></script>
+        <script src="/static/js/third-party/underscore.min.js"></script>
     
-    <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
-    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/search.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap.min.css" />
 </head>
 <body>
-    USER DASHBOARD
-    {% for user in random_users: %}
-    <div>{{user.email}}: {{user.name}}</div>
-    {% endfor %}
-    {% if error:%}
-    <div>{{error}}</div>
-    {% endif %}
+    <div class="row">
+        <div id="search" class="col-md-10"></div>
+    </div>
+    <script type="text/jsx" src="/static/js/search.js"/>
 </body>
 </html>
