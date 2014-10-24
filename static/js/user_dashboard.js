@@ -126,7 +126,7 @@ var UserDashboardContainer = React.createClass({
 
 React.renderComponent(
   <UserDashboardContainer url="/api/fetch_user" />,
-  document.getElementById('container')
+  document.getElementById('dashboard')
 );
 
 $(document).ready(function(){

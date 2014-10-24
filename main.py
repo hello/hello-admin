@@ -454,23 +454,17 @@ class FetchUserAPI(BaseRequestHandler):
     def get(self):
         output = {'user_profile': {}, 'error': ''}
         try:
-            email = self.request.get('email', default_value='long@sayhello.com')
-            log.info('EMAIL INPUT: {}'.format(email))
+            email = self.request.get('email')
             info_query = AppInfo.query().order(-AppInfo.created)
             results = info_query.fetch(1)
-            log.info("Querying datastore for most recent AppInfo")
-
             if not results:
                 self.error(500)
                 self.response.write("Missing AppInfo. Bailing.")
-                return
 
             app_info_model = results[0]
             hello = make_oauth2_service(app_info_model)
             session = hello.get_session(app_info_model.access_token)
             response = session.get("account/q", params={'email': email})
-            log.info(app_info_model)
-            log.info(response.url)
 
             if response.status_code == 200:
                 log.info('SUCCESS - {}'.format(response.content))
@@ -482,7 +476,6 @@ class FetchUserAPI(BaseRequestHandler):
                 ))
         except Exception as e:
             output['error'] = display_error(e)
-        log.info('OUTPUT: {}'.format(output['user_profile']))
         self.response.write(json.dumps(output))
 
 

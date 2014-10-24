@@ -7,7 +7,6 @@ body{background: #f2f7fb; font-family: 'Helvetica Neue', arial; padding: 25px 50
 .row {overflow: hidden; background: #FFFFFF;}
 .lookup input, .lookup button {margin: 10px 15px 10px 0;}
 
-
-#container {height: 100%;}
-#title {margin-left: 15px;}
+#container {height: 100%; border-radius: 5px;}
+#page-name {margin-left: 15px;}
 #user-input {width: 200px;}
