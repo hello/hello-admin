@@ -490,3 +490,39 @@ class UserDashboardHandler(BaseRequestHandler):
     def get(self):
         template = JINJA_ENVIRONMENT.get_template('templates/user_dashboard.html')
         self.response.write(template.render({}))
+
+
+class FetchRecentUsersAPI(BaseRequestHandler):
+    def get(self):
+        output = {'data': [], 'error': ''}
+        try:
+            info_query = AppInfo.query().order(-AppInfo.created)
+            results = info_query.fetch(1)
+
+            if not results:
+                self.error(500)
+                self.response.write("Missing AppInfo. Bailing.")
+                return
+
+            app_info_model = results[0]
+            hello = make_oauth2_service(app_info_model)
+            session = hello.get_session(app_info_model.access_token)
+            response = session.get("account/recent")
+
+            if response.status_code == 200:
+                log.info('SUCCESS - {}'.format(response.content))
+                output['data'] = [{'email': r['email'], 'last_modified': r['last_modified']} for r in response.json()]
+            else:
+                raise RuntimeError('{}: fail to retrieve recent users'.format(response.status_code))
+        except Exception as e:
+            output['error'] = display_error(e)
+            log.error('ERROR: {}'.format(display_error(e)))
+        self.response.write(json.dumps(output))
+
+
+class RecentUsersViewHandler(BaseRequestHandler):
+    def get(self):
+        self.render_to_response('templates/user_dashboard.html')
+
+
+
