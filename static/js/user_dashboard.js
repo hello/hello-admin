@@ -73,7 +73,7 @@ var UserSearchForm = React.createClass({
                 this.setState({alert: response.error, failure: true});
             }
             else {
-                this.setState({result: response.user_profile, success : true});
+                this.setState({result: response.user_profile, success : true, alert: ''});
             }
             setTimeout(this.fade, 2000);
           }.bind(this),
