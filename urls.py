@@ -19,7 +19,7 @@ page_routes = [
     ('/proxy/(.*)', ProxyHandler),
     ('/register_pill', RegisterPillHandler),
     ('/update', UpdateAdminAccessToken),
-    ('/user_dashboard', UserDashboardHandler),
+    ('/user_dashboard/?$', UserDashboardHandler),
 ]
 
 hello_admin_app = webapp2.WSGIApplication(

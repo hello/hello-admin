@@ -62,7 +62,9 @@ var UserSearchForm = React.createClass({
         if (!email) {
           return;
         }
-        
+        history.pushState({}, '', '/user_dashboard/?email=' + email);
+        console.log(getParameterByName('email'));
+
         $.ajax({
           url: this.props.url,
           dataType: 'json',
@@ -105,7 +107,7 @@ var UserSearchForm = React.createClass({
         return (<div>
             <form className="lookup form-inline" onSubmit={this.handleSubmit}>
                 <input id="user-input" type="text" placeholder="Email" ref="email" className="form-control"/>
-                <button type="submit" className="btn btn-default form-control"><span className="glyphicon glyphicon-search query"></span></button>
+                <button id="submit" type="submit" className="btn btn-default form-control"><span className="glyphicon glyphicon-search query"></span></button>
               {userProfileTable}
             </form>
             {userSearchAlert}
@@ -126,3 +128,17 @@ React.renderComponent(
   <UserDashboardContainer url="/api/fetch_user" />,
   document.getElementById('container')
 );
+
+$(document).ready(function(){
+    var email_from_url = getParameterByName('email');
+    if (email_from_url)
+        $('#user-input').val(email_from_url)
+    $('#submit').click();
+})
+
+function getParameterByName(name) {
+  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+  var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+      results = regex.exec(location.search);
+  return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
