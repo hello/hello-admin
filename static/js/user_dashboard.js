@@ -47,11 +47,10 @@ var UserProfileTable = React.createClass({
 var UserSearchForm = React.createClass({
     getInitialState: function() {
         return {
-            data: {}, 
-            email: '', 
             success : false, 
             failure: false, 
-            result : {}
+            result : {},
+            alert: ''
         }
     },
     fade : function() {
@@ -63,22 +62,26 @@ var UserSearchForm = React.createClass({
         if (!email) {
           return;
         }
-        console.log(email);
         
         $.ajax({
           url: this.props.url,
           dataType: 'json',
           type: 'GET',
           data: {email: email},
-          success: function(data) {
-            console.log(data);
-            this.setState({result: data.user_profile, success : true});
+          success: function(response) {
+            if (response.error) {
+                this.setState({alert: response.error, failure: true});
+            }
+            else {
+                this.setState({result: response.user_profile, success : true});
+            }
             setTimeout(this.fade, 2000);
           }.bind(this),
           error: function(xhr, status, err) {
             this.setState({
-                result: 'failed, check credentials', 
-                failure: true
+                alert: 'failed, check credentials', 
+                failure: true,
+                result: {}
             })
             setTimeout(this.fade, 2000);
             console.error(this.props.url, status, err);
@@ -95,14 +98,18 @@ var UserSearchForm = React.createClass({
           'failure' : this.state.failure,
           'normal' : !this.state.success && !this.state.failure
         });
-
-        return (
+        var userSearchAlert = !this.state.success && this.state.alert ? 
+            <div className="alert alert-danger">{this.state.alert}</div>: null;
+        var userProfileTable = !this.state.success && userSearchAlert ?
+            null: <UserProfileTable stage={stages} profileData={this.state.result}/>;
+        return (<div>
             <form className="lookup form-inline" onSubmit={this.handleSubmit}>
-              <input type="text" placeholder="Email" ref="email" className="form-control"/>
-              <button type="submit" className="btn btn-default form-control"><span className="glyphicon glyphicon-search query"></span></button>
-              <UserProfileTable stage={stages} profileData={this.state.result}/>
+                <input id="user-input" type="text" placeholder="Email" ref="email" className="form-control"/>
+                <button type="submit" className="btn btn-default form-control"><span className="glyphicon glyphicon-search query"></span></button>
+              {userProfileTable}
             </form>
-        );
+            {userSearchAlert}
+        </div>);
     }
 });
 

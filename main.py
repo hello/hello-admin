@@ -476,7 +476,10 @@ class FetchUserAPI(BaseRequestHandler):
                 log.info('SUCCESS - {}'.format(response.content))
                 output['user_profile'] = response.json()
             else:
-                raise RuntimeError('{}: fail to retrieve user'.format(response.status_code))
+                raise RuntimeError('{}: Failed to retrieve user "{}"'.format(
+                    response.status_code,
+                    email
+                ))
         except Exception as e:
             output['error'] = display_error(e)
         log.info('OUTPUT: {}'.format(output['user_profile']))
