@@ -3,10 +3,11 @@ import settings
 from main import MainHandler, CreateTokenHandler, ChartHandler, \
     CreateAccountHandler, CreateApplicationHandler, CreateApplicationAgainstProdHandler, \
     ProxyHandler, RegisterPillHandler, UpdateAdminAccessToken, UserDashboardHandler, \
-    FetchUserAPI
+    FetchUserAPI, FetchRecentUsersAPI
 
 api_routes = [
-    ('/api/fetch_user', FetchUserAPI),
+    ('/api/fetch_user/?$', FetchUserAPI),
+    ('/api/fetch_recent_users', FetchRecentUsersAPI),
 ]
 
 page_routes = [
@@ -19,7 +20,7 @@ page_routes = [
     ('/proxy/(.*)', ProxyHandler),
     ('/register_pill', RegisterPillHandler),
     ('/update', UpdateAdminAccessToken),
-    ('/user_dashboard', UserDashboardHandler),
+    ('/user_dashboard/?$', UserDashboardHandler),
 ]
 
 hello_admin_app = webapp2.WSGIApplication(
