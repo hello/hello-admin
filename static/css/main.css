@@ -20,5 +20,6 @@ body{background:#f2f7fb;font-family: 'Helvetica Neue', arial; color:;padding:0;m
 
 .input-box {margin: 10px 0 10px 0;}
 .tools {margin: 0 0 30px 30px;}
+#recent-users-table {margin-left: 12px;}
 /*hr {clear:left;border:0;height:0;background: rgba(0,0,0,0.1);margin:10px 0;}*/
 
