@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Hello Admin tool</title>
+        <title>{{title}}</title>
         <script src="/static/js/third-party/jquery-1.11.1.min.js"></script>
         <script src="/static/js/third-party/react-with-addons-0.11.2.min.js"></script>
         <script src="/static/js/third-party/JSXTransformer-0.11.2.js"></script>
@@ -8,8 +8,6 @@
         <script src="/static/js/third-party/jquery.tablesorter.min.js"></script>
         <script src="/static/js/third-party/underscore.min.js"></script>
         
-        <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
-        <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap.min.css" />
         <link rel="stylesheet" type="text/css" href="/static/css/main.css"/>
         <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap.min.css"/>
         <link rel="stylesheet" type="text/css" href="/static/css/third-party/glyphicon-control.css"/>
@@ -20,18 +18,26 @@
         <div id="header"> Welcome {{user.email()}} <a href="{{logout_url}}">Logout</a></div>
 
         <div class="row">
-            <div id="token" class="col-md-6"></div>
-            <div id="account" class="col-md-6"></div>
+            <div class="col-xs-3 col-md-3 col-lg-3">
+                <div id="account"></div>
+                <div id="token"></div>
+
+            </div>
+        	<div id="recent-users" class="col-xs-6 col-md-6 col-lg-6"></div>
+            <div class="col-xs-3 col-md-3 col-lg-3">
+                <div id="tools">
+                    <h3>Tools</h3>
+                    <hr class="fancy-line"/>
+                    <p><a href="/create/app"> Create entities</a></p>
+                    <p><a href="/create/app_against_prod"> Create entities against production</a></p>
+                    <p><a href="/update"> Update access token</a></p>
+                    <p><a href="/charts"> See charts</a></p>
+                    <p><a href="/user_dashboard/"> User dashboard</a></p>
+                </div>
+            </div>
+
         </div>
-        <div class="row">
-        	<div id="search" class="col-md-11"></div>
-        </div>
-        <div class="tools">
-            <h2>Tools</h2>
-            <p><a href="/update"> Update access token</a></p>
-            <p><a href="/charts"> See charts</a></p>
-            <p><a href="/user_dashboard/"> User dashboard</a></p>
-        </div>
+
 
         <script type="text/jsx" src="/static/js/token.js"></script>
         <script type="text/jsx" src="/static/js/account.js"></script>

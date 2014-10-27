@@ -13,9 +13,9 @@ var ApplicationList = React.createClass({
       );
     });
     return (
-      <select ref="apps" onChange={this.handleChange}>
+      <select className="form-control" ref="apps" onChange={this.handleChange}>
         {appOptions}
-        </select>
+      </select>
     );
   }
 });
@@ -89,11 +89,20 @@ var ApplicationForm = React.createClass({
 
     return (
       <form className={classes} onSubmit={this.handleSubmit}>
-        <ApplicationList data={this.state.data} ref="apps" />
-        <input type="text" placeholder="username@email.com" ref="username" className="input-box form-control"/>
-        <input type="text" placeholder="your password" ref="password" className="input-box form-control"/>
-        <input type="submit" value="Post" className="btn btn-default"/>
-        <p>{this.state.token} {this.state.username}</p>
+        <p className="icon-addon addon-md">
+          <ApplicationList id="token-app" data={this.state.data} ref="apps" />
+          <label for="token-app" className="glyphicon glyphicon-cloud"></label>
+        </p>
+        <p className="icon-addon addon-md">
+          <input id="token-email" type="text" placeholder="username@email.com" ref="username" className="input-box form-control"/>
+          <label for="token-email" className="glyphicon glyphicon-envelope"></label>
+        </p>
+        <p className="icon-addon addon-md">
+          <input id="token-pw" type="text" placeholder="your password" ref="password" className="input-box form-control"/>
+          <label for="token-pw" className="glyphicon glyphicon-lock"></label>
+        </p>
+        <div><button type="submit" className="btn btn-info btn-circle"><span className="glyphicon glyphicon-send"></span></button></div>
+        <div id="token-display">{this.state.token} {this.state.username}</div>
       </form>
     );
   }
@@ -101,8 +110,9 @@ var ApplicationForm = React.createClass({
 
 var Application = React.createClass({
   render: function() {
+    var app_choice = "----" + this.props.name;
     return (
-       <option value={this.props.client_id}>{this.props.name}</option>
+       <option value={this.props.client_id}>{app_choice}</option>
     );
   }
 });
@@ -113,7 +123,8 @@ var ApplicationBox = React.createClass({
   render: function() {
     return (
       <div className="tokenBox">
-        <h2>Token</h2>
+        <h3>Generate Token</h3>
+        <hr className="fancy-line"></hr>
         <ApplicationForm url={this.props.url} />
       </div>
     );
