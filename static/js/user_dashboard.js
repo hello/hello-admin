@@ -22,14 +22,18 @@ var UserProfileTable = React.createClass({
             var row = <UserProfileRow rowAttr={attribute} rowVal={value} />;
 
             // Table rows start with email, name, id
-            if (attribute === 'id')
+            if (attribute === 'id') {
                 tableRows.unshift(row);
-            else if (attribute === 'name')
+            }
+            else if (attribute === 'name') {
                 tableRows.unshift(row);
-            else if (attribute === 'email')
+            }
+            else if (attribute === 'email') {
                 tableRows.unshift(row);
-            else
+            }
+            else {
                 tableRows.push(row);
+            }
         });
 
         var tableClasses = "table table-striped table-condensed " + this.props.stage;

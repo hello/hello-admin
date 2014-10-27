@@ -65,7 +65,7 @@ var UserTable = React.createClass({
                               <option value="weight">Weight</option>
                               <option value="tz">Timezone</option>
                               <option value="dob">Date of Birth</option>
-                              <option value="id">Device ID</option>
+                              <option value="id">User SID</option>
                            </select>
                         </th>
                     </tr>
