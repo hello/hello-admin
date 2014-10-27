@@ -147,6 +147,7 @@ var RecentUsersBox = React.createClass({
         };
     },
     loadRecentUsersFromServer: function(){
+        console.log('loading recent users');
         $.ajax({
           url: 'api/recent_users',
           dataType: 'json',
@@ -166,7 +167,10 @@ var RecentUsersBox = React.createClass({
         });
     },
     componentDidMount: function() {
-        this.loadRecentUsersFromServer();
+        var thisRecentUsersBox = this,
+            refresh_period = 2*60*1000;
+        thisRecentUsersBox.loadRecentUsersFromServer();
+        setInterval(function () {thisRecentUsersBox.loadRecentUsersFromServer();}, refresh_period);
     },
     render: function() {
         return (
