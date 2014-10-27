@@ -6,8 +6,8 @@ from main import MainHandler, CreateTokenHandler, ChartHandler, \
     FetchUserAPI, FetchRecentUsersAPI
 
 api_routes = [
-    ('/api/fetch_user/?$', FetchUserAPI),
-    ('/api/fetch_recent_users', FetchRecentUsersAPI),
+    ('/api/user/?$', FetchUserAPI),
+    ('/api/recent_users', FetchRecentUsersAPI),
 ]
 
 page_routes = [

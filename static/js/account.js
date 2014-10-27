@@ -23,7 +23,7 @@ var AccountForm = React.createClass({
     
     
     if (!name || !email || !password) {
-      alert("Missing info")
+      alert("Missing info");
       return;
     }
 
@@ -42,11 +42,10 @@ var AccountForm = React.createClass({
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(this.props.url, status, err.toString());
-        this.setState({'failure' : true})
+        this.setState({'failure' : true});
         setTimeout(this.fade, 2000);
       }.bind(this)
     });
-
 
     return;
   },
@@ -65,34 +64,40 @@ var AccountForm = React.createClass({
     return (
 
       <form className={classes} onSubmit={this.handleSubmit}>
-        <p>
-          <input type="text" placeholder="firstname lastname" ref="name" className="form-control"/>
+        <p className="icon-addon addon-md">
+          <input id="account-name" type="text" placeholder="firstname lastname" ref="name" className="form-control"/>
+          <label for="account-name" className="glyphicon glyphicon-user"></label>
         </p>
-        <p>
-          <input type="text" placeholder="someone@sayhello.com" ref="email" className="form-control"/>
+        <p className="icon-addon addon-md">
+          <input id="account-email" type="text" placeholder="someone@sayhello.com" ref="email" className="form-control"/>
+          <label for="account-email" className="glyphicon glyphicon-envelope"></label>
         </p>
-        <p>
-          <input type="password" placeholder="super secure"  ref="password" className="form-control"/>
+        <p className="icon-addon addon-md">
+          <input id="account-pw" type="password" placeholder="super secure"  ref="password" className="form-control"/>
+          <label for="account-pw" className="glyphicon glyphicon-lock"></label>
         </p>
-        <p>
-          <select ref="gender">
-              <option value="FEMALE">female</option>
-              <option value="MALE">male</option>
-              <option value="OTHER">other</option>
+        <p className="icon-addon addon-md">
+          <select id="account-gender" className="form-control" ref="gender">
+              <option value="FEMALE">&nbsp; &nbsp; &nbsp; female</option>
+              <option value="MALE">&nbsp; &nbsp; &nbsp; male</option>
+              <option value="OTHER">&nbsp; &nbsp; &nbsp; other</option>
           </select>
+          <label for="account-gender" className="glyphicon glyphicon-cog"></label>
         </p>
     
         <input type="hidden" value="0" ref="height"/>
         <input type="hidden" value="0" ref="weight"/>
     
-        <p>
-          <select ref="tz">
-            <option value="-252000">America/Los_Angeles</option>
+        <p className="icon-addon addon-md">
+          <select id="account-tz" className="form-control" ref="tz">
+            <option value="-252000">&nbsp; &nbsp; &nbsp; America/Los_Angeles</option>
           </select>
+          <label for="account-tz" className="glyphicon glyphicon-globe"></label>
         </p>
     
         <p>
-          <input type="submit" value="Create account" className="btn btn-default"/> {this.state.success}
+          <div><button type="submit" className="btn btn-info btn-circle"><span className="glyphicon glyphicon-plus"></span></button></div>
+          <div>{this.state.success}</div>
         </p>
         
       </form>
@@ -104,7 +109,8 @@ var AccountBox = React.createClass({
   render: function() {
     return (
       <div className="accountBox">
-        <h2>Create account</h2>
+        <h3>Create Account</h3>
+        <hr className="fancy-line"></hr>
         <AccountForm onCommentSubmit={this.handleCommentSubmit} url={this.props.url} />
       </div>
     );

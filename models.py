@@ -23,15 +23,3 @@ class AccessToken(ndb.Model):
     @classmethod
     def query_tokens(cls):
         return cls.query().order(-cls.created).fetch(20)
-
-
-class User(ndb.Model):
-    email = ndb.StringProperty(required=True)
-    name = ndb.StringProperty(required=True)
-    gender = ndb.StringProperty()
-    date_joined = ndb.DateTimeProperty()
-    age = ndb.IntegerProperty()
-
-    @classmethod
-    def recent_user(cls, n=20):   # recent 20 users
-        return cls.query().order(-cls.date_joined).fetch(n)

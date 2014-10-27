@@ -31,7 +31,8 @@ from helpers import display_error
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'],
-    autoescape=True)
+    autoescape=True
+)
 
 
 class BaseRequestHandler(webapp2.RequestHandler):
@@ -403,7 +404,7 @@ class RegisterPillHandler(BaseRequestHandler):
         )
         if resp.status_code not in [200, 204]:
             log.error("%s - %s", resp.status_code, resp.content)
-            error_message = "%s" % (resp.content)
+            error_message = "%s" % resp.content
             self.display_error(error_message, status_code=resp.status_code)
             return
 
@@ -503,8 +504,8 @@ class FetchRecentUsersAPI(BaseRequestHandler):
             response = session.get("account/recent")
 
             if response.status_code == 200:
-                log.info('SUCCESS - {}'.format(response.content))
-                output['data'] = [{'email': r['email'], 'last_modified': r['last_modified']} for r in response.json()]
+                output['data'] = response.json()
+                # output['data'] = [{'email': r['email'], 'last_modified': r['last_modified']} for r in response.json()]
             else:
                 raise RuntimeError('{}: fail to retrieve recent users'.format(response.status_code))
         except Exception as e:

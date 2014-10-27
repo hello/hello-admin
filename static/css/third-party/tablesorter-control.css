@@ -1,0 +1,3 @@
+table.tablesorter thead tr th.tablesorter-headerAsc {background-image: url('../image/asc.gif'); background-repeat: no-repeat; background-position: center right; padding-right: 30px; margin-right: 5px;}
+table.tablesorter thead tr th.tablesorter-headerDesc {background-image: url('../image/desc.gif'); background-repeat: no-repeat; background-position: center right; padding-right: 30px; margin-right: 5px;}
+table.tablesorter thead tr th.tablesorter-headerUnSorted {background-image: url('../image/bg.gif'); background-repeat: no-repeat; background-position: center right; padding-right: 30px; margin-right: 5px;}

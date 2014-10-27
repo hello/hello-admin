@@ -22,18 +22,22 @@ var UserProfileTable = React.createClass({
             var row = <UserProfileRow rowAttr={attribute} rowVal={value} />;
 
             // Table rows start with email, name, id
-            if (attribute==='id')
-                tableRows.unshift(row); 
-            else if (attribute==='name')
-                tableRows.unshift(row); 
-            else if (attribute==='email')
-                tableRows.unshift(row); 
-            else
+            if (attribute === 'id') {
+                tableRows.unshift(row);
+            }
+            else if (attribute === 'name') {
+                tableRows.unshift(row);
+            }
+            else if (attribute === 'email') {
+                tableRows.unshift(row);
+            }
+            else {
                 tableRows.push(row);
+            }
         });
-        
+
         var tableClasses = "table table-striped table-condensed " + this.props.stage;
-        var tableHeaders = $.isEmptyObject(this.props.profileData) ? 
+        var tableHeaders = $.isEmptyObject(this.props.profileData) ?
             null: <tr><th>Attribute</th><th>Value</th></tr>;
         return (
             <table className={tableClasses}>
@@ -84,12 +88,19 @@ var UserSearchForm = React.createClass({
                 alert: 'failed, check credentials', 
                 failure: true,
                 result: {}
-            })
+            });
             setTimeout(this.fade, 2000);
             console.error(this.props.url, status, err);
           }.bind(this)
         });
-        return;
+    },
+
+    componentDidMount: function(e) {
+        var email_from_url = getParameterByName('email');
+        if (email_from_url) {
+            $('#user-input').val(email_from_url);
+            $('#submit').click();
+        }
     },
 
     render: function() {
@@ -105,11 +116,11 @@ var UserSearchForm = React.createClass({
         var userProfileTable = !this.state.success && userSearchAlert ?
             null: <UserProfileTable stage={stages} profileData={this.state.result}/>;
         return (<div>
-            <form className="lookup form-inline" onSubmit={this.handleSubmit}>
-                <input id="user-input" type="text" placeholder="Email" ref="email" className="form-control"/>
-                <button id="submit" type="submit" className="btn btn-default form-control"><span className="glyphicon glyphicon-search query"></span></button>
-              {userProfileTable}
+            <form className="lookup" onSubmit={this.handleSubmit}>
+                <input id="user-input" type="text" placeholder="Email" ref="email" className="form-control col-xs-5 form-control-inline-input"/>
+                <button id="submit" type="submit" className="form-control form-control-inline-submit col-xs-1 btn btn-default"><span className="glyphicon glyphicon-search query"></span></button>
             </form>
+            {userProfileTable}
             {userSearchAlert}
         </div>);
     }
@@ -125,16 +136,9 @@ var UserDashboardContainer = React.createClass({
 
 
 React.renderComponent(
-  <UserDashboardContainer url="/api/fetch_user" />,
+  <UserDashboardContainer url="/api/user" />,
   document.getElementById('dashboard')
 );
-
-$(document).ready(function(){
-    var email_from_url = getParameterByName('email');
-    if (email_from_url)
-        $('#user-input').val(email_from_url)
-    $('#submit').click();
-})
 
 function getParameterByName(name) {
   name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
