@@ -2,40 +2,72 @@
 
 var LinkToUserDashboard = React.createClass({
     render: function() {
-        var userDashboardLink = "/user_dashboard/?email=" + this.props.email
-        return <a href={userDashboardLink} target="_blank"> {this.props.email}</a>
+        var userDashboardLink = "/user_dashboard/?email=" + this.props.email;
+        return <a href={userDashboardLink} target="_blank" title="Click to visit this user's dashboard"> {this.props.email}</a>
     }
 });
 var UserRow = React.createClass({
+    componentDidMount: function() {
+        $('.tablesorter').tablesorter({
+           headers: {
+             0: {sorter: true},
+             1: {sorter: true}
+           }
+        });
+    },
+
     render: function() {
+        var chosenUserAttr = this.props.userAttr, attrVal;
+        if (chosenUserAttr === 'dob' || chosenUserAttr === 'last_modified')
+            attrVal = new Date(this.props.user[chosenUserAttr]).toLocaleString();
+        else
+            attrVal = this.props.user[chosenUserAttr];
         return (
             <tr>
-                <td><LinkToUserDashboard email={this.props.user.email} /></td>
-                <td>{new Date(this.props.user.last_modified).toLocaleString()}</td>
+                <td className="col-xs-2 col-md-2 col-lg-2"><LinkToUserDashboard email={this.props.user.email} /></td>
+                <td className="col-xs-4 col-lg-4 col-lg-4">{attrVal}</td>
             </tr>
         );
     }
 });
 
+
 var UserTable = React.createClass({
+    getInitialState: function() {
+        return {
+            selectedAttr: "last_modified"
+        }
+    },
+    handleChange: function() {
+        this.setState({
+            selectedAttr: this.refs.attrSelector.getDOMNode().value
+        });
+    },
     render: function() {
-        console.log(this.props);
         var rows = [];
-        var lastPlatform = null;
-        console.log(this.props.users);
         this.props.users.forEach(function(user) {
             var email_filter = user.email.toLowerCase().indexOf(this.props.filterText.toLowerCase()) === -1; 
             if (email_filter) {
                 return;
-            }http://localhost:9123/www.google.com
-            rows.push(<UserRow user={user} key={user.email} />);
+            }
+            rows.push(<UserRow user={user} userAttr={this.state.selectedAttr} key={user.email} />);
         }.bind(this));
         return (
-            <table id="recent-users-table" className="table table-condensed">
+            <table id="recent-users-table" className="table table-condensed tablesorter" ref="sortableTable">
                 <thead>
                     <tr>
-                        <th>Email</th>
-                        <th>Last Modified</th>
+                        <th className="col-xs-2 col-md-2 col-lg-2">Email</th>
+                        <th className="col-xs-4 col-md-4 col-lg-4">
+                           <select id="recent-users-attr" onChange={this.handleChange} className="form-control" ref="attrSelector">
+                              <option value="last_modified">Last Modified</option>
+                              <option value="gender">Gender</option>
+                              <option value="height">Height</option>
+                              <option value="weight">Weight</option>
+                              <option value="tz">Timezone</option>
+                              <option value="dob">Date of Birth</option>
+                              <option value="id">Device ID</option>
+                           </select>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>{rows}</tbody>
@@ -44,7 +76,7 @@ var UserTable = React.createClass({
     }
 });
 
-var SearchBar = React.createClass({
+var FilterBar = React.createClass({
     handleChange: function() {
         this.props.onUserInput(
             this.refs.filterTextInput.getDOMNode().value
@@ -53,15 +85,20 @@ var SearchBar = React.createClass({
     render: function() {
         return (
             <form>
-            	<div className="col-md-4">
-                <input
-                	className="form-control"
-                    type="text"
-                    placeholder="Filter by email"
-                    value={this.props.filterText}
-                    ref="filterTextInput"
-                    onChange={this.handleChange}
-                />
+                <div className="input-group input-group-md">
+                    <span className="input-group-addon"><i className="glyphicon glyphicon-filter"></i></span>
+                    <div className="icon-addon addon-md">
+                        <input
+                            id="email-filter"
+                            className="form-control col-md-4"
+                            type="text"
+                            placeholder="filter by email"
+                            value={this.props.filterText}
+                            ref="filterTextInput"
+                            onChange={this.handleChange}
+                        />
+                        <label for="email-filter" className="glyphicon glyphicon-envelope"></label>
+                    </div>
                 </div>
             </form>
         );
@@ -82,11 +119,11 @@ var FilterableUserTable = React.createClass({
             internalOnly: internalOnly
         });
     },
-    
+
     render: function() {
         return (
-            <div className="searchForm">
-                <SearchBar
+            <div className={"recentUsersForm " + this.props.cls}>
+                <FilterBar
                     filterText={this.state.filterText}
                     internalOnly={this.state.internalOnly}
                     onUserInput={this.handleUserInput}
@@ -102,39 +139,44 @@ var FilterableUserTable = React.createClass({
 });
 
 
-var SearchBox = React.createClass({
+var RecentUsersBox = React.createClass({
     getInitialState: function() {
         return {
-            users: []
+            users: [],
+            cls: 'normal'
         };
     },
-    componentDidMount: function(e){
-        console.log('how');
+    loadRecentUsersFromServer: function(){
         $.ajax({
-          url: 'api/fetch_recent_users',
+          url: 'api/recent_users',
           dataType: 'json',
           type: 'GET',
           success: function(response) {
-            this.setState({users: response.data});
+            this.setState({
+                users: response.data
+            });
           }.bind(this),
           error: function(xhr, status, err) {
             this.setState({
-               users: []
-            })
+               users: [],
+               cls: 'failure'
+            });
             console.error(this.props.url, status, err);
           }.bind(this)
         });
     },
+    componentDidMount: function() {
+        this.loadRecentUsersFromServer();
+    },
     render: function() {
-        console.log('POSTLOG');
-        console.log(this.state.users);
         return (
-          <div className="searchBox">
-            <h2>Recent users</h2>
-             <FilterableUserTable users={this.state.users} />
+          <div className="recentUsersBox">
+            <h3>Recent Users</h3>
+            <hr className="fancy-line"></hr>
+            <FilterableUserTable cls={this.state.cls} users={this.state.users} />
           </div>
         );
     }
 });
 
-React.renderComponent(<SearchBox  url="/search"/>, document.getElementById('search'));
+React.renderComponent(<RecentUsersBox />, document.getElementById('recent-users'));
