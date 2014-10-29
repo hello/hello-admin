@@ -123,8 +123,6 @@ var ApplicationBox = React.createClass({
   render: function() {
     return (
       <div className="tokenBox">
-        <h3>Generate Token</h3>
-        <hr className="fancy-line"></hr>
         <ApplicationForm url={this.props.url} />
       </div>
     );

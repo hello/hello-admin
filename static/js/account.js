@@ -109,8 +109,6 @@ var AccountBox = React.createClass({
   render: function() {
     return (
       <div className="accountBox">
-        <h3>Create Account</h3>
-        <hr className="fancy-line"></hr>
         <AccountForm onCommentSubmit={this.handleCommentSubmit} url={this.props.url} />
       </div>
     );

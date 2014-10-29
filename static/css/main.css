@@ -1,5 +1,5 @@
 body {background: #f2f7fb; font-family: Helvetica Neue, sans-serif;}
-.row {overflow: hidden; padding: 0 15px 10px 10px;}
+div.row {overflow: hidden; padding: 0 15px 10px 10px; margin: 0 auto; display: table;}
 
 .tokenForm,.accountForm,.recentUsersForm {background: #f2f7fb; padding: 10px 10px 0 10px; border-radius: 5px;}
 .recentUsersForm form {margin-bottom: 6px;}
@@ -17,3 +17,4 @@ button.btn-circle {border-radius: 100%; width: 32px; height: 32px; margin: 10px 
 #token-display {margin: 0 auto; display: table; font-style: oblique;}
 span.glyphicon-plus {margin: 0 0 2px -2.75px;}
 span.glyphicon-send {margin: 0 0 2px -5px;}
+div div.col-xxl {max-width: 1000px;}

@@ -18,21 +18,33 @@
         <div id="header"> Welcome {{user.email()}} <a href="{{logout_url}}">Logout</a></div>
 
         <div class="row">
-            <div class="col-xs-3 col-md-3 col-lg-3">
+            <div class="col-xxl col-xs-3 col-md-3 col-lg-3">
+                <h3>Create Account</h3>
+                <hr class="fancy-line"/>
                 <div id="account"></div>
+                <h3>Generate Token</h3>
+                <hr class="fancy-line"/>
                 <div id="token"></div>
 
             </div>
-        	<div id="recent-users" class="col-xs-6 col-md-6 col-lg-6"></div>
-            <div class="col-xs-3 col-md-3 col-lg-3">
+        	<div class="col-xxl col-xs-5 col-md-5 col-lg-5">
+                <h3>Recent Users</h3>
+                <hr class="fancy-line"/>
+                <div id="recent-users"></div>
+        	</div>
+            <div class="col-xxl col-xs-4 col-md-4 col-lg-4">
                 <div id="tools">
                     <h3>Tools</h3>
                     <hr class="fancy-line"/>
-                    <p><a href="/create/app"> Create entities</a></p>
-                    <p><a href="/create/app_against_prod"> Create entities against production</a></p>
-                    <p><a href="/update"> Update access token</a></p>
-                    <p><a href="/charts"> See charts</a></p>
-                    <p><a href="/user_dashboard/"> User dashboard</a></p>
+                    <p><a target="_blank" href="/create/app"> Create entities</a></p>
+                    <p><a target="_blank" href="/create/app_against_prod"> Create entities against production</a></p>
+                    <p><a target="_blank" href="/update"> Update access token</a></p>
+                    <p><a target="_blank" href="/charts"> See charts</a></p>
+                    <p><a target="_blank" href="/user_dashboard/"> User dashboard</a></p>
+                    <p><a target="_blank" href="/app_scope"> Manage application scopes</a></p>
+                    <h3>Search User</h3>
+                    <hr class="fancy-line"/>
+                    <div id="user-search"></div>
                 </div>
             </div>
 
@@ -42,5 +54,6 @@
         <script type="text/jsx" src="/static/js/token.js"></script>
         <script type="text/jsx" src="/static/js/account.js"></script>
         <script type="text/jsx" src="/static/js/recent_users.js"></script>
+        <script type="text/jsx" src="/static/js/user_search.js"></script>
     </body>
 </html>

@@ -451,9 +451,15 @@ class ProxyHandler(BaseRequestHandler):
         self.response.write(json.dumps(segments))
 
 
-class FetchUserAPI(BaseRequestHandler):
+class UserDashboardHandler(BaseRequestHandler):
     def get(self):
-        output = {'user_profile': {}, 'error': ''}
+        template = JINJA_ENVIRONMENT.get_template('templates/user_dashboard.html')
+        self.response.write(template.render({}))
+
+
+class UserAPI(BaseRequestHandler):
+    def get(self):
+        output = {'data': {}, 'error': ''}
         try:
             email = self.request.get('email')
             info_query = AppInfo.query().order(-AppInfo.created)
@@ -465,11 +471,14 @@ class FetchUserAPI(BaseRequestHandler):
             app_info_model = results[0]
             hello = make_oauth2_service(app_info_model)
             session = hello.get_session(app_info_model.access_token)
-            response = session.get("account/q", params={'email': email})
+            if email:
+                response = session.get("account/q", params={'email': email})
+            else:
+                response = session.get("account/recent")
 
             if response.status_code == 200:
                 log.info('SUCCESS - {}'.format(response.content))
-                output['user_profile'] = response.json()
+                output['data'] = response.json()
             else:
                 raise RuntimeError('{}: Failed to retrieve user "{}"'.format(
                     response.status_code,
@@ -480,15 +489,11 @@ class FetchUserAPI(BaseRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class UserDashboardHandler(BaseRequestHandler):
-    def get(self):
-        template = JINJA_ENVIRONMENT.get_template('templates/user_dashboard.html')
-        self.response.write(template.render({}))
-
-
-class FetchRecentUsersAPI(BaseRequestHandler):
+class AppAPI(BaseRequestHandler):
     def get(self):
         output = {'data': [], 'error': ''}
+        id = self.request.get('id')
+
         try:
             info_query = AppInfo.query().order(-AppInfo.created)
             results = info_query.fetch(1)
@@ -501,22 +506,92 @@ class FetchRecentUsersAPI(BaseRequestHandler):
             app_info_model = results[0]
             hello = make_oauth2_service(app_info_model)
             session = hello.get_session(app_info_model.access_token)
-            response = session.get("account/recent")
+
+            if id:
+                response = session.get("applications/{}".format(id))
+            else:
+                response = session.get("applications")
 
             if response.status_code == 200:
                 output['data'] = response.json()
-                # output['data'] = [{'email': r['email'], 'last_modified': r['last_modified']} for r in response.json()]
             else:
-                raise RuntimeError('{}: fail to retrieve recent users'.format(response.status_code))
+                raise RuntimeError('{}: fail to retrieve applications'.format(response.status_code))
         except Exception as e:
             output['error'] = display_error(e)
             log.error('ERROR: {}'.format(display_error(e)))
         self.response.write(json.dumps(output))
 
 
-class RecentUsersViewHandler(BaseRequestHandler):
+class AppScopeHandler(BaseRequestHandler):
     def get(self):
-        self.render_to_response('templates/user_dashboard.html')
+        template = JINJA_ENVIRONMENT.get_template('templates/app_scope.html')
+        self.response.write(template.render({}))
 
+class AppScopeAPI(BaseRequestHandler):
+    def get(self):
+        output = {'data': [], 'error': ''}
+        app_id = self.request.get('app_id')
 
+        try:
+            info_query = AppInfo.query().order(-AppInfo.created)
+            results = info_query.fetch(1)
+
+            if not results:
+                self.error(500)
+                self.response.write("Missing AppInfo. Bailing.")
+                return
+
+            app_info_model = results[0]
+            hello = make_oauth2_service(app_info_model)
+            session = hello.get_session(app_info_model.access_token)
+
+            if app_id:
+                response = session.get("applications/{}/scopes".format(app_id))
+            else:
+                response = session.get("applications/scopes")
+
+            if response.status_code == 200:
+                output['data'] = response.json()
+            else:
+                raise RuntimeError('{}: fail to retrieve applications scopes'.format(response.status_code))
+        except Exception as e:
+            output['error'] = display_error(e)
+            log.error('ERROR: {}'.format(display_error(e)))
+        self.response.write(json.dumps(output))
+
+    def put(self):
+        output = {'data': [], 'error': ''}
+        req = json.loads(self.request.body)
+        app_id = req.get('app_id', None)
+        scopes = req.get('scopes', None)
+
+        try:
+            if None in [app_id, scopes]:
+                raise RuntimeError("Invalid request!")
+
+            headers = {
+                'Content-type': 'application/json',
+                'Accept': 'application/json'
+            }
+            info_query = AppInfo.query().order(-AppInfo.created)
+            results = info_query.fetch(1)
+
+            if not results:
+                self.error(500)
+                self.response.write("Missing AppInfo. Bailing.")
+                return
+
+            app_info_model = results[0]
+            hello = make_oauth2_service(app_info_model)
+            session = hello.get_session(app_info_model.access_token)
+
+            response = session.put('applications/{}/scopes'.format(app_id), data=json.dumps(scopes), headers=headers)
+            log.info('updated_scopes: {}'.format(scopes))
+            if response.status_code not in [200, 204]:
+                raise RuntimeError('{}: fail to update application scope'.format(response.status_code))
+
+        except Exception as e:
+            output['error'] = display_error(e)
+            log.error('ERROR: {}'.format(display_error(e)))
+        self.response.write(json.dumps(output))
 

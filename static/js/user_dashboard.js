@@ -61,7 +61,9 @@ var UserSearchForm = React.createClass({
         this.setState({failure : false, success: false});
     },
     handleSubmit: function(e) {
-        e.preventDefault();
+        if (e) {
+            e.preventDefault();
+        }
         var email = this.refs.email.getDOMNode().value.trim().toLowerCase();
         if (!email) {
           return;
@@ -79,7 +81,7 @@ var UserSearchForm = React.createClass({
                 this.setState({alert: response.error, failure: true});
             }
             else {
-                this.setState({result: response.user_profile, success : true, alert: ''});
+                this.setState({result: response.data, success : true, alert: ''});
             }
             setTimeout(this.fade, 2000);
           }.bind(this),
@@ -98,8 +100,8 @@ var UserSearchForm = React.createClass({
     componentDidMount: function(e) {
         var email_from_url = getParameterByName('email');
         if (email_from_url) {
-            $('#user-input').val(email_from_url);
-            $('#submit').click();
+            this.refs.email.getDOMNode().value = email_from_url;
+            this.handleSubmit(e);
         }
     },
 

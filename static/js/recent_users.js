@@ -46,7 +46,7 @@ var UserTable = React.createClass({
     render: function() {
         var rows = [];
         this.props.users.forEach(function(user) {
-            var email_filter = user.email.toLowerCase().indexOf(this.props.filterText.toLowerCase()) === -1; 
+            var email_filter = user.email.toLowerCase().indexOf(this.props.filterText.toLowerCase()) === -1;
             if (email_filter) {
                 return;
             }
@@ -148,7 +148,7 @@ var RecentUsersBox = React.createClass({
     },
     loadRecentUsersFromServer: function(){
         $.ajax({
-          url: 'api/recent_users',
+          url: 'api/user',
           dataType: 'json',
           type: 'GET',
           success: function(response) {
@@ -166,13 +166,14 @@ var RecentUsersBox = React.createClass({
         });
     },
     componentDidMount: function() {
-        this.loadRecentUsersFromServer();
+        var thisRecentUsersBox = this,
+            refresh_period = 2*60*1000;
+        thisRecentUsersBox.loadRecentUsersFromServer();
+        setInterval(function () {thisRecentUsersBox.loadRecentUsersFromServer();}, refresh_period);
     },
     render: function() {
         return (
           <div className="recentUsersBox">
-            <h3>Recent Users</h3>
-            <hr className="fancy-line"></hr>
             <FilterableUserTable cls={this.state.cls} users={this.state.users} />
           </div>
         );
