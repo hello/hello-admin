@@ -1,0 +1,12 @@
+body {background: #f2f7fb; font-family: Helvetica Neue, sans-serif; padding: 25px 50px;}
+
+.normal {border: 1px solid #FFFFFF; transition: all 2s;}
+.success {border: 1px solid #61c4bd; transition: all 2s ease-in;}
+.failure {border: 1px solid #ce4c40; transition: all 5s ease-in;}
+
+.row {overflow: hidden; background: #FFFFFF;}
+
+#container {padding-bottom: 20px; border-radius: 5px;}
+#page-name {margin-left: 15px;}
+
+#magic {display: none}
