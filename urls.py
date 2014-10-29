@@ -3,15 +3,17 @@ import settings
 from main import MainHandler, CreateTokenHandler, ChartHandler, \
     CreateAccountHandler, CreateApplicationHandler, CreateApplicationAgainstProdHandler, \
     ProxyHandler, RegisterPillHandler, UpdateAdminAccessToken, UserDashboardHandler, \
-    FetchUserAPI, FetchRecentUsersAPI
+    UserAPI, AppAPI, AppScopeAPI, AppScopeHandler
 
 api_routes = [
-    ('/api/user/?$', FetchUserAPI),
-    ('/api/recent_users', FetchRecentUsersAPI),
+    ('/api/app/?$', AppAPI),
+    ('/api/app_scope/?$', AppScopeAPI),
+    ('/api/user/?$', UserAPI),
 ]
 
 page_routes = [
     ('/', MainHandler),
+    ('/app_scope/?$', AppScopeHandler),
     ('/access_token', CreateTokenHandler),
     ('/charts', ChartHandler),
     ('/create_account', CreateAccountHandler),
