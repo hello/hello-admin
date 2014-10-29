@@ -58,14 +58,15 @@ var appScopeCanvas = React.createClass({
     update: function(e) {
         var updateData = {
             app_id: this.refs.app.getDOMNode().value,
-            scopes: JSON.stringify(this.state.selectedAppScopes)
+            scopes: this.state.selectedAppScopes
         };
         console.log('this is updated data to be sent', updateData);
         $.ajax({
           url: 'api/app_scope',
           dataType: 'json',
+          contentType: 'application/json',
           type: 'PUT',
-          data: updateData,
+          data: JSON.stringify(updateData),
           success: function(response) {
             console.log(response);
           }.bind(this),
