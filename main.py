@@ -563,7 +563,6 @@ class AppScopeAPI(BaseRequestHandler):
         output = {'data': [], 'error': ''}
         app_id = self.request.get('app_id')
         scopes = self.request.get('scopes')
-
         try:
             if None in [app_id, scopes]:
                 raise RuntimeError("Invalid request!")
@@ -584,11 +583,9 @@ class AppScopeAPI(BaseRequestHandler):
             hello = make_oauth2_service(app_info_model)
             session = hello.get_session(app_info_model.access_token)
 
-            response = session.put('applications/{}/scopes'.format(app_id), data=json.dumps(scopes), headers=headers)
-
-            if response.status_code == 200:
-                output['data'] = response.json()
-            else:
+            response = session.put('applications/{}/scopes'.format(app_id), data=scopes, headers=headers)
+            log.info('updated_scopes: {}'.format(scopes))
+            if response.status_code != 204:
                 raise RuntimeError('{}: fail to update application scope'.format(response.status_code))
 
         except Exception as e:
