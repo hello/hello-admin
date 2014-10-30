@@ -713,3 +713,9 @@ class RecentTokensAPI(BaseRequestHandler):
             log.error('ERROR: {}'.format(display_error(e)))
 
         self.response.write(json.dumps(output))
+
+
+class Viz(BaseRequestHandler):
+    def get(self):
+        template = JINJA_ENVIRONMENT.get_template('templates/viz.html')
+        self.response.write(template.render({}))
