@@ -23,9 +23,11 @@ import logging as log
 import os
 import datetime as dt
 import urllib
+import requests
 from google.appengine.api import users
 from rauth import OAuth2Service
 from models import AppInfo, AdminUser, AccessToken
+from models import AppInfo, AdminUser, AccessToken, ZendeskCredentials
 from helpers import display_error
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -255,6 +257,7 @@ class CreateAccountHandler(BaseRequestHandler):
 
 
 class CreateApplicationHandler(BaseRequestHandler):
+class SetupHandler(BaseRequestHandler):
     def get(self):
         admin_user = AdminUser(
             id=settings.ENVIRONMENT,
@@ -270,6 +273,13 @@ class CreateApplicationHandler(BaseRequestHandler):
             access_token='updateme'
         )
         app_info.put()
+        zendesk_credentials = ZendeskCredentials(
+            id=settings.ENVIRONMENT,
+            domain='https://something.zendesk.com',
+            email_account='email@sayhello.com',
+            api_token='ask_marina'
+        )
+        zendesk_credentials.put()
 
 
 class CreateApplicationAgainstProdHandler(BaseRequestHandler):
@@ -595,3 +605,46 @@ class AppScopeAPI(BaseRequestHandler):
             log.error('ERROR: {}'.format(display_error(e)))
         self.response.write(json.dumps(output))
 
+class ZendeskAPI(BaseRequestHandler):
+    def get(self):
+        """
+        Grab tickets filed by a customer
+        - input: user email (required)
+        - auth params: domain, email_account, api_token (required by Zendesk)
+        """
+        output = {'data': [], 'error': ''}
+        user_email = self.request.get('email')
+
+        try:
+            info_query = ZendeskCredentials.query()
+            results = info_query.fetch(1)
+
+            if not results:
+                self.error(500)
+                self.response.write("Missing AppInfo. Bailing.")
+                return
+
+            zendesk_cred = results[0]
+            tickets = []
+            search_url = "{}/api/v2/search.json?query=type:ticket%20requester:{}".format(zendesk_cred.domain, user_email)
+            zen_auth = (zendesk_cred.email_account + '/token', zendesk_cred.api_token)
+            zen_response = requests.get(search_url, auth=zen_auth)
+
+            if zen_response.ok:
+                tickets += zen_response.json().get('results', [])
+
+            # Keep querying on as long as paginating is possible
+            while zen_response.json().get('next_page') is not None:
+                zen_response = requests.get(zen_response.json().get('next_page'), auth=zen_auth)
+                if zen_response.ok:
+                    tickets += zen_response.json().get('results', [])
+
+            if not tickets:
+                raise RuntimeError("fail to retrieve {}'s tickets")
+            output['data'] = tickets
+
+        except Exception as e:
+            output['error'] = display_error(e)
+            log.error('ERROR: {}'.format(display_error(e)))
+
+        self.response.write(json.dumps(output))
