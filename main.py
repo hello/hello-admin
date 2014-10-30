@@ -23,10 +23,12 @@ import logging as log
 import os
 import datetime as dt
 import urllib
+import requests
 from google.appengine.api import users
 from rauth import OAuth2Service
-from models import AppInfo, AdminUser, AccessToken
+from models import AppInfo, AdminUser, AccessToken, ZendeskCredentials
 from helpers import display_error
+import time
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -254,7 +256,7 @@ class CreateAccountHandler(BaseRequestHandler):
         self.response.write(json.dumps(template_values))
 
 
-class CreateApplicationHandler(BaseRequestHandler):
+class SetupHandler(BaseRequestHandler):
     def get(self):
         admin_user = AdminUser(
             id=settings.ENVIRONMENT,
@@ -270,24 +272,33 @@ class CreateApplicationHandler(BaseRequestHandler):
             access_token='updateme'
         )
         app_info.put()
+        zendesk_credentials = ZendeskCredentials(
+            id=settings.ENVIRONMENT,
+            domain='https://something.zendesk.com',
+            email_account='email@sayhello.com',
+            api_token='ask_marina'
+        )
+        zendesk_credentials.put()
 
 
 class CreateApplicationAgainstProdHandler(BaseRequestHandler):
     def get(self):
-        admin_user = AdminUser(
-            id='dev',
-            username='replace me with a real user',
-            password='with with correct pw'
-        )
-        admin_user.put()
+        if settings.DEBUG:
+            admin_user = AdminUser(
+                id='dev',
+                username='replace me with a real user',
+                password='with with correct pw'
+            )
+            admin_user.put()
 
-        app_info = AppInfo(
-            id='dev',
-            client_id=settings.PROD_CLIENT,
-            endpoint=settings.PROD_API,
-            access_token='updateme'
-        )
-        app_info.put()
+            app_info = AppInfo(
+                id='dev',
+                client_id=settings.PROD_CLIENT,
+                endpoint=settings.PROD_API,
+                access_token='updateme'
+            )
+            app_info.put()
+
 
 
 class UpdateAdminAccessToken(BaseRequestHandler):
@@ -595,3 +606,116 @@ class AppScopeAPI(BaseRequestHandler):
             log.error('ERROR: {}'.format(display_error(e)))
         self.response.write(json.dumps(output))
 
+class ZendeskAPI(BaseRequestHandler):
+    def get(self):
+        """
+        Grab tickets filed by a customer
+        - input: user email (required)
+        - auth params: domain, email_account, api_token (required by Zendesk)
+        """
+        output = {'data': [], 'error': ''}
+        user_email = self.request.get('email')
+
+        try:
+            info_query = ZendeskCredentials.query()
+            results = info_query.fetch(1)
+
+            if not results:
+                self.error(500)
+                self.response.write("Missing AppInfo. Bailing.")
+                return
+
+            zendesk_cred = results[0]
+            tickets = []
+            search_url = "{}/api/v2/search.json?query=type:ticket%20requester:{}".format(zendesk_cred.domain, user_email)
+            zen_auth = (zendesk_cred.email_account + '/token', zendesk_cred.api_token)
+            zen_response = requests.get(search_url, auth=zen_auth)
+
+            if zen_response.ok:
+                tickets += zen_response.json().get('results', [])
+
+            # Keep querying on as long as paginating is possible
+            while zen_response.json().get('next_page') is not None:
+                zen_response = requests.get(zen_response.json().get('next_page'), auth=zen_auth)
+                if zen_response.ok:
+                    tickets += zen_response.json().get('results', [])
+
+            if not tickets:
+                raise RuntimeError("fail to retrieve {}'s tickets")
+            output['data'] = tickets
+
+        except Exception as e:
+            output['error'] = display_error(e)
+            log.error('ERROR: {}'.format(display_error(e)))
+
+        self.response.write(json.dumps(output))
+
+class PreSleepAPI(BaseRequestHandler):
+    def get(self):
+        """
+        Grab temperature
+        - input:
+            sensor (required: one of ["humidity", "particulates", "temperature"])
+            token (required for each user)
+            resolution (required : week or day)
+        - auth params: oauth2
+        """
+        output = {'data': [], 'error': ''}
+        sensor = self.request.get('sensor', default_value='humidity')
+        resolution = self.request.get('resolution', default_value='day')
+        current_ts = int(time.time() * 1000)
+        user_token = self.request.get('user_token', default_value="6.9acdd33efed7493486fe7cbac185288a")
+
+        try:
+            if user_token is None:
+                raise RuntimeError("Missing user token!")
+            info_query = AppInfo.query().order(-AppInfo.created)
+            results = info_query.fetch(1)
+
+            if not results:
+                self.error(500)
+                self.response.write("Missing AppInfo. Bailing.")
+                return
+
+            app_info_model = results[0]
+            hello = make_oauth2_service(app_info_model)
+            session = hello.get_session(user_token)
+
+            req_url = "room/{}/{}".format(sensor, resolution)
+
+            response = session.get(req_url, params={'from': current_ts})
+
+            if response.status_code == 200:
+                output['data'] = response.json()
+            else:
+                raise RuntimeError('{}: fail to retrieve presleep'.format(response.status_code))
+        except Exception as e:
+            output['error'] = display_error(e)
+            log.error('ERROR: {}'.format(display_error(e)))
+
+        self.response.write(json.dumps(output))
+
+class RecentTokensAPI(BaseRequestHandler):
+    def get(self):
+        """
+        Grab recent tokens (up to 20)
+        - input:
+            sensor (required: one of ["humidity", "particulates", "temperature"])
+            token (required for each user)
+            resolution (required : week or day)
+        - auth params: oauth2
+        """
+        output = {'data': [], 'error': ''}
+        try:
+            output['data'] = [{'username': t.username, 'access_token': t.token} for t in get_most_recent_tokens()]
+        except Exception as e:
+            output['error'] = display_error(e)
+            log.error('ERROR: {}'.format(display_error(e)))
+
+        self.response.write(json.dumps(output))
+
+
+class Viz(BaseRequestHandler):
+    def get(self):
+        template = JINJA_ENVIRONMENT.get_template('templates/viz.html')
+        self.response.write(template.render({}))
