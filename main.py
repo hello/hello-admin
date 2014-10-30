@@ -648,3 +648,21 @@ class ZendeskAPI(BaseRequestHandler):
             log.error('ERROR: {}'.format(display_error(e)))
 
         self.response.write(json.dumps(output))
+class RecentTokensAPI(BaseRequestHandler):
+    def get(self):
+        """
+        Grab recent tokens (up to 20)
+        - input:
+            sensor (required: one of ["humidity", "particulates", "temperature"])
+            token (required for each user)
+            resolution (required : week or day)
+        - auth params: oauth2
+        """
+        output = {'data': [], 'error': ''}
+        try:
+            output['data'] = [{'username': t.username, 'access_token': t.token} for t in get_most_recent_tokens()]
+        except Exception as e:
+            output['error'] = display_error(e)
+            log.error('ERROR: {}'.format(display_error(e)))
+
+        self.response.write(json.dumps(output))
