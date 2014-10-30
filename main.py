@@ -26,7 +26,6 @@ import urllib
 import requests
 from google.appengine.api import users
 from rauth import OAuth2Service
-from models import AppInfo, AdminUser, AccessToken
 from models import AppInfo, AdminUser, AccessToken, ZendeskCredentials
 from helpers import display_error
 import time
@@ -257,7 +256,6 @@ class CreateAccountHandler(BaseRequestHandler):
         self.response.write(json.dumps(template_values))
 
 
-class CreateApplicationHandler(BaseRequestHandler):
 class SetupHandler(BaseRequestHandler):
     def get(self):
         admin_user = AdminUser(
@@ -285,20 +283,22 @@ class SetupHandler(BaseRequestHandler):
 
 class CreateApplicationAgainstProdHandler(BaseRequestHandler):
     def get(self):
-        admin_user = AdminUser(
-            id='dev',
-            username='replace me with a real user',
-            password='with with correct pw'
-        )
-        admin_user.put()
+        if settings.DEBUG:
+            admin_user = AdminUser(
+                id='dev',
+                username='replace me with a real user',
+                password='with with correct pw'
+            )
+            admin_user.put()
 
-        app_info = AppInfo(
-            id='dev',
-            client_id=settings.PROD_CLIENT,
-            endpoint=settings.PROD_API,
-            access_token='updateme'
-        )
-        app_info.put()
+            app_info = AppInfo(
+                id='dev',
+                client_id=settings.PROD_CLIENT,
+                endpoint=settings.PROD_API,
+                access_token='updateme'
+            )
+            app_info.put()
+
 
 
 class UpdateAdminAccessToken(BaseRequestHandler):
