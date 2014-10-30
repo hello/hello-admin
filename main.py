@@ -29,6 +29,7 @@ from rauth import OAuth2Service
 from models import AppInfo, AdminUser, AccessToken
 from models import AppInfo, AdminUser, AccessToken, ZendeskCredentials
 from helpers import display_error
+import time
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -648,6 +649,52 @@ class ZendeskAPI(BaseRequestHandler):
             log.error('ERROR: {}'.format(display_error(e)))
 
         self.response.write(json.dumps(output))
+
+class PreSleepAPI(BaseRequestHandler):
+    def get(self):
+        """
+        Grab temperature
+        - input:
+            sensor (required: one of ["humidity", "particulates", "temperature"])
+            token (required for each user)
+            resolution (required : week or day)
+        - auth params: oauth2
+        """
+        output = {'data': [], 'error': ''}
+        sensor = self.request.get('sensor', default_value='humidity')
+        resolution = self.request.get('resolution', default_value='day')
+        current_ts = int(time.time() * 1000)
+        user_token = self.request.get('user_token', default_value="6.9acdd33efed7493486fe7cbac185288a")
+
+        try:
+            if user_token is None:
+                raise RuntimeError("Missing user token!")
+            info_query = AppInfo.query().order(-AppInfo.created)
+            results = info_query.fetch(1)
+
+            if not results:
+                self.error(500)
+                self.response.write("Missing AppInfo. Bailing.")
+                return
+
+            app_info_model = results[0]
+            hello = make_oauth2_service(app_info_model)
+            session = hello.get_session(user_token)
+
+            req_url = "room/{}/{}".format(sensor, resolution)
+
+            response = session.get(req_url, params={'from': current_ts})
+
+            if response.status_code == 200:
+                output['data'] = response.json()
+            else:
+                raise RuntimeError('{}: fail to retrieve presleep'.format(response.status_code))
+        except Exception as e:
+            output['error'] = display_error(e)
+            log.error('ERROR: {}'.format(display_error(e)))
+
+        self.response.write(json.dumps(output))
+
 class RecentTokensAPI(BaseRequestHandler):
     def get(self):
         """
