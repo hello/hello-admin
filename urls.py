@@ -1,14 +1,17 @@
 import webapp2
 import settings
 from main import MainHandler, CreateTokenHandler, ChartHandler, \
-    CreateAccountHandler, CreateApplicationHandler, CreateApplicationAgainstProdHandler, \
+    CreateAccountHandler, SetupHandler, CreateApplicationAgainstProdHandler, \
     ProxyHandler, RegisterPillHandler, UpdateAdminAccessToken, UserDashboardHandler, \
-    UserAPI, AppAPI, AppScopeAPI, AppScopeHandler
+    UserAPI, AppAPI, AppScopeAPI, AppScopeHandler, ZendeskAPI, PreSleepAPI, RecentTokensAPI, Viz
 
 api_routes = [
     ('/api/app/?$', AppAPI),
     ('/api/app_scope/?$', AppScopeAPI),
     ('/api/user/?$', UserAPI),
+    ('/api/zendesk/?$', ZendeskAPI),
+    ('/api/presleep/?$', PreSleepAPI),
+    ('/api/recent_tokens/?$', RecentTokensAPI),
 ]
 
 page_routes = [
@@ -17,12 +20,13 @@ page_routes = [
     ('/access_token', CreateTokenHandler),
     ('/charts', ChartHandler),
     ('/create_account', CreateAccountHandler),
-    ('/create/app', CreateApplicationHandler),
+    ('/setup', SetupHandler),
     ('/create/app_against_prod', CreateApplicationAgainstProdHandler),
     ('/proxy/(.*)', ProxyHandler),
     ('/register_pill', RegisterPillHandler),
     ('/update', UpdateAdminAccessToken),
     ('/user_dashboard/?$', UserDashboardHandler),
+    ('/viz/?$', Viz),
 ]
 
 hello_admin_app = webapp2.WSGIApplication(
