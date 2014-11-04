@@ -11,6 +11,12 @@ from models.ext import ZendeskCredentials
 
 class AppAPI(BaseRequestHandler):
     def get(self):
+        """
+        Get all specs of all apps or a single app if specified
+        """
+        """
+        :return:
+        """
         output = {'data': [], 'error': ''}
         id = self.request.get('id')
 
@@ -32,6 +38,9 @@ class AppAPI(BaseRequestHandler):
 
 
 class AppScopeAPI(BaseRequestHandler):
+    """
+    Get the scopes of all apps or a single app if specified
+    """
     def get(self):
         output = {'data': [], 'error': ''}
         app_id = self.request.get('app_id')
@@ -54,6 +63,9 @@ class AppScopeAPI(BaseRequestHandler):
         self.response.write(json.dumps(output))
 
     def put(self):
+        """
+        Update the scopes of all apps
+        """
         output = {'data': [], 'error': ''}
         req = json.loads(self.request.body)
         app_id = req.get('app_id', None)
@@ -83,6 +95,9 @@ class AppScopeAPI(BaseRequestHandler):
 
 class CreateTokenAPI(BaseRequestHandler):
     def get(self):
+        """
+        Get all tokens created
+        """
         app_info_model = AppInfo.get_by_id(settings.ENVIRONMENT)
         log.info("Querying datastore for most recent AppInfo")
 
@@ -102,6 +117,9 @@ class CreateTokenAPI(BaseRequestHandler):
         self.response.write(resp.content)
 
     def post(self):
+        """
+        Create a token for a user requested for a specified app
+        """
         username = self.request.get("username", default_value="x@sayhello.com")
         password = self.request.get("password", default_value="x")
         client_id = self.request.get('client_id', default_value="unknown")
@@ -167,6 +185,9 @@ class CreateTokenAPI(BaseRequestHandler):
 
 class CreateAccountAPI(BaseRequestHandler):
     def post(self):
+        """
+        Create an user account
+        """
         name = self.request.get("name")
         email = self.request.get("email")
         password = self.request.get("password")
@@ -221,6 +242,9 @@ class CreateAccountAPI(BaseRequestHandler):
 
 class ProxyAPI(BaseRequestHandler):
     def get(self, path):
+        """
+        Get proxy for cross domain call in ChartHanlder
+        """
         data = []
 
         session = self.authorize_session()
@@ -256,6 +280,12 @@ class RecentTokensAPI(BaseRequestHandler):
 
 class RegisterPillAPI(BaseRequestHandler):
     def post(self):
+        """
+        Register a pill
+        """
+        """
+        :return:
+        """
 
         headers = {
             'Content-type': 'application/json',
@@ -282,89 +312,12 @@ class RegisterPillAPI(BaseRequestHandler):
             return
         self.redirect('/')
 
-class UpdateAdminAccessTokenHandler(BaseRequestHandler):
-    def get(self):
-        admin_user = AdminUser.get_by_id(settings.ENVIRONMENT)
-        app_info_model = AppInfo.get_by_id(settings.ENVIRONMENT)
-
-        if admin_user is None:
-
-            friendly_user_message = "User not found for id = %s" \
-                % settings.ENVIRONMENT
-            log.warn(friendly_user_message)
-            self.show_handler_error(friendly_user_message)
-            return
-
-        if app_info_model is None:
-            friendly_user_message = "AppInfo not found for id = %s" \
-                % settings.ENVIRONMENT
-            log.warn(friendly_user_message)
-            self.show_handler_error(friendly_user_message)
-            return
-
-        hello = make_oauth2_service(app_info_model)
-
-        data = {
-            "grant_type": "password",
-            "client_id": app_info_model.client_id,
-            "client_secret": '',
-            "username": admin_user.username,
-            "password": admin_user.password
-        }
-
-        resp = hello.get_raw_access_token(data=data)
-        log.info(resp.url)
-
-        if resp.status_code != 200:
-            log.error("Status code %s for url = %s" % (resp.status_code, resp.url))
-            log.error(data)
-            log.error("Response body = %s" % resp.content)
-            log.error("Redirecting to homepage with error message")
-            params = {'error_message': 'Failed to generate access token'}
-            self.redirect('/?=%s' % (urllib.urlencode(params)))
-            return
-
-        try:
-            json_data = json.loads(resp.content)
-        except ValueError, e:
-            friendly_user_message = "Failed to decode JSON. Bailing"
-            log.error(friendly_user_message)
-            log.error("For username: %s" % admin_user.username)
-            log.error("Json was: %s" % resp.content)
-            log.error("Error was: %s", e)
-
-            error_message = "%s - %s" % (friendly_user_message, resp.content)
-            self.show_handler_error(error_message)
-            return
-
-        if not isinstance(json_data, dict):
-            friendly_user_message = "json_data is not a dict. bailing."
-            log.error(friendly_user_message)
-            log.error(resp.content)
-            error_message = "%s - %s" % (friendly_user_message, resp.content)
-            self.show_handler_error(error_message)
-            return
-
-        if 'access_token' not in json_data:
-            friendly_user_message = "The key access_token was not found \
-                in the response"
-            log.error(friendly_user_message)
-            log.error(resp.content)
-            error_message = "%s - %s" % (friendly_user_message, resp.content)
-            self.show_handler_error(error_message)
-            return
-
-        access_token = json_data['access_token']
-        app_info_model.access_token = access_token
-        app_info_model.put()
-        msg = "updated app client_id = %s successfully." % \
-            app_info_model.client_id
-        log.info(msg)
-        self.redirect('/')
-
 
 class CreateApplicationAgainstProdAPI(BaseRequestHandler):
     def get(self):
+        """
+        Just helpful for local dev
+        """
         if settings.DEBUG:
             admin_user = AdminUser(
                 id='dev',
@@ -383,6 +336,9 @@ class CreateApplicationAgainstProdAPI(BaseRequestHandler):
 
 
 class SetupAPI(BaseRequestHandler):
+    """
+    Create entities for AppInfo, AdminUser and ZendeskCredentials
+    """
     def get(self):
         admin_user = AdminUser(
             id=settings.ENVIRONMENT,
@@ -398,6 +354,7 @@ class SetupAPI(BaseRequestHandler):
             access_token='updateme'
         )
         app_info.put()
+
         zendesk_credentials = ZendeskCredentials(
             id=settings.ENVIRONMENT,
             domain='https://something.zendesk.com',
@@ -408,6 +365,9 @@ class SetupAPI(BaseRequestHandler):
 
 
 class UpdateAdminAccessTokenAPI(BaseRequestHandler):
+    """
+    Update access token after admin user and app info entities are updated and memcache is flushed
+    """
     def get(self):
         admin_user = AdminUser.get_by_id(settings.ENVIRONMENT)
         app_info_model = AppInfo.get_by_id(settings.ENVIRONMENT)

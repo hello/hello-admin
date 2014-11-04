@@ -4,6 +4,10 @@ import logging as log
 
 
 def display_error(e):
+    """
+    :param e: exception
+    :type e: :class:Exception
+    """
     message = repr(e) or 'Unknown error'
     exc_type, exc_obj, exc_tb = sys.exc_info()
     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]

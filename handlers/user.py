@@ -42,6 +42,9 @@ class UserAPI(BaseRequestHandler):
         self.response.write(json.dumps(output))
 
     def post(self):
+        """
+        Create users
+        """
         name = self.request.get("name")
         email = self.request.get("email")
         password = self.request.get("password")

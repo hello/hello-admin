@@ -20,7 +20,9 @@ class BaseRequestHandler(webapp2.RequestHandler):
 
     def show_handler_error(self, error_message, status_code=500):
         """
+        :param error_message: custom error alert
         :type error_message: str
+        :param status_code: status code of the response
         :type status_code: int
         """
 
@@ -35,6 +37,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
 
     def _extra_context(self, context):
         """
+        :param context: a dictionary of extra value to be displayed
         :type context: dict
         """
         extras = {
@@ -47,13 +50,21 @@ class BaseRequestHandler(webapp2.RequestHandler):
         return context
 
     def render(self, template_file, template_values=None):
+        """
+        :param template_file: html file to be rendered
+        :type template_file: str
+        :param context: a dictionary of extra value to be displayed
+        :type context: dict
+        """
         context = {} if template_values is None else copy(template_values)
         template = JINJA_ENVIRONMENT.get_template(template_file)
         return template.render(self._extra_context(context))
 
     def render_to_response(self, template_file, context={}):
         """
+        :param template_file: html file to be rendered
         :type template_file: str
+        :param context: a dictionary of extra value to be displayed
         :type context: dict
         """
         s = self.render(template_file, template_values=context)
@@ -62,6 +73,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
     def authorize_session(self, token=None):
         """
         :param token: token issued to user to use an specific app
+        :type token: str
         """
         info_query = AppInfo.query().order(-AppInfo.created)
         results = info_query.fetch(1)
@@ -83,6 +95,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
 
 def make_oauth2_service(app_info_model):
     """
+    :param app_info_model: an instance of AppInfo that store auth data for a certain app
     :type app_info_model: :class:`AppInfo`
     """
     service = OAuth2Service(
@@ -98,6 +111,7 @@ def make_oauth2_service(app_info_model):
 
 def get_user(app_info_model):
     """
+    :param app_info_model: description
     :type app_info_model: :class:`AppInfo`
     """
     service = OAuth2Service(
@@ -109,3 +123,9 @@ def get_user(app_info_model):
         base_url=app_info_model.endpoint
     )
     return service
+
+
+class ProtectedRequestHandler(BaseRequestHandler):
+    def __init__(self, request, response):
+        # restriction code here
+        self.initialize(request, response)
