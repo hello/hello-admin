@@ -9,7 +9,7 @@ from handlers.helpers import make_oauth2_service, BaseRequestHandler
 from models.ext import ZendeskCredentials
 
 
-class AppHandler(BaseRequestHandler):
+class AppAPI(BaseRequestHandler):
     def get(self):
         output = {'data': [], 'error': ''}
         id = self.request.get('id')
@@ -31,7 +31,7 @@ class AppHandler(BaseRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class AppScopesHandler(BaseRequestHandler):
+class AppScopeAPI(BaseRequestHandler):
     def get(self):
         output = {'data': [], 'error': ''}
         app_id = self.request.get('app_id')
@@ -81,7 +81,7 @@ class AppScopesHandler(BaseRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class CreateTokenHandler(BaseRequestHandler):
+class CreateTokenAPI(BaseRequestHandler):
     def get(self):
         app_info_model = AppInfo.get_by_id(settings.ENVIRONMENT)
         log.info("Querying datastore for most recent AppInfo")
@@ -165,7 +165,7 @@ class CreateTokenHandler(BaseRequestHandler):
         self.response.write(json.dumps({'access_token': access_token}))
 
 
-class CreateAccountHandler(BaseRequestHandler):
+class CreateAccountAPI(BaseRequestHandler):
     def post(self):
         name = self.request.get("name")
         email = self.request.get("email")
@@ -219,7 +219,7 @@ class CreateAccountHandler(BaseRequestHandler):
         self.response.write(json.dumps(template_values))
 
 
-class ProxyHandler(BaseRequestHandler):
+class ProxyAPI(BaseRequestHandler):
     def get(self, path):
         data = []
 
@@ -239,7 +239,7 @@ class ProxyHandler(BaseRequestHandler):
         self.response.write(json.dumps(segments))
 
 
-class RecentTokensHandler(BaseRequestHandler):
+class RecentTokensAPI(BaseRequestHandler):
     def get(self):
         """
         Grab recent tokens (up to 20)
@@ -254,7 +254,7 @@ class RecentTokensHandler(BaseRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class RegisterPillHandler(BaseRequestHandler):
+class RegisterPillAPI(BaseRequestHandler):
     def post(self):
 
         headers = {
@@ -363,7 +363,7 @@ class UpdateAdminAccessTokenHandler(BaseRequestHandler):
         self.redirect('/')
 
 
-class CreateApplicationAgainstProdHandler(BaseRequestHandler):
+class CreateApplicationAgainstProdAPI(BaseRequestHandler):
     def get(self):
         if settings.DEBUG:
             admin_user = AdminUser(
@@ -382,7 +382,7 @@ class CreateApplicationAgainstProdHandler(BaseRequestHandler):
             app_info.put()
 
 
-class SetupHandler(BaseRequestHandler):
+class SetupAPI(BaseRequestHandler):
     def get(self):
         admin_user = AdminUser(
             id=settings.ENVIRONMENT,
@@ -407,7 +407,7 @@ class SetupHandler(BaseRequestHandler):
         zendesk_credentials.put()
 
 
-class UpdateAdminAccessToken(BaseRequestHandler):
+class UpdateAdminAccessTokenAPI(BaseRequestHandler):
     def get(self):
         admin_user = AdminUser.get_by_id(settings.ENVIRONMENT)
         app_info_model = AppInfo.get_by_id(settings.ENVIRONMENT)

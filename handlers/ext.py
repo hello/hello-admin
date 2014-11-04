@@ -6,7 +6,7 @@ from handlers.helpers import BaseRequestHandler
 from handlers.utils import display_error
 
 
-class ZendeskHandler(BaseRequestHandler):
+class ZendeskAPI(BaseRequestHandler):
     def get(self):
         """
         Grab tickets filed by a customer

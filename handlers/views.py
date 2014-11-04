@@ -1,5 +1,4 @@
 import datetime as dt
-import logging as log
 from models.setup import AccessToken
 import jinja2
 import os
@@ -12,25 +11,6 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     autoescape=True
 )
 
-class MainHandler(BaseRequestHandler):
-     def get(self):
-        self.render_to_response(template_file='templates/index.html',
-                                context={'title': 'Hello - Admin'})
-
-class UserDashboardHandler(BaseRequestHandler):
-    def get(self):
-        self.render_to_response(template_file='templates/user_dashboard.html',
-                                context={'title': 'Hello - User Dashboard'})
-
-class AppScopeHandler(BaseRequestHandler):
-    def get(self):
-        self.render_to_response(template_file='templates/app_scope.html',
-                                context={'title': 'Hello - App Scopes'})
-
-class DataVisual(BaseRequestHandler):
-    def get(self):
-        self.render_to_response(template_file='templates/viz.html',
-                                context={'title': 'Hello - Data Visual'})
 
 class ChartHandler(BaseRequestHandler):
     def get(self):
@@ -39,3 +19,27 @@ class ChartHandler(BaseRequestHandler):
         day = dt.datetime.strftime(dt.datetime.now(), "%Y-%m-%d")
         self.response.write(template.render({'tokens': tokens, 'day': day}))
 
+class UserDashboardView(BaseRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/user_dashboard.html',
+                                context={'title': '- User Dashboard'})
+
+class HomeView(BaseRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/home.html',
+                                context={'title': 'Home'})
+
+class SenseVisualView(BaseRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/sense.html',
+                                context={'title': '- Sense Visual'})
+
+class ZendeskView(BaseRequestHandler):
+     def get(self):
+         self.render_to_response(template_file='templates/zendesk.html',
+                                context={'title': '- Zendesk'})
+
+class SettingsView(BaseRequestHandler):
+     def get(self):
+        self.render_to_response(template_file='templates/settings.html',
+                                context={'title': '- Settings'})
