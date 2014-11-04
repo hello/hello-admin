@@ -1,0 +1,32 @@
+input.toggle[type=checkbox] {display: none;}
+input.toggle[type=checkbox]:checked + label {background-position: 0 0;}
+input.toggle[type=checkbox]:checked + label span {left: 40px;}
+
+label.toggle-label {
+	color: transparent;
+	background: url('../image/binary-toggle.png') -40px 0  no-repeat;
+	border-radius: 14px;
+	box-shadow: 0 1px 2px #888, 0 0 3px #777, inset 0 -1px 5px #333;
+	display: block;
+	position: relative;
+	text-indent: 100%;
+	width: 65px; height: 29px;
+	-webkit-transition: background-position .3s ease;
+	-moz-transition: background-position .3s ease;
+	cursor: pointer;
+	font-size: .01em;
+	float: left;
+}
+
+label.toggle-label span {
+	background: url('../image/binary-toggle.png') -1px -30px no-repeat;
+	border: 0 solid transparent;
+	border-radius: 14px;
+	box-shadow: 0 1px 3px #000, 0 2px 13px #000;
+	content: "";
+	display: block;
+	position: absolute; top: 0; left: -1px;
+	width: 28px; height: 28px;
+	-webkit-transition: left .3s ease;
+	-moz-transition: left .3s ease;
+}
