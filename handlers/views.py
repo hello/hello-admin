@@ -39,7 +39,11 @@ class ZendeskView(BaseRequestHandler):
          self.render_to_response(template_file='templates/zendesk.html',
                                 context={'title': '- Zendesk'})
 
-class SettingsView(BaseRequestHandler):
+class SettingsView(ProtectedRequestHandler):
+     """
+     Returns a panel for manipulating apps, accounts
+     """
      def get(self):
         self.render_to_response(template_file='templates/settings.html',
                                 context={'title': '- Settings'})
+
