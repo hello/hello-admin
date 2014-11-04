@@ -55,7 +55,7 @@ var AccountForm = React.createClass({
 
     var cx = React.addons.classSet;
     var classes = cx({
-      'accountForm': true,
+      'fancy-box': true,
       'success': this.state.success,
       'failure' : this.state.failure,
       'normal' : !this.state.success && !this.state.failure
@@ -108,7 +108,7 @@ var AccountForm = React.createClass({
 var AccountBox = React.createClass({
   render: function() {
     return (
-      <div className="accountBox">
+      <div>
         <AccountForm onCommentSubmit={this.handleCommentSubmit} url={this.props.url} />
       </div>
     );

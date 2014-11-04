@@ -1,5 +1,5 @@
 /** @jsx React.DOM */
-// The above declaration must remain intact at the top of the script.
+
 var sensorList = ['temperature', 'humidity', 'particulates', 'light'];
 var resolutionList = ['week', 'day'];
 var colorChoice = {
@@ -243,7 +243,7 @@ var vizBox = React.createClass({
     }
 });
 
-React.renderComponent(<vizBox />, document.getElementById('viz'));
+React.renderComponent(<vizBox />, document.getElementById('sense'));
 
 
 function manipulateData(rawData, sensor, resolution) {

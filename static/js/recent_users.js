@@ -22,10 +22,16 @@ var UserRow = React.createClass({
             attrVal = new Date(this.props.user[chosenUserAttr]).toLocaleString();
         else
             attrVal = this.props.user[chosenUserAttr];
+        var rowValClasses = React.addons.classSet({
+            'col-xs-4': true,
+            'col-md-4': true,
+            'col-lg-4': true,
+            'sid': chosenUserAttr === 'id'
+        });
         return (
             <tr>
                 <td className="col-xs-2 col-md-2 col-lg-2"><LinkToUserDashboard email={this.props.user.email} /></td>
-                <td className="col-xs-4 col-lg-4 col-lg-4">{attrVal}</td>
+                <td className={rowValClasses}>{attrVal}</td>
             </tr>
         );
     }
@@ -122,7 +128,7 @@ var FilterableUserTable = React.createClass({
 
     render: function() {
         return (
-            <div className={"recentUsersForm " + this.props.cls}>
+            <div className={"fancy-box " + this.props.cls}>
                 <FilterBar
                     filterText={this.state.filterText}
                     internalOnly={this.state.internalOnly}
@@ -173,7 +179,7 @@ var RecentUsersBox = React.createClass({
     },
     render: function() {
         return (
-          <div className="recentUsersBox">
+          <div>
             <FilterableUserTable cls={this.state.cls} users={this.state.users} />
           </div>
         );

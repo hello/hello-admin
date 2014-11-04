@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>
+        Admin &#10148;
+        {% block title %}
+        {% endblock %}
+    </title>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% block static %}
+    <script type="text/javascript" src="/static/js/third-party/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/react-with-addons-0.11.2.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/JSXTransformer-0.11.2.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/underscore.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/static/css/base.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/menu.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/glyphicon-control.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/tablesorter-control.css"/>
+    {% endblock %}
+
+    {% block extrastatic %}
+    {% endblock %}
+
+</head>
+<body>
+    <div id="header">
+        Hello, {{user}}! <a href="{{logout_url}}"> Logout</a>
+    </div>
+    <div id="menu">
+        <ul>
+           <li class='active'><a href='/'><span class="glyphicon glyphicon-user"> Trivia</span></a></li>
+           <li><a href='/sense'><span class="glyphicon glyphicon-stats"> Sense</span></a></li>
+           <li><a href='/zendesk'><span class="glyphicon glyphicon-headphones"> Zendesk</span></a></li>
+           <li><a href='/settings'><span class="glyphicon glyphicon-wrench"> Settings</span></a></li>
+        </ul>
+    </div>
+    <div class="row" id="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+    <div id="footer">
+        hello-admin app version: {{version}}
+    </div>
+</body>

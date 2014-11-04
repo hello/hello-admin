@@ -1,5 +1,5 @@
 application: hello-admin
-version: 4
+version: 5a
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -11,7 +11,7 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
 - url: .*
-  script: urls.hello_admin_app
+  script: handlers.urls.hello_admin_app
   login: required
   secure: always
 

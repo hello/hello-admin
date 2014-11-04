@@ -1,0 +1,32 @@
+{% extends "templates/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block extrastatic %}
+    <script type="text/jsx" src="/static/js/account.js"></script>
+    <script type="text/jsx" src="/static/js/token.js"></script>
+    <script type="text/jsx" src="/static/js/app_scope.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/settings.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/binary-toggle.css"/>
+{% endblock %}
+
+{% block content %}
+    <div class="col-xxl col-xs-4 col-md-4 col-lg-4">
+        <h3>Create Account</h3>
+        <hr class="fancy-line"/>
+        <div id="account"></div>
+        <h3>Generate Token</h3>
+        <hr class="fancy-line"/>
+        <div id="token"></div>
+        <h3>Links</h3>
+        <hr class="fancy-line"/>
+        <p><a target="_blank" href="/setup"> Create entities</a></p>
+        <p><a target="_blank" href="/create/app_against_prod"> Create entities against production</a></p>
+        <p><a target="_blank" href="/update"> Update access token</a></p>
+        <p><a target="_blank" href="/charts"> See charts</a></p>
+        <p><a target="_blank" href="/api/recent_tokens"> RecentTokensAPI</a></p>
+    </div>
+    <div class="col-xxl col-xs-8 col-md-8 col-lg-8">
+        <h3>Manage Apps Scopes</h3>
+        <hr class="fancy-line"/>
+        <div id="app-scope"></div>
+    </div>
+{% endblock %}
