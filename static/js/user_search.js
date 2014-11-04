@@ -3,10 +3,16 @@
 
 var UserSearchTableRow = React.createClass({
     render: function() {
+        var rowValClasses = React.addons.classSet({
+            'col-xs-3': true,
+            'col-md-3': true,
+            'col-lg-3': true,
+            'sid': this.props.rowAttr === 'id'
+        });
         return (
             <tr>
-              <td>{this.props.rowAttr}</td>
-              <td>{this.props.rowVal}</td>
+              <td className="col-xs-1 col-md-1 col-lg-1">{this.props.rowAttr}</td>
+              <td className={rowValClasses}>{this.props.rowVal}</td>
             </tr>
         );
 
@@ -38,14 +44,17 @@ var UserSearchTable = React.createClass({
             }
         });
         var tableClasses = "table table-condensed table-responsive " + this.props.stage;
-        var tableHeaders = $.isEmptyObject(this.props.users) ?
-                           null: <tr><th>Attribute</th><th>Value</th></tr>;
-        return (
-          <table className={tableClasses}>
-              <thead>{tableHeaders}</thead>
-              <tbody>{tableRows}</tbody>
-          </table>
-        );
+        var tableHeaders = <tr>
+                             <th className="col-xs-1 col-md-1 col-lg-1">Attribute</th>
+                             <th className="col-xs-3 col-md-3 col-lg-3">Value</th>
+                           </tr>;
+        var userSearchResult = this.props.users != [] && !$.isEmptyObject(this.props.users) ?
+                               <table className={tableClasses}>
+                                  <thead>{tableHeaders}</thead>
+                                  <tbody>{tableRows}</tbody>
+                               </table>
+                               : <div>{this.props.searchAlert}</div>;
+        return (userSearchResult);
     }
 });
 
@@ -53,7 +62,8 @@ var UserSearchTable = React.createClass({
 var UserSearchCanvas = React.createClass({
     getInitialState: function() {
         return {
-            users: []
+            users: {},
+            searchAlert: "\u2603"
         }
     },
     handleSubmit: function(e) {
@@ -71,14 +81,20 @@ var UserSearchCanvas = React.createClass({
           data: {email: email},
           success: function(response) {
             if (response.error) {
-                console.log('search failed');
+                this.setState({
+                    users: {},
+                    searchAlert: "☹ " + response.error
+                });
             }
             else {
                 this.setState({users: response.data});
             }
           }.bind(this),
           error: function(xhr, status, err) {
-            this.setState({users: []});
+            this.setState({
+                users: {},
+                searchAlert: "☹ Query failed"
+            });
             console.error(this.props.url, status, err);
           }.bind(this)
         });
@@ -86,8 +102,8 @@ var UserSearchCanvas = React.createClass({
     },
 
     render: function() {
-        return (<div>
-             <form onSubmit={this.handleSubmit}>
+        return (<div className="fancy-box">
+          <form onSubmit={this.handleSubmit}>
             <div className="input-group input-group-md">
               <span className="input-group-addon"><i className="glyphicon glyphicon-search"></i></span>
               <div className="icon-addon addon-md">
@@ -105,7 +121,7 @@ var UserSearchCanvas = React.createClass({
               </span>
             </div>
           </form>
-            <UserSearchTable users = {this.state.users} />
+          <UserSearchTable users={this.state.users} searchAlert={this.state.searchAlert} />
         </div>);
     }
 });
