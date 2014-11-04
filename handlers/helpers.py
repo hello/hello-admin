@@ -39,7 +39,8 @@ class BaseRequestHandler(webapp2.RequestHandler):
         """
         extras = {
             "logout_url": users.create_logout_url('/'),
-            "user": self.current_user.email()
+            "user": self.current_user.email(),
+            "version": os.environ['CURRENT_VERSION_ID']
         }
 
         context.update(extras)
