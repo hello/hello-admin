@@ -81,7 +81,7 @@ var ApplicationForm = React.createClass({
 
     var cx = React.addons.classSet;
     var classes = cx({
-      'tokenForm': true,
+      'fancy-box': true,
       'success': this.state.success,
       'failure' : this.state.failure,
       'normal' : !this.state.success && !this.state.failure
@@ -122,7 +122,7 @@ var ApplicationBox = React.createClass({
   
   render: function() {
     return (
-      <div className="tokenBox">
+      <div>
         <ApplicationForm url={this.props.url} />
       </div>
     );

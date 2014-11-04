@@ -42,12 +42,19 @@ var appScopeCanvas = React.createClass({
           }.bind(this)
         });
         setTimeout(function(){
-            $('#magic').click();
-        }, 2000);
+          $('#magic').click();
+        }, 3000);
     },
 
-    toggle: function(e) {
-        var toggled_scope = $(e.target).parent().attr('id');
+    handleToggle: function(e){
+        var clicked_element = $(e.target), this_toggle;
+        if (clicked_element.hasClass("switch-button"))
+            this_toggle = clicked_element.parent().prev(".toggle");
+        else
+            this_toggle = clicked_element.prev(".toggle");
+        this_toggle.prop("checked", !this_toggle.prop("checked"));
+        var toggled_scope = this_toggle.attr('id');
+        console.log(toggled_scope, 'huhu');
         var newSelectedAppScopes = this.state.selectedAppScopes.indexOf(toggled_scope) > -1 ?
                                     _.without(this.state.selectedAppScopes, toggled_scope):
                                     _.union(this.state.selectedAppScopes, [toggled_scope]);
@@ -76,6 +83,7 @@ var appScopeCanvas = React.createClass({
         });
     },
     render: function() {
+//        $("label").click(function(){$(this).prev("input").prop("checked", true)});
         var options = [];
         this.state.apps.forEach(function(app){
             var option =  app.id === 3 ?
@@ -86,28 +94,31 @@ var appScopeCanvas = React.createClass({
 
         var tableHeader = <tr><th>Scope</th><th>Status</th></tr>;
         var tableRows = [];
-        var offLabel = <span onClick={this.toggle} className="label label-danger form-control">OFF</span>,
-            onLabel = <span onClick={this.toggle} className="label label-success form-control">ON</span>;
 
         this.state.allScopes.forEach(function(scope){
-            var status = this.state.selectedAppScopes.indexOf(scope) === -1 ?
-                      offLabel:onLabel;
+            var tt = this.state.selectedAppScopes.indexOf(scope) === -1 ?
+                <div><input id={scope} className="toggle" type="checkbox" /><label className="toggle-label" onClick={this.handleToggle}><span className="switch-button" onClick={this.handleToggle}/></label></div>
+                : <div><input id={scope} className="toggle" type="checkbox" checked /><label className="toggle-label" onClick={this.handleToggle}><span className="switch-button" onClick={this.handleToggle}/></label></div>;
+
             tableRows.push(<tr>
                 <td>{scope}</td>
-                <td id={scope}>{status}</td>
+                <td>{tt}</td>
             </tr>);
         }.bind(this));
 
         return (<div>
-            <select ref="app" onChange={this.handleSelectChange} className="form-control">{options}</select>
-            <table className="table table-condensed">
-              <thead>{tableHeader}</thead>
-              <tbody>{tableRows}</tbody>
-            </table>
-            <button type="submit" onClick={this.update} className="btn btn-info form-control">Save</button>
+            <div className="fancy-box">
+                <select ref="app" onChange={this.handleSelectChange} className="form-control">{options}</select>
+                <table className="table table-condensed">
+                  <thead>{tableHeader}</thead>
+                  <tbody>{tableRows}</tbody>
+                </table>
+            </div>
+            <button type="submit" onClick={this.update} className="btn btn-info form-control"><span className="glyphicon glyphicon-floppy-saved"> Save</span></button>
             <button type="button" onClick={this.handleSelectChange} className="btn btn-warning form-control" id="magic">Magic</button>
         </div>)
     }
 });
 
 React.renderComponent(<appScopeCanvas />, document.getElementById('app-scope'));
+
