@@ -5,9 +5,9 @@ from handlers.setup import ProxyAPI, AppAPI, AppScopeAPI, RecentTokensAPI, Creat
     CreateAccountAPI, CreateApplicationAgainstProdAPI, RegisterPillAPI, SetupAPI, UpdateAdminAccessTokenAPI
 from handlers.ext import ZendeskAPI
 from handlers.user import UserAPI
-from handlers.metrics import PreSleepAPI
-from handlers.views import UserDashboardView, ChartHandler, SenseVisualView, SettingsView, UserView, ZendeskView
 from handlers.metrics import PreSleepAPI, DebugLogAPI
+from handlers.views import ChartHandler, UserDashboardView, SenseVisualView, SettingsView, UserView, ZendeskView, \
+    DebugLogView
 
 api_routes = [
     ('/api/app/?$', AppAPI),
@@ -25,6 +25,7 @@ page_routes = [
     ('/access_token', CreateTokenAPI),
     ('/charts', ChartHandler),
     ('/create_account', CreateAccountAPI),
+    ('/debug_log/?$', DebugLogView),
     ('/setup', SetupAPI),
     ('/create/app_against_prod', CreateApplicationAgainstProdAPI),
     ('/proxy/(.*)', ProxyAPI),

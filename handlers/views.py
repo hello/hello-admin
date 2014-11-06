@@ -35,7 +35,7 @@ class UserView(BaseRequestHandler):
     Returns a portal to quickly look for recent users and search for users.
     """
     def get(self):
-        self.render_to_response(template_file='templates/home.html',
+        self.render_to_response(template_file='templates/users.html',
                                 context={'title': 'User'})
 
 class SenseVisualView(BaseRequestHandler):
@@ -61,4 +61,12 @@ class SettingsView(ProtectedRequestHandler):
      def get(self):
         self.render_to_response(template_file='templates/settings.html',
                                 context={'title': 'Settings'})
+
+class DebugLogView(ProtectedRequestHandler):
+     """
+     Returns a panel for manipulating apps, accounts
+     """
+     def get(self):
+        self.render_to_response(template_file='templates/debug_log.html',
+                                context={'title': 'Log'})
 
