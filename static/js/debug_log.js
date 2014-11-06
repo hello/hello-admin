@@ -1,5 +1,54 @@
 /** @jsx React.DOM */
 
+
+var LogTable = React.createClass({
+   render: function(){
+       var logTableRows = [], that = this;
+       that.props.logs.forEach(function(log){
+            var currentInput = $('#search-input').val();
+            var regex = that.props.caseInsensitive === true ?
+                        new RegExp(currentInput, 'gi'): new RegExp(currentInput, 'g');
+            var regexList = that.props.showLineBreaks === true ? [regex]
+                :[regex, new RegExp('\r', 'g'), new RegExp('\n', 'g')];
+            highlightedRegex =  highlightByRegexForJSX(log.text,
+                regexList,
+                that.props.highlightColor
+            );
+            msg = highlightedRegex.jsxMix;
+            matchCount = highlightedRegex.matchCount;
+            nCount = highlightedRegex.nCount;
+            rCount = highlightedRegex.rCount;
+
+            var ts = [
+                <span className="label label-default">{log.docid.split('-')[0]}</span>, <br/>, <br/>,
+                new Date(Number(log.docid.split('-')[1])).toLocaleString(), <br/>, <br/>,
+                <em>%s Count: {matchCount}</em>, <br/>,
+                <em>\n Count: {nCount}</em>, <br/>,
+                <em>\r Count: {rCount}</em>
+            ];
+            var msgClasses = React.addons.classSet({
+                'col-lg-11': true,
+                'col-md-11': true,
+                'col-xs-11': true,
+                'col-sm-11': true,
+                'showLineBreaks': that.props.showLineBreaks
+            });
+            logTableRows.push(<tr>
+                <td className="col-lg-1 col-md-1 col-xs-1 col-sm-1">{ts}</td>
+                <td className={msgClasses}>{msg}</td>
+            </tr>);
+       });
+       return (
+            <table className="table table-condensed table-striped table-bordered">
+              <thead><tr>
+                <th className="alert alert-success"><span className="glyphicon glyphicon-time"> Time</span></th>
+                <th className="alert alert-warning"><span className="glyphicon glyphicon-paperclip"> Messages</span></th>
+              </tr></thead>
+              <tbody>{logTableRows}</tbody>
+            </table>
+       )
+   }
+});
 var DebugLog = React.createClass({
     getInitialState: function(){
         return {
@@ -87,51 +136,15 @@ var DebugLog = React.createClass({
         return false;
     },
     render: function(){
-        var result = [], iam = this;
-        iam.state.logs.forEach(function(log){
-            var currentInput = $('#search-input').val();
-            var regex = iam.state.caseInsensitive === true ?
-                        new RegExp(currentInput, 'gi'): new RegExp(currentInput, 'g');
-            var regexList = iam.state.showLineBreaks === true ? [regex]
-                :[regex, new RegExp('\r', 'g'), new RegExp('\n', 'g')];
-            highlightedRegex =  highlightByRegexForJSX(log.text,
-                regexList,
-                iam.state.highlightColor
-            );
-            msg = highlightedRegex.jsxMix;
-            matchCount = highlightedRegex.matchCount;
-            nCount = highlightedRegex.nCount;
-            rCount = highlightedRegex.rCount;
-
-            var ts = [
-                log.docid.split('-')[0], <br/>,
-                new Date(Number(log.docid.split('-')[1])).toLocaleString(), <br/>, <br/>,
-                <em>%s Count: {matchCount}</em>, <br/>,
-                <em>\n Count: {nCount}</em>, <br/>,
-                <em>\r Count: {rCount}</em>
-            ];
-            var msgClasses = React.addons.classSet({
-                'col-lg-11': true,
-                'col-md-11': true,
-                'col-xs-11': true,
-                'col-sm-11': true,
-                'showLineBreaks': iam.state.showLineBreaks
-            });
-            result.push(<tr>
-                <td className="col-lg-1 col-md-1 col-xs-1 col-sm-1">{ts}</td>
-                <td className={msgClasses}>{msg}</td>
-            </tr>);
-        });
-        var display = this.state.logs.length === 0 ?
+        var result = this.state.logs.length === 0 ?
             <div className="docs-count">{this.state.searchAlert}</div>: [
             <div className="docs-count">{this.state.searchAlert}</div>,
-            <table className="table table-condensed table-striped table-bordered">
-                <thead><tr>
-                    <th className="alert alert-success"><span className="glyphicon glyphicon-time"> Time</span></th>
-                    <th className="alert alert-warning"><span className="glyphicon glyphicon-paperclip"> Messages</span></th>
-                </tr></thead>
-                <tbody>{result}</tbody>
-            </table>
+            <LogTable
+                logs={this.state.logs}
+                caseInsensitive={this.state.caseInsensitive}
+                showLineBreaks={this.state.showLineBreaks}
+                highlightColor={this.state.highlightColor}
+            />
         ];
         var glyphClasses = React.addons.classSet({
             'glyphicon': true,
@@ -168,15 +181,17 @@ var DebugLog = React.createClass({
                   </span>
                 </div>
             </form><br/>
-            {display}
+            {result}
         </div>)
     }
 });
 
 React.renderComponent(<DebugLog />, document.getElementById('debug-log'));
 
+
 function highlightByRegexForJSX(text, regexList, color) {
-    // this function return a mix of strings and spans where the spans replace the substrings matching the regex list
+    // this function return a mix of strings and spans
+    // where the spans replace the substrings matching the regex list
     var matchCount = 0;
     var rCount = 0;
     var nCount = 0;
@@ -195,8 +210,7 @@ function highlightByRegexForJSX(text, regexList, color) {
         });
     });
     var mixedArray = [];
-    var dd = textSplit.split('^_^');
-    dd.forEach(function (t) {
+    textSplit.split('^_^').forEach(function (t) {
         if (t.slice(0, 3) !== '<b>') {
             mixedArray.push(t);
         }
