@@ -1,6 +1,5 @@
 /** @jsx React.DOM */
 
-
 var LogTable = React.createClass({
    render: function(){
        var logTableRows = [], that = this;
@@ -14,10 +13,10 @@ var LogTable = React.createClass({
                 regexList,
                 that.props.highlightColor
             );
-            msg = highlightedRegex.jsxMix;
-            matchCount = highlightedRegex.matchCount;
-            nCount = highlightedRegex.nCount;
-            rCount = highlightedRegex.rCount;
+            var msg = highlightedRegex.jsxMix,
+                matchCount = highlightedRegex.matchCount, // number of matches
+                nCount = highlightedRegex.nCount, // number of \n
+                rCount = highlightedRegex.rCount; // number of \r
 
             var ts = [
                 <span className="label label-default">{log.docid.split('-')[0]}</span>, <br/>, <br/>,
@@ -195,9 +194,9 @@ function highlightByRegexForJSX(text, regexList, color) {
     var matchCount = 0;
     var rCount = 0;
     var nCount = 0;
-    var textSplit = text;
     regexList.forEach(function(r){
-        textSplit = textSplit.replace(r, function (matchString) {
+        text = text.replace(r, function (matchString) {
+            // ^_^ is chosen as a dummy delimiter
             if (r.exec('\n') !== null) {
                 return '^_^<b>\\n</b>^_^';
             }
@@ -205,12 +204,12 @@ function highlightByRegexForJSX(text, regexList, color) {
                 return '^_^<b>\\r</b>^_^';
             }
             else {
-                return '^_^<b>' + matchString + '</b>^_^';  // ^_^ as dummy delimiter
+                return '^_^<b>' + matchString + '</b>^_^';
             }
         });
     });
     var mixedArray = [];
-    textSplit.split('^_^').forEach(function (t) {
+    text.split('^_^').forEach(function (t) {
         if (t.slice(0, 3) !== '<b>') {
             mixedArray.push(t);
         }
@@ -223,7 +222,6 @@ function highlightByRegexForJSX(text, regexList, color) {
             rCount += 1;
         }
         else if (!new RegExp('<b>\\s*</b>').test(t)){
-            console.log(t, matchCount);
             mixedArray.push(<span style={{color: color}} dangerouslySetInnerHTML={{__html: t}}></span>);
             matchCount += 1;
         }
