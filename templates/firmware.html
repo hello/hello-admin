@@ -1,0 +1,30 @@
+{% extends "templates/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <div id="firmware" class="col-xxl col-xs-4 col-md-4 col-lg-4">
+        <style>
+            #firmware label{display:block;}
+            #firmware form{margin:50px 0;border:2px solid #ccc;padding:20px;}
+        </style>
+        <form method="POST" action="/api/firmware/add">
+            <input type="hidden" name="truncate" value="1" />
+            <p><label>Device_id</label><input type="text" name="device_id" /></p>
+            <p><input type="submit" value="Delete all firmware updates for this device_id" /></p>
+        </form>
+        <form method="POST" action="/api/firmware/add">
+            <h2>Add file to be downloaded here</h2>
+            <p><label>Device_id</label><input type="text" name="device_id" /></p>
+            <p><label>Firmware version</label><input type="text" name="firmware_version" /></p>
+            <p><label>Name in s3</label><input type="text" name="s3_name" /></p>
+            <p>Copy to Serial Flash <input type="checkbox" name="copy_to_serial_flash" value="1"/></p>
+            <p>Reset Network Processor <input type="checkbox" name="reset_network_processor" value="1" /></p>
+            <p>Reset Application Processor <input type="checkbox" name="reset_application_processor" value="1" /></p>
+            <p><label>Serial Flash Filename</label><input type="text" name="serial_flash_filename" /></p>
+            <p><label>Serial Flash path</label><input type="text" name="serial_flash_path" /></p>
+            <p><label>SD Card filename</label><input type="text" name="sd_card_filename" /></p>
+            <p><label>SD Card path</label><input type="text" name="sd_card_path" /></p>
+            <p><input type="submit" value="Add file" /></p>
+        </form>
+    </div>
+{% endblock %}

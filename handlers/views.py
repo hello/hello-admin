@@ -62,3 +62,11 @@ class SettingsView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/settings.html',
                                 context={'title': '- Settings'})
 
+class FirmwareView(ProtectedRequestHandler):
+     """
+     Returns a panel for adding files for OTA firmware updates
+     """
+     def get(self):
+        self.render_to_response(template_file='templates/firmware.html',
+                                context={'title': '- firmware'})
+

@@ -4,9 +4,11 @@ import settings
 from handlers.setup import ProxyAPI, AppAPI, AppScopeAPI, RecentTokensAPI, CreateTokenAPI, \
     CreateAccountAPI, CreateApplicationAgainstProdAPI, RegisterPillAPI, SetupAPI, UpdateAdminAccessTokenAPI
 from handlers.ext import ZendeskAPI
+from handlers.firmware import FirmwareAPI
 from handlers.user import UserAPI
 from handlers.metrics import PreSleepAPI
 from handlers.views import UserDashboardView, ChartHandler, SenseVisualView, SettingsView, UserView, ZendeskView
+from handlers.views import FirmwareView
 
 api_routes = [
     ('/api/app/?$', AppAPI),
@@ -15,6 +17,7 @@ api_routes = [
     ('/api/presleep/?$', PreSleepAPI),
     ('/api/recent_tokens/?$', RecentTokensAPI),
     ('/api/zendesk/?$', ZendeskAPI),
+    ('/api/firmware/add', FirmwareAPI),
 ]
 
 
@@ -32,6 +35,7 @@ page_routes = [
     ('/sense/?$', SenseVisualView),
     ('/settings/?$', SettingsView),
     ('/zendesk/?$', ZendeskView),
+    ('/firmware/?$', FirmwareView),
 ]
 
 hello_admin_app = webapp2.WSGIApplication(
