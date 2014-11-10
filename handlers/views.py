@@ -28,14 +28,14 @@ class UserDashboardView(BaseRequestHandler):
     """
     def get(self):
         self.render_to_response(template_file='templates/user_dashboard.html',
-                                context={'title': '- User Dashboard'})
+                                context={'title': 'User Dashboard'})
 
 class UserView(BaseRequestHandler):
     """
     Returns a portal to quickly look for recent users and search for users.
     """
     def get(self):
-        self.render_to_response(template_file='templates/home.html',
+        self.render_to_response(template_file='templates/users.html',
                                 context={'title': 'User'})
 
 class SenseVisualView(BaseRequestHandler):
@@ -44,7 +44,7 @@ class SenseVisualView(BaseRequestHandler):
     """
     def get(self):
         self.render_to_response(template_file='templates/sense.html',
-                                context={'title': '- Sense Visual'})
+                                context={'title': 'Sense Visual'})
 
 class ZendeskView(BaseRequestHandler):
      """
@@ -52,7 +52,7 @@ class ZendeskView(BaseRequestHandler):
      """
      def get(self):
          self.render_to_response(template_file='templates/zendesk.html',
-                                context={'title': '- Zendesk'})
+                                context={'title': 'Zendesk'})
 
 class SettingsView(ProtectedRequestHandler):
      """
@@ -60,5 +60,13 @@ class SettingsView(ProtectedRequestHandler):
      """
      def get(self):
         self.render_to_response(template_file='templates/settings.html',
-                                context={'title': '- Settings'})
+                                context={'title': 'Settings'})
+
+class DebugLogView(ProtectedRequestHandler):
+     """
+     Returns a panel for manipulating apps, accounts
+     """
+     def get(self):
+        self.render_to_response(template_file='templates/debug_log.html',
+                                context={'title': 'Log'})
 

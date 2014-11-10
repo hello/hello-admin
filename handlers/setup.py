@@ -6,7 +6,7 @@ import settings
 from models.setup import AppInfo, AdminUser, AccessToken
 from handlers.utils import display_error
 from handlers.helpers import make_oauth2_service, BaseRequestHandler
-from models.ext import ZendeskCredentials
+from models.ext import ZendeskCredentials, SearchifyCredentials
 
 
 class AppAPI(BaseRequestHandler):
@@ -362,6 +362,12 @@ class SetupAPI(BaseRequestHandler):
             api_token='ask_marina'
         )
         zendesk_credentials.put()
+
+        searchify_credentials = SearchifyCredentials(
+            id=settings.ENVIRONMENT,
+            api_client='ask_tim'
+        )
+        searchify_credentials.put()
 
 
 class UpdateAdminAccessTokenAPI(BaseRequestHandler):
