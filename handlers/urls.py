@@ -7,12 +7,16 @@ from handlers.ext import ZendeskAPI
 from handlers.firmware import FirmwareAPI
 from handlers.user import UserAPI
 from handlers.metrics import PreSleepAPI
-from handlers.views import UserDashboardView, ChartHandler, SenseVisualView, SettingsView, UserView, ZendeskView
+from handlers.views import UserDashboardView, ChartHandler, SenseVisualView, SettingsView, UserView, ZendeskView \
+DebugLogView
 from handlers.views import FirmwareView
+from handlers.metrics import PreSleepAPI, DebugLogAPI
+    
 
 api_routes = [
     ('/api/app/?$', AppAPI),
     ('/api/app_scope/?$', AppScopeAPI),
+    ('/api/debug_log/?$', DebugLogAPI),
     ('/api/user/?$', UserAPI),
     ('/api/presleep/?$', PreSleepAPI),
     ('/api/recent_tokens/?$', RecentTokensAPI),
@@ -26,6 +30,7 @@ page_routes = [
     ('/access_token', CreateTokenAPI),
     ('/charts', ChartHandler),
     ('/create_account', CreateAccountAPI),
+    ('/debug_log/?$', DebugLogView),
     ('/setup', SetupAPI),
     ('/create/app_against_prod', CreateApplicationAgainstProdAPI),
     ('/proxy/(.*)', ProxyAPI),
