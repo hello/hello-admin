@@ -70,3 +70,11 @@ class DebugLogView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/debug_log.html',
                                 context={'title': 'Log'})
 
+class FirmwareView(ProtectedRequestHandler):
+     """
+     Returns a panel for adding files for OTA firmware updates
+     """
+     def get(self):
+        self.render_to_response(template_file='templates/firmware.html',
+                                context={'title': '- firmware'})
+
