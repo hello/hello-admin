@@ -17,7 +17,6 @@ class PreSleepAPI(BaseRequestHandler):
             resolution (required : week or day)
         """
         output = {'data': [], 'error': ''}
-        sensor = self.request.get('sensor', default_value='humidity')
         resolution = self.request.get('resolution', default_value='day')
         current_ts = int(time.time() * 1000)
         user_token = self.request.get('user_token', default_value=None)
@@ -47,10 +46,11 @@ class DebugLogAPI(BaseRequestHandler):
     """
     def get(self):
          output = {'data': [], 'error': ''}
-         search_input = self.request.get('search_input', default_value=None)
-         search_by = self.request.get('search_by', default_value=None)
-
          try:
+             search_input = self.request.get('search_input', default_value=None)
+             search_by = self.request.get('search_by', default_value=None)
+             max_results = int(self.request.get('max_results', default_value=20))
+
              if None in [search_input, search_by]:
                  raise RuntimeError("Missing input")
 
@@ -64,7 +64,7 @@ class DebugLogAPI(BaseRequestHandler):
 
              debug_log_api = ApiClient(searchify_cred.api_client)
              index = debug_log_api.get_index('sense-logs')
-             output['data'] =  index.search('{}:{}'.format(search_by, search_input), fetch_fields=['text'])
+             output['data'] = index.search('{}:{}'.format(search_by, search_input), fetch_fields=['text'], length=max_results)
 
          except Exception as e:
              output['error'] = display_error(e)
