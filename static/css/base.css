@@ -1,6 +1,8 @@
 #header {background: #475f7d url(image/menu-pattern.png); padding: 10px; color: #F2F7FB; text-align: right;}
+#header.dev {background: saddlebrown;}
 #content {margin: 0 15px 15px 15px;}
-#footer {background: #F2F7FB url(image/menu-pattern.png); padding: 10px; color: gray; text-align: center; opacity: 0.7}
+#footer {background: #F2F7FB url(image/menu-pattern.png); padding: 10px; color: gray; text-align: center; opacity: 0.7; width: 100%;}
+
 
 .normal {border: 1px solid #90ADE6; transition: all 2s;}
 .success {border: 1px solid #61c4bd; transition: all 2s ease-in;}
@@ -15,3 +17,13 @@ table.table>thead>tr>th {display: table-cell; vertical-align: middle; text-align
 button.btn-circle {border-radius: 100%; width: 32px; height: 32px; margin: 10px auto; display: table; color: #ffffff; background-color: rgba(45, 193, 205, 0.34);}
 span.label {font: 75% lighter "Lucida Grande", Verdana, Arial, sans-serif}
 h3 {text-align: center;}
+
+div.bootstrap-tagsinput {min-width: 100%;}
+div.bootstrap-tagsinput>span.label {font-size: 12px;}
+div.long-tagsinput-highlight {border-color: deepskyblue;box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px lightblue;outline: 0 none;}
+code.nonscript {background: #ffffff; color: #003333;}
+
+div.slider-handle {background: orangered; border-radius: 4px;}
+div.slider-selection {background: coral;}
+div.slider-track {background: antiquewhite;}
+div.slider div.tooltip {display: none;}
