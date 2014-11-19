@@ -4,8 +4,8 @@ var sensorList = ['temperature', 'humidity', 'particulates', 'light'];
 var resolutionList = ['week', 'day'];
 var colorChoice = {
     temperature: {
-        day: 'pink',
-        week: 'red'
+        day: '#E30B5C',
+        week: 'violet'
     },
     humidity: {
         day: '#8db600',
@@ -20,6 +20,10 @@ var colorChoice = {
         week: 'brown'
     }
 };
+var legends = {
+    day: 'Yesterday',
+    week: 'Last Week'
+}
 var vizCanvas = React.createClass({
     componentDidMount: function() {
         console.log('sketch me up!')
@@ -149,8 +153,6 @@ var vizCanvas = React.createClass({
 
 });
 
-//function prepareDrawData()
-
 
 var vizForm = React.createClass({
     getInitialState: function() {
@@ -168,9 +170,11 @@ var vizForm = React.createClass({
             var request_params = {
               user_token: $('select').val(),
               sensor: sensor,
-              resolution: resolution
+              resolution: resolution,
+              timezone_offset: timezoneOffsetInMs
             };
 //            console.log('sending', request_params);
+            var timezoneOffsetInMs = new Date().getTimezoneOffset()*1000*60;
             $.ajax({
               url: 'api/presleep',
               dataType: 'json',
@@ -179,7 +183,6 @@ var vizForm = React.createClass({
               success: function(response) {
                   var d = {};
                   d[sensor] = this.state[sensor];
-                  console.log('SS', d[sensor]);
                   if (d[sensor].length === resolutionList.length) {
                       d[sensor] = [];
                   }
@@ -196,11 +199,9 @@ var vizForm = React.createClass({
     },
     render: function() {
         var options = [];
-//        console.log('ability to impersonate', this.props.impersonatees);
         this.props.impersonatees.forEach(function(impersonatee){
             options.push(<option value={impersonatee.access_token}>{impersonatee.username + ' ' + impersonatee.access_token }</option>)
         });
-        console.log('h', this.state.humidity);
         return (<div>
             <form className="form-inline">
                 <select ref="cascadeur" className="form-control">{options}</select>
@@ -256,7 +257,7 @@ function manipulateData(rawData, sensor, resolution) {
     });
     return {
         values: points,
-        key: resolution,
+        key: legends[resolution],
         color: colorChoice[sensor][resolution]
     }
 }

@@ -17,11 +17,14 @@ class PreSleepAPI(BaseRequestHandler):
             resolution (required : week or day)
         """
         output = {'data': [], 'error': ''}
-        resolution = self.request.get('resolution', default_value='day')
-        current_ts = int(time.time() * 1000)
-        user_token = self.request.get('user_token', default_value=None)
-
         try:
+            sensor = self.request.get('sensor', default_value='humidity')
+            resolution = self.request.get('resolution', default_value='day')
+            timezone_offset = int(self.request.get('timezone_offset', default_value=8*3600*1000))
+            current_ts = int(time.time() * 1000) - timezone_offset
+            log.warning(current_ts)
+            user_token = self.request.get('user_token', default_value=None)
+
             if user_token is None:
                 raise RuntimeError("Missing user token!")
 
