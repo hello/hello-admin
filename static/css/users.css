@@ -1,3 +1,4 @@
-.table>tbody>tr>td.sid {font-size: 12px}
+table.table>tbody>tr>td.sid {font-size: 12px}
+table.table>thead>tr>th {text-align: left;}
 #email-filter{border-top-right-radius: 5px; border-bottom-right-radius: 5px}
 #token-display {margin: 0 auto; display: table; font-style: oblique;}

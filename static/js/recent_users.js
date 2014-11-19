@@ -1,9 +1,14 @@
 /** @jsx React.DOM */
 
 var LinkToUserDashboard = React.createClass({
+    handleClick: function(){
+        console.log('clicked');
+        $('#email-search').focus().val(this.props.email);
+        $("#email-search-submit").click();
+    },
     render: function() {
-        var userDashboardLink = "/user_dashboard/?email=" + this.props.email;
-        return <a href={userDashboardLink} target="_blank" title="Click to visit this user's dashboard"> {this.props.email}</a>
+        var userLink = "/users/?email=" + this.props.email;
+        return <a onClick={this.handleClick}>{this.props.email}</a>
     }
 });
 var UserRow = React.createClass({
@@ -11,7 +16,7 @@ var UserRow = React.createClass({
         $('.tablesorter').tablesorter({
            headers: {
              0: {sorter: true},
-             1: {sorter: true}
+             1: {sorter: false}
            }
         });
     },
@@ -154,7 +159,7 @@ var RecentUsersBox = React.createClass({
     },
     loadRecentUsersFromServer: function(){
         $.ajax({
-          url: 'api/user',
+          url: '/api/user',
           dataType: 'json',
           type: 'GET',
           success: function(response) {

@@ -80,12 +80,14 @@ var UserSearchCanvas = React.createClass({
     },
     handleSubmit: function(e) {
         console.log('submitted');
-        e.preventDefault();
+        if (e) {
+            e.preventDefault();
+        }
         var email = this.refs.email.getDOMNode().value.trim().toLowerCase();
         if (!email) {
           return;
         }
-
+        history.pushState({}, '', '/users/?email=' + email);
         $.ajax({
           url: "/api/user",
           dataType: 'json',
@@ -137,23 +139,33 @@ var UserSearchCanvas = React.createClass({
         return false;
     },
 
+    componentDidMount: function(e) {
+        var email_from_url = getParameterByName('email');
+        if (email_from_url) {
+            this.refs.email.getDOMNode().value = email_from_url;
+            this.handleSubmit(e);
+        }
+    },
+
     render: function() {
         return (<div className="fancy-box">
           <form onSubmit={this.handleSubmit}>
             <div className="input-group input-group-md">
-              <span className="input-group-addon"><i className="glyphicon glyphicon-search"></i></span>
+              <span className="input-group-addon"><i className="glyphicon glyphicon-tasks"></i></span>
               <div className="icon-addon addon-md">
                 <input
                     id="email-search"
                     ref="email"
-                    className="form-control col-md-5"
+                    className="form-control"
                     type="text"
-                    placeholder="query by email"
+                    placeholder="query by EXACT email"
                 />
                 <label for="email-search" className="glyphicon glyphicon-envelope"></label>
               </div>
               <span className="input-group-btn">
-                <button className="btn btn-default form-control" type="submit">Go!</button>
+                <button id="email-search-submit" className="btn btn-default form-control" type="submit">
+                    <span className="glyphicon glyphicon-search"/>
+                </button>
               </span>
             </div>
           </form>

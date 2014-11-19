@@ -47,36 +47,35 @@ class SenseVisualView(BaseRequestHandler):
                                 context={'title': 'Sense Visual'})
 
 class ZendeskView(BaseRequestHandler):
-     """
-     Returns zendesk statistics, underconstruction
-     """
-     def get(self):
+    """
+    Returns zendesk statistics, underconstruction
+    """
+    def get(self):
          self.render_to_response(template_file='templates/zendesk.html',
                                 context={'title': 'Zendesk'})
 
 class SettingsView(ProtectedRequestHandler):
-     """
-     Returns a panel for manipulating apps, accounts
-     """
-     def get(self):
+    """
+    Returns a panel for manipulating apps, accounts
+    """
+    def get(self):
         self.render_to_response(template_file='templates/settings.html',
                                 context={'title': 'Settings'})
 
 class DebugLogView(ProtectedRequestHandler):
-     """
-     Returns a panel for manipulating apps, accounts
-     """
-     def get(self):
+    """
+    Returns a beautiful & comfy log viewer
+    """
+    def get(self):
         self.render_to_response(template_file='templates/debug_log.html',
                                 context={'title': 'Log'})
 
 class FirmwareView(ProtectedRequestHandler):
-     """
-     Returns a panel for adding files for OTA firmware updates
-     """
-     def get(self):
+    """
+    Returns a panel for moderating firmware content
+    """
+    def get(self):
         self.render_to_response(template_file='templates/firmware.html',
-                                context={'title': '- firmware'})
                                 context={'title': 'Firmware'})
 
 class TeamsView(ProtectedRequestHandler):
