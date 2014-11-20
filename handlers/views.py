@@ -22,21 +22,13 @@ class ChartHandler(BaseRequestHandler):
         day = dt.datetime.strftime(dt.datetime.now(), "%Y-%m-%d")
         self.response.write(template.render({'tokens': tokens, 'day': day}))
 
-class UserDashboardView(BaseRequestHandler):
-    """
-    Returns all you should know about an user, under construction
-    """
-    def get(self):
-        self.render_to_response(template_file='templates/user_dashboard.html',
-                                context={'title': 'User Dashboard'})
-
 class UserView(BaseRequestHandler):
     """
     Returns a portal to quickly look for recent users and search for users.
     """
     def get(self):
         self.render_to_response(template_file='templates/users.html',
-                                context={'title': 'User'})
+                                context={'title': 'Users'})
 
 class SenseVisualView(BaseRequestHandler):
     """
@@ -44,7 +36,7 @@ class SenseVisualView(BaseRequestHandler):
     """
     def get(self):
         self.render_to_response(template_file='templates/sense.html',
-                                context={'title': 'Sense Visual'})
+                                context={'title': 'Sense'})
 
 class ZendeskView(BaseRequestHandler):
     """
@@ -93,7 +85,6 @@ class ConfigurationView(ProtectedRequestHandler):
     """
     def get(self):
         self.render_to_response(template_file='templates/configuration.html',
-                                context={'title': 'Devices'})
                                 context={'title': 'Configuration'})
 
 class Teams2View(ProtectedRequestHandler):

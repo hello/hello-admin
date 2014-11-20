@@ -3,6 +3,7 @@ import settings
 from handlers.configuration import FeaturesAPI
 from handlers.cron import ZendeskCronHandler
 from handlers.teams import TeamsAPI
+from handlers.teams import Teams2API
 from handlers.ext import ZendeskAPI
 from handlers.ext import ZendeskStatsAPI
 from handlers.firmware import FirmwareAPI
@@ -25,15 +26,17 @@ from handlers.views import TeamsView
 from handlers.views import FirmwareView
 from handlers.views import SenseVisualView
 from handlers.views import SettingsView
-from handlers.views import UserDashboardView
 from handlers.views import UserView
 from handlers.views import ZendeskView
+from handlers.views import Teams2View
+from handlers.views import ErrorView
 
 api_routes = [
     ('/api/app/?$', AppAPI),
     ('/api/app_scope/?$', AppScopeAPI),
     ('/api/debug_log/?$', DebugLogAPI),
     ('/api/device/?$', TeamsAPI),
+    ('/api/teams2/?$', Teams2API),
     ('/api/features/?$', FeaturesAPI),
     ('/api/firmware/?$', FirmwareAPI),
     ('/api/presleep/?$', PreSleepAPI),
@@ -51,7 +54,7 @@ page_routes = [
     ('/create_account', CreateAccountAPI),
     ('/configuration/?$', ConfigurationView),
     ('/debug_log/?$', DebugLogView),
-    ('/teams/?$', TeamsView),
+    ('/teams2/?$', TeamsView),
     ('/firmware/?$', FirmwareView),
     ('/proxy/(.*)', ProxyAPI),
     ('/register_pill', RegisterPillAPI),
@@ -59,9 +62,10 @@ page_routes = [
     ('/settings/?$', SettingsView),
     ('/setup', SetupAPI),
     ('/update', UpdateAdminAccessTokenAPI),
-    ('/user_dashboard/?$', UserDashboardView),
     ('/users/?$', UserView),
     ('/zendesk/?$', ZendeskView),
+    ('/teams/?$', Teams2View),
+    ('/error/?$', ErrorView),
 ]
 
 
