@@ -94,6 +94,15 @@ class ConfigurationView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/configuration.html',
                                 context={'title': 'Devices'})
+                                context={'title': 'Configuration'})
+
+class Teams2View(ProtectedRequestHandler):
+    """
+    Returns a panel for monitoring team device IDs and groups (teams) by feature.
+    """
+    def get(self):
+        self.render_to_response(template_file='templates/teams2.html',
+                                context={'title': 'Teams2'})
 
 class ErrorView(BaseRequestHandler):
     def get(self):

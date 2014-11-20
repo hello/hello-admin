@@ -1,0 +1,6 @@
+#refresh {display: none;}
+#feature-input{max-width: 100%;}
+#groups-input {padding-bottom: 50px;}
+table.table td{text-align: center;}
+.group-td:hover, .ids-td:hover {-webkit-stroke-width: 7px;-webkit-stroke-color: yellow; -webkit-fill-color: yellow; text-shadow: 1px 0 20px yellow;}
+.remark {font-size: 11px; float: right; margin-top: 6px;}
