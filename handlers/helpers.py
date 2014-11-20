@@ -43,7 +43,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         """
         extras = {
             "logout_url": users.create_logout_url('/'),
-            "user": self.current_user.email(),
+            "user": self.current_user.email().split('@')[0].title(),
             "version": os.environ['CURRENT_VERSION_ID'],
             "env": settings.ENVIRONMENT
         }
@@ -129,5 +129,9 @@ def get_user(app_info_model):
 
 class ProtectedRequestHandler(BaseRequestHandler):
     def __init__(self, request, response):
-        # restriction code here
+        super(ProtectedRequestHandler, self).__init__()
         self.initialize(request, response)
+        if not self.current_user.email().endswith('@sayhello.com'):
+            self.redirect('/error')
+
+

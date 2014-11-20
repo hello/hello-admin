@@ -95,3 +95,7 @@ class ConfigurationView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/configuration.html',
                                 context={'title': 'Devices'})
 
+class ErrorView(BaseRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/error.html',
+                                context={'title': 'Sorry'})
