@@ -22,3 +22,7 @@ function getParameterByName(name) {
       results = regex.exec(location.search);
   return results === null ? "" : decodeURIComponent(results[1]);
 }
+
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}

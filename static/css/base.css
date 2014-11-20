@@ -1,7 +1,13 @@
-#header {background: #475f7d url(image/menu-pattern.png); padding: 10px; color: #F2F7FB; text-align: right;}
-#header.dev {background: saddlebrown;}
-#content {margin: 0 15px 15px 15px;}
-#footer {background: #F2F7FB url(image/menu-pattern.png); padding: 10px; color: gray; text-align: center; opacity: 0.7; width: 100%;}
+#header {background: #475F78 url(image/menu-pattern.png); padding: 10px 0; margin: 0 auto; color: #F2F7FB; width: 100%; position: fixed; top: 0; z-index: 999; -moz-box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); -webkit-box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3);}
+#header>div{text-align: center;}
+#header.dev {background: #475F78 url(image/menu-pattern.png);}
+#menu {color: rgba(0, 0, 139, 0.18); font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;}
+#menu>a {color: deepskyblue;margin-right: 10px;}
+#menu>a:hover {text-decoration: none; -webkit-stroke-width: 7px;-webkit-stroke-color: #B0FC23; -webkit-fill-color: #B0FC23; text-shadow: 1px 0 20px #B0FC23;}
+#menu>a.menu-active {color: #B0FC23; text-decoration: none; -webkit-stroke-width: 7px;-webkit-stroke-color: #B0FC23; -webkit-fill-color: #B0FC23; text-shadow: 1px 0 20px #B0FC23;}
+#menu>a>span.glyphicon {margin: 0 7px;}
+#content {margin: 30px 15px 0 15px;}
+#footer {background: #F2F7FB url(image/menu-pattern.png); padding: 6px; color: gray; text-align: center; opacity: 0.5; width: 100%; position: fixed; bottom: 0;}
 
 
 .normal {border: 1px solid #90ADE6; transition: all 2s;}
@@ -16,7 +22,7 @@ table.table>tbody>tr>td {display: table-cell; vertical-align: middle;}
 table.table>thead>tr>th {display: table-cell; vertical-align: middle; text-align: center;}
 button.btn-circle {border-radius: 100%; width: 32px; height: 32px; margin: 10px auto; display: table; color: #ffffff; background-color: rgba(45, 193, 205, 0.34);}
 span.label {font: 75% lighter "Lucida Grande", Verdana, Arial, sans-serif}
-h3 {text-align: center;}
+body h3 {text-align: center; font: 20px "Century Gothic",CenturyGothic,AppleGothic,sans-serif}
 
 div.bootstrap-tagsinput {min-width: 100%;}
 div.bootstrap-tagsinput>span.label {font-size: 12px;}
@@ -27,3 +33,5 @@ div.slider-handle {background: orangered; border-radius: 4px;}
 div.slider-selection {background: coral;}
 div.slider-track {background: antiquewhite;}
 div.slider div.tooltip {display: none;}
+
+.cursor-custom {cursor: url("/static/css/image/copy.png"), auto;}
