@@ -455,4 +455,23 @@ class UpdateAdminAccessTokenAPI(BaseRequestHandler):
         msg = "updated app client_id = %s successfully." % \
             app_info_model.client_id
         log.info(msg)
-        self.redirect('/')
+        self.redirect('/')class CreateGroupsAPI(SuperEngineerRequestHandler):
+    def get(self):
+        """
+        Populate groups entity
+        """
+        output= {'data': [], 'error': ''}
+        if settings.DEBUG:
+            groups_data = {
+                'super_engineer': 'long@sayhello.com',
+                'customer_experience': 'marina@sayhello.com',
+                'software': 'pang@sayhello.com, benjo@sayhello.com',
+                'hardware': 'scott@sayhello.com',
+                'firmware':  'chris@sayhello.com, kingshy@sayhello.com'
+            }
+            groups_entity = UserGroup(**groups_data)
+            groups_entity.put()
+            output['data'] = groups_data
+        else:
+            output['error'] = 'Not permitted'
+        self.response.write(json.dumps(output))
