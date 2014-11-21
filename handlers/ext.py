@@ -1,13 +1,13 @@
 import json
 import logging as log
 import requests
-from models.ext import ZendeskCredentials
-from handlers.helpers import BaseRequestHandler
-from handlers.utils import display_error
-from utils import iso_to_utc_timestamp
 from handlers.analysis import get_zendesk_stats
+from handlers.helpers import CustomerExperienceRequestHandler
+from handlers.utils import display_error
+from models.ext import ZendeskCredentials
+from utils import iso_to_utc_timestamp
 
-class ZendeskAPI(BaseRequestHandler):
+class ZendeskAPI(CustomerExperienceRequestHandler):
     def get(self):
         """
         Grab tickets filed by a customer
@@ -53,7 +53,7 @@ class ZendeskAPI(BaseRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class ZendeskStatsAPI(BaseRequestHandler):
+class ZendeskStatsAPI(CustomerExperienceRequestHandler):
     def get(self):
         """
         Grab tickets filed by a customer

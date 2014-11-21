@@ -3,13 +3,13 @@ import logging as log
 import urllib
 
 import settings
-from models.setup import AppInfo, AdminUser, AccessToken
+from models.setup import AppInfo, AdminUser, AccessToken, UserGroup
 from handlers.utils import display_error
-from handlers.helpers import make_oauth2_service, BaseRequestHandler
+from handlers.helpers import make_oauth2_service, ProtectedRequestHandler, SuperEngineerRequestHandler
 from models.ext import ZendeskCredentials, SearchifyCredentials
 
 
-class AppAPI(BaseRequestHandler):
+class AppAPI(ProtectedRequestHandler):
     def get(self):
         """
         Get all specs of all apps or a single app if specified
@@ -91,7 +91,7 @@ class AppScopeAPI(ProtectedRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class CreateTokenAPI(BaseRequestHandler):
+class CreateTokenAPI(ProtectedRequestHandler):
     def get(self):
         """
         Get all tokens created
@@ -181,7 +181,7 @@ class CreateTokenAPI(BaseRequestHandler):
         self.response.write(json.dumps({'access_token': access_token}))
 
 
-class CreateAccountAPI(BaseRequestHandler):
+class CreateAccountAPI(ProtectedRequestHandler):
     def post(self):
         """
         Create an user account
@@ -238,7 +238,7 @@ class CreateAccountAPI(BaseRequestHandler):
         self.response.write(json.dumps(template_values))
 
 
-class ProxyAPI(BaseRequestHandler):
+class ProxyAPI(ProtectedRequestHandler):
     def get(self, path):
         """
         Get proxy for cross domain call in ChartHanlder
@@ -261,7 +261,7 @@ class ProxyAPI(BaseRequestHandler):
         self.response.write(json.dumps(segments))
 
 
-class RecentTokensAPI(BaseRequestHandler):
+class RecentTokensAPI(ProtectedRequestHandler):
     def get(self):
         """
         Grab recent tokens (up to 20)
@@ -276,7 +276,7 @@ class RecentTokensAPI(BaseRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class RegisterPillAPI(BaseRequestHandler):
+class RegisterPillAPI(ProtectedRequestHandler):
     def post(self):
         """
         Register a pill
@@ -311,7 +311,7 @@ class RegisterPillAPI(BaseRequestHandler):
         self.redirect('/')
 
 
-class CreateApplicationAgainstProdAPI(BaseRequestHandler):
+class CreateApplicationAgainstProdAPI(SuperEngineerRequestHandler):
     def get(self):
         """
         Just helpful for local dev
@@ -333,7 +333,7 @@ class CreateApplicationAgainstProdAPI(BaseRequestHandler):
             app_info.put()
 
 
-class SetupAPI(BaseRequestHandler):
+class SetupAPI(SuperEngineerRequestHandler):
     """
     Create entities for AppInfo, AdminUser and ZendeskCredentials
     """
@@ -374,7 +374,7 @@ class SetupAPI(BaseRequestHandler):
         searchify_credentials.put()
 
 
-class UpdateAdminAccessTokenAPI(BaseRequestHandler):
+class UpdateAdminAccessTokenAPI(SuperEngineerRequestHandler):
     """
     Update access token after admin user and app info entities are updated and memcache is flushed
     """
@@ -455,7 +455,10 @@ class UpdateAdminAccessTokenAPI(BaseRequestHandler):
         msg = "updated app client_id = %s successfully." % \
             app_info_model.client_id
         log.info(msg)
-        self.redirect('/')class CreateGroupsAPI(SuperEngineerRequestHandler):
+        self.redirect('/')
+
+
+class CreateGroupsAPI(SuperEngineerRequestHandler):
     def get(self):
         """
         Populate groups entity

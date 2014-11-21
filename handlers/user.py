@@ -2,7 +2,7 @@ import json
 import logging as log
 import jinja2
 import os
-from handlers.helpers import BaseRequestHandler
+from handlers.helpers import ProtectedRequestHandler
 from utils import display_error
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -12,7 +12,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 )
 
 
-class UserAPI(BaseRequestHandler):
+class UserAPI(ProtectedRequestHandler):
     def get(self):
         """
         Grab users

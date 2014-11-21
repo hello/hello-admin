@@ -1,10 +1,9 @@
 import json
 import logging as log
-import time
 from handlers.utils import display_error
-from handlers.helpers import BaseRequestHandler
+from handlers.helpers import FirmwareRequestHandler
 
-class FirmwareAPIDecaprecated(BaseRequestHandler):
+class FirmwareAPIDeprecated(FirmwareRequestHandler):
     '''Enables OTA firmware updates'''
     def post(self):
         session = self.authorize_session()
@@ -59,11 +58,15 @@ class FirmwareAPIDecaprecated(BaseRequestHandler):
         self.redirect('/firmware')
 
 
-class FirmwareAPI(BaseRequestHandler):
+class FirmwareAPI(FirmwareRequestHandler):
     '''Enables OTA firmware updates'''
 
     def get(self):
         output = {'data': [], 'error': ''}
+        session = self.authorize_session()
+        source = self.request.get('source', default_value=None)
+        device_id = self.request.get('device_id', default_value=None)
+
         try:
             if source:
                 req_url = "firmware/source/{}".format(source)

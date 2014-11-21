@@ -1,8 +1,11 @@
 import datetime as dt
-from models.setup import AccessToken
 import jinja2
 import os
-from handlers.helpers import BaseRequestHandler, ProtectedRequestHandler
+from handlers.helpers import ProtectedRequestHandler
+from handlers.helpers import CustomerExperienceRequestHandler
+from handlers.helpers import FirmwareRequestHandler
+from handlers.helpers import SuperEngineerRequestHandler
+from models.setup import AccessToken
 
 this_file_path = os.path.dirname(__file__)
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -12,7 +15,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 )
 
 
-class ChartHandler(BaseRequestHandler):
+class ChartHandler(ProtectedRequestHandler):
     """
     Returns a timeline of sleep events
     """
@@ -22,7 +25,7 @@ class ChartHandler(BaseRequestHandler):
         day = dt.datetime.strftime(dt.datetime.now(), "%Y-%m-%d")
         self.response.write(template.render({'tokens': tokens, 'day': day}))
 
-class UserView(BaseRequestHandler):
+class UserView(ProtectedRequestHandler):
     """
     Returns a portal to quickly look for recent users and search for users.
     """
@@ -30,7 +33,7 @@ class UserView(BaseRequestHandler):
         self.render_to_response(template_file='templates/users.html',
                                 context={'title': 'Users'})
 
-class SenseVisualView(BaseRequestHandler):
+class SenseVisualView(ProtectedRequestHandler):
     """
     Returns graphs of data from Sense (temperature, humidity, particulates, light)
     """
@@ -38,7 +41,7 @@ class SenseVisualView(BaseRequestHandler):
         self.render_to_response(template_file='templates/sense.html',
                                 context={'title': 'Sense'})
 
-class ZendeskView(BaseRequestHandler):
+class ZendeskView(CustomerExperienceRequestHandler):
     """
     Returns zendesk statistics, underconstruction
     """
@@ -46,7 +49,7 @@ class ZendeskView(BaseRequestHandler):
          self.render_to_response(template_file='templates/zendesk.html',
                                 context={'title': 'Zendesk'})
 
-class SettingsView(ProtectedRequestHandler):
+class SettingsView(SuperEngineerRequestHandler):
     """
     Returns a panel for manipulating apps, accounts
     """
@@ -62,7 +65,7 @@ class DebugLogView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/debug_log.html',
                                 context={'title': 'Log'})
 
-class FirmwareView(ProtectedRequestHandler):
+class FirmwareView(FirmwareRequestHandler):
     """
     Returns a panel for moderating firmware content
     """
@@ -70,7 +73,7 @@ class FirmwareView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/firmware.html',
                                 context={'title': 'Firmware'})
 
-class TeamsView(ProtectedRequestHandler):
+class TeamsView(FirmwareRequestHandler):
     """
     Returns a panel for viewing specifications of devices,
     having ability to disconnect a device / flash firmware from a chosen list
@@ -93,9 +96,9 @@ class Teams2View(ProtectedRequestHandler):
     """
     def get(self):
         self.render_to_response(template_file='templates/teams2.html',
-                                context={'title': 'Teams2'})
+                                context={'title': 'Teams'})
 
-class ErrorView(BaseRequestHandler):
+class ErrorView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/error.html',
-                                context={'title': 'Sorry'})
+                                context={'title': 'Denied'})

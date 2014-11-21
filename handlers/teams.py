@@ -1,13 +1,10 @@
 import logging as log
 import json
 from handlers.utils import display_error
-from handlers.helpers import BaseRequestHandler, make_oauth2_service
+from handlers.helpers import FirmwareRequestHandler
 
-from rauth import OAuth2Service
-from models.setup import AppInfo
-import datetime
 
-class TeamsAPI(BaseRequestHandler):
+class TeamsAPI(FirmwareRequestHandler):
     def get(self):
         output = {'data': [], 'error': ''}
         session = self.authorize_session()
