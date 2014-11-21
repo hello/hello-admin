@@ -17,14 +17,13 @@ class PreSleepAPI(BaseRequestHandler):
             resolution (required : week or day)
         """
         output = {'data': [], 'error': ''}
-        try:
-            sensor = self.request.get('sensor', default_value='humidity')
-            resolution = self.request.get('resolution', default_value='day')
-            timezone_offset = int(self.request.get('timezone_offset', default_value=8*3600*1000))
-            current_ts = int(time.time() * 1000) - timezone_offset
-            log.warning(current_ts)
-            user_token = self.request.get('user_token', default_value=None)
+        sensor = self.request.get('sensor', default_value='humidity')
+        resolution = self.request.get('resolution', default_value='day')
+        timezone_offset = int(self.request.get('timezone_offset', default_value=8*3600*1000))
+        current_ts = int(time.time() * 1000) - timezone_offset
+        user_token = self.request.get('user_token', default_value=None)
 
+        try:
             if user_token is None:
                 raise RuntimeError("Missing user token!")
 
@@ -49,22 +48,19 @@ class DebugLogAPI(BaseRequestHandler):
     """
     def get(self):
          output = {'data': [], 'error': ''}
-         try:
-             search_input = self.request.get('search_input', default_value=None)
-             search_by = self.request.get('search_by', default_value=None)
-             max_results = int(self.request.get('max_results', default_value=20))
 
+         search_input = self.request.get('search_input', default_value=None)
+         search_by = self.request.get('search_by', default_value=None)
+         max_results = int(self.request.get('max_results', default_value=20))
+         searchify_entity= SearchifyCredentials.query().fetch(1)
+
+         try:
              if None in [search_input, search_by]:
                  raise RuntimeError("Missing input")
-
-             info_query = SearchifyCredentials.query()
-             results = info_query.fetch(1)
-
-             if not results:
+             if not searchify_entity:
                  raise RuntimeError("Missing AppInfo. Bailing.")
 
-             searchify_cred = results[0]
-
+             searchify_cred = searchify_entity[0]
              debug_log_api = ApiClient(searchify_cred.api_client)
              index = debug_log_api.get_index('sense-logs')
              output['data'] = index.search('{}:{}'.format(search_by, search_input), fetch_fields=['text'], length=max_results)

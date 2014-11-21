@@ -65,16 +65,13 @@ class FirmwareAPI(BaseRequestHandler):
     def get(self):
         output = {'data': [], 'error': ''}
         try:
-            session = self.authorize_session()
-            source = self.request.get('source', default_value=None)
-            device_id = self.request.get('device_id', default_value=None)
             if source:
                 req_url = "firmware/source/{}".format(source)
             elif device_id:
                 req_url = "firmware/{}/0".format(device_id)
             else:
                 raise RuntimeError("Invalid GET request")
-            log.info(req_url)
+
             response = session.get(req_url, headers={'Content-Type' : 'application/json'})
             if response.status_code == 200:
                 output['data'] = response.json()
@@ -89,22 +86,19 @@ class FirmwareAPI(BaseRequestHandler):
 
     def put(self):
         output = {'data': [], 'error': '', 'status': 0}
-        try:
-            session = self.authorize_session()
-            req = json.loads(self.request.body)
-            device_id = req.get('device_id', None)
-            firmware_version = req.get('firmware_version', None)
+        session = self.authorize_session()
+        req = json.loads(self.request.body)
+        device_id = req.get('device_id', None)
+        firmware_version = req.get('firmware_version', None)
 
+        try:
             if None in (device_id, firmware_version):
                 raise RuntimeError('invalid put request')
 
             req_url = "firmware/{}/{}".format(device_id, firmware_version)
-            log.info(req_url)
-            print 'data\n', json.dumps(req.get('update_data'))
             response = session.put(req_url,
                                    headers={'Content-Type' : 'application/json'},
                                    data=json.dumps(req.get('update_data')))
-            print 'response.status_code', response.status_code
             if response.status_code not in [200, 204]:
                 raise RuntimeError('{}: fail to update firmware {} for device {}'.format(response.status_code, firmware_version, device_id))
             output['status'] = response.status_code
@@ -116,10 +110,11 @@ class FirmwareAPI(BaseRequestHandler):
 
     def post(self):
         output = {'data': [], 'error': '', 'status': 0}
+        session = self.authorize_session()
+        req = json.loads(self.request.body)
+        device_id = req.get('device_id', None)
+
         try:
-            session = self.authorize_session()
-            req = json.loads(self.request.body)
-            device_id = req.get('device_id', None)
             if not device_id:
                 raise RuntimeError('Invalid delete request!')
 

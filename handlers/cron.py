@@ -10,26 +10,25 @@ from handlers.analysis import get_zendesk_stats
 class ZendeskCronHandler(BaseRequestHandler):
     def get(self):
         output = {'data': []}
+        info_query = ZendeskCredentials.query()
+        results = info_query.fetch(1)
+
+        if not results:
+            self.error(500)
+
+        zendesk_cred = results[0]
+        tickets = []
+
+        zen_api = "{}/api/v2/search.json?query=type:ticket%20".format(zendesk_cred.domain)
+
+        end_date = "2014-11-17"
+        start_date = "2014-11-16"
+        date_type = "created"
+
+        search_url = zen_api + "{}>{}+{}<{}".format(date_type, start_date, date_type, end_date)
+
+        zen_auth = (zendesk_cred.email_account + '/token', zendesk_cred.api_token)
         try:
-            info_query = ZendeskCredentials.query()
-            results = info_query.fetch(1)
-
-            if not results:
-                self.error(500)
-                raise RuntimeError("Missing AppInfo. Bailing.")
-
-            zendesk_cred = results[0]
-            tickets = []
-
-            zen_api = "{}/api/v2/search.json?query=type:ticket%20".format(zendesk_cred.domain)
-
-            end_date = "2014-11-07"
-            start_date = "2014-11-06"
-            date_type = "created"
-
-            search_url = zen_api + "{}>{}+{}<{}".format(date_type, start_date, date_type, end_date)
-
-            zen_auth = (zendesk_cred.email_account + '/token', zendesk_cred.api_token)
             zen_response = requests.get(search_url, auth=zen_auth)
 
             if zen_response.ok:

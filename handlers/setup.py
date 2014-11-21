@@ -19,9 +19,9 @@ class AppAPI(BaseRequestHandler):
         """
         output = {'data': [], 'error': ''}
         id = self.request.get('id')
+        session = self.authorize_session()
 
         try:
-            session = self.authorize_session()
             if id:
                 response = session.get("applications/{}".format(id))
             else:
@@ -37,17 +37,16 @@ class AppAPI(BaseRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class AppScopeAPI(BaseRequestHandler):
+class AppScopeAPI(ProtectedRequestHandler):
     """
     Get the scopes of all apps or a single app if specified
     """
     def get(self):
         output = {'data': [], 'error': ''}
         app_id = self.request.get('app_id')
+        session = self.authorize_session()
 
         try:
-            session = self.authorize_session()
-
             if app_id:
                 response = session.get("applications/{}/scopes".format(app_id))
             else:
@@ -68,20 +67,19 @@ class AppScopeAPI(BaseRequestHandler):
         """
         output = {'data': [], 'error': ''}
         req = json.loads(self.request.body)
+
         app_id = req.get('app_id', None)
         scopes = req.get('scopes', None)
+
+        headers = {
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+        }
+        session = self.authorize_session()
 
         try:
             if None in [app_id, scopes]:
                 raise RuntimeError("Invalid request!")
-
-            headers = {
-                'Content-type': 'application/json',
-                'Accept': 'application/json'
-            }
-
-            session = self.authorize_session()
-
             response = session.put('applications/{}/scopes'.format(app_id), data=json.dumps(scopes), headers=headers)
             log.info('updated_scopes: {}'.format(scopes))
             if response.status_code not in [200, 204]:
