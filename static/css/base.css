@@ -35,3 +35,4 @@ div.slider-track {background: antiquewhite;}
 div.slider div.tooltip {display: none;}
 
 .cursor-custom {cursor: url("/static/css/image/copy.png"), auto;}
+.cursor-custom:hover {-webkit-stroke-width: 7px;-webkit-stroke-color: yellow; -webkit-fill-color: yellow; text-shadow: 1px 0 20px yellow;}

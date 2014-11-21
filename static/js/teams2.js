@@ -134,15 +134,13 @@ var ConfigMaestro = React.createClass({
           <h4><span>{displayMode}</span> IDs <em className="remark">Enter new or click to select current &rarr;</em></h4>
           <LongTagsInput id="ids-input" tagClass="label label-info" placeHolder="e.g 555Cxx, 555C6y" />
           <h4>Change IDs of a Group</h4>
-          <Button action="add" bsStyle="warning" onClick={this.handleSend}><Glyphicon glyph="send"/> Add</Button>
-          <span>&nbsp;</span>
-          <Button action="replace" bsStyle="primary" onClick={this.handleSend}><Glyphicon glyph="send"/> Replace</Button>
-          <span>&nbsp;</span>
-          <Button action="remove" bsStyle="danger" onClick={this.handleSend}><Glyphicon glyph="send"/> Remove</Button>
+          <Button className="col-xs-3 col-md-3 col-lg-3" action="add" bsStyle="success" onClick={this.handleSend}><Glyphicon glyph="plus"/> Add</Button>
+          <Button className="col-xs-3 col-md-3 col-lg-3" action="replace" bsStyle="primary" onClick={this.handleSend}><Glyphicon glyph="refresh"/> Replace</Button>
+          <Button className="col-xs-3 col-md-3 col-lg-3"action="remove" bsStyle="danger" onClick={this.handleSend}><Glyphicon glyph="minus"/> Remove</Button>
           <p>&nbsp;</p><p>&nbsp;</p><hr className="fancy-line"/><p>&nbsp;</p>
           <h4>Delete a Group</h4>
           <Input id="group-del-input" type="text" placeholder="e.g gamma-dev" buttonBefore={<Button>Before</Button>}/>
-          <Button action="delete-group" bsStyle="default" onClick={this.handleSend}><Glyphicon glyph="send"/> Delete</Button>
+          <Button className="col-xs-3 col-md-3 col-lg-3" action="delete-group" bsStyle="default" onClick={this.handleSend}><Glyphicon glyph="remove"/> Delete</Button>
         </code></Col>
         <Col xs={7} md={7}><code className="nonscript">
           <h4>Current Teams</h4>

@@ -158,7 +158,7 @@ var UserSearchCanvas = React.createClass({
                     ref="email"
                     className="form-control"
                     type="text"
-                    placeholder="query by EXACT email"
+                    placeholder="query by EXACT email or click on a recent user"
                 />
                 <label for="email-search" className="glyphicon glyphicon-envelope"></label>
               </div>
