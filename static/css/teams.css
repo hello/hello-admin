@@ -1,0 +1,5 @@
+span.input-group-addon {padding: 0; border: none;}
+div.modal-dialog {margin-top: 140px; margin-left: 50%; width: 500px; height: 150px;}
+div.modal-content>div {padding: 10px 15px;}
+#update {display: none;}
+div.modal-backdrop.in {opacity: 0;}

@@ -54,7 +54,7 @@ var DebugLog = React.createClass({
             logs: [],
             searchAlert: "",
             placeholder: " for example: Uploading UART",
-            mode: "text",
+            mode: "",
             highlightColor: '#FF0000',
             caseInsensitive: true,
             showLineBreaks: false
@@ -62,7 +62,33 @@ var DebugLog = React.createClass({
     },
     componentDidMount: function() {
         var that = this;
-        that.refs.searchBy.getDOMNode().value = 'text';
+        var maxDocsFromURL = getParameterByName('max_docs');
+        var searchInputFromURL = getParameterByName('search_input');
+        var searchByFromURL = getParameterByName('search_by');
+
+        if (maxDocsFromURL) {
+          $('#sliderValue').text(maxDocsFromURL);
+        }
+        else {
+          maxDocsFromURL = 20;
+        }
+        if (searchByFromURL) {
+          that.refs.searchBy.getDOMNode().value = searchByFromURL;
+        }
+        else {
+          that.refs.searchBy.getDOMNode().value = 'text';
+        }
+        if (searchInputFromURL) {
+          that.refs.searchInput.getDOMNode().value = searchInputFromURL;
+        }
+
+        if (searchByFromURL || searchInputFromURL)
+          that.handleSubmit();
+
+        $('.slider').slider({value: Number(maxDocsFromURL)}).on('slide', function(slideEvt){
+            $('#sliderValue').text(slideEvt.value);
+        });
+
         $('#case-check').attr('checked', true);
         $('#colorpick').spectrum({
             color: "#FF0000",
@@ -108,9 +134,11 @@ var DebugLog = React.createClass({
           type: 'GET',
           data: {
               search_by: searchBy,
-              search_input: searchInput
+              search_input: searchInput,
+              max_results: $('#sliderValue').text()
           },
           success: function(response) {
+            history.pushState({}, '', '/debug_log/?search_input=' + searchInput + '&search_by=' + searchBy + '&max_docs=' + $('#sliderValue').text());
             if (response.error) {
                 this.setState({
                     logs: [],
@@ -119,7 +147,7 @@ var DebugLog = React.createClass({
             }
             else {
                 this.setState({
-                    logs: response.data.results,
+                    logs: this.state.mode==='text' ? response.data.results: response.data.results.reverse(),
                     searchAlert: "found " + response.data.results.length + " documents"
                 });
             }
@@ -153,6 +181,10 @@ var DebugLog = React.createClass({
         return (<div>
             <form className="row" onSubmit={this.handleSubmit}>
                 <div className="col-lg-1 col-md-1 col-xs-1">
+                  <span id="sliderText">Max docs: </span><span id="sliderValue">20</span>
+                  <input type="text" className="span2 slider" value="" data-slider-min="5" data-slider-max="101" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square" />
+                </div>
+                <div className="col-lg-1 col-md-1 col-xs-1" id="colorpickContainer">
                     <input type="text" id="colorpick"/>
                 </div>
                 <div className="col-lg-1 col-md-1 col-xs-1">
@@ -170,7 +202,7 @@ var DebugLog = React.createClass({
                         <label for="mode" className="glyphicon glyphicon-star-empty"></label>
                     </div>
                 </div>
-                <div className="col-lg-4 col-md-4 col-xs-4 input-group input-group-md">
+                <div className="col-lg-3 col-md-3 col-xs-3 input-group input-group-md">
                   <div className="icon-addon addon-md">
                     <input id="search-input" className="form-control" ref="searchInput" placeholder={this.state.placeholder} />
                     <label for="search-input" className={glyphClasses}></label>

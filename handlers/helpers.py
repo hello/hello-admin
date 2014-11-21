@@ -2,6 +2,7 @@ import webapp2
 import jinja2
 from google.appengine.api import users
 import os
+import settings
 from copy import copy
 from rauth import OAuth2Service
 from models.setup import AppInfo
@@ -43,7 +44,8 @@ class BaseRequestHandler(webapp2.RequestHandler):
         extras = {
             "logout_url": users.create_logout_url('/'),
             "user": self.current_user.email(),
-            "version": os.environ['CURRENT_VERSION_ID']
+            "version": os.environ['CURRENT_VERSION_ID'],
+            "env": settings.ENVIRONMENT
         }
 
         context.update(extras)

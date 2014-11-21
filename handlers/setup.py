@@ -340,6 +340,12 @@ class SetupAPI(BaseRequestHandler):
     Create entities for AppInfo, AdminUser and ZendeskCredentials
     """
     def get(self):
+
+        env = AdminUser.get_by_id(settings.ENVIRONMENT)
+        if env is not None:
+            self.response.write('Credentials already existed')
+            return
+
         admin_user = AdminUser(
             id=settings.ENVIRONMENT,
             username='username',
