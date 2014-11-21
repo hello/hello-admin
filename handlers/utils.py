@@ -45,3 +45,11 @@ def iso_to_human_timestring(iso_time):
     """
     return datetime.strptime(iso_time.split('Z')[0], "%Y-%m-%dT%H:%M:%S").strftime("%m-%d-%Y %H:%M:%S")
 
+def stripStringToList(string, separator=","):
+    """
+    :param string: a string that needs to be parsed into a list
+    :type string: str
+    :param separator: separator between elements of the string
+    :type separator: str
+    """
+    return [u.strip() for u in string.split(separator)]

@@ -1,11 +1,12 @@
-import webapp2
 import jinja2
-from google.appengine.api import users
 import os
 import settings
+import webapp2
 from copy import copy
+from google.appengine.api import users
+from models.setup import AppInfo, UserGroup
 from rauth import OAuth2Service
-from models.setup import AppInfo
+from utils import stripStringToList
 
 this_file_path = os.path.dirname(__file__)
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -128,10 +129,80 @@ def get_user(app_info_model):
 
 
 class ProtectedRequestHandler(BaseRequestHandler):
+    """
+    Restrict general access and define priviedge users lists
+    """
     def __init__(self, request, response):
         super(ProtectedRequestHandler, self).__init__()
         self.initialize(request, response)
-        if not self.current_user.email().endswith('@sayhello.com'):
+        self.restrict()
+
+    def restrict(self):
+        if not self.is_restricted_primary():
+            return
+        if self.is_restricted_secondary():
             self.redirect('/error')
 
+    def is_restricted_primary(self):
+        return not self.current_user.email() in self.super_engineer()
 
+    def is_restricted_secondary(self):
+        """
+        This method is to be extended by the heir handler
+        """
+        pass
+
+    ## Retrieve groups grom DataStore
+    @property
+    def groups_entity(self):
+        return  UserGroup.query_groups().fetch(1)[0]
+
+    def super_engineer(self):
+        return stripStringToList(self.groups_entity.super_engineer)
+
+    def customer_experience(self):
+        return stripStringToList(self.groups_entity.customer_experience)
+
+    def software(self):
+        return stripStringToList(self.groups_entity.software)
+
+    def firmware(self):
+        return stripStringToList(self.groups_entity.firmware)
+
+    def hardware(self):
+        return stripStringToList(self.groups_entity.hardware)
+
+class CustomerExperienceRequestHandler(ProtectedRequestHandler):
+    """
+    Grant access to only customer experience team members
+    """
+    def is_restricted_secondary(self):
+        return not self.current_user.email() in super(CustomerExperienceRequestHandler, self).customer_experience()
+
+class SoftwareRequestHandler(ProtectedRequestHandler):
+    """
+    Grant access to only software team members
+    """
+    def is_restricted_secondary(self):
+        return not self.current_user.email() in super(SoftwareRequestHandler, self).software()
+
+class FirmwareRequestHandler(ProtectedRequestHandler):
+    """
+    Grant access to only firmware team members
+    """
+    def is_restricted_secondary(self):
+        return not self.current_user.email() in super(FirmwareRequestHandler, self).firmware()
+
+class HardwareRequestHandler(ProtectedRequestHandler):
+    """
+    Grant access to only hardware team members
+    """
+    def is_restricted_secondary(self):
+        return not self.current_user.email() in super(HardwareRequestHandler, self).hardware()
+
+class SuperEngineerRequestHandler(ProtectedRequestHandler):
+    """
+    Grant admin to only super engineers
+    """
+    def is_restricted_secondary(self):
+        return not self.current_user.email() in super(SuperEngineerRequestHandler, self).super_engineer()

@@ -1,21 +1,21 @@
-<html>
-<head>
-    <title>{{title}}</title>
+{% extends "templates/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block extrastatic %}
     <style>
-		body {background: #f9fee8;margin: 0; padding: 20px; text-align:center; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:#666666;}
+		body {text-align:center; font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif; font-size:14px;}
 		.error_page {width: 600px; padding: 50px; margin: auto;}
 		.error_page h1 {margin: 20px 0 0;}
 		.error_page p {margin: 10px 0; padding: 0;}
 		a {color: #9caa6d; text-decoration:none;}
 		a:hover {color: #9caa6d; text-decoration:underline;}
-		</style>
-</head>
-    <body class="login" cz-shortcut-listen="true">
+    </style>
+{% endblock %}
+
+{% block content %}
   <div class="error_page">
     <img alt="Kidmondo_face_sad" src="/static/css/image/sad_face.gif">
-    <h1>Oops ! Wrong way</h1>
+    <h3>Oops ! Wrong way</h3>
     <p><a href="/">Return to the homepage</a></p>
   </div>
 
-</body>
-</html>
+{% endblock %}
