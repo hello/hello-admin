@@ -1,5 +1,5 @@
 application: 'hello-admin'
-version: refactor
+version: 8k
 runtime: python27
 api_version: 1
 threadsafe: yes

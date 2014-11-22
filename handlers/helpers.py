@@ -112,7 +112,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         output = ResponseOutput()
         session = self.authorize_session(token=impersonatee_token)
         request_detail = {
-            "headers": {'Content-Type' : 'application/json'},
+            "headers": {'Content-Type': 'application/json'},
         }
 
         if body_data and type in ['PUT', 'POST', 'PATCH']:
@@ -203,7 +203,7 @@ class ProtectedRequestHandler(BaseRequestHandler):
     ## Retrieve groups grom DataStore
     @property
     def groups_entity(self):
-        return  UserGroup.query_groups().fetch(1)[0]
+        return UserGroup.query_groups().fetch(1)[0]
 
     def super_engineer(self):
         return stripStringToList(self.groups_entity.super_engineer)
@@ -227,12 +227,14 @@ class CustomerExperienceRequestHandler(ProtectedRequestHandler):
     def is_restricted_secondary(self):
         return not self.current_user.email() in super(CustomerExperienceRequestHandler, self).customer_experience()
 
+
 class SoftwareRequestHandler(ProtectedRequestHandler):
     """
     Grant access to only software team members
     """
     def is_restricted_secondary(self):
         return not self.current_user.email() in super(SoftwareRequestHandler, self).software()
+
 
 class FirmwareRequestHandler(ProtectedRequestHandler):
     """
@@ -241,6 +243,7 @@ class FirmwareRequestHandler(ProtectedRequestHandler):
     def is_restricted_secondary(self):
         return not self.current_user.email() in super(FirmwareRequestHandler, self).firmware()
 
+
 class HardwareRequestHandler(ProtectedRequestHandler):
     """
     Grant access to only hardware team members
@@ -248,12 +251,16 @@ class HardwareRequestHandler(ProtectedRequestHandler):
     def is_restricted_secondary(self):
         return not self.current_user.email() in super(HardwareRequestHandler, self).hardware()
 
+
 class SuperEngineerRequestHandler(ProtectedRequestHandler):
     """
     Grant admin to only super engineers
     """
     def is_restricted_secondary(self):
-        return not self.current_user.email() in super(SuperEngineerRequestHandler, self).super_engineer()class ResponseOutput():
+        return not self.current_user.email() in super(SuperEngineerRequestHandler, self).super_engineer()
+
+
+class ResponseOutput():
     def __init__(self):
         self.data = []
         self.error = ""
