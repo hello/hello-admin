@@ -2,11 +2,13 @@ import jinja2
 import os
 import settings
 import webapp2
+import json
 from copy import copy
 from google.appengine.api import users
 from models.setup import AppInfo, UserGroup
 from rauth import OAuth2Service
 from utils import stripStringToList
+from utils import display_error
 
 this_file_path = os.path.dirname(__file__)
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -88,13 +90,63 @@ class BaseRequestHandler(webapp2.RequestHandler):
         app_info_model = results[0]
         hello = make_oauth2_service(app_info_model)
 
-        if token is None:  # token could be set to impersonate an user
+        if token is None:  # token could be set to impersonate an user otherwise
             token = app_info_model.access_token
         return hello.get_session(token)
+
+    def hello_request(self, api_url, body_data="", url_params={}, type="GET"
+                          , impersonatee_token=None):
+        """
+        :param api_url: api URL
+        :type api_url: str
+        :param body_data: data to be sent with the request body
+        :type api_url: str
+        :param url_params: URL parameters
+        :type url_params: dict
+        :param type: http request type, one of ["GET", "POST", "PUT", "DELETE"]
+        :type api_url: str
+        """
+
+        output = {'data': {}, 'error': '', 'status': 401}
+        session = self.authorize_session(token=impersonatee_token)
+        request_detail = {
+            "headers": {'Content-Type' : 'application/json'},
+        }
+
+        if body_data and type != "DELETE":
+            request_detail['data'] = body_data
+        if url_params:
+            request_detail['params'] = url_params
+        try:
+            if type == "GET":
+                response = session.get(api_url, **request_detail)
+            elif type == "POST":
+                response = session.post(api_url, **request_detail)
+            elif type == "PUT":
+                response = session.put(api_url, **request_detail)
+            elif type == "DELETE":
+                response = session.delete(api_url, **request_detail)
+            else:
+                return
+
+            output['status'] = response.status_code
+
+            if response.status_code == 200:
+                output['data'] = response.json()
+            elif response.status_code == 204:
+                pass
+            else:
+                raise RuntimeError('Request failed ! Status code: {}'.format(response.status_code))
+        except Exception as e:
+            output['error'] = display_error(e)
+
+        self.response.write(json.dumps(output))
 
     @property
     def current_user(self):
         return users.get_current_user()
+    def error_log(self):
+        return
 
 def make_oauth2_service(app_info_model):
     """
