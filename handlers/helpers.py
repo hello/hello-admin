@@ -96,7 +96,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         return hello.get_session(token)
 
     def hello_request(self, api_url, body_data="", url_params={}, type="GET"
-                          , impersonatee_token=None):
+                          , impersonatee_token=None, test_mode=False):
         """
         :param api_url: api URL
         :type api_url: str
@@ -109,7 +109,6 @@ class BaseRequestHandler(webapp2.RequestHandler):
         :return a ResponseOutput object in test mode  or a string otherwise
         """
 
-        output = {'data': {}, 'error': '', 'status': 401}
         output = ResponseOutput()
         session = self.authorize_session(token=impersonatee_token)
         request_detail = {
@@ -130,11 +129,18 @@ class BaseRequestHandler(webapp2.RequestHandler):
         except Exception as e:
             output.set_error(display_error(e))
 
-        self.response.write(json.dumps(output))
+        if test_mode is True:
+            return output
+        else:
+            self.hello_render(output)
+
+    def hello_render(self, output):
+        return self.response.write(render_response(output))
 
     @property
     def current_user(self):
         return users.get_current_user()
+
     def error_log(self):
         return
 
@@ -267,3 +273,12 @@ class SuperEngineerRequestHandler(ProtectedRequestHandler):
         if not isinstance(status, int) and not isinstance(status, long):
             raise TypeError("Response status must be an int or a longs")
         self.status = status
+
+
+def render_response(response_output):
+    """
+    :param response_output: response output
+    :type response_output: ResponseOutput
+    :return json-serialized data as a str
+    """
+    return json.dumps(response_output.__dict__)
