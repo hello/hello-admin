@@ -7,6 +7,7 @@ from copy import copy
 from google.appengine.api import users
 from models.setup import AppInfo, UserGroup
 from rauth import OAuth2Service
+from rauth.session import OAuth2Session
 from utils import stripStringToList
 from utils import display_error
 
@@ -113,23 +114,13 @@ class BaseRequestHandler(webapp2.RequestHandler):
             "headers": {'Content-Type' : 'application/json'},
         }
 
-        if body_data and type != "DELETE":
+        if body_data and type in ['PUT', 'POST', 'PATCH']:
             request_detail['data'] = body_data
         if url_params:
             request_detail['params'] = url_params
         try:
-            if type == "GET":
-                response = session.get(api_url, **request_detail)
-            elif type == "POST":
-                response = session.post(api_url, **request_detail)
-            elif type == "PUT":
-                response = session.put(api_url, **request_detail)
-            elif type == "DELETE":
-                response = session.delete(api_url, **request_detail)
-            else:
-                return
-
             output['status'] = response.status_code
+            response = getattr(OAuth2Session, type.lower())(session, api_url, **request_detail)
 
             if response.status_code == 200:
                 output['data'] = response.json()
