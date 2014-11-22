@@ -14,27 +14,11 @@ class AppAPI(ProtectedRequestHandler):
         """
         Get all specs of all apps or a single app if specified
         """
-        """
-        :return:
-        """
-        output = {'data': [], 'error': ''}
         id = self.request.get('id')
-        session = self.authorize_session()
-
-        try:
-            if id:
-                response = session.get("applications/{}".format(id))
-            else:
-                response = session.get("applications")
-
-            if response.status_code == 200:
-                output['data'] = response.json()
-            else:
-                raise RuntimeError('{}: fail to retrieve applications'.format(response.status_code))
-        except Exception as e:
-            output['error'] = display_error(e)
-            log.error('ERROR: {}'.format(display_error(e)))
-        self.response.write(json.dumps(output))
+        self.hello_request(
+            api_url="applications/{}".format(id) if id else "applications",
+            type="GET"
+        )
 
 
 class AppScopeAPI(ProtectedRequestHandler):
@@ -42,53 +26,23 @@ class AppScopeAPI(ProtectedRequestHandler):
     Get the scopes of all apps or a single app if specified
     """
     def get(self):
-        output = {'data': [], 'error': ''}
-        app_id = self.request.get('app_id')
-        session = self.authorize_session()
-
-        try:
-            if app_id:
-                response = session.get("applications/{}/scopes".format(app_id))
-            else:
-                response = session.get("applications/scopes")
-
-            if response.status_code == 200:
-                output['data'] = response.json()
-            else:
-                raise RuntimeError('{}: fail to retrieve applications scopes'.format(response.status_code))
-        except Exception as e:
-            output['error'] = display_error(e)
-            log.error('ERROR: {}'.format(display_error(e)))
-        self.response.write(json.dumps(output))
+        app_id = self.request.get('app_id', "")
+        self.hello_request(
+            api_url="applications/{}/scopes".format(app_id) if app_id else "applications/scopes",
+            type="GET"
+        )
 
     def put(self):
-        """
-        Update the scopes of all apps
-        """
-        output = {'data': [], 'error': ''}
         req = json.loads(self.request.body)
 
-        app_id = req.get('app_id', None)
-        scopes = req.get('scopes', None)
+        app_id = req.get('app_id', "")
+        scopes = req.get('scopes', "")
 
-        headers = {
-            'Content-type': 'application/json',
-            'Accept': 'application/json'
-        }
-        session = self.authorize_session()
-
-        try:
-            if None in [app_id, scopes]:
-                raise RuntimeError("Invalid request!")
-            response = session.put('applications/{}/scopes'.format(app_id), data=json.dumps(scopes), headers=headers)
-            log.info('updated_scopes: {}'.format(scopes))
-            if response.status_code not in [200, 204]:
-                raise RuntimeError('{}: fail to update application scope'.format(response.status_code))
-
-        except Exception as e:
-            output['error'] = display_error(e)
-            log.error('ERROR: {}'.format(display_error(e)))
-        self.response.write(json.dumps(output))
+        self.hello_request(
+            api_url='applications/{}/scopes'.format(app_id),
+            type="PUT",
+            body_data=json.dumps(scopes)
+        )
 
 
 class CreateTokenAPI(ProtectedRequestHandler):
@@ -281,34 +235,16 @@ class RegisterPillAPI(ProtectedRequestHandler):
         """
         Register a pill
         """
-        """
-        :return:
-        """
-
-        headers = {
-            'Content-type': 'application/json',
-            'Accept': 'application/json'
-        }
-
-        session = self.authorize_session()
-
         data = dict(
             pill_id=self.request.get('pill_id'),
             account_id=self.request.get('account_id')
         )
-        log.info(data)
 
-        resp = session.post(
-            'devices/pill',
-            data=json.dumps(data),
-            headers=headers
+        self.hello_request(
+            api_url='device/pill',
+            type='POST',
+            body_data=json.dumps(data)
         )
-        if resp.status_code not in [200, 204]:
-            log.error("%s - %s", resp.status_code, resp.content)
-            error_message = "%s" % resp.content
-            self.show_handler_error(error_message, status_code=resp.status_code)
-            return
-        self.redirect('/')
 
 
 class CreateApplicationAgainstProdAPI(SuperEngineerRequestHandler):

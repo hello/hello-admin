@@ -16,30 +16,20 @@ class PreSleepAPI(ProtectedRequestHandler):
             token (required for each user)
             resolution (required : week or day)
         """
-        output = {'data': [], 'error': ''}
+
         sensor = self.request.get('sensor', default_value='humidity')
         resolution = self.request.get('resolution', default_value='day')
         timezone_offset = int(self.request.get('timezone_offset', default_value=8*3600*1000))
         current_ts = int(time.time() * 1000) - timezone_offset
-        user_token = self.request.get('user_token', default_value=None)
+        impersonatee_token = self.request.get('impersonatee_token', default_value=None)
 
-        try:
-            if user_token is None:
-                raise RuntimeError("Missing user token!")
+        self.hello_request(
+            api_url="room/{}/{}".format(sensor, resolution),
+            url_params={'from': current_ts},
+            impersonatee_token=impersonatee_token,
+            type="GET"
+        )
 
-            session = self.authorize_session(user_token)
-            req_url = "room/{}/{}".format(sensor, resolution)
-            response = session.get(req_url, params={'from': current_ts})
-
-            if response.status_code == 200:
-                output['data'] = response.json()
-            else:
-                raise RuntimeError('{}: fail to retrieve presleep'.format(response.status_code))
-        except Exception as e:
-            output['error'] = display_error(e)
-            log.error('ERROR: {}'.format(display_error(e)))
-
-        self.response.write(json.dumps(output))
 
 
 class DebugLogAPI(ProtectedRequestHandler):

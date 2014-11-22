@@ -73,15 +73,6 @@ class FirmwareView(FirmwareRequestHandler):
         self.render_to_response(template_file='templates/firmware.html',
                                 context={'title': 'Firmware'})
 
-class TeamsView(FirmwareRequestHandler):
-    """
-    Returns a panel for viewing specifications of devices,
-    having ability to disconnect a device / flash firmware from a chosen list
-    """
-    def get(self):
-        self.render_to_response(template_file='templates/teams.html',
-                                context={'title': 'Teams'})
-
 class ConfigurationView(ProtectedRequestHandler):
     """
     Returns a panel for monitoring team device IDs and groups (teams) by feature.
@@ -90,12 +81,12 @@ class ConfigurationView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/configuration.html',
                                 context={'title': 'Configuration'})
 
-class Teams2View(ProtectedRequestHandler):
+class TeamsView(ProtectedRequestHandler):
     """
-    Returns a panel for monitoring team device IDs and groups (teams) by feature.
+    Returns a panel for monitoring groups of devices & users
     """
     def get(self):
-        self.render_to_response(template_file='templates/teams2.html',
+        self.render_to_response(template_file='templates/teams.html',
                                 context={'title': 'Teams'})
 
 class ErrorView(ProtectedRequestHandler):
