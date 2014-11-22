@@ -168,7 +168,7 @@ var vizForm = React.createClass({
         sensorList.forEach(function(sensor){
           resolutionList.forEach(function(resolution){
             var request_params = {
-              user_token: $('select').val(),
+              impersonatee_token: $('select').val(),
               sensor: sensor,
               resolution: resolution,
               timezone_offset: timezoneOffsetInMs

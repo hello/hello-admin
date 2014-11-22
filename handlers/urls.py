@@ -17,7 +17,6 @@ from handlers.setup import ProxyAPI
 from handlers.setup import RecentTokensAPI
 from handlers.setup import RegisterPillAPI, SetupAPI
 from handlers.setup import UpdateAdminAccessTokenAPI
-from handlers.teams import Teams2API
 from handlers.teams import TeamsAPI
 from handlers.user import UserAPI
 from handlers.views import ChartHandler
@@ -27,7 +26,6 @@ from handlers.views import ErrorView
 from handlers.views import FirmwareView
 from handlers.views import SenseVisualView
 from handlers.views import SettingsView
-from handlers.views import Teams2View
 from handlers.views import TeamsView
 from handlers.views import UserView
 from handlers.views import ZendeskView
@@ -42,7 +40,7 @@ api_routes = [
     ('/api/firmware/?$', FirmwareAPI),
     ('/api/presleep/?$', PreSleepAPI),
     ('/api/recent_tokens/?$', RecentTokensAPI),
-    ('/api/teams2/?$', Teams2API),
+    ('/api/teams/?$', TeamsAPI),
     ('/api/user/?$', UserAPI),
     ('/api/zendesk/?$', ZendeskAPI),
     ('/api/zendesk_stats/?$', ZendeskStatsAPI),
@@ -63,8 +61,7 @@ page_routes = [
     ('/sense/?$', SenseVisualView),
     ('/settings/?$', SettingsView),
     ('/setup', SetupAPI),
-    ('/teams/?$', Teams2View),
-    ('/teams2/?$', TeamsView),
+    ('/teams/?$', TeamsView),
     ('/update', UpdateAdminAccessTokenAPI),
     ('/users/?$', UserView),
     ('/zendesk/?$', ZendeskView),

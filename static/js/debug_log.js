@@ -106,18 +106,6 @@ var DebugLog = React.createClass({
     handleWhiteSpaceChange: function() {
         this.setState({showLineBreaks: $('#whitespace-check').is(':checked')});
     },
-    handleModeChange: function() {
-        if (this.refs.devicesInput.getDOMNode().value === 'device_id') {
-            this.setState({
-                placeholder: '  for example: D05FB81BE1E0',
-            });
-        }
-        else if (this.refs.devicesInput.getDOMNode().value === 'text') {
-            this.setState({
-                placeholder: '  for example: Uploading UART',
-            });
-        }
-    },
     handleSubmit: function(){
         var textInput = $('#text-input').val(),
             devicesInput = $('#devices-input').val();
@@ -184,11 +172,11 @@ var DebugLog = React.createClass({
                 </div>
 
                 <div className="col-lg-3 col-md-3 col-xs-3">
-                    <LongTagsInput id="devices-input" tagClass="label label-info" placeHolder="devices e.g 555Cxx, 555C6y" />
+                    <LongTagsInput id="devices-input" tagClass="label label-info" placeHolder="Devices(multiple) e.g 5xy, 5yz" />
                 </div>
                 <div className="col-lg-3 col-md-3 col-xs-3 input-group input-group-md">
                   <div className="icon-addon addon-md">
-                    <input id="text-input" className="form-control" ref="textInput" placeholder='text e.g UART' />
+                    <input id="text-input" className="form-control" ref="textInput" placeholder='Text e.g UART' />
                     <label for="text-input" className="glyphicon glyphicon-pencil"></label>
                   </div>
                   <span className="input-group-btn">
