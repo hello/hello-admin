@@ -106,9 +106,11 @@ class BaseRequestHandler(webapp2.RequestHandler):
         :type url_params: dict
         :param type: http request type, one of ["GET", "POST", "PUT", "DELETE"]
         :type api_url: str
+        :return a ResponseOutput object in test mode  or a string otherwise
         """
 
         output = {'data': {}, 'error': '', 'status': 401}
+        output = ResponseOutput()
         session = self.authorize_session(token=impersonatee_token)
         request_detail = {
             "headers": {'Content-Type' : 'application/json'},
@@ -119,17 +121,14 @@ class BaseRequestHandler(webapp2.RequestHandler):
         if url_params:
             request_detail['params'] = url_params
         try:
-            output['status'] = response.status_code
             response = getattr(OAuth2Session, type.lower())(session, api_url, **request_detail)
+            output.set_status(response.status_code)
 
             if response.status_code == 200:
-                output['data'] = response.json()
-            elif response.status_code == 204:
-                pass
-            else:
-                raise RuntimeError('Request failed ! Status code: {}'.format(response.status_code))
+                output.set_data(response.json())
+
         except Exception as e:
-            output['error'] = display_error(e)
+            output.set_error(display_error(e))
 
         self.response.write(json.dumps(output))
 
@@ -248,4 +247,23 @@ class SuperEngineerRequestHandler(ProtectedRequestHandler):
     Grant admin to only super engineers
     """
     def is_restricted_secondary(self):
-        return not self.current_user.email() in super(SuperEngineerRequestHandler, self).super_engineer()
+        return not self.current_user.email() in super(SuperEngineerRequestHandler, self).super_engineer()class ResponseOutput():
+    def __init__(self):
+        self.data = []
+        self.error = ""
+        self.status = 401
+
+    def set_data(self, data):
+        if not isinstance(data, list) and not isinstance(data, dict):
+            raise TypeError("Response data must be a list or a dict")
+        self.data = data
+
+    def set_error(self, error):
+        if not isinstance(error, str):
+            raise TypeError("Response error must be a string")
+        self.error = error
+
+    def set_status(self, status):
+        if not isinstance(status, int) and not isinstance(status, long):
+            raise TypeError("Response status must be an int or a longs")
+        self.status = status
