@@ -1,5 +1,6 @@
-span.input-group-addon {padding: 0; border: none;}
-div.modal-dialog {margin-top: 140px; margin-left: 50%; width: 500px; height: 150px;}
-div.modal-content>div {padding: 10px 15px;}
-#update {display: none;}
-div.modal-backdrop.in {opacity: 0;}
+#refresh {display: none;}
+#feature-input{max-width: 100%;}
+#groups-input {padding-bottom: 50px;}
+table.table td{text-align: center;}
+.remark {font-size: 11px; float: right; margin-top: 6px;}
+button {margin-right: 10px; opacity: 0.9;}

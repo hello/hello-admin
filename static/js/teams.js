@@ -1,181 +1,155 @@
 /** @jsx React.DOM */
 
-var AddRemoveDeviceModal = React.createClass({
-  addDevice: function() {
-      this.props.onRequestHide();
-      var addData = {
-          devices: $('#device').val(),
-          team: $('#teamModify').val() || $('#teamNew').val()
-      };
-      var that = this;
-      $.ajax({
-          url: '/api/device',
-          dataType: 'json',
-          contentType: 'application/json',
-          type: 'PUT',
-          data: JSON.stringify(addData),
-          success: function(response) {
-            $('#update').click(); // trigger update
-          }.bind(that),
-          error: function(xhr, status, err) {
-            console.error(status, err);
-          }.bind(that)
-      });
-  },
-  removeDevice: function() {
-      this.props.onRequestHide();
-      var removeData = {
-          devices: $('#device').val(),
-          team: $('#teamModify').val()
-      };
-      $.ajax({
-          url: '/api/device',
-          dataType: 'json',
-          contentType: 'application/json',
-          type: 'POST',
-          data: JSON.stringify(removeData),
-          success: function(response) {
-            $('#update').click(); // trigger update
-          }.bind(this),
-          error: function(xhr, status, err) {
-            console.error(status, err);
-          }.bind(this)
-      });
+var FeaturesTableBody = React.createClass({
+  getDefaultProps: function() {
+      return {data: []}
   },
 
-  handleNewTeamChange: function () {
-      if ($('#teamNew').val() !== "") {
-        $('#teamModify').val("");
-        $('#teamModifyContainer').hide();
-        $('#removeDeviceButton').hide();
-      }
-      else {
-        $('#teamNew').val("");
-        $('#teamModifyContainer').show();
-        $('#removeDeviceButton').show();
-      }
-  },
-  render: function() {
-    var team = $('#teamSelect').val();
-    var teamOptions = [<option value="">Choose Team</option>];
-    this.props.teams.forEach(function(t){
-      teamOptions.push(<option value={t}>{t}</option>)
-    });
-
-    return this.transferPropsTo(
-        <Modal title="Add/Remove devices from an existing team" animation={true}>
-          <div className="modal-body">
-            <LongTagsInput id="device" type="text" tagClass="label label-info" label="Devices" placeHolder="input 1 or more devices" />
-            <Input id="teamNew" type="text" bsStyle="warning" label="New Team" placeholder="input a brand new team" onChange={this.handleNewTeamChange} />
-            <div id="teamModifyContainer">
-            <Input id="teamModify" defaultValue={team} type="select" label="Existing Team">
-              {teamOptions}
-            </Input>
-            </div>
-          </div>
-          <div className="modal-footer">
-            <Button bsStyle="success" onClick={this.addDevice}><Glyphicon glyph="floppy-saved"/>&nbsp;&nbsp;Add</Button>
-            <Button id="removeDeviceButton" bsStyle="danger" onClick={this.removeDevice}><Glyphicon glyph="floppy-remove"/>&nbsp;&nbsp;Remove</Button>
-            <Button onClick={this.props.onRequestHide}>Close</Button>
-          </div>
-        </Modal>
-      );
+  render: function () {
+      var rows = [];
+      this.props.data.forEach(function(d){
+        var idsSpans = [];
+        d.ids.forEach(function(id){
+          var id_td = d.ids.indexOf(id) === d.ids.length - 1 ? id: id+", ";
+          idsSpans.push(<span className="ids-td cursor-custom">{id_td}</span>);
+        });
+        rows.push(<tr>
+            <td><span className="group-td cursor-custom">{d.name}</span></td>
+            <td>{idsSpans}</td>
+        </tr>);
+      });
+      return (<tbody>
+        {rows}
+      </tbody>)
   }
 });
 
-var DeviceMaestro = React.createClass({
-    getInitialState: function() {
-        return {
-            teams: [],
-            devices: [],
-            getStatus: 0
-        }
-    },
 
-    getTeams: function() {
-        $.ajax({
-          url: '/api/device',
-          dataType: 'json',
-          contentType: 'application/json',
-          type: 'GET',
-          data: {show_teams_only: "true"},
-          success: function(response) {
-            this.setState({
-                getStatus: response.status,
-                teams: response.data
-            });
-          }.bind(this),
-          error: function(xhr, status, err) {
-            console.error(status, err);
-            this.setState({getStatus: status});
-          }.bind(this)
-        });
-    },
-
-    getDevices: function() {
-        var selectedTeam = $('#teamSelect').val();
-        if (selectedTeam === '') {
-            this.setState({devices: []});
-            return
-        }
-
-        $.ajax({
-          url: '/api/device',
-          dataType: 'json',
-          contentType: 'application/json',
-          type: 'GET',
-          data: {team: selectedTeam},
-          success: function(response) {
-            this.setState({
-                getStatus: response.status,
-                devices: response.data.ids
-            });
-          }.bind(this),
-          error: function(xhr, status, err) {
-            console.error(status, err);
-            this.setState({getStatus: status});
-          }.bind(this)
-        });
-    },
-
-    componentDidMount: function() {
-        this.getTeams();
-    },
-
-    update: function() {
-        this.getTeams();
-        this.getDevices();
-    },
-
-    render: function() {
-        var listGroupItems = [];
-        this.state.devices.forEach(function(d){
-            listGroupItems.push(
-                <ListGroupItem>{d}</ListGroupItem>
-            );
-        });
-        var options = [<option value="">Select Team</option>];
-        this.state.teams.forEach(function(team){
-           options.push(<option value={team}>{team}</option>);
-        });
-        return (<div className="row">
-          <div className="col-xs-4">
-              <Input id="teamSelect" type="select" defaultValue="" onChange={this.getDevices}>
-                {options}
-              </Input>
-              <ListGroup>
-                {listGroupItems}
-              </ListGroup>
-          </div>
-
-          <div className="col-xs-2">
-            <ModalTrigger modal={<AddRemoveDeviceModal teams={this.state.teams} />}>
-              <Button bsStyle="primary" bsSize="medium">Add / Remove Devices</Button>
-            </ModalTrigger>
-          </div>
-          <button id="update" onClick={this.update}/>
-        </div>);
-    }
+var FeaturesTable = React.createClass({
+  render: function() {
+      return (<Table condensed bordered>
+          <thead>
+            <tr>
+              <th className="alert-info">Group</th>
+              <th className="alert-success">IDs</th>
+            </tr>
+          </thead>
+          <FeaturesTableBody data={this.props.data} />
+      </Table>)
+  }
 });
 
-React.renderComponent(<DeviceMaestro/>, document.getElementById('reboot'));
+var ConfigMaestro = React.createClass({
+  getInitialState: function () {
+    return {
+      ids: "",
+      data: []
+    };
+  },
+
+  populateInput: function () {
+    $('.group-td').click(function(){
+      $('#group-input').val($(this).text());
+    });
+    $('.ids-td').click(function(){
+      $('#ids-input').tagsinput('add', $(this).text());
+    });
+  },
+
+  getTeams: function() {
+    var that = this;
+    $.ajax({
+      url: '/api/teams',
+      dataType: 'json',
+      contentType: 'application/json',
+      type: 'GET',
+      data: {mode: $('#mode-input').val()},
+      success: function(response) {
+        console.log(response.data);
+        this.setState({
+          data: response.data
+        });
+        this.populateInput();
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(status, err);
+      }.bind(this)
+    });
+  },
+
+
+  handleModeChange: function() {
+    this.getTeams();
+  },
+
+  componentDidMount: function () {
+    this.getTeams();
+  },
+
+  handleSend: function(e) {
+    var that = this;
+    var action = $(e.target).attr('action') || $(e.target).parent('button').attr('action');
+    var sendData = {
+      group: action !== 'delete-group' ? $('#group-input').val(): $('#group-del-input').val(),
+      ids: $('#ids-input').val(),
+      mode: $('#mode-input').val(),
+      action: action
+    };
+    console.log('sending', sendData);
+    $.ajax({
+      url: '/api/teams',
+      dataType: 'json',
+      contentType: 'application/json',
+      data: JSON.stringify(sendData),
+      type: 'PUT',
+      success: function(response) {
+        console.log(response);
+        that.getTeams();
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(status, err);
+      }.bind(this)
+    });
+  },
+
+  render: function () {
+    var currentMode = $('#mode-input').val();
+    var displayMode =  currentMode ? currentMode.capitalize(): null;
+    return (<Grid>
+      <Row className="show-grid">
+        <Col xs={3} md={3} xsOffset={5} mdOffset={5}><code className="nonscript">
+          <Input id="mode-input" bsStyle="warning" type="select" defaultValue="devices" onChange={this.handleModeChange} addonBefore="Type">
+            <option value="devices">&#10148;&nbsp;Devices</option>
+            <option value="users">&#10148;&nbsp;Users</option>
+          </Input>
+        </code></Col>
+      </Row>
+      <Row className="show-grid">
+        <hr className="fancy-line"/>
+      </Row>
+      <Row className="show-grid">
+        <Col xs={5} md={5}><code className="nonscript">
+          <h4><span>{displayMode}</span> Group <em className="remark">Enter new or click to select current &rarr;</em></h4>
+          <Input id="group-input" type="text" placeholder="e.g alpha-dev" />
+          <h4><span>{displayMode}</span> IDs <em className="remark">Enter new or click to select current &rarr;</em></h4>
+          <LongTagsInput id="ids-input" tagClass="label label-info" placeHolder="e.g 555Cxx, 555C6y" />
+          <h4>Change IDs of a Group</h4>
+          <Button className="col-xs-3 col-md-3 col-lg-3" action="add" bsStyle="success" onClick={this.handleSend}><Glyphicon glyph="plus"/> Add</Button>
+          <Button className="col-xs-3 col-md-3 col-lg-3" action="replace" bsStyle="primary" onClick={this.handleSend}><Glyphicon glyph="refresh"/> Replace</Button>
+          <Button className="col-xs-3 col-md-3 col-lg-3"action="remove" bsStyle="danger" onClick={this.handleSend}><Glyphicon glyph="minus"/> Remove</Button>
+          <p>&nbsp;</p><p>&nbsp;</p><hr className="fancy-line"/><p>&nbsp;</p>
+          <h4>Delete a Group</h4>
+          <Input id="group-del-input" type="text" placeholder="e.g gamma-dev" buttonBefore={<Button>Before</Button>}/>
+          <Button className="col-xs-3 col-md-3 col-lg-3" action="delete-group" bsStyle="default" onClick={this.handleSend}><Glyphicon glyph="remove"/> Delete</Button>
+        </code></Col>
+        <Col xs={7} md={7}><code className="nonscript">
+          <h4>Current Teams</h4>
+          <FeaturesTable data={this.state.data} />
+          <button id="refresh" onClick={this.getTeams}/>
+        </code></Col>
+      </Row>
+    </Grid>);
+  }
+});
+
+React.renderComponent(<ConfigMaestro />, document.getElementById("teams"));

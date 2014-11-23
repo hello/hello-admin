@@ -1,16 +1,17 @@
 {% extends "templates/base.html" %}
 {% block title %}{{ title }}{% endblock %}
 {% block extrastatic %}
-    <script type="text/javascript" src="/static/js/third-party/react-bootstrap.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="/static/css/teams.css" />
+    <script type="text/javascript" src="/static/js/third-party/spectrum.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/bootstrap-slider.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-slider.css" />
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-tagsinput.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/teams.css" />
     <script type="text/javascript" src="/static/js/third-party/bootstrap-tagsinput.js"></script>
     <script type="text/jsx" src="/static/js/third-party/long-tagsinput.js"></script>
     <script type="text/jsx" src="/static/js/teams.js"></script>
-{% endblock %}s
+
+{% endblock %}
 
 {% block content %}
-    <h3>In-house Devices</h3>
-    <hr class="fancy-line">
-    <div id="reboot"></div>
+    <div id="teams"></div>
 {% endblock %}

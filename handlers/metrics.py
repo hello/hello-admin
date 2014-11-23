@@ -2,12 +2,12 @@ import json
 import logging as log
 import time
 from handlers.utils import display_error
-from handlers.helpers import BaseRequestHandler
+from handlers.helpers import ProtectedRequestHandler
 from models.ext import SearchifyCredentials
 from indextank import ApiClient
+from utils import stripStringToList
 
-
-class PreSleepAPI(BaseRequestHandler):
+class PreSleepAPI(ProtectedRequestHandler):
     def get(self):
         """
         Grab temperature
@@ -16,58 +16,58 @@ class PreSleepAPI(BaseRequestHandler):
             token (required for each user)
             resolution (required : week or day)
         """
-        output = {'data': [], 'error': ''}
-        try:
-            sensor = self.request.get('sensor', default_value='humidity')
-            resolution = self.request.get('resolution', default_value='day')
-            timezone_offset = int(self.request.get('timezone_offset', default_value=8*3600*1000))
-            current_ts = int(time.time() * 1000) - timezone_offset
-            log.warning(current_ts)
-            user_token = self.request.get('user_token', default_value=None)
 
-            if user_token is None:
-                raise RuntimeError("Missing user token!")
+        sensor = self.request.get('sensor', default_value='humidity')
+        resolution = self.request.get('resolution', default_value='day')
+        timezone_offset = int(self.request.get('timezone_offset', default_value=8*3600*1000))
+        current_ts = int(time.time() * 1000) - timezone_offset
+        impersonatee_token = self.request.get('impersonatee_token', default_value=None)
 
-            session = self.authorize_session(user_token)
-            req_url = "room/{}/{}".format(sensor, resolution)
-            response = session.get(req_url, params={'from': current_ts})
-
-            if response.status_code == 200:
-                output['data'] = response.json()
-            else:
-                raise RuntimeError('{}: fail to retrieve presleep'.format(response.status_code))
-        except Exception as e:
-            output['error'] = display_error(e)
-            log.error('ERROR: {}'.format(display_error(e)))
-
-        self.response.write(json.dumps(output))
+        self.hello_request(
+            api_url="room/{}/{}".format(sensor, resolution),
+            url_params={'from': current_ts},
+            impersonatee_token=impersonatee_token,
+            type="GET"
+        )
 
 
-class DebugLogAPI(BaseRequestHandler):
+
+class DebugLogAPI(ProtectedRequestHandler):
     """
     Retrieve debug logs
     """
     def get(self):
          output = {'data': [], 'error': ''}
+
+         max_results = int(self.request.get('max_results', default_value=20))
+         text_input = self.request.get('text', default_value="")
+         devices_input = self.request.get('devices', default_value="")
+
+         searchify_entity= SearchifyCredentials.query().fetch(1)
+
          try:
-             search_input = self.request.get('search_input', default_value=None)
-             search_by = self.request.get('search_by', default_value=None)
-             max_results = int(self.request.get('max_results', default_value=20))
-
-             if None in [search_input, search_by]:
-                 raise RuntimeError("Missing input")
-
-             info_query = SearchifyCredentials.query()
-             results = info_query.fetch(1)
-
-             if not results:
+             if not searchify_entity:
                  raise RuntimeError("Missing AppInfo. Bailing.")
-
-             searchify_cred = results[0]
-
+             searchify_cred = searchify_entity[0]
              debug_log_api = ApiClient(searchify_cred.api_client)
+
              index = debug_log_api.get_index('sense-logs')
-             output['data'] = index.search('{}:{}'.format(search_by, search_input), fetch_fields=['text'], length=max_results)
+
+             if not text_input and not devices_input:
+                 raise RuntimeError('Invalid input')
+
+             search_params = {
+                 'query': 'text:UART',
+                 'category_filters': {},
+                 'fetch_fields': ['text'],
+                 'length': max_results
+             }
+             if text_input:
+                 search_params['query'] = 'text:{}'.format(text_input)
+             if devices_input:
+                 search_params['category_filters'] = {'device_id': stripStringToList(devices_input)}
+
+             output['data'] = index.search(**search_params)
 
          except Exception as e:
              output['error'] = display_error(e)

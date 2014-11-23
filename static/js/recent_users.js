@@ -8,7 +8,7 @@ var LinkToUserDashboard = React.createClass({
     },
     render: function() {
         var userLink = "/users/?email=" + this.props.email;
-        return <a onClick={this.handleClick}>{this.props.email}</a>
+        return <span className="cursor-custom" onClick={this.handleClick}>{this.props.email}</span>
     }
 });
 var UserRow = React.createClass({

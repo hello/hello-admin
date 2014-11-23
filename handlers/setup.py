@@ -3,97 +3,49 @@ import logging as log
 import urllib
 
 import settings
-from models.setup import AppInfo, AdminUser, AccessToken
+from models.setup import AppInfo, AdminUser, AccessToken, UserGroup
 from handlers.utils import display_error
-from handlers.helpers import make_oauth2_service, BaseRequestHandler
+from handlers.helpers import make_oauth2_service, ProtectedRequestHandler, SuperEngineerRequestHandler
 from models.ext import ZendeskCredentials, SearchifyCredentials
 
 
-class AppAPI(BaseRequestHandler):
+class AppAPI(ProtectedRequestHandler):
     def get(self):
         """
         Get all specs of all apps or a single app if specified
         """
-        """
-        :return:
-        """
-        output = {'data': [], 'error': ''}
         id = self.request.get('id')
-
-        try:
-            session = self.authorize_session()
-            if id:
-                response = session.get("applications/{}".format(id))
-            else:
-                response = session.get("applications")
-
-            if response.status_code == 200:
-                output['data'] = response.json()
-            else:
-                raise RuntimeError('{}: fail to retrieve applications'.format(response.status_code))
-        except Exception as e:
-            output['error'] = display_error(e)
-            log.error('ERROR: {}'.format(display_error(e)))
-        self.response.write(json.dumps(output))
+        self.hello_request(
+            api_url="applications/{}".format(id) if id else "applications",
+            type="GET"
+        )
 
 
-class AppScopeAPI(BaseRequestHandler):
+class AppScopeAPI(ProtectedRequestHandler):
     """
     Get the scopes of all apps or a single app if specified
     """
     def get(self):
-        output = {'data': [], 'error': ''}
-        app_id = self.request.get('app_id')
-
-        try:
-            session = self.authorize_session()
-
-            if app_id:
-                response = session.get("applications/{}/scopes".format(app_id))
-            else:
-                response = session.get("applications/scopes")
-
-            if response.status_code == 200:
-                output['data'] = response.json()
-            else:
-                raise RuntimeError('{}: fail to retrieve applications scopes'.format(response.status_code))
-        except Exception as e:
-            output['error'] = display_error(e)
-            log.error('ERROR: {}'.format(display_error(e)))
-        self.response.write(json.dumps(output))
+        app_id = self.request.get('app_id', "")
+        self.hello_request(
+            api_url="applications/{}/scopes".format(app_id) if app_id else "applications/scopes",
+            type="GET"
+        )
 
     def put(self):
-        """
-        Update the scopes of all apps
-        """
-        output = {'data': [], 'error': ''}
         req = json.loads(self.request.body)
-        app_id = req.get('app_id', None)
-        scopes = req.get('scopes', None)
 
-        try:
-            if None in [app_id, scopes]:
-                raise RuntimeError("Invalid request!")
+        app_id = req.get('app_id', "")
+        scopes = req.get('scopes', "")
 
-            headers = {
-                'Content-type': 'application/json',
-                'Accept': 'application/json'
-            }
-
-            session = self.authorize_session()
-
-            response = session.put('applications/{}/scopes'.format(app_id), data=json.dumps(scopes), headers=headers)
-            log.info('updated_scopes: {}'.format(scopes))
-            if response.status_code not in [200, 204]:
-                raise RuntimeError('{}: fail to update application scope'.format(response.status_code))
-
-        except Exception as e:
-            output['error'] = display_error(e)
-            log.error('ERROR: {}'.format(display_error(e)))
-        self.response.write(json.dumps(output))
+        self.hello_request(
+            api_url='applications/{}/scopes'.format(app_id),
+            type="PUT",
+            body_data=json.dumps(scopes)
+        )
 
 
-class CreateTokenAPI(BaseRequestHandler):
+class CreateTokenAPI(ProtectedRequestHandler):
     def get(self):
         """
         Get all tokens created
@@ -183,7 +135,7 @@ class CreateTokenAPI(BaseRequestHandler):
         self.response.write(json.dumps({'access_token': access_token}))
 
 
-class CreateAccountAPI(BaseRequestHandler):
+class CreateAccountAPI(ProtectedRequestHandler):
     def post(self):
         """
         Create an user account
@@ -240,7 +192,7 @@ class CreateAccountAPI(BaseRequestHandler):
         self.response.write(json.dumps(template_values))
 
 
-class ProxyAPI(BaseRequestHandler):
+class ProxyAPI(ProtectedRequestHandler):
     def get(self, path):
         """
         Get proxy for cross domain call in ChartHanlder
@@ -263,7 +215,7 @@ class ProxyAPI(BaseRequestHandler):
         self.response.write(json.dumps(segments))
 
 
-class RecentTokensAPI(BaseRequestHandler):
+class RecentTokensAPI(ProtectedRequestHandler):
     def get(self):
         """
         Grab recent tokens (up to 20)
@@ -278,42 +230,24 @@ class RecentTokensAPI(BaseRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class RegisterPillAPI(BaseRequestHandler):
+class RegisterPillAPI(ProtectedRequestHandler):
     def post(self):
         """
         Register a pill
         """
-        """
-        :return:
-        """
-
-        headers = {
-            'Content-type': 'application/json',
-            'Accept': 'application/json'
-        }
-
-        session = self.authorize_session()
-
         data = dict(
             pill_id=self.request.get('pill_id'),
             account_id=self.request.get('account_id')
         )
-        log.info(data)
 
-        resp = session.post(
-            'devices/pill',
-            data=json.dumps(data),
-            headers=headers
+        self.hello_request(
+            api_url='device/pill',
+            type='POST',
+            body_data=json.dumps(data)
         )
-        if resp.status_code not in [200, 204]:
-            log.error("%s - %s", resp.status_code, resp.content)
-            error_message = "%s" % resp.content
-            self.show_handler_error(error_message, status_code=resp.status_code)
-            return
-        self.redirect('/')
 
 
-class CreateApplicationAgainstProdAPI(BaseRequestHandler):
+class CreateApplicationAgainstProdAPI(SuperEngineerRequestHandler):
     def get(self):
         """
         Just helpful for local dev
@@ -335,7 +269,7 @@ class CreateApplicationAgainstProdAPI(BaseRequestHandler):
             app_info.put()
 
 
-class SetupAPI(BaseRequestHandler):
+class SetupAPI(SuperEngineerRequestHandler):
     """
     Create entities for AppInfo, AdminUser and ZendeskCredentials
     """
@@ -376,7 +310,7 @@ class SetupAPI(BaseRequestHandler):
         searchify_credentials.put()
 
 
-class UpdateAdminAccessTokenAPI(BaseRequestHandler):
+class UpdateAdminAccessTokenAPI(SuperEngineerRequestHandler):
     """
     Update access token after admin user and app info entities are updated and memcache is flushed
     """
@@ -458,3 +392,25 @@ class UpdateAdminAccessTokenAPI(BaseRequestHandler):
             app_info_model.client_id
         log.info(msg)
         self.redirect('/')
+
+
+class CreateGroupsAPI(SuperEngineerRequestHandler):
+    def get(self):
+        """
+        Populate groups entity
+        """
+        output= {'data': [], 'error': ''}
+        if settings.DEBUG:
+            groups_data = {
+                'super_engineer': 'long@sayhello.com',
+                'customer_experience': 'marina@sayhello.com',
+                'software': 'pang@sayhello.com, benjo@sayhello.com',
+                'hardware': 'scott@sayhello.com',
+                'firmware':  'chris@sayhello.com, kingshy@sayhello.com'
+            }
+            groups_entity = UserGroup(**groups_data)
+            groups_entity.put()
+            output['data'] = groups_data
+        else:
+            output['error'] = 'Not permitted'
+        self.response.write(json.dumps(output))

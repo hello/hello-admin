@@ -1,8 +1,11 @@
 import datetime as dt
-from models.setup import AccessToken
 import jinja2
 import os
-from handlers.helpers import BaseRequestHandler, ProtectedRequestHandler
+from handlers.helpers import ProtectedRequestHandler
+from handlers.helpers import CustomerExperienceRequestHandler
+from handlers.helpers import FirmwareRequestHandler
+from handlers.helpers import SuperEngineerRequestHandler
+from models.setup import AccessToken
 
 this_file_path = os.path.dirname(__file__)
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -12,7 +15,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 )
 
 
-class ChartHandler(BaseRequestHandler):
+class ChartHandler(ProtectedRequestHandler):
     """
     Returns a timeline of sleep events
     """
@@ -22,31 +25,23 @@ class ChartHandler(BaseRequestHandler):
         day = dt.datetime.strftime(dt.datetime.now(), "%Y-%m-%d")
         self.response.write(template.render({'tokens': tokens, 'day': day}))
 
-class UserDashboardView(BaseRequestHandler):
-    """
-    Returns all you should know about an user, under construction
-    """
-    def get(self):
-        self.render_to_response(template_file='templates/user_dashboard.html',
-                                context={'title': 'User Dashboard'})
-
-class UserView(BaseRequestHandler):
+class UserView(ProtectedRequestHandler):
     """
     Returns a portal to quickly look for recent users and search for users.
     """
     def get(self):
         self.render_to_response(template_file='templates/users.html',
-                                context={'title': 'User'})
+                                context={'title': 'Users'})
 
-class SenseVisualView(BaseRequestHandler):
+class SenseVisualView(ProtectedRequestHandler):
     """
     Returns graphs of data from Sense (temperature, humidity, particulates, light)
     """
     def get(self):
         self.render_to_response(template_file='templates/sense.html',
-                                context={'title': 'Sense Visual'})
+                                context={'title': 'Sense'})
 
-class ZendeskView(BaseRequestHandler):
+class ZendeskView(CustomerExperienceRequestHandler):
     """
     Returns zendesk statistics, underconstruction
     """
@@ -54,7 +49,7 @@ class ZendeskView(BaseRequestHandler):
          self.render_to_response(template_file='templates/zendesk.html',
                                 context={'title': 'Zendesk'})
 
-class SettingsView(ProtectedRequestHandler):
+class SettingsView(SuperEngineerRequestHandler):
     """
     Returns a panel for manipulating apps, accounts
     """
@@ -70,7 +65,7 @@ class DebugLogView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/debug_log.html',
                                 context={'title': 'Log'})
 
-class FirmwareView(ProtectedRequestHandler):
+class FirmwareView(FirmwareRequestHandler):
     """
     Returns a panel for moderating firmware content
     """
@@ -78,20 +73,23 @@ class FirmwareView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/firmware.html',
                                 context={'title': 'Firmware'})
 
-class TeamsView(ProtectedRequestHandler):
-    """
-    Returns a panel for viewing specifications of devices,
-    having ability to disconnect a device / flash firmware from a chosen list
-    """
-    def get(self):
-        self.render_to_response(template_file='templates/teams.html',
-                                context={'title': 'Teams'})
-
 class ConfigurationView(ProtectedRequestHandler):
     """
     Returns a panel for monitoring team device IDs and groups (teams) by feature.
     """
     def get(self):
         self.render_to_response(template_file='templates/configuration.html',
-                                context={'title': 'Devices'})
+                                context={'title': 'Configuration'})
 
+class TeamsView(ProtectedRequestHandler):
+    """
+    Returns a panel for monitoring groups of devices & users
+    """
+    def get(self):
+        self.render_to_response(template_file='templates/teams.html',
+                                context={'title': 'Teams'})
+
+class ErrorView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/error.html',
+                                context={'title': 'Denied'})

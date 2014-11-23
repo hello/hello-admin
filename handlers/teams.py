@@ -1,88 +1,36 @@
-import logging as log
 import json
-from handlers.utils import display_error
-from handlers.helpers import BaseRequestHandler
-
-class TeamsAPI(BaseRequestHandler):
-     def get(self):
-        output = {'data': [], 'error': ''}
-        try:
-            session = self.authorize_session()
-            team = self.request.get('team', default_value="")
-            show_teams_only = self.request.get('show_teams_only', default_value="")
-
-            if not team and not show_teams_only:
-                raise RuntimeError("Invalid GET request")
-
-            if show_teams_only == "true":
-                req_url = "teams/devices"
-            else:
-                req_url = "teams/devices/{}".format(team)
-            log.info(req_url)
-            response = session.get(req_url, headers={'Content-Type' : 'application/json'})
-            if response.status_code == 200:
-                output['data'] = [r['name'] for r in response.json()] if show_teams_only == "true" else response.json()
-            else:
-                raise RuntimeError('{}: fail to retrieve list of devices for team {}'.format(response.status_code, team))
-
-        except Exception as e:
-            output['error'] = display_error(e)
-            log.error('ERROR: {}'.format(display_error(e)))
-
-        self.response.write(json.dumps(output))
-
-     def put(self):
-        output = {'data': [], 'error': '', 'status': 0}
-        try:
-            session = self.authorize_session()
-            req = json.loads(self.request.body)
-            devices = req.get('devices', [])
-            team = req.get('team', '')
-
-            if not team or not devices:
-                raise RuntimeError('Invalid PUT request!')
-
-            devices = [d.strip() for d in devices.split(',')]
-
-            req_url = "teams/devices"
-            put_response = session.post(req_url,
-                                        headers={'Content-Type' : 'application/json'},
-                                        data=json.dumps({"name": team, "ids": devices}))
-
-            if put_response.status_code != 204:
-                log.error(put_response.content)
-                raise RuntimeError('{}: fail to add device {} to {}'.format(put_response.status_code, devices, team))
-            output['status'] = put_response.status_code
-        except Exception as e:
-            output['error'] = display_error(e)
-            log.error('ERROR: {}'.format(display_error(e)))
-
-        self.response.write(json.dumps(output))
+from handlers.helpers import FirmwareRequestHandler
 
 
-     def post(self):
-        output = {'data': [], 'error': '', 'status': 0}
-        try:
-            session = self.authorize_session()
-            req = json.loads(self.request.body)
-            device = req.get('devices', [])
-            team = req.get('team', '')
+class TeamsAPI(FirmwareRequestHandler):
+    def get(self):
+        mode = self.request.get('mode', default_value="")
+        self.hello_request(
+            api_url="teams/{}".format(mode),
+            type="GET"
+        )
 
-            if not team or not device:
-                raise RuntimeError('Invalid POST request!')
+    def put(self):
+        req = json.loads(self.request.body)
 
-            device = device.split(',')
+        group = req.get('group', "")
+        ids = req.get('ids', "").strip().split(",")
+        mode = req.get('mode', "")
+        action = req.get('action', "")
 
-            for d in device:
-                req_url = "teams/devices/{}/{}".format(team, d.strip())
-                response = session.delete(req_url,
-                                          headers={'Content-Type' : 'application/json'})
-                if response.status_code != 204:
-                    log.error(response.content)
-                    raise RuntimeError('{}: fail to delete firmware device {}'.format(response.status_code, device))
-            output['status'] = response.status_code
-        except Exception as e:
-            output['error'] = display_error(e)
-            log.error('ERROR: {}'.format(display_error(e)))
+        if mode == "users" and action != "delete-group":
+            ids = map(int, ids)
 
-        self.response.write(json.dumps(output))
+        request_type_map = {
+            "add": "POST",
+            "replace": "PUT",
+            "remove": "DELETE",
+            "delete-group": "DELETE"
+        }
+
+        request_specs = {
+            "api_url": "teams/{}/{}".format(mode, group) if action == "delete-group" else "teams/{}".format(mode),
+            "type": request_type_map[action],
+            "body_data": json.dumps({"name": group, "ids": ids})
+        }
+        self.hello_request(**request_specs)

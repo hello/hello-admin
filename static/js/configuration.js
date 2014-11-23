@@ -54,7 +54,6 @@ var ConfigMaestro = React.createClass({
       contentType: 'application/json',
       type: 'GET',
       success: function(response) {
-        console.log(response.data);
         this.setState({
           data: response.data
         });
@@ -67,15 +66,28 @@ var ConfigMaestro = React.createClass({
 
   getCurrentGroups: function() {
     $.ajax({
-      url: 'api/device',
-      dataType: 'json',
-      data: {'show_teams_only': true},
-      contentType: 'application/json',
+      url: 'api/teams',
       type: 'GET',
+      dataType: 'json',
+      contentType: 'application/json',
+      data: {mode: 'users'},
       success: function(response) {
-        console.log(response.data);
-        this.setState({
-          groups: response.data
+        var usersGroups = response.data;
+        $.ajax({
+          url: 'api/teams',
+          type: 'GET',
+          dataType: 'json',
+          contentType: 'application/json',
+          data: {mode: 'devices'},
+          success: function(response) {
+            var devicesGroups = response.data;
+            this.setState({
+              groups: usersGroups.concat(devicesGroups)
+            });
+          }.bind(this),
+          error: function(xhr, status, err) {
+            console.error(status, err);
+          }.bind(this)
         });
       }.bind(this),
       error: function(xhr, status, err) {
@@ -115,7 +127,6 @@ var ConfigMaestro = React.createClass({
       data: JSON.stringify(submitData),
       type: 'PUT',
       success: function(response) {
-        console.log(response);
         this.getCurrentFeatures();
       }.bind(this),
       error: function(xhr, status, err) {
@@ -127,8 +138,9 @@ var ConfigMaestro = React.createClass({
   render: function () {
     var groupsOptions = [];
     var that = this;
-    that.state.groups.forEach(function(group){
-      groupsOptions.push(<option value={group}>{that.state.groups.indexOf(group)+1 + ". " +  group}</option>)
+    groupsNames = _.chain(that.state.groups).values().flatten().pluck("name").uniq().value();
+    groupsNames.forEach(function(group){
+      groupsOptions.push(<option value={group}>{"➢  " + group}</option>)
     });
     return (<Grid>
       <Row className="show-grid">

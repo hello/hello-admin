@@ -4,7 +4,7 @@ var LogTable = React.createClass({
    render: function(){
        var logTableRows = [], that = this;
        that.props.logs.forEach(function(log){
-            var currentInput = $('#search-input').val();
+            var currentInput = $('#text-input').val();
             var regex = that.props.caseInsensitive === true ?
                         new RegExp(currentInput, 'gi'): new RegExp(currentInput, 'g');
             var regexList = that.props.showLineBreaks === true ? [regex]
@@ -53,8 +53,6 @@ var DebugLog = React.createClass({
         return {
             logs: [],
             searchAlert: "",
-            placeholder: " for example: Uploading UART",
-            mode: "",
             highlightColor: '#FF0000',
             caseInsensitive: true,
             showLineBreaks: false
@@ -63,8 +61,8 @@ var DebugLog = React.createClass({
     componentDidMount: function() {
         var that = this;
         var maxDocsFromURL = getParameterByName('max_docs');
-        var searchInputFromURL = getParameterByName('search_input');
-        var searchByFromURL = getParameterByName('search_by');
+        var textInputFromURL = getParameterByName('text');
+        var devicesInputFromURL = getParameterByName('devices');
 
         if (maxDocsFromURL) {
           $('#sliderValue').text(maxDocsFromURL);
@@ -72,17 +70,14 @@ var DebugLog = React.createClass({
         else {
           maxDocsFromURL = 20;
         }
-        if (searchByFromURL) {
-          that.refs.searchBy.getDOMNode().value = searchByFromURL;
+        if (devicesInputFromURL) {
+          $('#devices-input').val(devicesInputFromURL);
         }
-        else {
-          that.refs.searchBy.getDOMNode().value = 'text';
-        }
-        if (searchInputFromURL) {
-          that.refs.searchInput.getDOMNode().value = searchInputFromURL;
+        if (textInputFromURL) {
+          $('#text-input').val(textInputFromURL);
         }
 
-        if (searchByFromURL || searchInputFromURL)
+        if (devicesInputFromURL || textInputFromURL)
           that.handleSubmit();
 
         $('.slider').slider({value: Number(maxDocsFromURL)}).on('slide', function(slideEvt){
@@ -111,34 +106,20 @@ var DebugLog = React.createClass({
     handleWhiteSpaceChange: function() {
         this.setState({showLineBreaks: $('#whitespace-check').is(':checked')});
     },
-    handleModeChange: function() {
-        if (this.refs.searchBy.getDOMNode().value === 'device_id') {
-            this.setState({
-                placeholder: '  for example: D05FB81BE1E0',
-                mode:'device_id'
-            });
-        }
-        else if (this.refs.searchBy.getDOMNode().value === 'text') {
-            this.setState({
-                placeholder: '  for example: Uploading UART',
-                mode:'text'
-            });
-        }
-    },
     handleSubmit: function(){
-        var searchInput = this.refs.searchInput.getDOMNode().value,
-            searchBy = this.refs.searchBy.getDOMNode().value;
+        var textInput = $('#text-input').val(),
+            devicesInput = $('#devices-input').val();
         $.ajax({
           url: "/api/debug_log",
           dataType: 'json',
           type: 'GET',
           data: {
-              search_by: searchBy,
-              search_input: searchInput,
+              devices: devicesInput,
+              text: textInput,
               max_results: $('#sliderValue').text()
           },
           success: function(response) {
-            history.pushState({}, '', '/debug_log/?search_input=' + searchInput + '&search_by=' + searchBy + '&max_docs=' + $('#sliderValue').text());
+            history.pushState({}, '', '/debug_log/?text=' + textInput + '&devices=' + devicesInput + '&max_docs=' + $('#sliderValue').text());
             if (response.error) {
                 this.setState({
                     logs: [],
@@ -147,7 +128,7 @@ var DebugLog = React.createClass({
             }
             else {
                 this.setState({
-                    logs: this.state.mode==='text' ? response.data.results: response.data.results.reverse(),
+                    logs: response.data.results.reverse(),
                     searchAlert: "found " + response.data.results.length + " documents"
                 });
             }
@@ -173,11 +154,7 @@ var DebugLog = React.createClass({
                 highlightColor={this.state.highlightColor}
             />
         ];
-        var glyphClasses = React.addons.classSet({
-            'glyphicon': true,
-            'glyphicon-pencil': this.state.mode === 'text',
-            'glyphicon-barcode': this.state.mode === 'device_id'
-        });
+
         return (<div>
             <form className="row" onSubmit={this.handleSubmit}>
                 <div className="col-lg-1 col-md-1 col-xs-1">
@@ -193,22 +170,17 @@ var DebugLog = React.createClass({
                  <div className="col-lg-1 col-md-1 col-xs-1">
                     <input id="whitespace-check" type="checkbox" onChange={this.handleWhiteSpaceChange} /> Show Linebreaks
                 </div>
+
                 <div className="col-lg-3 col-md-3 col-xs-3">
-                    <div className="icon-addon addon-md">
-                        <select id="mode" className="form-control" ref="searchBy" onChange={this.handleModeChange}>
-                            <option value="device_id">&nbsp;&nbsp;&nbsp;&nbsp; Search by Device ID</option>
-                            <option value="text">&nbsp;&nbsp;&nbsp;&nbsp; Search by Text Phrase</option>
-                        </select>
-                        <label for="mode" className="glyphicon glyphicon-star-empty"></label>
-                    </div>
+                    <LongTagsInput id="devices-input" tagClass="label label-info" placeHolder="Devices(multiple) e.g 5xy, 5yz" />
                 </div>
                 <div className="col-lg-3 col-md-3 col-xs-3 input-group input-group-md">
                   <div className="icon-addon addon-md">
-                    <input id="search-input" className="form-control" ref="searchInput" placeholder={this.state.placeholder} />
-                    <label for="search-input" className={glyphClasses}></label>
+                    <input id="text-input" className="form-control" ref="textInput" placeholder='Text e.g UART' />
+                    <label for="text-input" className="glyphicon glyphicon-pencil"></label>
                   </div>
                   <span className="input-group-btn">
-                    <button className="btn btn-success" type="submit"><span className="glyphicon glyphicon-search"></span></button>
+                    <button className="btn btn-success" onClick={this.handleSubmit}><span className="glyphicon glyphicon-search"></span></button>
                   </span>
                 </div>
             </form><br/>

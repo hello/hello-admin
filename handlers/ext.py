@@ -1,13 +1,13 @@
 import json
 import logging as log
 import requests
-from models.ext import ZendeskCredentials
-from handlers.helpers import BaseRequestHandler
-from handlers.utils import display_error
-from utils import iso_to_utc_timestamp
 from handlers.analysis import get_zendesk_stats
+from handlers.helpers import CustomerExperienceRequestHandler
+from handlers.utils import display_error
+from models.ext import ZendeskCredentials
+from utils import iso_to_utc_timestamp
 
-class ZendeskAPI(BaseRequestHandler):
+class ZendeskAPI(CustomerExperienceRequestHandler):
     def get(self):
         """
         Grab tickets filed by a customer
@@ -16,24 +16,19 @@ class ZendeskAPI(BaseRequestHandler):
         """
         output = {'data': [], 'error': ''}
         user_email = self.request.get('email')
+        zendesk_entity = ZendeskCredentials.query().fetch(1)
+
+        if not zendesk_entity:
+            self.error(500)
+
+        zendesk_cred = zendesk_entity[0]
+        tickets = []
+        search_url = "{}/api/v2/search.json?query=type:ticket%20requester:{}".format(zendesk_cred.domain, user_email)
+        zen_auth = (zendesk_cred.email_account + '/token', zendesk_cred.api_token)
 
         try:
             if not user_email:
                 raise RuntimeError("Missing input: user email");
-
-            info_query = ZendeskCredentials.query()
-            results = info_query.fetch(1)
-
-            if not results:
-                self.error(500)
-                raise RuntimeError("Missing AppInfo. Bailing.")
-
-            zendesk_cred = results[0]
-            tickets = []
-
-            search_url = "{}/api/v2/search.json?query=type:ticket%20requester:{}".format(zendesk_cred.domain, user_email)
-
-            zen_auth = (zendesk_cred.email_account + '/token', zendesk_cred.api_token)
             zen_response = requests.get(search_url, auth=zen_auth)
 
             if zen_response.ok:
@@ -58,7 +53,7 @@ class ZendeskAPI(BaseRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class ZendeskStatsAPI(BaseRequestHandler):
+class ZendeskStatsAPI(CustomerExperienceRequestHandler):
     def get(self):
         """
         Grab tickets filed by a customer
@@ -70,29 +65,29 @@ class ZendeskStatsAPI(BaseRequestHandler):
         end_date = self.request.get('end_date')  ## yyyy-mm-dd
         date_type = self.request.get('date_type', default_value="created")
 
+        info_query = ZendeskCredentials.query()
+        results = info_query.fetch(1)
+
+        if not results:
+            self.error(500)
+
+        zendesk_cred = results[0]
+        tickets = []
+
+        zen_api = "{}/api/v2/search.json?query=type:ticket%20".format(zendesk_cred.domain)
+
+        if start_date and end_date:
+            search_url = zen_api + "{}>{}+{}<{}".format(date_type, start_date, date_type, end_date)
+        elif start_date:
+            search_url = zen_api + "{}>{}".format(date_type, start_date)
+        elif end_date:
+            search_url =  zen_api + "{}<{}".format(date_type, end_date)
+        else:
+            search_url =  zen_api + "{}".format(date_type)
+
+        zen_auth = (zendesk_cred.email_account + '/token', zendesk_cred.api_token)
+
         try:
-            info_query = ZendeskCredentials.query()
-            results = info_query.fetch(1)
-
-            if not results:
-                self.error(500)
-                raise RuntimeError("Missing AppInfo. Bailing.")
-
-            zendesk_cred = results[0]
-            tickets = []
-
-            zen_api = "{}/api/v2/search.json?query=type:ticket%20".format(zendesk_cred.domain)
-
-            if start_date and end_date:
-                search_url = zen_api + "{}>{}+{}<{}".format(date_type, start_date, date_type, end_date)
-            elif start_date:
-                search_url = zen_api + "{}>{}".format(date_type, start_date)
-            elif end_date:
-                search_url =  zen_api + "{}<{}".format(date_type, end_date)
-            else:
-                search_url =  zen_api + "{}".format(date_type)
-
-            zen_auth = (zendesk_cred.email_account + '/token', zendesk_cred.api_token)
             zen_response = requests.get(search_url, auth=zen_auth)
 
             if zen_response.ok:
