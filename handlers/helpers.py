@@ -132,10 +132,10 @@ class BaseRequestHandler(webapp2.RequestHandler):
         if test_mode is True:
             return output
         else:
-            self.hello_render(output)
+            return self.render_response(output)
 
-    def hello_render(self, output):
-        return self.response.write(render_response(output))
+    def render_response(self, output):
+        return self.response.write(output.get_serialized_output())
 
     @property
     def current_user(self):
@@ -281,11 +281,9 @@ class ResponseOutput():
             raise TypeError("Response status must be an int or a longs")
         self.status = status
 
-
-def render_response(response_output):
-    """
-    :param response_output: response output
-    :type response_output: ResponseOutput
-    :return json-serialized data as a str
-    """
-    return json.dumps(response_output.__dict__)
+    def get_serialized_output(self):
+        return json.dumps({
+            'data': self.data,
+            'error': self.error,
+            'status': self.status
+        })
