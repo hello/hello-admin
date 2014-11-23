@@ -1,10 +1,12 @@
+import datetime
 import logging as log
 import requests
-from models.ext import ZendeskCredentials
-from models.ext import ZendeskDailyStats
+from handlers.analysis import get_zendesk_stats
 from handlers.helpers import BaseRequestHandler
 from handlers.utils import display_error
-from handlers.analysis import get_zendesk_stats
+from handlers.utils import get_current_pacific_datetime
+from models.ext import ZendeskCredentials
+from models.ext import ZendeskDailyStats
 
 
 class ZendeskCronHandler(BaseRequestHandler):
@@ -21,8 +23,8 @@ class ZendeskCronHandler(BaseRequestHandler):
 
         zen_api = "{}/api/v2/search.json?query=type:ticket%20".format(zendesk_cred.domain)
 
-        end_date = "2014-11-17"
-        start_date = "2014-11-16"
+        end_date = (get_current_pacific_datetime()).strftime('%Y-%m-%d')
+        start_date = (get_current_pacific_datetime() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
         date_type = "created"
 
         search_url = zen_api + "{}>{}+{}<{}".format(date_type, start_date, date_type, end_date)

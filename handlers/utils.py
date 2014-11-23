@@ -7,7 +7,7 @@ import pytz
 
 
 utc_timezone = pytz.timezone("UTC")
-local_timezone = pytz.timezone("America/Los_Angeles")
+pacific_timezone = pytz.timezone("America/Los_Angeles")
 def display_error(e):
     """
     :param e: exception
@@ -30,12 +30,12 @@ def iso_to_utc_timestamp(iso_time):
     return calendar.timegm(datetime.strptime(iso_time.split('Z')[0], "%Y-%m-%dT%H:%M:%S").timetuple())
 
 
-def iso_to_datetime_obj(iso_time):
+def iso_to_pacific_datetime_obj(iso_time):
     """
     :param iso_time: a time string in ISO8601 format, e.g.: '2007-03-04T21:08:12'
     :type iso_time: str
     """
-    return datetime.strptime(iso_time.split('Z')[0], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=utc_timezone).astimezone(local_timezone)
+    return datetime.strptime(iso_time.split('Z')[0], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=utc_timezone).astimezone(pacific_timezone)
 
 
 def iso_to_human_timestring(iso_time):
@@ -45,6 +45,7 @@ def iso_to_human_timestring(iso_time):
     """
     return datetime.strptime(iso_time.split('Z')[0], "%Y-%m-%dT%H:%M:%S").strftime("%m-%d-%Y %H:%M:%S")
 
+
 def stripStringToList(string, separator=","):
     """
     :param string: a string that needs to be parsed into a list
@@ -53,3 +54,7 @@ def stripStringToList(string, separator=","):
     :type separator: str
     """
     return [u.strip() for u in string.split(separator)]
+
+
+def get_current_pacific_datetime():
+    return datetime.now(pacific_timezone)
