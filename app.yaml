@@ -1,5 +1,5 @@
 application: 'hello-admin'
-version: 8k
+version: 9b
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -10,6 +10,9 @@ handlers:
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
+- url: /cron/zendesk_daily_stats
+  script: handlers.urls.hello_admin_app
+  login: admin
 - url: .*
   script: handlers.urls.hello_admin_app
   login: required

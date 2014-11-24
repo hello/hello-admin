@@ -1,5 +1,5 @@
 cron:
 - description: zendesk daily stats
-  url: /cron/zendesk_daily_stats/
+  url: /cron/zendesk_daily_stats
   schedule: every day 08:05
 
