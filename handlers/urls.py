@@ -30,6 +30,11 @@ from handlers.views import TeamsView
 from handlers.views import UserView
 from handlers.views import ZendeskView
 
+
+cron_routes = [
+    ('/cron/zendesk_daily_stats', ZendeskCronHandler)
+]
+
 api_routes = [
     ('/api/app/?$', AppAPI),
     ('/api/app_scope/?$', AppScopeAPI),
@@ -67,12 +72,7 @@ page_routes = [
     ('/zendesk/?$', ZendeskView),
 ]
 
-
-cron_routes = [
-    ('/cron/zendesk_daily_stats/', ZendeskCronHandler)
-]
-
 hello_admin_app = webapp2.WSGIApplication(
-    routes=api_routes + page_routes + cron_routes,
+    routes=cron_routes + api_routes + page_routes,
     debug=settings.DEBUG
 )
