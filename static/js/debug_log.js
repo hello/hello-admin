@@ -4,12 +4,17 @@ var LogTable = React.createClass({
    render: function(){
        var logTableRows = [], that = this;
        that.props.logs.forEach(function(log){
-            var currentInput = $('#text-input').val();
-            var regex = that.props.caseInsensitive === true ?
-                        new RegExp(currentInput, 'gi'): new RegExp(currentInput, 'g');
-            var regexList = that.props.showLineBreaks === true ? [regex]
-                :[regex, new RegExp('\r', 'g'), new RegExp('\n', 'g')];
-            highlightedRegex =  highlightByRegexForJSX(log.text,
+            var regexList = that.props.showLineBreaks === true ? []
+                : [new RegExp('\r', 'g'), new RegExp('\n', 'g')];
+           
+            var currentTextInput = $('#text-input').val();
+            if (currentTextInput !== "") {
+                var textInputRegex = that.props.caseInsensitive === true ?
+                    new RegExp(currentTextInput, 'gi') : new RegExp(currentTextInput, 'g');
+                regexList.push(textInputRegex);
+            }
+            
+            highlightedRegex = highlightByRegexForJSX(log.text,
                 regexList,
                 that.props.highlightColor
             );
