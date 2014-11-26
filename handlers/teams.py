@@ -33,4 +33,10 @@ class TeamsAPI(FirmwareRequestHandler):
             "type": request_type_map[action],
             "body_data": json.dumps({"name": group, "ids": ids})
         }
-        self.hello_request(**request_specs)
+
+        if action == "remove":
+            for i in ids:
+                request_specs['api_url'] = "teams/{}/{}/{}".format(mode, group, i)
+                self.hello_request(**request_specs)
+        else:
+            self.hello_request(**request_specs)

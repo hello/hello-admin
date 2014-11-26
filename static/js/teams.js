@@ -106,8 +106,9 @@ var ConfigMaestro = React.createClass({
         console.log(response);
         that.getTeams();
       }.bind(this),
-      error: function(xhr, status, err) {
-        console.error(status, err);
+      error: function(e) {
+        console.log(e);
+        that.getTeams();
       }.bind(this)
     });
   },
