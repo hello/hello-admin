@@ -55,10 +55,11 @@ var ConfigMaestro = React.createClass({
 
   populateInput: function () {
     $('.feature-td').click(function(){
-      $('#feature-input').val($(this).text());
+      $('#feature-input').focus().val($(this).text());
     });
     $('.ids-td').click(function(){
       $('#ids-input').tagsinput('add', $(this).text());
+      $('.bootstrap-tagsinput').children('input').focus();
     });
   },
 
