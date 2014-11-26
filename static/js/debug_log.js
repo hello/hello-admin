@@ -164,7 +164,7 @@ var DebugLog = React.createClass({
             <form className="row" onSubmit={this.handleSubmit}>
                 <div className="col-lg-1 col-md-1 col-xs-1">
                   <span id="sliderText">Max docs: </span><span id="sliderValue">20</span>
-                  <input type="text" className="span2 slider" value="" data-slider-min="5" data-slider-max="101" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square" />
+                  <input type="text" className="span2 slider" value="" data-slider-min="1" data-slider-max="150" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square" />
                 </div>
                 <div className="col-lg-1 col-md-1 col-xs-1" id="colorpickContainer">
                     <input type="text" id="colorpick"/>
