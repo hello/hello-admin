@@ -4,12 +4,18 @@ var FeaturesTableBody = React.createClass({
   getDefaultProps: function() {
       return {data: []}
   },
+
   render: function () {
       var rows = [];
       this.props.data.forEach(function(d){
+        var idsSpans = [];
+        d.ids.forEach(function(id){
+          var id_td = d.ids.indexOf(id) === d.ids.length - 1 ? id: id+", ";
+          idsSpans.push(<span className="ids-td cursor-custom">{id_td}</span>);
+        });
         rows.push(<tr>
-            <td>{d.name}</td>
-            <td>{d.ids.join(", ")}</td>
+            <td><span className="feature-td cursor-custom">{d.name}</span></td>
+            <td>{idsSpans}</td>
             <td>{d.groups.join(", ")}</td>
             <td>{d.percentage}</td>
         </tr>);
@@ -47,6 +53,15 @@ var ConfigMaestro = React.createClass({
     };
   },
 
+  populateInput: function () {
+    $('.feature-td').click(function(){
+      $('#feature-input').val($(this).text());
+    });
+    $('.ids-td').click(function(){
+      $('#ids-input').tagsinput('add', $(this).text());
+    });
+  },
+
   getCurrentFeatures: function() {
     $.ajax({
       url: '/api/features',
@@ -57,6 +72,7 @@ var ConfigMaestro = React.createClass({
         this.setState({
           data: response.data
         });
+        this.populateInput();
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(status, err);
@@ -84,6 +100,7 @@ var ConfigMaestro = React.createClass({
             this.setState({
               groups: usersGroups.concat(devicesGroups)
             });
+            this.populateInput();
           }.bind(this),
           error: function(xhr, status, err) {
             console.error(status, err);
@@ -145,11 +162,11 @@ var ConfigMaestro = React.createClass({
     return (<Grid>
       <Row className="show-grid">
         <Col xs={5} md={5}><code className="nonscript">
-          <h4>Feature</h4>
+          <h4>Feature<em className="remark">Enter a <strong>string</strong> or click to select current &rarr;</em></h4>
           <Input id="feature-input" bsStyle="warning" type="text" placeholder="e.g alpha-firmware"/>
-          <h4>IDs</h4>
+          <h4>IDs<em className="remark">Enter device(s) (<strong>string</strong>), user(s) (<strong>int</strong>) or click to select current &rarr;</em></h4>
           <LongTagsInput id="ids-input" tagClass="label label-info" placeHolder="e.g D123, D456" />
-          <h4>Groups</h4>
+          <h4>Groups<em className="remark">Hold <strong>Cmd</strong> to select/deselect multiple &darr;</em></h4>
           <Input id="groups-input"type="select" multiple>
             {groupsOptions}
           </Input>
