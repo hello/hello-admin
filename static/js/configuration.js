@@ -43,7 +43,7 @@ var ConfigMaestro = React.createClass({
       ids: "",
       groups: [],
       data: [],
-      sliderValue: 20
+      sliderValue: 0
     };
   },
 
@@ -107,7 +107,7 @@ var ConfigMaestro = React.createClass({
       that.setState({ids: $('#groups-input').val()});
     });
 
-    $('.slider').slider({value: 20}).on('slide', function(slideEvt){
+    $('.slider').slider({value: 0}).on('slide', function(slideEvt){
       that.setState({sliderValue: slideEvt.value});
     });
   },
