@@ -18,8 +18,11 @@ class TeamsAPI(FirmwareRequestHandler):
         mode = req.get('mode', "")
         action = req.get('action', "")
 
-        if mode == "users" and action != "delete-group":
-            ids = map(int, ids)
+        try:
+            if mode == "users" and action != "delete-group":
+                ids = map(int, ids)
+        except ValueError:
+            return
 
         request_type_map = {
             "add": "POST",

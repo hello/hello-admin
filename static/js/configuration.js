@@ -164,7 +164,7 @@ var ConfigMaestro = React.createClass({
       <Row className="show-grid">
         <Col xs={5} md={5}><code className="nonscript">
           <h4>Feature<em className="remark">Enter a <strong>string</strong> or click to select current &rarr;</em></h4>
-          <Input id="feature-input" bsStyle="warning" type="text" placeholder="e.g alpha-firmware"/>
+          <Input id="feature-input" bsStyle="success" type="text" placeholder="e.g alpha-firmware"/>
           <h4>IDs<em className="remark">Enter device(s) (<strong>string</strong>), user(s) (<strong>int</strong>) or click to select current &rarr;</em></h4>
           <LongTagsInput id="ids-input" tagClass="label label-info" placeHolder="e.g D123, D456" />
           <h4>Groups<em className="remark">Hold <strong>Cmd</strong> to select/deselect multiple &darr;</em></h4>
