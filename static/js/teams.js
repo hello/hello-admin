@@ -116,6 +116,7 @@ var ConfigMaestro = React.createClass({
   render: function () {
     var currentMode = $('#mode-input').val();
     var displayMode =  currentMode ? currentMode.capitalize(): null;
+    var inputTypeRemark = currentMode === "users" ? "int": "string";
     return (<Grid>
       <Row className="show-grid">
         <Col xs={3} md={3} xsOffset={5} mdOffset={5}><code className="nonscript">
@@ -130,10 +131,10 @@ var ConfigMaestro = React.createClass({
       </Row>
       <Row className="show-grid">
         <Col xs={5} md={5}><code className="nonscript">
-          <h4><span>{displayMode}</span> Group <em className="remark">Enter new or click to select current &rarr;</em></h4>
+          <h4><span>{displayMode}</span> Group <em className="remark">Enter a <strong>string</strong> or click to select current &rarr;</em></h4>
           <Input id="group-input" type="text" placeholder="e.g alpha-dev" />
-          <h4><span>{displayMode}</span> IDs <em className="remark">Enter new or click to select current &rarr;</em></h4>
-          <LongTagsInput id="ids-input" tagClass="label label-info" placeHolder="e.g 555Cxx, 555C6y" />
+          <h4><span>{displayMode}</span> IDs <em className="remark">Enter <strong>{inputTypeRemark}</strong>(s) or click to select current &rarr;</em></h4>
+          <LongTagsInput id="ids-input" tagClass="label label-info" placeHolder="e.g 123, 666, 987" />
           <h4>Change IDs of a Group</h4>
           <Button className="col-xs-3 col-md-3 col-lg-3" action="add" bsStyle="success" onClick={this.handleSend}><Glyphicon glyph="plus"/> Add</Button>
           <Button className="col-xs-3 col-md-3 col-lg-3" action="replace" bsStyle="primary" onClick={this.handleSend}><Glyphicon glyph="refresh"/> Replace</Button>
