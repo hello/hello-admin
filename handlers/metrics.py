@@ -69,7 +69,7 @@ class DebugLogAPI(ProtectedRequestHandler):
                  input_list = stripStringToList(devices_input)
                  devices_list = []
                  for d in input_list:
-                     if re.compile('^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$').match(d) is not None:
+                     if re.compile('^\w+@\w+.\w+').match(d) is not None:
                          devices_list += self.hello_request(
                              api_url="devices/q",
                              type="GET",
