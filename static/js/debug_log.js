@@ -177,7 +177,7 @@ var DebugLog = React.createClass({
                 </div>
 
                 <div className="col-lg-3 col-md-3 col-xs-3">
-                    <LongTagsInput id="devices-input" tagClass="label label-info" placeHolder="Devices(multiple) e.g 5xy, 5yz" />
+                    <LongTagsInput id="devices-input" tagClass="label label-info" placeHolder="Enter Devices/Emails (multiple)" />
                 </div>
                 <div className="col-lg-3 col-md-3 col-xs-3 input-group input-group-md">
                   <div className="icon-addon addon-md">

@@ -1,5 +1,6 @@
 import json
 import logging as log
+import re
 import time
 from handlers.utils import display_error
 from handlers.helpers import ProtectedRequestHandler
@@ -65,7 +66,19 @@ class DebugLogAPI(ProtectedRequestHandler):
              if text_input:
                  search_params['query'] = 'text:{}'.format(text_input)
              if devices_input:
-                 search_params['category_filters'] = {'device_id': stripStringToList(devices_input)}
+                 input_list = stripStringToList(devices_input)
+                 devices_list = []
+                 for d in input_list:
+                     if re.compile('^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$').match(d) is not None:
+                         devices_list += self.hello_request(
+                             api_url="devices/q",
+                             type="GET",
+                             url_params={'email': d},
+                             test_mode=True
+                         ).data
+                     else:
+                         devices_list.append(d)
+                 search_params['category_filters'] = {'device_id': devices_list}
 
              output['data'] = index.search(**search_params)
 
