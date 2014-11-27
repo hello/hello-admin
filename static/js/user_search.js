@@ -47,13 +47,16 @@ var UserSearchTable = React.createClass({
             lastTicket = this.props.zenTickets[numberOfZenTickets-1],
             lastTicketCreated = this.props.zenTickets.length > 0 ? lastTicket.created_at: null,
             lastTicketSubject = this.props.zenTickets.length > 0 ? lastTicket.subject: null,
-            lastTicketLink = this.props.zenTickets.length > 0 ? <a target="_blank" href={"https://helloinc.zendesk.com/agent/tickets/" + lastTicket.id}>{"https://helloinc.zendesk.com/agent/tickets/" + lastTicket.id}</a>: null;
+            lastTicketLink = this.props.zenTickets.length > 0 ? <a target="_blank" href={"https://helloinc.zendesk.com/agent/tickets/" + lastTicket.id}>{"https://helloinc.zendesk.com/agent/tickets/" + lastTicket.id}</a>: null,
+            devices = this.props.devices.length > 0 ? this.props.devices.join(", "): null;
+
 
 
         tableRows.push(<UserSearchTableRow rowAttr="# Zen tickets" rowVal={numberOfZenTickets} />);
         tableRows.push(<UserSearchTableRow rowAttr="last ticket created" rowVal={lastTicketCreated} />);
         tableRows.push(<UserSearchTableRow rowAttr="last ticket subject" rowVal={lastTicketSubject} />);
         tableRows.push(<UserSearchTableRow rowAttr="last ticket url" rowVal={lastTicketLink} />);
+        tableRows.push(<UserSearchTableRow rowAttr="devices" rowVal={devices} />);
         var tableClasses = "table table-condensed table-responsive " + this.props.stage;
         var tableHeaders = <tr>
                              <th className="col-xs-1 col-md-1 col-lg-1">Attribute</th>
@@ -75,7 +78,8 @@ var UserSearchCanvas = React.createClass({
         return {
             users: {},
             searchAlert: "\u2603",
-            zenTickets: []
+            zenTickets: [],
+            devices: []
         }
     },
     handleSubmit: function(e) {
@@ -136,6 +140,30 @@ var UserSearchCanvas = React.createClass({
           }.bind(this)
         });
 
+        $.ajax({
+          url: "/api/devices",
+          dataType: 'json',
+          type: 'GET',
+          data: {email: email},
+          success: function(response) {
+            if (response.error) {
+                this.setState({
+                    devices: []
+                });
+            }
+            else {
+                this.setState({devices: response.data});
+            }
+          }.bind(this),
+          error: function(xhr, status, err) {
+            this.setState({
+                devices: []
+            });
+            console.error(this.props.url, status, err);
+          }.bind(this)
+        });
+
+
         return false;
     },
 
@@ -169,7 +197,7 @@ var UserSearchCanvas = React.createClass({
               </span>
             </div>
           </form>
-          <UserSearchTable users={this.state.users} zenTickets={this.state.zenTickets} searchAlert={this.state.searchAlert} />
+          <UserSearchTable users={this.state.users} zenTickets={this.state.zenTickets} devices={this.state.devices} searchAlert={this.state.searchAlert} />
         </div>);
     }
 });
