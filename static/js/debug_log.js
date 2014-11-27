@@ -133,8 +133,8 @@ var DebugLog = React.createClass({
             }
             else {
                 this.setState({
-                    logs: response.data.results.reverse(),
-                    searchAlert: "found " + response.data.results.length + " documents"
+                    logs: response.data.reverse(),
+                    searchAlert: "found " + response.data.length + " documents"
                 });
             }
           }.bind(this),
