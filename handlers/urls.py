@@ -5,6 +5,7 @@ from handlers.cron import ZendeskCronHandler
 from handlers.ext import ZendeskAPI
 from handlers.ext import ZendeskStatsAPI
 from handlers.firmware import FirmwareAPI
+from handlers.devices import DeviceAPI
 from handlers.metrics import DebugLogAPI
 from handlers.metrics import PreSleepAPI
 from handlers.setup import AppAPI
@@ -18,7 +19,7 @@ from handlers.setup import RecentTokensAPI
 from handlers.setup import RegisterPillAPI, SetupAPI
 from handlers.setup import UpdateAdminAccessTokenAPI
 from handlers.teams import TeamsAPI
-from handlers.user import UserAPI
+from handlers.users import UserAPI
 from handlers.views import ChartHandler
 from handlers.views import ConfigurationView
 from handlers.views import DebugLogView
@@ -40,7 +41,7 @@ api_routes = [
     ('/api/app_scope/?$', AppScopeAPI),
     ('/api/create_groups/?$', CreateGroupsAPI),
     ('/api/debug_log/?$', DebugLogAPI),
-    ('/api/device/?$', TeamsAPI),
+    ('/api/devices/?$', DeviceAPI),
     ('/api/features/?$', FeaturesAPI),
     ('/api/firmware/?$', FirmwareAPI),
     ('/api/presleep/?$', PreSleepAPI),
