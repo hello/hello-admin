@@ -1,4 +1,5 @@
 import json
+import logging as log
 from handlers.helpers import FirmwareRequestHandler
 
 
@@ -22,6 +23,7 @@ class TeamsAPI(FirmwareRequestHandler):
             if mode == "users" and action != "delete-group":
                 ids = map(int, ids)
         except ValueError:
+            log.error('User ID must be an integer.')
             return
 
         request_type_map = {
