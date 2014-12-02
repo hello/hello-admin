@@ -47,8 +47,7 @@ var UserSearchTable = React.createClass({
             lastTicket = this.props.zenTickets[numberOfZenTickets-1],
             lastTicketCreated = this.props.zenTickets.length > 0 ? lastTicket.created_at: null,
             lastTicketSubject = this.props.zenTickets.length > 0 ? lastTicket.subject: null,
-            lastTicketLink = this.props.zenTickets.length > 0 ? <a target="_blank" href={"https://helloinc.zendesk.com/agent/tickets/" + lastTicket.id}>{"https://helloinc.zendesk.com/agent/tickets/" + lastTicket.id}</a>: null,
-            devices = this.props.devices.length > 0 ? this.props.devices.join(", "): null;
+            lastTicketLink = this.props.zenTickets.length > 0 ? <a target="_blank" href={"https://helloinc.zendesk.com/agent/tickets/" + lastTicket.id}>{"https://helloinc.zendesk.com/agent/tickets/" + lastTicket.id}</a>: null;
 
 
 
@@ -56,7 +55,24 @@ var UserSearchTable = React.createClass({
         tableRows.push(<UserSearchTableRow rowAttr="last ticket created" rowVal={lastTicketCreated} />);
         tableRows.push(<UserSearchTableRow rowAttr="last ticket subject" rowVal={lastTicketSubject} />);
         tableRows.push(<UserSearchTableRow rowAttr="last ticket url" rowVal={lastTicketLink} />);
-        tableRows.push(<UserSearchTableRow rowAttr="devices" rowVal={devices} />);
+
+        if (this.props.devices.length > 0) {
+          this.props.devices.forEach(function(device){
+            var deviceLabel = [
+                <span>{device.type}</span>, <br/>,
+                <a href={"/debug_log/?devices=" + device.device_id} target="_blank" title="Go to debug log">
+                  <Label bsStyle= {device.state === "NORMAL" ? "success": "danger"}>{device.device_id}</Label>
+                </a>
+            ];
+            var deviceDetail = [
+                <span>last seen: {new Date(device.last_updated).toLocaleString()}</span>, <br/>,
+                <span>state: {device.state}</span>, <br/>,
+                <span>firmware version: {device.firmware_version}</span>, <br/>
+            ];
+            tableRows.push(<UserSearchTableRow rowAttr={deviceLabel} rowVal={deviceDetail} />);
+          })
+        }
+
         var tableClasses = "table table-condensed table-responsive " + this.props.stage;
         var tableHeaders = <tr>
                              <th className="col-xs-1 col-md-1 col-lg-1">Attribute</th>
@@ -143,7 +159,7 @@ var UserSearchCanvas = React.createClass({
         $.ajax({
           url: "/api/devices",
           dataType: 'json',
-          type: 'GET',
+          type: 'POST',
           data: {email: email},
           success: function(response) {
             if (response.error) {
@@ -162,7 +178,6 @@ var UserSearchCanvas = React.createClass({
             console.error(this.props.url, status, err);
           }.bind(this)
         });
-
 
         return false;
     },
