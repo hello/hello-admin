@@ -3,14 +3,18 @@
 var Alert = ReactBootstrap.Alert;
 var Button = ReactBootstrap.Button;
 var Col = ReactBootstrap.Col;
+var DropdownButton = ReactBootstrap.DropdownButton;
 var Glyphicon = ReactBootstrap.Glyphicon;
 var Grid = ReactBootstrap.Grid;
 var Input = ReactBootstrap.Input;
 var Label = ReactBootstrap.Label;
 var ListGroup = ReactBootstrap.ListGroup;
 var ListGroupItem = ReactBootstrap.ListGroupItem;
+var MenuItem = ReactBootstrap.MenuItem;
 var Modal = ReactBootstrap.Modal;
 var ModalTrigger = ReactBootstrap.ModalTrigger;
+var Pager = ReactBootstrap.Pager;
+var PageItem = ReactBootstrap.PageItem;
 var Row = ReactBootstrap.Row;
 var TabbedArea = ReactBootstrap.TabbedArea;
 var Table = ReactBootstrap.Table;
@@ -25,4 +29,4 @@ function getParameterByName(name) {
 
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
-}
+};
