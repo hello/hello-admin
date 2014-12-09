@@ -13,6 +13,10 @@ var FeaturesTableBody = React.createClass({
           var id_td = d.ids.indexOf(id) === d.ids.length - 1 ? id: id+", ";
           idsSpans.push(<span className="ids-td cursor-custom">{id_td}</span>);
         });
+        idsSpans.push(<span className="ids-all cursor-hand">
+            <span className="ids-val">{d.ids.join(", ")}</span>
+            <img src="/static/css/image/copy.png"/><span className="superscript">all</span>
+        </span>);
         rows.push(<tr>
             <td><span className="group-td cursor-custom">{d.name}</span></td>
             <td>{idsSpans}</td>
@@ -53,6 +57,10 @@ var ConfigMaestro = React.createClass({
     });
     $('.ids-td').click(function(){
       $('#ids-input').tagsinput('add', $(this).text());
+      $('.bootstrap-tagsinput').children('input').focus();
+    });
+    $('.ids-all').click(function(){
+      $('#ids-input').tagsinput('add', $(this).children(".ids-val").text());
       $('.bootstrap-tagsinput').children('input').focus();
     });
   },

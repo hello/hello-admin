@@ -13,6 +13,10 @@ var FeaturesTableBody = React.createClass({
           var id_td = d.ids.indexOf(id) === d.ids.length - 1 ? id: id+", ";
           idsSpans.push(<span className="ids-td cursor-custom">{id_td}</span>);
         });
+        idsSpans.push(<span className="ids-all cursor-hand">
+            <span className="ids-val">{d.ids.join(", ")}</span>
+            <img src="/static/css/image/copy.png"/><span className="superscript">all</span>
+        </span>);
         rows.push(<tr>
             <td><span className="feature-td cursor-custom">{d.name}</span></td>
             <td>{idsSpans}</td>
@@ -59,6 +63,10 @@ var ConfigMaestro = React.createClass({
     });
     $('.ids-td').click(function(){
       $('#ids-input').tagsinput('add', $(this).text());
+      $('.bootstrap-tagsinput').children('input').focus();
+    });
+    $('.ids-all').click(function(){
+      $('#ids-input').tagsinput('add', $(this).children(".ids-val").text());
       $('.bootstrap-tagsinput').children('input').focus();
     });
   },
@@ -154,7 +162,7 @@ var ConfigMaestro = React.createClass({
   },
 
   render: function () {
-    var groupsOptions = [];
+    var groupsOptions = [<option value="all">➢  all</option>];
     var that = this;
     groupsNames = _.chain(that.state.groups).values().flatten().pluck("name").uniq().value();
     groupsNames.forEach(function(group){
@@ -168,7 +176,7 @@ var ConfigMaestro = React.createClass({
           <h4>IDs<em className="remark">Enter device(s) (<strong>string</strong>), user(s) (<strong>int</strong>) or click to select current &rarr;</em></h4>
           <LongTagsInput id="ids-input" tagClass="label label-info" placeHolder="e.g D123, D456" />
           <h4>Groups<em className="remark">Hold <strong>Cmd</strong> to select/deselect multiple &darr;</em></h4>
-          <Input id="groups-input"type="select" multiple>
+          <Input id="groups-input" type="select" multiple>
             {groupsOptions}
           </Input>
           <h4>Percentage: <span>{this.state.sliderValue}</span></h4>

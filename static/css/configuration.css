@@ -3,3 +3,6 @@
 #groups-input {padding-bottom: 50px;}
 table.table td{text-align: center;}
 .remark {font-size: 11px; float: right; margin-top: 6px;}
+.ids-all {float: right;}
+.ids-val {display: none;}
+.superscript {font-size: 7px; margin-bottom: 5px;}
