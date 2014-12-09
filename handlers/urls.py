@@ -2,20 +2,21 @@ import webapp2
 import settings
 from handlers.configuration import FeaturesAPI
 from handlers.cron import ZendeskCronHandler
+from handlers.cron import SearchifyPurge
 from handlers.ext import ZendeskAPI
 from handlers.ext import ZendeskStatsAPI
 from handlers.firmware import FirmwareAPI
 from handlers.devices import DeviceAPI
 from handlers.metrics import DebugLogAPI
 from handlers.metrics import PreSleepAPI
+from handlers.metrics import TroubleshootAPI
 from handlers.setup import AppAPI
 from handlers.setup import AppScopeAPI
 from handlers.setup import CreateAccountAPI
 from handlers.setup import CreateApplicationAgainstProdAPI
 from handlers.setup import CreateGroupsAPI
-from handlers.setup import CreateTokenAPI
 from handlers.setup import ProxyAPI
-from handlers.setup import RecentTokensAPI
+from handlers.setup import TokenAPI
 from handlers.setup import RegisterPillAPI, SetupAPI
 from handlers.setup import UpdateAdminAccessTokenAPI
 from handlers.teams import TeamsAPI
@@ -30,10 +31,12 @@ from handlers.views import SettingsView
 from handlers.views import TeamsView
 from handlers.views import UserView
 from handlers.views import ZendeskView
+from handlers.views import TroubleshootView
 
 
 cron_routes = [
-    ('/cron/zendesk_daily_stats', ZendeskCronHandler)
+    ('/cron/zendesk_daily_stats', ZendeskCronHandler),
+    ('/cron/searchify_purge', SearchifyPurge),
 ]
 
 api_routes = [
@@ -45,8 +48,9 @@ api_routes = [
     ('/api/features/?$', FeaturesAPI),
     ('/api/firmware/?$', FirmwareAPI),
     ('/api/presleep/?$', PreSleepAPI),
-    ('/api/recent_tokens/?$', RecentTokensAPI),
+    ('/api/tokens/?$', TokenAPI),
     ('/api/teams/?$', TeamsAPI),
+    ('/api/troubleshoot/?$', TroubleshootAPI),
     ('/api/user/?$', UserAPI),
     ('/api/zendesk/?$', ZendeskAPI),
     ('/api/zendesk_stats/?$', ZendeskStatsAPI),
@@ -54,7 +58,6 @@ api_routes = [
 
 page_routes = [
     ('/', UserView),
-    ('/access_token', CreateTokenAPI),
     ('/charts', ChartHandler),
     ('/configuration/?$', ConfigurationView),
     ('/create/app_against_prod', CreateApplicationAgainstProdAPI),
@@ -71,6 +74,7 @@ page_routes = [
     ('/update', UpdateAdminAccessTokenAPI),
     ('/users/?$', UserView),
     ('/zendesk/?$', ZendeskView),
+    ('/troubleshoot/?$', TroubleshootView),
 ]
 
 hello_admin_app = webapp2.WSGIApplication(

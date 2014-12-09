@@ -2,7 +2,8 @@
 {% block title %}{{ title }}{% endblock %}
 {% block extrastatic %}
     <script type="text/jsx" src="/static/js/account.js"></script>
-    <script type="text/jsx" src="/static/js/token.js"></script>
+    <script type="text/jsx" src="/static/js/token_generator.js"></script>
+    <script type="text/jsx" src="/static/js/app_generator.js"></script>
     <script type="text/jsx" src="/static/js/app_scope.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/settings.css"/>
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/binary-toggle.css"/>
@@ -15,7 +16,10 @@
         <div id="account"></div>
         <h3>Generate Token</h3>
         <hr class="fancy-line"/>
-        <div id="token"></div>
+        <div id="token-generator"></div>
+        <h3>Generate App</h3>
+        <hr class="fancy-line"/>
+        <div id="app-generator"></div>
         <h3>Links</h3>
         <hr class="fancy-line"/>
         {% if env == "dev" %}

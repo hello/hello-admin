@@ -254,7 +254,7 @@ class HardwareRequestHandler(ProtectedRequestHandler):
 
 class SuperEngineerRequestHandler(ProtectedRequestHandler):
     """
-    Grant admin to only super engineers
+    Grant access to only super engineers
     """
     def is_restricted_secondary(self):
         return not self.current_user.email() in super(SuperEngineerRequestHandler, self).super_engineer()

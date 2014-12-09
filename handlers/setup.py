@@ -276,6 +276,20 @@ class CreateApplicationAgainstProdAPI(SuperEngineerRequestHandler):
             )
             app_info.put()
 
+            zendesk_credentials = ZendeskCredentials(
+                id=settings.ENVIRONMENT,
+                domain='https://something.zendesk.com',
+                email_account='email@sayhello.com',
+                api_token='ask_marina'
+            )
+            zendesk_credentials.put()
+
+            searchify_credentials = SearchifyCredentials(
+                id=settings.ENVIRONMENT,
+                api_client='ask_tim'
+            )
+            searchify_credentials.put()
+
 
 class SetupAPI(SuperEngineerRequestHandler):
     """
@@ -410,11 +424,12 @@ class CreateGroupsAPI(SuperEngineerRequestHandler):
         output= {'data': [], 'error': ''}
         if settings.DEBUG:
             groups_data = {
-                'super_engineer': 'long@sayhello.com',
-                'customer_experience': 'marina@sayhello.com',
+                'super_engineer': 'long@sayhello.com, tim@sayhello.com, benjo@sayhello.com, pang@sayhello.com',
+                'customer_experience': 'marina@sayhello.com, chrisl@sayhello.com',
                 'software': 'pang@sayhello.com, benjo@sayhello.com',
-                'hardware': 'scott@sayhello.com',
-                'firmware':  'chris@sayhello.com, kingshy@sayhello.com'
+                'hardware': 'scott@sayhello.com, ben@sayhello.com',
+                'firmware': 'chris@sayhello.com, kingshy@sayhello.com',
+                'elite_admin': 'long@sayhello.com, tim@sayhello.com'
             }
             groups_entity = UserGroup(**groups_data)
             groups_entity.put()
