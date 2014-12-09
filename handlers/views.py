@@ -89,6 +89,14 @@ class TeamsView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/teams.html',
                                 context={'title': 'Teams'})
 
+class TroubleshootView(ProtectedRequestHandler):
+    """
+    Returns a panel for monitoring potential in-troube devices
+    """
+    def get(self):
+        self.render_to_response(template_file='templates/troubleshoot.html',
+                                context={'title': 'Troubleshoot'})
+
 class ErrorView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/error.html',

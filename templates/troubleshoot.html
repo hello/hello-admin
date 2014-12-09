@@ -1,0 +1,15 @@
+{% extends "templates/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block extrastatic %}
+    <script type="text/javascript" src="/static/js/third-party/jquery.tablesorter.min.js"></script>
+    <script type="text/jsx" src="/static/js/troubleshoot.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/troubleshoot.css"/>
+{% endblock %}
+
+{% block content %}
+   <div class="row" id="container">
+        <h3 id="page-name">Troubleshoot</h3>
+        <hr class="fancy-line"/>
+        <div class="col-xs-12" id="troubleshoot"></div>
+    </div>
+{% endblock %}
