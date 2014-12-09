@@ -19,7 +19,12 @@ class AppAPI(ProtectedRequestHandler):
             api_url="applications/{}".format(id) if id else "applications",
             type="GET"
         )
-
+    def post(self):
+        self.hello_request(
+            api_url="applications",
+            type="POST",
+            body_data=json.dumps(json.loads(self.request.body))
+        )
 
 class AppScopeAPI(ProtectedRequestHandler):
     """
