@@ -1,5 +1,5 @@
 application: 'hello-admin'
-version: 9e
+version: 10n
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -11,6 +11,9 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
 - url: /cron/zendesk_daily_stats
+  script: handlers.urls.hello_admin_app
+  login: admin
+- url: /cron/searchify_purge
   script: handlers.urls.hello_admin_app
   login: admin
 - url: .*
