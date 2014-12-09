@@ -21,8 +21,17 @@ class AccessToken(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
 
     @classmethod
-    def query_tokens(cls):
-        return cls.query().order(-cls.created).fetch(20)
+    def query_tokens(cls, username, app):
+        if not username and not app:
+            return cls.query().order(-cls.created).fetch()
+        elif username and app:
+            return cls.query(cls.username == username, cls.app == app).order(-cls.created).fetch()
+        elif username:
+            return cls.query(cls.username == username).order(-cls.created).fetch()
+        elif app:
+            return cls.query(cls.app == app).order(-cls.created).fetch()
+        else:
+            return []
 
 
 class UserGroup(ndb.Model):
