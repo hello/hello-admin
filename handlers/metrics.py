@@ -32,7 +32,6 @@ class PreSleepAPI(ProtectedRequestHandler):
         )
 
 
-
 class DebugLogAPI(ProtectedRequestHandler):
     """
     Retrieve debug logs
@@ -93,12 +92,14 @@ class DebugLogAPI(ProtectedRequestHandler):
              log.error('ERROR: {}'.format(display_error(e)))
 
          self.response.write(json.dumps(output))
+
+
 class TroubleshootAPI(ProtectedRequestHandler):
     """
     Retrieve inactie device
     """
     def get(self):
         self.hello_request(
-            api_url="devices/inactive/hours/96",
+            api_url="devices/inactive/hours/120",
             type="GET"
         )
