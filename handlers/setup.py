@@ -45,96 +45,6 @@ class AppScopeAPI(ProtectedRequestHandler):
         )
 
 
-class CreateTokenAPI(ProtectedRequestHandler):
-    def get(self):
-        """
-        Get all tokens created
-        """
-        app_info_model = AppInfo.get_by_id(settings.ENVIRONMENT)
-        log.info("Querying datastore for most recent AppInfo")
-
-        if app_info_model is None:
-            self.error(500)
-            self.response.write("Missing AppInfo. Bailing.")
-            return
-
-        hello = make_oauth2_service(app_info_model)
-        headers = {
-            'Content-type': 'application/json',
-            'Accept': 'application/json'
-        }
-
-        session = hello.get_session(app_info_model.access_token)
-        resp = session.get('applications', headers=headers)
-        self.response.write(resp.content)
-
-    def post(self):
-        """
-        Create a token for a user requested for a specified app
-        """
-        username = self.request.get("username", default_value="x@sayhello.com")
-        password = self.request.get("password", default_value="x")
-        client_id = self.request.get('client_id', default_value="unknown")
-
-        log.info("username: %s, password:%s, client_id:%s" % (username, password, client_id))
-
-        app_info_model = AppInfo.get_by_id(settings.ENVIRONMENT)
-
-        if app_info_model is None:
-            self.error(500)
-            self.response.write("Missing AppInfo. Bailing.")
-            return
-
-        # override here because we want to generate a token for a given app,
-        # not necessarily the admin one
-        app_info_model.client_id = client_id
-        hello = make_oauth2_service(app_info_model)
-
-        data = {
-            "grant_type": "password",
-            "client_id": app_info_model.client_id,
-            "client_secret": '',
-            "username": username,
-            "password": password
-        }
-
-        resp = hello.get_raw_access_token(data=data)
-        log.info(resp.url)
-
-        try:
-            json_data = json.loads(resp.content)
-        except ValueError, e:
-            log.error("Failed to decode JSON. Bailing")
-            log.error("For username: %s" % username)
-            log.error("Json was: %s" % resp.content)
-            log.error("Error was: %s" % e)
-            self.error(500)
-            return
-        log.warn(resp.content)
-        if not isinstance(json_data, dict):
-            log.error("json_data is not a dict. bailing.")
-            log.error(resp.content)
-            self.error(500)
-            return
-
-        if 'access_token' not in json_data:
-            log.error("The key access_token was not found in the response")
-            log.error(resp.content)
-            self.error(500)
-            return
-
-        access_token = json_data['access_token']
-
-        token = AccessToken(
-            username=username,
-            token=access_token,
-            app=client_id
-        )
-        token.put()
-
-        self.response.write(json.dumps({'access_token': access_token}))
-
-
 class CreateAccountAPI(ProtectedRequestHandler):
     def post(self):
         """
@@ -215,19 +125,112 @@ class ProxyAPI(ProtectedRequestHandler):
         self.response.write(json.dumps(segments))
 
 
-class RecentTokensAPI(ProtectedRequestHandler):
+class TokenAPI(ProtectedRequestHandler):
     def get(self):
         """
-        Grab recent tokens (up to 20)
+        List current tokens
         """
         output = {'data': [], 'error': ''}
-        try:
-            output['data'] = [{'username': t.username, 'access_token': t.token} for t in AccessToken.query_tokens()]
-        except Exception as e:
-            output['error'] = display_error(e)
-            log.error('ERROR: {}'.format(display_error(e)))
 
+        username = self.request.get("username", default_value="")
+        app = self.request.get("app", default_value="")
+
+        tokens = AccessToken.query_tokens(username, app)
+        output['data'] = [{'username': t.username, 'token': t.token, 'app': t.app} for t in tokens]
         self.response.write(json.dumps(output))
+
+    def post(self):
+        """
+        Get or create a token for a user
+        """
+        output = {'data': [], 'error': ''}
+        post_data = json.loads(self.request.body)
+        username = post_data.get("username", "")
+        app = post_data.get("app", "")
+        
+        tokens = AccessToken.query_tokens(username, app)
+        if tokens != []:
+            output['data'] = {'token': tokens[0].token}
+        else:
+            password = self.request.get("password", default_value="")
+            output['data'] = self.make_tokens(username, app, password)
+        self.response.write(json.dumps(output))
+
+    def put(self):
+        """
+        Create a token for a user
+        """
+        output = {'data': [], 'error': ''}
+        put_data = json.loads(self.request.body)
+        username = put_data.get("username", "")
+        app = put_data.get("app", "")
+        password = put_data.get("password", "")
+        output['data'] = self.make_tokens(username, app, password)
+        self.response.write(json.dumps(output))
+
+
+    def make_tokens(self, username, app, password):
+        """
+        :param username: username that needs a token to access
+        :type username: str
+        :param app: app name (client id) that username want to access via
+        :type app: str
+        :param password: password for username
+        :type password: str
+        :return: dict {'token': <token>}
+        """
+        app_info_model = AppInfo.get_by_id(settings.ENVIRONMENT)
+
+        if app_info_model is None:
+            self.error(500)
+            self.response.write("Missing AppInfo. Bailing.")
+            return
+
+        app_info_model.client_id = app
+        hello = make_oauth2_service(app_info_model)
+
+        data = {
+            "grant_type": "password",
+            "client_id": app,
+            "client_secret": '',
+            "username": username,
+            "password": password
+        }
+
+        response = hello.get_raw_access_token(data=data)
+        log.info(response.url)
+
+        try:
+            json_data = json.loads(response.content)
+
+        except ValueError, e:
+            log.error("Failed to decode JSON. Bailing")
+            log.error("For username: %s" % username)
+            log.error("Json was: %s" % response.content)
+            log.error("Error was: %s" % e)
+            self.error(500)
+            return
+        log.warn(response.content)
+        if not isinstance(json_data, dict):
+            log.error("json_data is not a dict. bailing.")
+            log.error(response.content)
+            self.error(500)
+            return
+
+        if 'access_token' not in json_data:
+            log.error("The key access_token was not found in the response")
+            log.error(response.content)
+            self.error(500)
+            return
+        access_token = json_data['access_token']
+
+        token = AccessToken(
+            username=username,
+            token=access_token,
+            app=app
+        )
+        token.put()
+        return {'token': access_token}
 
 
 class RegisterPillAPI(ProtectedRequestHandler):

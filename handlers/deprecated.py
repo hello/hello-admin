@@ -1,4 +1,14 @@
+import json
+import logging as log
+import settings
+
 from handlers.helpers import FirmwareRequestHandler
+from handlers.helpers import ProtectedRequestHandler
+from handlers.helpers import make_oauth2_service
+from models.setup import AccessToken
+from models.setup import AppInfo
+
+
 
 class FirmwareAPIDeprecated(FirmwareRequestHandler):
     '''Enables OTA firmware updates'''
@@ -53,3 +63,93 @@ class FirmwareAPIDeprecated(FirmwareRequestHandler):
             self.response.write(json.dumps(dict(error=response.content)))
             return
         self.redirect('/firmware')
+
+
+class CreateTokenAPI(ProtectedRequestHandler):
+    def get(self):
+        """
+        Get all tokens created
+        """
+        app_info_model = AppInfo.get_by_id(settings.ENVIRONMENT)
+        log.info("Querying datastore for most recent AppInfo")
+
+        if app_info_model is None:
+            self.error(500)
+            self.response.write("Missing AppInfo. Bailing.")
+            return
+
+        hello = make_oauth2_service(app_info_model)
+        headers = {
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+        }
+
+        session = hello.get_session(app_info_model.access_token)
+        resp = session.get('applications', headers=headers)
+        self.response.write(resp.content)
+
+    def post(self):
+        """
+        Create a token for a user requested for a specified app
+        """
+        username = self.request.get("username", default_value="x@sayhello.com")
+        password = self.request.get("password", default_value="x")
+        client_id = self.request.get('client_id', default_value="unknown")
+
+        log.info("username: %s, password:%s, client_id:%s" % (username, password, client_id))
+
+        app_info_model = AppInfo.get_by_id(settings.ENVIRONMENT)
+
+        if app_info_model is None:
+            self.error(500)
+            self.response.write("Missing AppInfo. Bailing.")
+            return
+
+        # override here because we want to generate a token for a given app,
+        # not necessarily the admin one
+        app_info_model.client_id = client_id
+        hello = make_oauth2_service(app_info_model)
+
+        data = {
+            "grant_type": "password",
+            "client_id": app_info_model.client_id,
+            "client_secret": '',
+            "username": username,
+            "password": password
+        }
+
+        resp = hello.get_raw_access_token(data=data)
+        log.info(resp.url)
+
+        try:
+            json_data = json.loads(resp.content)
+        except ValueError, e:
+            log.error("Failed to decode JSON. Bailing")
+            log.error("For username: %s" % username)
+            log.error("Json was: %s" % resp.content)
+            log.error("Error was: %s" % e)
+            self.error(500)
+            return
+        log.warn(resp.content)
+        if not isinstance(json_data, dict):
+            log.error("json_data is not a dict. bailing.")
+            log.error(resp.content)
+            self.error(500)
+            return
+
+        if 'access_token' not in json_data:
+            log.error("The key access_token was not found in the response")
+            log.error(resp.content)
+            self.error(500)
+            return
+
+        access_token = json_data['access_token']
+
+        token = AccessToken(
+            username=username,
+            token=access_token,
+            app=client_id
+        )
+        token.put()
+
+        self.response.write(json.dumps({'access_token': access_token}))
