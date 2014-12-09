@@ -14,7 +14,7 @@
     <script type="text/javascript" src="/static/js/third-party/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="/static/js/third-party/react-with-addons-0.11.2.min.js"></script>
     <script type="text/javascript" src="/static/js/third-party/JSXTransformer-0.11.2.js"></script>
-    <script type="text/javascript" src="/static/js/third-party/react-bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/react-bootstrap-0.12.0.min.js"></script>
     <script type="text/javascript" src="/static/js/third-party/underscore.min.js"></script>
     <script type="text/javascript" src="/static/js/third-party/typeahead.js"></script>
 
@@ -33,6 +33,7 @@
     <div id="header" class="row">
         <div id="menu" class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
             <a {% if title == "Users" %} class="menu-active"{% endif%} href='/'><span class="glyphicon glyphicon-user"></span><span>Users</span></a>|
+            <a {% if title == "Troubleshoot" %} class="menu-active"{% endif%} href='/troubleshoot'><span class="glyphicon glyphicon-dashboard"></span><span>Troubleshoot</span></a>|
             <a {% if title == "Zendesk" %} class="menu-active"{% endif%} href='/zendesk'><span class="glyphicon glyphicon-headphones"></span><span>Zendesk</span></a>|
             <a {% if title == "Sense" %} class="menu-active"{% endif%} href='/sense'><span class="glyphicon glyphicon-stats"></span><span>Sense</span></a>|
             <a {% if title == "Log" %} class="menu-active"{% endif%} href='/debug_log'><span class="glyphicon glyphicon-list-alt"></span><span>Log</span></a>|

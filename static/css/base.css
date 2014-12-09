@@ -34,5 +34,8 @@ div.slider-selection {background: coral;}
 div.slider-track {background: antiquewhite;}
 div.slider div.tooltip {display: none;}
 
+.cursor-hand {cursor: pointer;}
 .cursor-custom {cursor: url("/static/css/image/copy.png"), auto;}
 .cursor-custom:hover {-webkit-stroke-width: 7px;-webkit-stroke-color: yellow; -webkit-fill-color: yellow; text-shadow: 1px 0 20px yellow;}
+
+ul.dropdown-menu {min-width: 50px; opacity: 0.8;}
