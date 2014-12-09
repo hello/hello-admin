@@ -1,5 +1,13 @@
 /** @jsx React.DOM */
 
+var today = new Date();
+var lastWeek = new Date();
+lastWeek.setDate(lastWeek.getDate() -7);
+
+var datepickerFormat = d3.time.format("%m/%d/%Y %I:%M:%S %p");
+var todayInDatepickerFormat = datepickerFormat(today);
+var lastWeekInDatepickerFormat = datepickerFormat(lastWeek);
+
 var sensorList = ['temperature', 'humidity', 'particulates', 'light'];
 var resolutionList = ['week', 'day'];
 var colorChoice = {
@@ -21,8 +29,8 @@ var colorChoice = {
     }
 };
 var legends = {
-    day: 'Yesterday',
-    week: 'Last Week'
+    day: 'every 5 minutes',
+    week: 'every hour'
 }
 var vizCanvas = React.createClass({
     componentDidMount: function() {
@@ -138,21 +146,81 @@ var vizCanvas = React.createClass({
 
           return lightChart;
         });
-
-       return (<div>
-         <h4 className="chart-title">Temperature</h4>
-         <svg id="temperature" />
-         <h4 className="chart-title">Humidity</h4>
-         <svg id="humidity" />
-         <h4 className="chart-title">Particulates</h4>
-         <svg id="particulates" />
-         <h4 className="chart-title">Light</h4>
-         <svg id="light" />
-       </div>)
+        var graphs = [];
+        if (that.props.username !== "" && that.props.isUserKnown === false) {
+          graphs.push(<div><p/><Alert bsStyle="danger">{"Unauthorized to see this user data!"}</Alert></div>);
+        }
+        else {
+          sensorList.forEach(function (s) {
+            if (that.props[s].length > 0 && ((that.props[s][0] && that.props[s][0].values.length) || (that.props[s][1] && that.props[s][1].values.length > 0))) {
+                graphs.push(<h4 className="chart-title">{s.capitalize()}</h4>);
+                graphs.push(<svg id={s} />);
+            }
+            else if (that.props.username !== "" && that.props.isUserKnown === true) {
+                graphs.push(<div>
+                    <p/>
+                    <Alert bsStyle="warning">{"No " + s + " data available!"}</Alert>
+            </div>);
+            }
+          });
+        }
+        return (<div>{graphs}</div>)
     }
-
 });
 
+
+var UserTokenDialog = React.createClass({
+  getInitialState: function() {
+    return {
+        token: "",
+        error: ""
+    }
+  },
+  handleClick: function() {
+    var that = this;
+    var postData = {
+      username: that.props.parent.state.username,
+      password: $('#password').val(),
+      app: "admin-data-viewer"
+    };
+    console.log('sending', postData);
+    $.ajax({
+      url: "/api/tokens",
+      dataType: 'json',
+      type: 'PUT',
+      data: JSON.stringify(postData),
+      success: function(response) {
+        console.log(response)
+        that.setState({token: response.data.token, error: ""});
+        that.props.parent.getCurrentImpersonatees(true);
+        that.props.onRequestHide();
+      }.bind(that),
+      error: function(e) {
+        that.setState({token: "", error: "Failed to generate token. Check credentials"})
+      }.bind(that)
+    });
+  },
+  render: function() {
+    var display_token = this.state.token === "" ? null :
+        <div>Generated token: <span id="display_token">{this.state.token}</span></div>;
+    var display_error = this.state.error === "" ? null :
+        <div>Error: <span id="display_error">{this.state.error}</span></div>;
+    return this.transferPropsTo(
+      <Modal pra title={"Enter password for " + this.props.username}>
+        <div className="modal-body">
+          <Input id="password" type="password"/>
+        </div>
+        <div className="modal-footer">
+          <Button onClick={this.handleClick}>Get Token</Button>
+          <Button onClick={this.props.onRequestHide}>Close</Button>
+          <p/>
+          {display_token}
+          {display_error}
+        </div>
+      </Modal>
+    );
+  }
+});
 
 var vizForm = React.createClass({
     getInitialState: function() {
@@ -160,20 +228,73 @@ var vizForm = React.createClass({
             temperature: [],
             humidity: [],
             particulates: [],
-            light: []
+            light: [],
+            impersonatees: [],
+            username: "",
+            isUserKnown: false
         }
     },
-    handleChange: function() {
-        var iam = this;
+    getCurrentImpersonatees: function(willUpdateCharts) {
+        var that = this;
+        $.ajax({
+          url: 'api/tokens',
+          dataType: 'json',
+          type: 'GET',
+          data: {app: "admin-data-viewer"},
+          success: function(response) {
+            that.setState({impersonatees: response.data});
+            console.log(response.data);
+            if (willUpdateCharts === true) {
+              that.handleSubmit();
+            }
+          }.bind(that),
+          error: function(xhr, status, err) {
+            console.error(that.props.url, status, err);
+          }.bind(that)
+        });
+    },
+
+    componentDidMount: function() {
+        this.getCurrentImpersonatees(false);
+    },
+
+    handleSubmit: function() {
+        var that = this;
+        var currentInput = $('#username-input').val();
+        this.setState({username: currentInput});
+        var currentImpersonatees = _.map(that.state.impersonatees, function(x) {return x.username});
+        if (currentInput.trim() === "") {
+            return false;
+        }
+        console.log(currentImpersonatees, currentInput);
+        if (currentImpersonatees.indexOf(currentInput) === -1) {
+          $('#modal-trigger').click();
+          this.setState({isUserKnown: false});
+//          that.handleSubmit();
+          return false;
+        }
+        else {
+          this.setState({isUserKnown: true});
+        }
+
+        var tokenForCurrentInput = _.map(that.state.impersonatees,  function(x) {if (x.username === currentInput) {return x.token}})[0];
+        console.log(tokenForCurrentInput);
+//        var tokenForCurrentInput = "";
+//        that.state.impersonatees.forEach(function(i) {
+//           if (i.username === currentInput) {
+//               tokenForCurrentInput = token;
+//           }
+//        });
+
         sensorList.forEach(function(sensor){
           resolutionList.forEach(function(resolution){
             var request_params = {
-              impersonatee_token: $('select').val(),
+              impersonatee_token: tokenForCurrentInput,
               sensor: sensor,
               resolution: resolution,
               timezone_offset: timezoneOffsetInMs
             };
-//            console.log('sending', request_params);
+            console.log('sending', request_params);
             var timezoneOffsetInMs = new Date().getTimezoneOffset()*1000*60;
             $.ajax({
               url: 'api/presleep',
@@ -181,33 +302,43 @@ var vizForm = React.createClass({
               data: request_params,
               type: 'GET',
               success: function(response) {
+                  console.log(response);
                   var d = {};
                   d[sensor] = this.state[sensor];
                   if (d[sensor].length === resolutionList.length) {
                       d[sensor] = [];
                   }
-                  d[sensor].push(manipulateData(response.data, sensor, resolution));
+                  d[sensor].push(manipulateData(response.data, sensor, resolution, $('#start-date').val(), $('#end-date').val()));
                   this.setState(d);
-              }.bind(iam),
+              }.bind(that),
               error: function(xhr, status, err) {
-                console.error(iam.props.url, status, err);
-              }.bind(iam)
+                console.error(that.props.url, status, err);
+              }.bind(that)
             });
           });
         });
         return false
     },
+
     render: function() {
-        var options = [];
-        this.props.impersonatees.forEach(function(impersonatee){
-            options.push(<option value={impersonatee.access_token}>{impersonatee.username + ' ' + impersonatee.access_token }</option>)
-        });
         return (<div>
-            <form className="form-inline">
-                <select ref="cascadeur" className="form-control">{options}</select>
-                <button type="button" onClick={this.handleChange} className="form-control">GO</button>
+            <form onSubmit={this.handleSubmit} className="row">
+                <div className="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                  <p className="icon-addon addon-xs">
+                    <input id="username-input" className="form-control" placeholder="username"/>
+                    <label className="glyphicon glyphicon-user"></label>
+                  </p>
+                </div>
+                <LongDatetimePicker placeHolder="start date" id="start-date" defaultDate={lastWeekInDatepickerFormat} maxDate={todayInDatepickerFormat}  />
+                <LongDatetimePicker placeHolder="end date" id="end-date" defaultDate={todayInDatepickerFormat} maxDate={todayInDatepickerFormat} />
+                <Button type="submit" bsStyle="success"><Glyphicon glyph="share-alt"/></Button>
             </form>
+            <ModalTrigger style="display: none;" modal={<UserTokenDialog parent={this} username={this.state.username} />}>
+              <Button id="modal-trigger" bsStyle="primary" bsSize="large">Launch UserTokenDialog</Button>
+            </ModalTrigger>
             <vizCanvas
+               username={this.state.username}
+               isUserKnown={this.state.isUserKnown}
                temperature={this.state.temperature}
                humidity={this.state.humidity}
                particulates={this.state.particulates}
@@ -217,43 +348,25 @@ var vizForm = React.createClass({
     }
 });
 var vizBox = React.createClass({
-    getInitialState: function() {
-        return {
-            impersonatees: []
-        }
-    },
-    componentDidMount: function() {
-        $.ajax({
-          url: 'api/recent_tokens',
-          dataType: 'json',
-          type: 'GET',
-          success: function(response) {
-            this.setState({
-                impersonatees: response.data
-            })
-          }.bind(this),
-          error: function(xhr, status, err) {
-            console.error(this.props.url, status, err);
-          }.bind(this)
-        });
-    },
     render: function() {
-        return (<div>
-            <vizForm impersonatees={this.state.impersonatees} />
-        </div>)
+        return (<code className="nonscript">
+            <vizForm />
+        </code>)
     }
 });
 
 React.renderComponent(<vizBox />, document.getElementById('sense'));
 
 
-function manipulateData(rawData, sensor, resolution) {
+function manipulateData(rawData, sensor, resolution, startDate, endDate) {
     var points = [];
-    rawData.forEach(function(point){
+    rawData.forEach(function(point) {
+      if (point.datetime >= new Date(startDate).getTime() && point.datetime <= new Date(endDate).getTime()) {
         points.push({
             x: point.datetime,
             y: point.value
         });
+      }
     });
     return {
         values: points,
