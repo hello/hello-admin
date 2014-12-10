@@ -100,6 +100,6 @@ class TroubleshootAPI(ProtectedRequestHandler):
     """
     def get(self):
         self.hello_request(
-            api_url="devices/inactive/hours/120",
+            api_url="devices/inactive?since={}".format(int(time.time() * 1000)),
             type="GET"
         )
