@@ -83,7 +83,7 @@ class SearchifyPurge(BaseRequestHandler):
 
         old_docs_list = []
         for q in ['text:uart', 'text:uploading', 'text:sending', 'text:complete', 'text:success', 'text:Texas', 'text:dev']:
-            old_docs_list += self.idenitfy_old_docs(index=sense_logs_index, query=q, time_threshold=last_month, start=0, limit=50)
+            old_docs_list += self.identify_old_docs(index=sense_logs_index, query=q, time_threshold=last_month, start=0, limit=50)
         old_docs_to_be_deleted_list = list(set(old_docs_list))[:65]
         output = {
             'old_docs_to_be_deleted': old_docs_to_be_deleted_list,
@@ -95,7 +95,7 @@ class SearchifyPurge(BaseRequestHandler):
             output['error'] = e.message
         self.response.write(json.dumps(output))
 
-    def idenitfy_old_docs(self, index, query, time_threshold, start, limit):
+    def identify_old_docs(self, index, query, time_threshold, start, limit):
         delete_docid_list = []
         # Customize function 100 to present oldest documents first regardless of relevance to query
         index.add_function(100, "age + 0*relevance")
