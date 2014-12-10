@@ -1,8 +1,8 @@
 import json
-from handlers.helpers import BaseRequestHandler
+from handlers.helpers import ProtectedRequestHandler
 
 
-class FeaturesAPI(BaseRequestHandler):
+class FeaturesAPI(ProtectedRequestHandler):
     def get(self):
         self.hello_request(
             api_url="features",

@@ -35,6 +35,7 @@ class AccessToken(ndb.Model):
 
 
 class UserGroup(ndb.Model):
+    elite_admin = ndb.StringProperty(required=True)
     super_engineer = ndb.StringProperty(required=True)
     customer_experience = ndb.StringProperty(required=True)
     firmware = ndb.StringProperty(required=True)
