@@ -5,7 +5,7 @@ var TroubleshootTableHeaders = React.createClass({
         if (this.props.data.length > 0) {
           Object.keys(this.props.data[0]).forEach(function(header){
             if (header == "max_ts") {
-              header = "last seen at"
+              header = "Inactive Period"
             }
             headers.push(<th className="alert-success">{header}</th>)
           });
@@ -25,9 +25,7 @@ var TroubleshootTableBody = React.createClass({
             var cells = [];
             $.each(device, function(attr, val){
               if (attr == "max_ts") {
-                var now = new Date();
-//                val = ((now.getTime() + now.getTimezoneOffset() * 60000 - val)/86400000).toFixed(2);
-                val = new Date(val).toLocaleString()
+                val = millisecondsToHumanReadableString(val);
               }
               cells.push(<td>{val}</td>);
             });
