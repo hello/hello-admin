@@ -28,5 +28,20 @@ function getParameterByName(name) {
 }
 
 String.prototype.capitalize = function() {
-    return this.charAt(0).toUpperCase() + this.slice(1);
+  return this.charAt(0).toUpperCase() + this.slice(1);
 };
+
+function millisecondsToHumanReadableString(milliseconds){
+  var seconds = milliseconds/1000;
+  var numyears = Math.floor(seconds / 31536000);
+  var numdays = Math.floor((seconds % 31536000) / 86400);
+  var numhours = Math.floor(((seconds % 31536000) % 86400) / 3600);
+  var numminutes = Math.floor((((seconds % 31536000) % 86400) % 3600) / 60);
+  var numseconds = ((((seconds % 31536000) % 86400) % 3600) % 60).toFixed(2);
+  var year = numyears > 0 ? numyears + (numyears === 1 ? " year": " years"): "";
+  var day = numdays > 0 ? numdays + (numdays === 1 ? " day": " days"): "";
+  var hour = numhours > 0 ? numhours + (numhours === 1 ? " hour": " hours"): "";
+  var minute = numminutes > 0 ? numminutes + (numminutes === 1 ? " minute": " minutes"): "";
+  var second = numseconds > 0 ? numseconds + (numseconds === 1 ? " second": " seconds"): "";
+  return [year, day, hour, minute, second].join(" ");
+}

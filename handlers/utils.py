@@ -6,6 +6,7 @@ import calendar
 import pytz
 
 
+
 utc_timezone = pytz.timezone("UTC")
 pacific_timezone = pytz.timezone("America/Los_Angeles")
 def display_error(e):
@@ -58,3 +59,15 @@ def stripStringToList(string, separator=","):
 
 def get_current_pacific_datetime():
     return datetime.now(pacific_timezone)
+
+
+def extract_dicts_by_fields(dicts, fields):
+    """
+    :param dicts: a list of dicts (dict) that needs extraction
+    :type dicts: list
+    :param fields: a list of fields (str) that serve as filters
+    :type fields: list
+    """
+    if not isinstance(dicts, list) or not isinstance(fields, list):
+        raise TypeError("Expecting input as lists")
+    return [{field: d.get(field, None) for field in fields} for d in dicts]

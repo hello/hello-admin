@@ -101,5 +101,6 @@ class TroubleshootAPI(ProtectedRequestHandler):
     def get(self):
         self.hello_request(
             api_url="devices/inactive?since={}".format(int(time.time() * 1000)),
-            type="GET"
+            type="GET",
+            filter_fields=["max_ts", "device_id"]
         )

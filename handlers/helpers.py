@@ -10,6 +10,7 @@ from rauth import OAuth2Service
 from rauth.session import OAuth2Session
 from utils import stripStringToList
 from utils import display_error
+from utils import extract_dicts_by_fields
 
 this_file_path = os.path.dirname(__file__)
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -96,16 +97,22 @@ class BaseRequestHandler(webapp2.RequestHandler):
         return hello.get_session(token)
 
     def hello_request(self, api_url, body_data="", url_params={}, type="GET"
-                          , impersonatee_token=None, test_mode=False):
+                          , impersonatee_token=None, test_mode=False, filter_fields=[]):
         """
         :param api_url: api URL
         :type api_url: str
         :param body_data: data to be sent with the request body
-        :type api_url: str
+        :type body_data: str
         :param url_params: URL parameters
         :type url_params: dict
-        :param type: http request type, one of ["GET", "POST", "PUT", "DELETE"]
-        :type api_url: str
+        :param type: http request type, one of ["GET", "POST", "PUT", "PATCH", "DELETE"]
+        :type type: str
+        :param impersonatee_token: optional token to represent a user
+        :type impersonatee_token: str
+        :param test_mode: boolean value to control output, if test_mode is one, return an object rather than a response
+        :type test_mode: bool
+        :param filter_fields: optional list of fields for filtering
+        :type filter_fields: list
         :return a ResponseOutput object in test mode  or a string otherwise
         """
 
@@ -124,7 +131,10 @@ class BaseRequestHandler(webapp2.RequestHandler):
             output.set_status(response.status_code)
 
             if response.status_code == 200:
-                output.set_data(response.json())
+                response_data = response.json()
+                if filter_fields != []:
+                    response_data = extract_dicts_by_fields(response_data, filter_fields)
+                output.set_data(response_data)
 
         except Exception as e:
             output.set_error(display_error(e))
