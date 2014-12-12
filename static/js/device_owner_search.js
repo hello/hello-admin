@@ -19,8 +19,12 @@ var DeviceOwnerSearch = React.createClass({
       }
     },
 
-    handleSubmit: function() {
+    handleSubmit: function(e) {
+      if (e) {
+        e.preventDefault();
+      }
       var deviceIdInput = $('#device-id-input').val().trim();
+      history.pushState({}, '', '/users/?device_id=' + deviceIdInput);
       console.log("sending GET", deviceIdInput);
       $.ajax({
         url: '/api/devices/owners',
@@ -38,6 +42,14 @@ var DeviceOwnerSearch = React.createClass({
         }.bind(this)
       });
       return false;
+    },
+
+    componentDidMount: function(e) {
+        var deviceIdFromURL = getParameterByName('device_id');
+        if (deviceIdFromURL) {
+          $("#device-id-input").val(deviceIdFromURL);
+          this.handleSubmit(e);
+        }
     },
 
     render: function() {

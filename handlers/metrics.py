@@ -99,8 +99,17 @@ class TroubleshootAPI(ProtectedRequestHandler):
     Retrieve inactie device
     """
     def get(self):
+        page = self.request.get('page', default_value=1)
+        start = self.request.get('start', default_value=0)
+        since = self.request.get('since', default_value=0)
+        threshold = self.request.get('threshold', default_value=0)
         self.hello_request(
-            api_url="devices/inactive?since={}".format(int(time.time() * 1000)),
+            api_url="devices/inactive",
             type="GET",
-            filter_fields=["max_ts", "device_id"]
+            url_params={
+                'page': page,
+                'start': start,
+                'since': since,
+                'threshold': threshold
+            }
         )
