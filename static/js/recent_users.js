@@ -1,14 +1,12 @@
 /** @jsx React.DOM */
 
 var LinkToUserDashboard = React.createClass({
-    handleClick: function(){
-        console.log('clicked');
+    populateUserSearchEmail: function(){
         $('#email-search').focus().val(this.props.email);
         $("#email-search-submit").click();
     },
     render: function() {
-        var userLink = "/users/?email=" + this.props.email;
-        return <span className="cursor-custom" onClick={this.handleClick}>{this.props.email}</span>
+        return <span className="cursor-custom" onClick={this.populateUserSearchEmail}>{this.props.email}</span>
     }
 });
 var UserRow = React.createClass({
