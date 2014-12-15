@@ -193,7 +193,8 @@ class ProtectedRequestHandler(BaseRequestHandler):
     def __init__(self, request, response):
         super(ProtectedRequestHandler, self).__init__()
         self.initialize(request, response)
-        self.restrict()
+        if settings.DEBUG is False:
+            self.restrict()
 
     def restrict(self):
         if not self.is_restricted_primary():
