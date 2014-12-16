@@ -276,16 +276,17 @@ var vizForm = React.createClass({
         else {
           this.setState({isUserKnown: true});
         }
-
-        var tokenForCurrentInput = _.map(that.state.impersonatees,  function(x) {if (x.username === currentInput) {return x.token}})[0];
+        console.log('impersonatees', that.state.impersonatees);
+        console.log(that.state.impersonatees.length);
+        var tokenForCurrentInput = "";
+        that.state.impersonatees.forEach(function(impersonatee) {
+          if (impersonatee.username === currentInput) {
+            tokenForCurrentInput = impersonatee.token;
+          }
+        });
         console.log(tokenForCurrentInput);
-//        var tokenForCurrentInput = "";
-//        that.state.impersonatees.forEach(function(i) {
-//           if (i.username === currentInput) {
-//               tokenForCurrentInput = token;
-//           }
-//        });
 
+        var timezoneOffsetInMs = new Date().getTimezoneOffset()*1000*60;
         sensorList.forEach(function(sensor){
           resolutionList.forEach(function(resolution){
             var request_params = {
@@ -295,7 +296,6 @@ var vizForm = React.createClass({
               timezone_offset: timezoneOffsetInMs
             };
             console.log('sending', request_params);
-            var timezoneOffsetInMs = new Date().getTimezoneOffset()*1000*60;
             $.ajax({
               url: 'api/presleep',
               dataType: 'json',
