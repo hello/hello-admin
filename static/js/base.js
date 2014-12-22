@@ -31,6 +31,10 @@ String.prototype.capitalize = function() {
   return this.charAt(0).toUpperCase() + this.slice(1);
 };
 
+String.prototype.isWhiteString = function() {
+    return (this.trim().length === 0);
+};
+
 function millisecondsToHumanReadableString(milliseconds){
   var seconds = milliseconds/1000;
   var numyears = Math.floor(seconds / 31536000);
@@ -44,4 +48,26 @@ function millisecondsToHumanReadableString(milliseconds){
   var minute = numminutes > 0 ? numminutes + (numminutes === 1 ? " minute": " minutes"): "";
   var second = numseconds > 0 ? numseconds + (numseconds === 1 ? " second": " seconds"): "";
   return [year, day, hour, minute, second].join(" ");
+}
+
+function getUTCEpochFromLocalTime(t, needOffset) {
+  var d = new Date(t);
+  if (needOffset === true){
+    return d.getTime()/1000 + d.getTimezoneOffset() * 60;
+  }
+  else {
+    return d.getTime()/1000;
+  }
+}
+
+function getLocalDateFromUTCEpoch(utcSeconds, needOffset) {
+  var d;
+  if (needOffset === true){
+    d = new Date(utcSeconds*1000 - new Date().getTimezoneOffset() * 60000);
+  }
+  else {
+    d = new Date(utcSeconds*1000);
+  }
+  console.log(d.toLocaleString());
+  return d.toLocaleString() || "";
 }

@@ -1,19 +1,27 @@
 /** @jsx React.DOM */
 
+var today = new Date();
+var last14days = new Date();
+last14days.setDate(last14days.getDate() - 14);
+
+var datepickerFormat = d3.time.format("%m/%d/%Y %I:%M:%S %p");
+var todayInDatepickerFormat = datepickerFormat(today);
+var last14daysInDatepickerFormat = datepickerFormat(last14days);
+
 var LogTable = React.createClass({
    render: function(){
        var logTableRows = [], that = this;
        that.props.logs.forEach(function(log){
             var regexList = that.props.showLineBreaks === true ? []
                 : [new RegExp('\r', 'g'), new RegExp('\n', 'g')];
-           
+
             var currentTextInput = $('#text-input').val();
             if (currentTextInput !== "") {
                 var textInputRegex = that.props.caseInsensitive === true ?
                     new RegExp(currentTextInput, 'gi') : new RegExp(currentTextInput, 'g');
                 regexList.push(textInputRegex);
             }
-            
+
             highlightedRegex = highlightByRegexForJSX(log.text,
                 regexList,
                 that.props.highlightColor
@@ -25,7 +33,7 @@ var LogTable = React.createClass({
 
             var ts = [
                 <span className="label label-default">{log.docid.split('-')[0]}</span>, <br/>, <br/>,
-                new Date(Number(log.docid.split('-')[1])).toLocaleString(), <br/>, <br/>,
+                getLocalDateFromUTCEpoch(Number(log.timestamp)), <br/>, <br/>,
                 <em>%s Count: {matchCount}</em>, <br/>,
                 <em>\n Count: {nCount}</em>, <br/>,
                 <em>\r Count: {rCount}</em>
@@ -68,6 +76,16 @@ var DebugLog = React.createClass({
         var maxDocsFromURL = getParameterByName('max_docs');
         var textInputFromURL = getParameterByName('text');
         var devicesInputFromURL = getParameterByName('devices');
+        var startFromURL = getParameterByName('start');
+        var endFromURL = getParameterByName('end');
+
+        if (startFromURL) {
+          $('#start-time').val(startFromURL);
+        }
+
+        if (endFromURL) {
+          $('#end-time').val(endFromURL);
+        }
 
         if (maxDocsFromURL) {
           $('#sliderValue').text(maxDocsFromURL);
@@ -113,7 +131,9 @@ var DebugLog = React.createClass({
     },
     handleSubmit: function(){
         var textInput = $('#text-input').val(),
-            devicesInput = $('#devices-input').val();
+            devicesInput = $('#devices-input').val(),
+            startInput = getUTCEpochFromLocalTime($('#start-time').val()),
+            endInput = getUTCEpochFromLocalTime($('#end-time').val());
         $.ajax({
           url: "/api/debug_log",
           dataType: 'json',
@@ -121,10 +141,12 @@ var DebugLog = React.createClass({
           data: {
               devices: devicesInput,
               text: textInput,
-              max_results: $('#sliderValue').text()
+              max_results: $('#sliderValue').text(),
+              start_time: startInput,
+              end_time: endInput
           },
           success: function(response) {
-            history.pushState({}, '', '/debug_log/?text=' + textInput + '&devices=' + devicesInput + '&max_docs=' + $('#sliderValue').text());
+            history.pushState({}, '', '/debug_log/?text=' + textInput + '&devices=' + devicesInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + $('#start-time').val() + '&end=' + $('#end-time').val());
             if (response.error) {
                 this.setState({
                     logs: [],
@@ -132,9 +154,10 @@ var DebugLog = React.createClass({
                 });
             }
             else {
+                refinedLogs = logsFilter(response.data, startInput, endInput);
                 this.setState({
-                    logs: response.data.reverse(),
-                    searchAlert: "found " + response.data.length + " documents"
+                    logs: refinedLogs,
+                    searchAlert: "found " + refinedLogs.length + " documents"
                 });
             }
           }.bind(this),
@@ -161,33 +184,37 @@ var DebugLog = React.createClass({
         ];
 
         return (<div>
-            <form className="row" onSubmit={this.handleSubmit}>
-                <div className="col-lg-1 col-md-1 col-xs-1">
-                  <span id="sliderText">Max docs: </span><span id="sliderValue">20</span>
-                  <input type="text" className="span2 slider" value="" data-slider-min="1" data-slider-max="150" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square" />
-                </div>
-                <div className="col-lg-1 col-md-1 col-xs-1" id="colorpickContainer">
-                    <input type="text" id="colorpick"/>
-                </div>
-                <div className="col-lg-1 col-md-1 col-xs-1">
-                    <input id="case-check" type="checkbox" onChange={this.handleCaseChange} /> Case Insensitive
-                </div>
-                 <div className="col-lg-1 col-md-1 col-xs-1">
-                    <input id="whitespace-check" type="checkbox" onChange={this.handleWhiteSpaceChange} /> Show Linebreaks
-                </div>
+            <form onSubmit={this.handleSubmit}>
+              <Row>
+                <LongDatetimePicker placeHolder="start time" id="start-time" size="2" defaultDate={last14daysInDatepickerFormat} maxDate={todayInDatepickerFormat}  />
+                <LongDatetimePicker placeHolder="end time" id="end-time" size="2" defaultDate={todayInDatepickerFormat} maxDate={todayInDatepickerFormat} />
+                <Col xs={3} sm={3} md={3} lg={3}>
+                  <input className="form-control" id="text-input" placeholder='Text e.g UART' />
+                </Col>
+                <Col xs={4} sm={4} md={4} lg={4}>
+                  <LongTagsInput id="devices-input" tagClass="label label-info" placeHolder="Enter Devices/Emails (multiple)" />
+                </Col>
+                <Col xs={1} sm={1} md={1} lg={1}>
+                  <Button bsStyle="success" type="submit"><Glyphicon glyph="search"/></Button>
+                </Col>
+              </Row>
 
-                <div className="col-lg-3 col-md-3 col-xs-3">
-                    <LongTagsInput id="devices-input" tagClass="label label-info" placeHolder="Enter Devices/Emails (multiple)" />
-                </div>
-                <div className="col-lg-3 col-md-3 col-xs-3 input-group input-group-md">
-                  <div className="icon-addon addon-md">
-                    <input id="text-input" className="form-control" ref="textInput" placeholder='Text e.g UART' />
-                    <label for="text-input" className="glyphicon glyphicon-pencil"></label>
-                  </div>
-                  <span className="input-group-btn">
-                    <button className="btn btn-success" onClick={this.handleSubmit}><span className="glyphicon glyphicon-search"></span></button>
-                  </span>
-                </div>
+              <Row>
+                <Col xs={4} sm={4} md={4} lg={4}>
+                  <input type="text" id="colorpick"/>
+                </Col>
+                <Col xs={2} sm={2} md={2} lg={2}>
+                    <input id="case-check" type="checkbox" onChange={this.handleCaseChange} /> Case Insensitive
+                </Col>
+                <Col xs={2} sm={2} md={2} lg={2}>
+                    <input id="whitespace-check" type="checkbox" onChange={this.handleWhiteSpaceChange} /> Show Linebreaks
+                </Col>
+                <Col xs={4} sm={4} md={4} lg={4}>
+                  <span id="sliderText">Max docs: </span><span id="sliderValue">20</span>&nbsp;
+                  <input type="text" className="span2 slider" value="" data-slider-min="1" data-slider-max="150" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square" />
+                </Col>
+                </Row>
+
             </form><br/>
             {result}
         </div>)
@@ -241,4 +268,22 @@ function highlightByRegexForJSX(text, regexList, color) {
         nCount: nCount,
         rCount: rCount
     };
+}
+
+function logsFilter(data, start, end) {
+    var filtered_logs = data.filter(function(log){
+       if (start && end) {
+         return Number(log.timestamp) >= start && Number(log.timestamp) <= end;
+       }
+       else if(start) {
+         return Number(log.timestamp) >= start;
+       }
+       else if(end) {
+         return Number(log.timestamp) <= end;
+       }
+       else {
+         return log;
+       }
+    });
+    return filtered_logs.reverse();
 }

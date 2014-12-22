@@ -5,6 +5,7 @@ var LongDatetimePicker = React.createClass({
         return {
             id: "datetimepicker",
             placeHolder: "datetimepicker",
+            size: "3",
             minDate: "1/1/1970",
             maxDate: "12/12/3000",
             pickDate: true,                 //en/disables the date picker
@@ -32,15 +33,17 @@ var LongDatetimePicker = React.createClass({
     componentDidMount: function() {
         var settings = {}, that = this;
         Object.keys(that.props).forEach(function(attr){
-          if (attr !== "id" && attr !== "placeHolder") {
+          if (attr !== "id" && attr !== "placeHolder" && attr != "size") {
             settings[attr] = that.props[attr];
           }
         });
         $('#'+this.props.id).datetimepicker(settings);
     },
+
     render: function() {
+        var s = this.props.size;
         return (
-          <div className="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+          <div className={"col-xs-" + s + " col-sm-" + s + " col-md-" + s + " col-lg-" + s}>
               <p className="icon-addon addon-md">
                 <input id={this.props.id} className="form-control" placeholder={this.props.placeHolder}/>
                 <label className="glyphicon glyphicon-calendar"></label>
