@@ -7,8 +7,10 @@ from handlers.ext import ZendeskAPI
 from handlers.ext import ZendeskStatsAPI
 from handlers.firmware import FirmwareAPI
 from handlers.devices import DeviceAPI
+from handlers.devices import DeviceInactiveAPI
 from handlers.devices import DeviceOwnersAPI
 from handlers.metrics import DebugLogAPI
+from handlers.metrics import SearchifyStatsAPI
 from handlers.metrics import PreSleepAPI
 from handlers.metrics import TroubleshootAPI
 from handlers.setup import AppAPI
@@ -46,6 +48,7 @@ api_routes = [
     ('/api/create_groups/?$', CreateGroupsAPI),
     ('/api/debug_log/?$', DebugLogAPI),
     ('/api/devices/?$', DeviceAPI),
+    ('/api/devices/inactive/?$', DeviceInactiveAPI),
     ('/api/devices/owners/?$', DeviceOwnersAPI),
     ('/api/features/?$', FeaturesAPI),
     ('/api/firmware/?$', FirmwareAPI),
@@ -53,9 +56,11 @@ api_routes = [
     ('/api/tokens/?$', TokenAPI),
     ('/api/teams/?$', TeamsAPI),
     ('/api/troubleshoot/?$', TroubleshootAPI),
+    ('/api/searchify_stats/?$', SearchifyStatsAPI),
     ('/api/user/?$', UserAPI),
     ('/api/zendesk/?$', ZendeskAPI),
     ('/api/zendesk_stats/?$', ZendeskStatsAPI),
+    ('/api/zendesk_stats_2/?$', ZendeskDailyStatsAPI),
 ]
 
 page_routes = [

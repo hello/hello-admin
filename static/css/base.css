@@ -38,4 +38,5 @@ div.slider div.tooltip {display: none;}
 .cursor-custom {cursor: url("/static/css/image/copy.png"), auto;}
 .cursor-custom:hover {-webkit-stroke-width: 7px;-webkit-stroke-color: yellow; -webkit-fill-color: yellow; text-shadow: 1px 0 20px yellow;}
 
+div.bootstrap-tagsinput>input {height: 25px;}
 ul.dropdown-menu {min-width: 50px; opacity: 0.8;}

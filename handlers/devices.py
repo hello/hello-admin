@@ -36,3 +36,21 @@ class DeviceOwnersAPI(ProtectedRequestHandler):
             type="GET",
             filter_fields=['email']
         )
+
+class DeviceInactiveAPI(ProtectedRequestHandler):
+    """
+    Retrieve inactie devices
+    """
+    def get(self):
+        after = self.request.get('after', default_value="")
+        before = self.request.get('before', default_value="")
+        device_type = self.request.get('device_type', default_value="sense")
+        self.hello_request(
+            api_url="devices/inactive/{}".format(device_type),
+            type="GET",
+            url_params={
+                'after': after,
+                'before': before,
+            }
+        )
+

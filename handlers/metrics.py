@@ -42,8 +42,10 @@ class DebugLogAPI(ProtectedRequestHandler):
         max_results = int(self.request.get('max_results', default_value=20))
         text_input = self.request.get('text', default_value="")
         devices_input = self.request.get('devices', default_value="")
+        start_time = self.request.get('start_time', default_value="")
+        end_time = self.request.get('end_time', default_value="")
 
-        searchify_entity= SearchifyCredentials.query().fetch(1)
+        searchify_entity = SearchifyCredentials.query().fetch(1)
 
         try:
             if not searchify_entity:
@@ -53,12 +55,24 @@ class DebugLogAPI(ProtectedRequestHandler):
 
             index = debug_log_api.get_index('sense-logs')
 
+            if start_time.isdigit() and end_time.isdigit():
+                scoring_function = 'if((doc.var[0] - {})*(doc.var[0] - {}) < 0, doc.var[0], rel)'.format(start_time, end_time)
+            elif start_time.isdigit():
+                scoring_function = 'if((doc.var[0] - {}) > 0, doc.var[0], rel)'.format(start_time)
+            elif end_time.isdigit():
+                scoring_function = 'if((doc.var[0] - {}) < 0, doc.var[0], rel)'.format(end_time)
+            else:
+                scoring_function = 'doc.var[0]'
+
+            index.add_function(300, scoring_function)
             search_params = {
                 'query': 'text:UART',
                 'category_filters': {},
-                'fetch_fields': ['text'],
-                'length': max_results
+                'fetch_fields': ['text', 'timestamp'],
+                'length': max_results,
+                'scoring_function': 300
             }
+
             if text_input:
                 search_params['query'] = 'text:{}'.format(text_input)
 
@@ -113,3 +127,18 @@ class TroubleshootAPI(ProtectedRequestHandler):
                 'threshold': threshold
             }
         )
+
+
+class SearchifyStatsAPI(ProtectedRequestHandler):
+    """
+    Retrieve current count of docs on searchify
+    """
+    def get(self):
+        output = {'data': [], 'error': ''}
+        try:
+            searchify_cred= SearchifyCredentials.query().get()
+            searchify_api = ApiClient(searchify_cred.api_client)
+            output['data'] = [i._get_metadata() for i in searchify_api.list_indexes()]
+        except Exception as e:
+            output['error'] = display_error(e)
+        self.response.write(json.dumps(output))
