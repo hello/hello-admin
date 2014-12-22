@@ -54,7 +54,6 @@ class DebugLogAPI(ProtectedRequestHandler):
             debug_log_api = ApiClient(searchify_cred.api_client)
 
             index = debug_log_api.get_index('sense-logs')
-            print start_time, end_time
 
             if start_time.isdigit() and end_time.isdigit():
                 scoring_function = 'if((doc.var[0] - {})*(doc.var[0] - {}) < 0, doc.var[0], rel)'.format(start_time, end_time)
@@ -73,7 +72,7 @@ class DebugLogAPI(ProtectedRequestHandler):
                 'length': max_results,
                 'scoring_function': 300
             }
-            print search_params
+
             if text_input:
                 search_params['query'] = 'text:{}'.format(text_input)
 
