@@ -112,4 +112,16 @@ class TroubleshootAPI(ProtectedRequestHandler):
                 'since': since,
                 'threshold': threshold
             }
-        )
+        )class SearchifyStatsAPI(ProtectedRequestHandler):
+    """
+    Retrieve current count of docs on searchify
+    """
+    def get(self):
+        output = {'data': [], 'error': ''}
+        try:
+            searchify_cred= SearchifyCredentials.query().get()
+            searchify_api = ApiClient(searchify_cred.api_client)
+            output['data'] = [i._get_metadata() for i in searchify_api.list_indexes()]
+        except Exception as e:
+            output['error'] = display_error(e)
+        self.response.write(json.dumps(output))

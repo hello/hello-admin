@@ -56,6 +56,7 @@ api_routes = [
     ('/api/tokens/?$', TokenAPI),
     ('/api/teams/?$', TeamsAPI),
     ('/api/troubleshoot/?$', TroubleshootAPI),
+    ('/api/searchify_stats/?$', SearchifyStatsAPI),
     ('/api/user/?$', UserAPI),
     ('/api/zendesk/?$', ZendeskAPI),
     ('/api/zendesk_stats/?$', ZendeskStatsAPI),
