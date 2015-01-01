@@ -3,8 +3,9 @@ import settings
 from handlers.configuration import FeaturesAPI
 from handlers.cron import ZendeskCronHandler
 from handlers.cron import SearchifyPurge
-from handlers.ext import ZendeskAPI
-from handlers.ext import ZendeskStatsAPI
+from handlers.zendesk import ZendeskAPI
+from handlers.zendesk import ZendeskStatsAPI
+from handlers.zendesk import ZendeskDailyStatsAPI
 from handlers.firmware import FirmwareAPI
 from handlers.devices import DeviceAPI
 from handlers.devices import DeviceInactiveAPI

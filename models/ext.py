@@ -26,5 +26,5 @@ class ZendeskDailyStats(ndb.Model):
     created_at = ndb.DateTimeProperty(auto_now_add=True)
 
     @classmethod
-    def query_stats(cls):
-        return cls.query().order("-created_at").fetch(31)
+    def query_stats(cls, limit=None):
+        return cls.query().order(-cls.created_at).fetch(limit)

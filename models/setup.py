@@ -21,7 +21,7 @@ class AccessToken(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
 
     @classmethod
-    def query_tokens(cls, username, app):
+    def query_tokens(cls, username="", app=""):
         if not username and not app:
             return cls.query().order(-cls.created).fetch()
         elif username and app:

@@ -5,6 +5,7 @@ from handlers.analysis import get_zendesk_stats
 from handlers.helpers import CustomerExperienceRequestHandler
 from handlers.utils import display_error
 from models.ext import ZendeskCredentials
+from models.ext import ZendeskDailyStats
 from utils import iso_to_utc_timestamp
 
 class ZendeskAPI(CustomerExperienceRequestHandler):
@@ -112,5 +113,23 @@ class ZendeskStatsAPI(CustomerExperienceRequestHandler):
         except Exception as e:
             output['error'] = display_error(e)
             log.error('ERROR: {}'.format(display_error(e)))
+
+        self.response.write(json.dumps(output))
+
+
+class ZendeskDailyStatsAPI(CustomerExperienceRequestHandler):
+    def get(self):
+        output = {'data': [], 'error': ''}
+        try:
+            for daily_stats in ZendeskDailyStats.query_stats():
+                output['data'].append({
+                    'new_tickets': daily_stats.new_tickets,
+                    'open_tickets': daily_stats.open_tickets,
+                    'solved_tickets': daily_stats.solved_tickets,
+                    'closed_tickets': daily_stats.closed_tickets,
+                    'created_at': int(daily_stats.created_at.strftime("%s"))
+                })
+        except Exception as e:
+            output['error'] = display_error(e)
 
         self.response.write(json.dumps(output))

@@ -135,7 +135,7 @@ var ZendeskMaestro = React.createClass({
    },
    render: function() {
        var zendeskCanvas = this.state.status.length > 0 || this.state.recipient.length > 0 ?
-           <ZendeskCanvas status={this.state.status} recipient={this.state.recipient}/> : null;
+           <ZendeskCanvas className="col-xs-9 col-sm-9 col-md-9 col-lg-9" status={this.state.status} recipient={this.state.recipient}/> : null;
        return (<div>
            <form className="row" onSubmit={this.handleSubmit}>
               <div className="col-xs-3 col-sm-3 col-md-3 col-lg-3">

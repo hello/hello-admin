@@ -210,7 +210,7 @@ var DebugLog = React.createClass({
                     <input id="whitespace-check" type="checkbox" onChange={this.handleWhiteSpaceChange} /> Show Linebreaks
                 </Col>
                 <Col xs={4} sm={4} md={4} lg={4}>
-                  <span id="sliderText">Max docs: </span><span id="sliderValue">20</span>&nbsp;
+                  Max docs: <span id="sliderValue">20</span>&nbsp;&nbsp;&nbsp;
                   <input type="text" className="span2 slider" value="" data-slider-min="1" data-slider-max="150" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square" />
                 </Col>
                 </Row>
