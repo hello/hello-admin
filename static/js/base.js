@@ -60,14 +60,18 @@ function getUTCEpochFromLocalTime(t, needOffset) {
   }
 }
 
-function getLocalDateFromUTCEpoch(utcSeconds, needOffset) {
+function getLocalDateFromUTCEpoch(utcSeconds, needOffset, offsetMilliseconds) {
   var d;
   if (needOffset === true){
-    d = new Date(utcSeconds*1000 - new Date().getTimezoneOffset() * 60000);
+    if (offsetMilliseconds) {
+      d = new Date(utcSeconds * 1000 + offsetMilliseconds);
+    }
+    else {
+      d = new Date(utcSeconds * 1000 - new Date().getTimezoneOffset() * 60000);
+    }
   }
   else {
     d = new Date(utcSeconds*1000);
   }
-  console.log(d.toLocaleString());
   return d.toLocaleString() || "";
 }
