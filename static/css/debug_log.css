@@ -2,5 +2,4 @@
 .showLineBreaks {white-space: pre;}
 table.table-bordered>thead>tr>th, table.table-bordered>tbody>tr>td {border: 1px dashed brown;}
 #colorpickContainer{margin-left: 100px;}
-#sliderText, #sliderValue {font-size: 14px; font-stretch: ultra-condensed; font-family: Arial Narrow, Helvetica, sans-serif;}
 #start-time, #end-time {font-size: 12px;}
