@@ -30,7 +30,7 @@ var TimelineContent = React.createClass({
                     null:
                     <p>Sound: <span>{segment.sound}</span></p>;
 
-                var date = <span className="cd-date">{getLocalDateFromUTCEpoch(segment.timestamp/1000, true, segment.offset_millis)}</span>;
+                var date = <span className="cd-date">{getLocalDateFromUTCEpoch(segment.timestamp/1000, false)}</span>;
                 var svgIcon = "/static/css/svg/" + timelineSVG(segment.event_type);
                 var currentEmailInput = $('#email-input').val();
                 var currentDateInput = $('#date-input').val().replace(/\-/g, '/');
