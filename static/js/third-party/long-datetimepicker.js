@@ -41,11 +41,18 @@ var LongDatetimePicker = React.createClass({
     },
 
     render: function() {
-        var s = this.props.size;
+        var s = this.props.size, input;
+        if (this.props.format) {
+          input = <input id={this.props.id} className="form-control" placeholder={this.props.placeHolder} data-date-format={this.props.format}/>;
+        }
+        else {
+          input = <input id={this.props.id} className="form-control" placeholder={this.props.placeHolder} />
+        }
         return (
+
           <div className={"col-xs-" + s + " col-sm-" + s + " col-md-" + s + " col-lg-" + s}>
               <p className="icon-addon addon-md">
-                <input id={this.props.id} className="form-control" placeholder={this.props.placeHolder}/>
+                {input}
                 <label className="glyphicon glyphicon-calendar"></label>
               </p>
           </div>

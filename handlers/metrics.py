@@ -142,3 +142,16 @@ class SearchifyStatsAPI(ProtectedRequestHandler):
         except Exception as e:
             output['error'] = display_error(e)
         self.response.write(json.dumps(output))
+
+
+class TimelineAPI(ProtectedRequestHandler):
+    def get(self):
+        email = self.request.get('email')
+        date = self.request.get('date')
+        print email, date
+        self.hello_request(
+            # api_url="timeline/admin/tim@home.com/2014-12-21",
+            api_url="timeline/admin/{}/{}".format(email, date),
+            type="GET",
+            impersonatee_token="10.d246f438c7c444f3bc3685ca654fd23f"
+        )

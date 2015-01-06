@@ -1,0 +1,26 @@
+{% extends "templates/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block extrastatic %}
+    <link rel="stylesheet" href="/static/css/timeline-reset.css">
+	<link rel="stylesheet" href="/static/css/timeline-style.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-datetimepicker.min.css" />
+
+    <script type="text/javascript" src="/static/js/third-party/modernizr.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/moment.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/bootstrap-datetimepicker.min.js"></script>
+
+    <script type="text/jsx" src="/static/js/custom/long-label.js"></script>
+    <script type="text/jsx" src="/static/js/third-party/long-datetimepicker.js"></script>
+    <script type="text/jsx" src="/static/js/timeline.js"></script>
+
+{% endblock %}
+
+{% block content %}
+   <div class="row" id="container">
+        <h3 id="page-name">Timeline</h3>
+        <hr class="fancy-line"/>
+        <div class="col-xs-12" id="timeline-canvas"></div>
+    </div>
+{% endblock %}
+

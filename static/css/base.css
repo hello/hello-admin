@@ -40,3 +40,6 @@ div.slider div.tooltip {display: none;}
 
 div.bootstrap-tagsinput>input {height: 25px;}
 ul.dropdown-menu {min-width: 50px; opacity: 0.8;}
+
+button.btn:focus {outline: none !important;}
+/*::-webkit-scrollbar {display: none;}*/
