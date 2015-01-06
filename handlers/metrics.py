@@ -121,6 +121,8 @@ class ApplicationLogsAPI(ProtectedRequestHandler):
         max_results = int(self.request.get('max_results', default_value=20))
         text_input = self.request.get('text', default_value="")
         levels_input = self.request.get('levels', default_value="")
+        origins_input = self.request.get('origins', default_value="")
+        versions_input = self.request.get('versions', default_value="")
         start_time = self.request.get('start_time', default_value="")
         end_time = self.request.get('end_time', default_value="")
 
@@ -155,10 +157,13 @@ class ApplicationLogsAPI(ProtectedRequestHandler):
             levels_list = []
             if levels_input:
                 levels_list = stripStringToList(levels_input)
-                search_params['category_filters'] = {'level': levels_list}
-
-            if not text_input and (not levels_input or not levels_list):
-                raise RuntimeError('No results')
+                search_params['category_filters'].update({'level': levels_list})
+            if origins_input:
+                origins_list = stripStringToList(origins_input)
+                search_params['category_filters'].update({'origin': origins_list})
+            if versions_input:
+                versions_list = stripStringToList(versions_input)
+                search_params['category_filters'].update({'version': versions_list})
 
             if text_input:
                 search_params['query'] = 'text:{}'.format(text_input)

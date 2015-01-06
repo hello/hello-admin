@@ -35,7 +35,7 @@ var LogTable = React.createClass({
             var origin = log.docid.split('-').slice(0, log.docid.split('-').length - 1).join('-');
 
             var ts = [
-                <span className="label label-default">{origin}</span>, <br/>, <br/>,
+                <LongLabel bsStyle={labelOriginColor(origin)} content={origin}/>, <br/>, <br/>,
                 getLocalDateFromUTCEpoch(Number(log.timestamp)), <br/>, <br/>,
                 <em>%s Count: {matchCount}</em>, <br/>,
                 <em>\n Count: {nCount}</em>, <br/>,
@@ -79,6 +79,8 @@ var DebugLog = React.createClass({
         var maxDocsFromURL = getParameterByName('max_docs');
         var textInputFromURL = getParameterByName('text');
         var levelsInputFromURL = getParameterByName('levels');
+        var originsInputFromURL = getParameterByName('origins');
+        var versionsInputFromURL = getParameterByName('versions');
         var startFromURL = getParameterByName('start');
         var endFromURL = getParameterByName('end');
 
@@ -98,6 +100,12 @@ var DebugLog = React.createClass({
         }
         if (levelsInputFromURL) {
           $('#levels-input').val(levelsInputFromURL);
+        }
+        if (originsInputFromURL) {
+          $('#origins-input').val(originsInputFromURL);
+        }
+        if (versionsInputFromURL) {
+          $('#versions-input').val(versionsInputFromURL);
         }
         if (textInputFromURL) {
           $('#text-input').val(textInputFromURL);
@@ -136,6 +144,8 @@ var DebugLog = React.createClass({
     handleSubmit: function(){
         var textInput = $('#text-input').val(),
             levelsInput = $('#levels-input').val(),
+            originsInput = $('#origins-input').val(),
+            versionsInput = $('#versions-input').val(),
             startInput = getUTCEpochFromLocalTime($('#start-time').val()),
             endInput = getUTCEpochFromLocalTime($('#end-time').val());
         $.ajax({
@@ -144,13 +154,15 @@ var DebugLog = React.createClass({
           type: 'GET',
           data: {
               levels: levelsInput,
+              origins: originsInput,
+              versions: versionsInput,
               text: textInput,
               max_results: $('#sliderValue').text(),
               start_time: startInput,
               end_time: endInput
           },
           success: function(response) {
-            history.pushState({}, '', '/application_logs/?text=' + textInput + '&levels=' + levelsInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + $('#start-time').val() + '&end=' + $('#end-time').val());
+            history.pushState({}, '', '/application_logs/?text=' + textInput + '&levels=' + levelsInput + '&origins=' + originsInput + '&versions=' + versionsInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + $('#start-time').val() + '&end=' + $('#end-time').val());
             if (response.error) {
                 this.setState({
                     logs: [],
@@ -176,8 +188,8 @@ var DebugLog = React.createClass({
         return false;
     },
     render: function(){
-        var result = this.state.logs.length === 0 ?
-            <div className="docs-count">{this.state.searchAlert}</div>: [
+        var result = this.state.logs.length === 0 ? [
+            <div className="docs-count">{this.state.searchAlert}</div>]: [
             <div className="docs-count">{this.state.searchAlert}</div>,
             <LogTable
                 logs={this.state.logs}
@@ -190,22 +202,10 @@ var DebugLog = React.createClass({
         return (<div>
             <form onSubmit={this.handleSubmit}>
               <Row>
-                <LongDatetimePicker placeHolder="start time" id="start-time" size="2" defaultDate={last14daysInDatepickerFormat} maxDate={todayInDatepickerFormat}  />
-                <LongDatetimePicker placeHolder="end time" id="end-time" size="2" defaultDate={todayInDatepickerFormat} maxDate={todayInDatepickerFormat} />
+                <LongDatetimePicker placeHolder="start time" id="start-time" size="3" defaultDate={last14daysInDatepickerFormat} maxDate={todayInDatepickerFormat}  />
+                <LongDatetimePicker placeHolder="end time" id="end-time" size="3" defaultDate={todayInDatepickerFormat} maxDate={todayInDatepickerFormat} />
                 <Col xs={3} sm={3} md={3} lg={3}>
                   <input className="form-control" id="text-input" placeholder='Text e.g: DiffInSeconds' />
-                </Col>
-                <Col xs={4} sm={4} md={4} lg={4}>
-                  <LongTagsInput id="levels-input" tagClass="label label-info" placeHolder="Levels e.g: INFO, DEBUG" />
-                </Col>
-                <Col xs={1} sm={1} md={1} lg={1}>
-                  <Button bsStyle="success" type="submit"><Glyphicon glyph="search"/></Button>
-                </Col>
-              </Row>
-
-              <Row>
-                <Col xs={4} sm={4} md={4} lg={4}>
-                  <input type="text" id="colorpick"/>
                 </Col>
                 <Col xs={2} sm={2} md={2} lg={2}>
                     <input id="case-check" type="checkbox" onChange={this.handleCaseChange} /> Case Insensitive
@@ -213,12 +213,25 @@ var DebugLog = React.createClass({
                 <Col xs={2} sm={2} md={2} lg={2}>
                     <input id="whitespace-check" type="checkbox" onChange={this.handleWhiteSpaceChange} /> Show Linebreaks
                 </Col>
-                <Col xs={4} sm={4} md={4} lg={4}>
-                  Max docs each level: <span id="sliderValue">20</span>&nbsp;&nbsp;&nbsp;
-                  <input type="text" className="span2 slider" value="" data-slider-min="1" data-slider-max="150" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square" />
+              </Row>
+              <Row id="filters">
+                <Col xs={3} sm={3} md={3} lg={3}>
+                  <LongTagsInput id="levels-input" tagClass="label label-info" placeHolder="Levels e.g: INFO, DEBUG" />
                 </Col>
-                </Row>
-
+                <Col xs={3} sm={3} md={3} lg={3}>
+                  <LongTagsInput id="origins-input" tagClass="label label-info" placeHolder="Origins e.g: suripu-app" />
+                </Col>
+                <Col xs={3} sm={3} md={3} lg={3}>
+                  <LongTagsInput id="versions-input" tagClass="label label-info" placeHolder="Versions e.g: 0.1.321" />
+                </Col>
+                <Col xs={2} sm={2} md={2} lg={2}>
+                    <span id="slider-narration">Max docs per filter</span>: <span id="sliderValue">20</span>
+                    <input type="text" className="span2 slider" value="" data-slider-min="1" data-slider-max="150" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square" />
+                </Col>
+                <Col xs={1} sm={1} md={1} lg={1}>
+                  <Button bsStyle="info" bsSize="large" className="btn-circle" type="submit"><Glyphicon glyph="search"/></Button>
+                </Col>
+              </Row>
             </form><br/>
             {result}
         </div>)
@@ -300,4 +313,8 @@ function compareTimestamp(log1, log2) {
         return 1;
     }
     return 0;
+}
+
+function labelOriginColor(origin) {
+    return "label-".concat(origin);
 }
