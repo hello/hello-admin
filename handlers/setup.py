@@ -437,3 +437,17 @@ class CreateGroupsAPI(SuperEngineerRequestHandler):
         else:
             output['error'] = 'Not permitted'
         self.response.write(json.dumps(output))
+
+
+class ViewPermissionAPI(ProtectedRequestHandler):
+    def get(self):
+        """
+        See if user has permission to view data
+        """
+        viewer = self.current_user.email()
+        output = {
+            "viewer": viewer,
+            "has_access_to_customers_data": viewer in self.customer_experience() or viewer in self.super_engineer()
+        }
+        self.response.write(json.dumps(output))
+

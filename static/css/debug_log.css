@@ -1,5 +1,6 @@
 .docs-count {text-align: right; text-decoration: underline;}
 .showLineBreaks {white-space: pre;}
 table.table-bordered>thead>tr>th, table.table-bordered>tbody>tr>td {border: 1px dashed brown;}
+#start-time, #end-time  {font-size: 86%;}
+#content {font-size: 75%;}
 #colorpickContainer{margin-left: 100px;}
-#start-time, #end-time {font-size: 12px;}
