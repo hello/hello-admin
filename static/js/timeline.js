@@ -1,5 +1,9 @@
 /** @jsx React.DOM */
 
+var d = new Date();
+d.setDate(d.getDate() - 1);
+var yesterday = d3.time.format("%m-%d-%Y")(d);
+
 var TimelineContent = React.createClass({
     render: function() {
         var blocks = [];
@@ -30,7 +34,7 @@ var TimelineContent = React.createClass({
                     null:
                     <p>Sound: <span>{segment.sound}</span></p>;
 
-                var date = <span className="cd-date">{getLocalDateFromUTCEpoch(segment.timestamp/1000, true, segment.offset_millis)}</span>;
+                var date = <span className="cd-date">{getLocalDateFromUTCEpoch(segment.timestamp/1000, false)}</span>;
                 var svgIcon = "/static/css/svg/" + timelineSVG(segment.event_type);
                 var currentEmailInput = $('#email-input').val();
                 var currentDateInput = $('#date-input').val().replace(/\-/g, '/');
@@ -119,6 +123,25 @@ var TimelineMaestro = React.createClass({
     },
 
     handleSubmit: function() {
+        if (this.isAuthorized() === true) {
+            this.retrieveTimelineData();
+        }
+        else {
+            return false;
+        }
+    },
+
+    isAuthorized: function() {
+        var that = this;
+        // TODO: see pseudocode below
+        // if user belongs to priority group:
+        //    get_or_create admin-data-viewer (ADMIN_READ scope) token to see data
+        // else:
+        //    get_or_create timeline-viewer token (SLEEP_TIMELINE scope) to see data for that user only
+        return true;
+    },
+
+    retrieveTimelineData: function() {
         var that = this;
         var emailInput = $('#email-input').val();
         var dateInput = $('#date-input').val();
@@ -139,6 +162,7 @@ var TimelineMaestro = React.createClass({
             data: requestData,
             dataType: 'json',
             success: function(response) {
+                console.log(response);
                 that.setState({data: response.data});
                 that.pushHistory(emailInput, dateInput);
             }.bind(that),
@@ -148,6 +172,7 @@ var TimelineMaestro = React.createClass({
         });
         return false;
     },
+
     handleFilter: function() {
         this.setState({filterStatus: $('#filter-input').val()});
     },
@@ -156,8 +181,11 @@ var TimelineMaestro = React.createClass({
             null:
             <TimelineContent data={this.state.data} filterStatus={this.state.filterStatus}/>;
         return(<code className="nonscript">
+            <ModalTrigger style="display: none;" modal={<UserTokenDialog parent={this} username={this.state.username} />}>
+              <Button id="modal-trigger" bsStyle="primary" bsSize="large">Launch UserTokenDialog</Button>
+            </ModalTrigger>
             <form onSubmit={this.handleSubmit} className="row">
-                <LongDatetimePicker size="3" placeHolder="date" id="date-input" pickTime={false} format="MM-DD-YYYY" defaultDate="12-21-2014" />
+                <LongDatetimePicker size="3" placeHolder="date" id="date-input" pickTime={false} format="MM-DD-YYYY" defaultDate={yesterday} maxDate={yesterday} />
                 <Col xs={3} md={3}>
                     <Input id="email-input" type="text" addonBefore={<Glyphicon glyph="user"/>} placeholder="user email" />
                 </Col>
@@ -189,7 +217,8 @@ function labelColor(eventType) {
         WAKE_UP: "label-wakeup",
         MOTION: "label-motion",
         SLEEP: "label-sleep",
-        LIGHTS_OUT: "label-lights-out"
+        LIGHTS_OUT: "label-lights-out",
+        LIGHT: "label-light"
     };
     return assignColor[eventType] || "label-no-event";
 }
@@ -200,7 +229,8 @@ function timelineSVG(eventType) {
         WAKE_UP: "wake_up.svg",
         MOTION: "motion.svg",
         SLEEP: "sleep.svg",
-        LIGHTS_OUT: "lights_out.svg"
+        LIGHTS_OUT: "lights_out.svg",
+        LIGHT: "light.svg"
     };
     return assignSVG[eventType] || "unknown.svg";
 }
@@ -211,7 +241,8 @@ function timelineBackground(eventType) {
         WAKE_UP: "timeline-wakeup",
         MOTION: "timeline-motion",
         SLEEP: "timeline-sleep",
-        LIGHTS_OUT: "timeline-lights-out"
+        LIGHTS_OUT: "timeline-lights-out",
+        LIGHT: "timeline-light"
     };
     return assignBackground[eventType] || "timeline-no-event";
 }
@@ -222,7 +253,8 @@ function filterEvents(segments, type) {
         wakeup: "WAKE_UP",
         motion: "MOTION",
         sleep: "SLEEP",
-        lights_out: "LIGHTS_OUT"
+        lights_out: "LIGHTS_OUT",
+        light: "LIGHT"
     };
     return segments.filter(function(s){
         if (type === "events") {

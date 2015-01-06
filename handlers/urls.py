@@ -11,6 +11,7 @@ from handlers.devices import DeviceAPI
 from handlers.devices import DeviceInactiveAPI
 from handlers.devices import DeviceOwnersAPI
 from handlers.metrics import DebugLogAPI
+from handlers.metrics import ApplicationLogsAPI
 from handlers.metrics import SearchifyStatsAPI
 from handlers.metrics import PreSleepAPI
 from handlers.metrics import TimelineAPI
@@ -29,6 +30,7 @@ from handlers.users import UserAPI
 from handlers.views import ChartHandler
 from handlers.views import ConfigurationView
 from handlers.views import DebugLogView
+from handlers.views import ApplicationLogsView
 from handlers.views import ErrorView
 from handlers.views import FirmwareView
 from handlers.views import SenseVisualView
@@ -50,6 +52,7 @@ api_routes = [
     ('/api/app_scope/?$', AppScopeAPI),
     ('/api/create_groups/?$', CreateGroupsAPI),
     ('/api/debug_log/?$', DebugLogAPI),
+    ('/api/application_logs/?$', ApplicationLogsAPI),
     ('/api/devices/?$', DeviceAPI),
     ('/api/devices/inactive/?$', DeviceInactiveAPI),
     ('/api/devices/owners/?$', DeviceOwnersAPI),
@@ -74,6 +77,7 @@ page_routes = [
     ('/create/app_against_prod', CreateApplicationAgainstProdAPI),
     ('/create_account', CreateAccountAPI),
     ('/debug_log/?$', DebugLogView),
+    ('/application_logs/?$', ApplicationLogsView),
     ('/error/?$', ErrorView),
     ('/firmware/?$', FirmwareView),
     ('/proxy/(.*)', ProxyAPI),

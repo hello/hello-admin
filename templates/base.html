@@ -17,13 +17,15 @@
     <script type="text/javascript" src="/static/js/third-party/react-bootstrap-0.12.0.min.js"></script>
     <script type="text/javascript" src="/static/js/third-party/underscore.min.js"></script>
     <script type="text/javascript" src="/static/js/third-party/typeahead.js"></script>
-
     <script type="text/jsx" src="/static/js/base.js"></script>
-    <link rel="stylesheet" type="text/css" href="/static/css/base.css" />
+
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-xl.css"/>
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/glyphicon-control.css"/>
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/tablesorter-control.css"/>
+
+    <link rel="stylesheet" href="/static/css/reset.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/base.css" />
     {% endblock %}
 
     {% block extrastatic %}
@@ -31,26 +33,36 @@
 
 </head>
 <body>
+
     <div id="header" class="row">
-        <div id="menu" class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
-            <a {% if title == "Users" %} class="menu-active"{% endif%} href='/'><span class="glyphicon glyphicon-user"></span><span>Users</span></a>|
+        <div id="menu" class="col-xs-11 col-sm-11 col-md-11 col-lg-11 col-xl-11">
+            &nbsp;<a {% if title == "Users" %} class="menu-active"{% endif%} href='/'><span class="glyphicon glyphicon-user"></span><span>Users</span></a>|
             <a {% if title == "Troubleshoot" %} class="menu-active"{% endif%} href='/troubleshoot'><span class="glyphicon glyphicon-dashboard"></span><span>Troubleshoot</span></a>|
             <a {% if title == "Zendesk" %} class="menu-active"{% endif%} href='/zendesk'><span class="glyphicon glyphicon-headphones"></span><span>Zendesk</span></a>|
-            <a {% if title == "Sense" %} class="menu-active"{% endif%} href='/sense'><span class="glyphicon glyphicon-stats"></span><span>Sense</span></a>|
-            <a {% if title == "Timeline" %} class="menu-active"{% endif%} href='/timeline'><span class="glyphicon glyphicon-leaf"></span><span>Timeline</span></a>|
-            <a {% if title == "Log" %} class="menu-active"{% endif%} href='/debug_log'><span class="glyphicon glyphicon-list-alt"></span><span>Log</span></a>|
-            <a {% if title == "Teams" %} class="menu-active"{% endif%} href='/teams'><span class="glyphicon glyphicon-fire"></span><span>Teams</span></a>|
-            <a {% if title == "Configuration" %} class="menu-active"{% endif%} href='/configuration'><span class="glyphicon glyphicon-cog"></span><span>Configuration</span></a>|
+            <a {% if title == "Sense" or title == "Timeline" %} class="menu-active"{% endif%} href='/timeline'><span class="glyphicon glyphicon-stats"></span><span>Data</span></a>|
+            <a {% if title == "Log" or title == "Application Logs" %} class="menu-active"{% endif%} href='/debug_log'><span class="glyphicon glyphicon-list-alt"></span><span>Logs</span></a>|
+            <a {% if title == "Teams" or title == "Configuration" or title == "Firmware" %} class="menu-active"{% endif%} href='/teams'><span class="glyphicon glyphicon-fire"></span><span>Operations</span></a>|
             <a {% if title == "Settings" %} class="menu-active"{% endif%} href='/settings'><span class="glyphicon glyphicon-wrench"></span><span>Settings</span></a>
+
+            <br>
+
+            <div id="sub-menu">
+            <a {% if title == "Timeline"%} class="menu-active"{% endif%} {% if title == "Sense"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/timeline'>&#10149; Timeline</a>
+            <a {% if title == "Sense"%} class="menu-active"{% endif%} {% if title == "Timeline"%} class="menu-inactive"{% endif%} class="menu-transparent"  href='/sense'>&#10149; Sense</a>
+            <a {% if title == "Log" %} class="menu-active"{% endif%} {% if title == "Application Logs"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/debug_log'>&#10149; Sense Logs</a>
+            <a {% if title == "Application Logs" %} class="menu-active"{% endif%} {% if title == "Log"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/application_logs'>&#10149; Application Logs</a>
+            <a {% if title == "Teams" %} class="menu-active"{% endif%} {% if title == "Configuration" or  title == "Firmware"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/teams'>&#10149; Teams</a>
+            <a {% if title == "Configuration" %} class="menu-active"{% endif%} {% if title == "Teams" or  title == "Firmware"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/configuration'>&#10149; Configuration</a>
+            <a {% if title == "Firmware" %} class="menu-active"{% endif%} {% if title == "Configuration" or title == "Teams" %} class="menu-inactive"{% endif%} class="menu-transparent" href='/firmware'>&#10149; Firmware</a>
+            </div>
         </div>
-        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
-            Hello, {{user}}! <a href="{{logout_url}}"> Logout</a>
+
+        <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+            <span>Hi {{user}}!</span><br>
+            <a href="{{logout_url}}"> Logout</a>
         </div>
     </div>
-    <div id="second-header">
-        {% block submenu %}
-        {% endblock %}
-    </div>
+
     <div class="row" id="content">
         {% block content %}
         {% endblock %}
