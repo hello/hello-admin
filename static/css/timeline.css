@@ -1,40 +1,15 @@
-/* --------------------------------
-
-Primary style
-
--------------------------------- */
-html * {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-*, *:after, *:before {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
 body {
-  font-size: 100%;
-  font-family: "Century Gothic",CenturyGothic,AppleGothic,sans-serif;
-  color: #7f8c97;
   background-color: #e9f0f5;
+}
+
+#content {
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
 img {
   max-width: 100%;
 }
 
-/*h1, h2 {*/
-  /*font-family: "Open Sans", sans-serif;*/
-  /*font-weight: bold;*/
-/*}*/
-
-/* --------------------------------
-
-Modules - reusable parts of our design
-
--------------------------------- */
 .cd-container {
   /* this class is used to give a max-width to the element it is applied to, and center it horizontally when it reaches that max-width */
   width: 90%;
@@ -48,11 +23,6 @@ Modules - reusable parts of our design
   clear: both;
 }
 
-/* --------------------------------
-
-Main components
-
--------------------------------- */
 header {
   height: 200px;
   line-height: 200px;
@@ -78,7 +48,6 @@ header h1 {
 #cd-timeline {
   position: relative;
   padding: 2em 0;
-  margin-top: 2em;
   margin-bottom: 2em;
 }
 #cd-timeline::before {
@@ -477,7 +446,7 @@ header h1 {
 }
 
 #page-name {
-  margin: 20px auto 10px auto;
+  margin: 0 auto;
   color: #000000;
 }
 
@@ -504,3 +473,9 @@ header h1 {
 .label-lights-out, .timeline-lights-out {
   background-color: rgba(90, 151, 245, 0.43);
 }
+
+.label-light, .timeline-light {
+  background-color: rgba(255, 21, 0, 0.58);
+}
+
+#modal-trigger {display: none;}
