@@ -479,3 +479,10 @@ header h1 {
 }
 
 #modal-trigger {display: none;}
+canvas {background-color: #e9f0f5;}
+#insights-info {margin-bottom: -100px;}
+#score-bar {text-align: center;}
+
+h2.event-date {font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;}
+span.insights {font-size: 11px; font-family: fantasy; font-weight: bold;}
+span.event-message {color: red; font-family: fantasy; font-weight: bold;}
