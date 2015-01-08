@@ -9,6 +9,7 @@ from handlers.zendesk import ZendeskDailyStatsAPI
 from handlers.firmware import FirmwareAPI
 from handlers.devices import DeviceAPI
 from handlers.devices import DeviceInactiveAPI
+from handlers.metrics import BatteryAPI
 from handlers.devices import DeviceOwnersAPI
 from handlers.metrics import DebugLogAPI
 from handlers.metrics import ApplicationLogsAPI
@@ -27,6 +28,7 @@ from handlers.setup import RegisterPillAPI, SetupAPI
 from handlers.setup import UpdateAdminAccessTokenAPI
 from handlers.teams import TeamsAPI
 from handlers.users import UserAPI
+from handlers.views import BatteryView
 from handlers.views import ChartHandler
 from handlers.views import ConfigurationView
 from handlers.views import DebugLogView
@@ -50,6 +52,7 @@ cron_routes = [
 api_routes = [
     ('/api/app/?$', AppAPI),
     ('/api/app_scope/?$', AppScopeAPI),
+    ('/api/battery/?$', BatteryAPI),
     ('/api/create_groups/?$', CreateGroupsAPI),
     ('/api/debug_log/?$', DebugLogAPI),
     ('/api/application_logs/?$', ApplicationLogsAPI),
@@ -72,6 +75,7 @@ api_routes = [
 
 page_routes = [
     ('/', UserView),
+    ('/battery/?$', BatteryView),
     ('/charts', ChartHandler),
     ('/configuration/?$', ConfigurationView),
     ('/create/app_against_prod', CreateApplicationAgainstProdAPI),

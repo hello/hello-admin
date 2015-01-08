@@ -113,6 +113,14 @@ class TimelineView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/timeline.html',
                                 context={'title': 'Timeline'})
 
+class BatteryView(ProtectedRequestHandler):
+    """
+    Returns a panel for monitoring potential timeline viewing
+    """
+    def get(self):
+        self.render_to_response(template_file='templates/battery.html',
+                                context={'title': 'Battery'})
+
 class ErrorView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/error.html',
