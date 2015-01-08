@@ -126,9 +126,7 @@ var TimelineMaestro = React.createClass({
         if (this.isAuthorized() === true) {
             this.retrieveTimelineData();
         }
-        else {
-            return false;
-        }
+        return false;
     },
 
     isAuthorized: function() {
