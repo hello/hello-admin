@@ -226,3 +226,13 @@ class TimelineAPI(ProtectedRequestHandler):
             type="GET",
             impersonatee_token="10.d246f438c7c444f3bc3685ca654fd23f"
         )
+
+class BatteryAPI(ProtectedRequestHandler):
+    def get(self):
+        email = self.request.get('email')
+        print email
+        self.hello_request(
+            api_url="devices/pill/{}/status".format(email),
+            type="GET",
+            impersonatee_token="10.d246f438c7c444f3bc3685ca654fd23f"
+        )
