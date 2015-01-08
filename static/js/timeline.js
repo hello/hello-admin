@@ -183,7 +183,7 @@ var TimelineMaestro = React.createClass({
               <Button id="modal-trigger" bsStyle="primary" bsSize="large">Launch UserTokenDialog</Button>
             </ModalTrigger>
             <form onSubmit={this.handleSubmit} className="row">
-                <LongDatetimePicker size="3" placeHolder="date" id="date-input" pickTime={false} format="MM-DD-YYYY" defaultDate={yesterday} maxDate={yesterday} />
+                <LongDatetimePicker size="3" placeHolder="date" id="date-input" pickTime={false} format="MM-DD-YYYY" defaultDate={yesterday} />
                 <Col xs={3} md={3}>
                     <Input id="email-input" type="text" addonBefore={<Glyphicon glyph="user"/>} placeholder="user email" />
                 </Col>
