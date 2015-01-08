@@ -152,22 +152,22 @@ var TroubleshootMaestro = React.createClass({
     render: function() {
         return (<code className="nonscript"><table className="table table-bordered tablesorter">
             <Row className="show-grid">
-              <Col xs={3} md={3}><h4>&nbsp;Start Time</h4></Col>
-              <Col xs={3} md={3}><h4>&nbsp;End Time</h4></Col>
-              <Col xs={3} md={3}><h4>&nbsp;Device Type</h4></Col>
-              <Col xs={3} md={3}><h4>Inactive Hours: <span>{this.state.sliderValue}</span></h4></Col>
+              <Col xs={2} sm={2} md={2} lg={2} xl={2}><h4>&nbsp;Start Time</h4></Col>
+              <Col xs={2} sm={2} md={2} lg={2} xl={2}><h4>&nbsp;End Time</h4></Col>
+              <Col xs={2} sm={2} md={2} lg={2} xl={2}><h4>&nbsp;Device Type</h4></Col>
+              <Col xs={6} sm={6} md={6} lg={6} xl={6}><h4>Inactive Hours: <span>{this.state.sliderValue}</span></h4></Col>
             </Row>
-            0 <input type="text" className="span2 slider" value="" data-slider-min="0" data-slider-max="720" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square"/> 720
-            <LongDatetimePicker placeHolder="start time" id="start-time" />
-            <LongDatetimePicker placeHolder="end time" id="end-time" />
-            <Col xs={3} md={3}>
+            0   <input type="text" className="span2 slider" value="" data-slider-min="0" data-slider-max="240" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square"/> 240
+            <LongDatetimePicker size="2" placeHolder="start time" id="start-time" />
+            <LongDatetimePicker size="2" placeHolder="end time" id="end-time" />
+            <Col xs={2} md={2}>
             <Input type="select" id="device-type">
               <option selected value="sense">Sense</option>
               <option value="pill">Pill</option>
             </Input></Col>
             &nbsp;&nbsp;&nbsp;<Button onClick={this.handleSubmit}><Glyphicon glyph="search"/></Button>
             <Pagination parent={this} />
-            <em>You are looking at <strong>{$('#device-type').val()}</strong> devices which were last seen after <strong>{$('#start-time').val()}</strong> and have been inactive for at least <strong>{this.state.sliderValue} hours</strong> by <strong>{$('#end-time').val()}</strong></em><p/>
+            <em id="narration">You are looking at <strong>{$('#device-type').val()}</strong> devices which were last seen after <strong>{$('#start-time').val()}</strong> and have been inactive for at least <strong>{this.state.sliderValue} hours</strong> by <strong>{$('#end-time').val()}</strong></em><p/>
             <TroubleshootTableHeaders data={this.state.data}/>
             <TroubleshootTableBody parent={this} data={this.state.data}/>
         </table></code>)
