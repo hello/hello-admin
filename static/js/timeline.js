@@ -14,13 +14,9 @@ var TimelineContent = React.createClass({
             console.log(segments);
 
             segments.forEach(function(segment) {
-                var event = (!segment.event_type || segment.event_type.isWhiteString() === true) ?
-                    <h2><LongLabel bsStyle={labelColor(segment.event_type)} content={segment.id}/> No event</h2>
-                    : <h2><LongLabel bsStyle={labelColor(segment.event_type)} content={segment.id}/> {segment.event_type}</h2>;
+                var date = <h2 className="event-date"><LongLabel bsStyle={labelColor(segment.event_type)} content={segment.id}/> {getLocalDateFromUTCEpoch(segment.timestamp/1000, false)}</h2>;
 
-                var message = (!segment.message || segment.message.isWhiteString() === true) ?
-                    null
-                    : <p>Message: <span>{segment.message}</span></p>;
+                var message = <span className="cd-date">Message: <span className="event-message">{segment.message || "No event!"}</span></span>;
 
                 var duration = <p>Duration: <span>{segment.duration}</span></p>;
 
@@ -34,7 +30,6 @@ var TimelineContent = React.createClass({
                     null:
                     <p>Sound: <span>{segment.sound}</span></p>;
 
-                var date = <span className="cd-date">{getLocalDateFromUTCEpoch(segment.timestamp/1000, false)}</span>;
                 var svgIcon = "/static/css/svg/" + timelineSVG(segment.event_type);
                 var currentEmailInput = $('#email-input').val();
                 var currentDateInput = $('#date-input').val().replace(/\-/g, '/');
@@ -47,15 +42,14 @@ var TimelineContent = React.createClass({
                         </div>
 
                         <div className="cd-timeline-content">
-                            {event}
-                            {message}
+                            {date}
                             {duration}
                             {sensors}
                             {sleepDepth}
                             {sound}
                             <a href={"/debug_log/?devices=" + currentEmailInput + "&start=" +  start + "&end=" + end + "&max_docs=100"}
                                target="_blank" className="cd-read-more">See debug log</a>
-                            {date}
+                            {message}
                         </div>
                     </div>
                 );
@@ -102,6 +96,10 @@ var TimelineMaestro = React.createClass({
         });
     },
 
+    updateScore: function() {
+        $(".dial").val(27).trigger('change');
+    },
+
     submitWithInputsfromURL: function() {
         var emailInputFromURL = getParameterByName('email');
         var dateInputFromURL = getParameterByName('date');
@@ -116,6 +114,16 @@ var TimelineMaestro = React.createClass({
     componentDidMount: function() {
         this.populateTimeline();
         this.submitWithInputsfromURL();
+        $('.dial').knob(
+            {
+                "min":0,
+                "max":100,
+                "width": "80",
+                "readOnly": true,
+                "thickness": ".2",
+                "bgColor": "green"
+            }
+        );
     },
 
     pushHistory: function(email, date) {
@@ -162,6 +170,7 @@ var TimelineMaestro = React.createClass({
             success: function(response) {
                 console.log(response);
                 that.setState({data: response.data});
+                $('.dial').val(response.data[0].score).trigger('change');
                 that.pushHistory(emailInput, dateInput);
             }.bind(that),
             error: function(e) {
@@ -174,16 +183,22 @@ var TimelineMaestro = React.createClass({
     handleFilter: function() {
         this.setState({filterStatus: $('#filter-input').val()});
     },
+
     render: function() {
         var timelineContent = (this.state.data[0].segments.length === 0) ?
             null:
             <TimelineContent data={this.state.data} filterStatus={this.state.filterStatus}/>;
+        var negMessages = this.state.data[0].insights.filter(function(i){return i.condition == "WARNING" || i.conditionClass == "ALERT";}).map(function(i){return i.message}).join("<br/><br/>");
+        var negInsights = (negMessages.length === 0) ? null:
+            <Alert bsStyle="warning"><span className="insights" dangerouslySetInnerHTML={{__html: negMessages}}/></Alert>;
+
+        var posMessages = this.state.data[0].insights.filter(function(i){return i.condition == "IDEAL"}).map(function(i){return i.message}).join("<br/>");
+        var posInsights = (posMessages.length === 0) ? null:
+            <Alert bsStyle="success"><span className="insights" dangerouslySetInnerHTML={{__html: posMessages}}/></Alert>;
+
         return(<code className="nonscript">
-            <ModalTrigger style="display: none;" modal={<UserTokenDialog parent={this} username={this.state.username} />}>
-              <Button id="modal-trigger" bsStyle="primary" bsSize="large">Launch UserTokenDialog</Button>
-            </ModalTrigger>
             <form onSubmit={this.handleSubmit} className="row">
-                <LongDatetimePicker size="3" placeHolder="date" id="date-input" pickTime={false} format="MM-DD-YYYY" defaultDate={yesterday} maxDate={yesterday} />
+                <LongDatetimePicker size="3" placeHolder="date" id="date-input" pickTime={false} format="MM-DD-YYYY" defaultDate={yesterday} />
                 <Col xs={3} md={3}>
                     <Input id="email-input" type="text" addonBefore={<Glyphicon glyph="user"/>} placeholder="user email" />
                 </Col>
@@ -198,14 +213,23 @@ var TimelineMaestro = React.createClass({
                         <option value="motion">Motion only</option>
                         <option value="sleep">Sleep only</option>
                         <option value="lights_out">Lights out only</option>
+                        <option value="light">Light only</option>
                         <option value="all">All data</option>
                     </Input>
                 </Col>
             </form>
-        {timelineContent}
+            <Row id="insights-info">
+                <Col xs={3} sm={3} md={3} lg={3} xl={3} xsOffset={2} mdOffset={2} smOffset={2} lgOffset={2} xlOffset={2}>{negInsights}</Col>
+                <Col id="score-bar" xs={2} sm={2} md={2} lg={2} xl={2}>
+                    <LongCircularBar score={this.state.data[0].score} />
+                </Col>
+                <Col xs={3} md={3} sm={3} lg={3} xl={3}>{posInsights}</Col>
+            </Row>
+            {timelineContent}
         </code>)
     }
 });
+
 
 React.renderComponent(<TimelineMaestro />, document.getElementById('timeline-canvas'));
 
@@ -272,3 +296,10 @@ function reformatDate(dateString) {
     return [year, month, date].join("-");
 }
 
+function extractAlert(insight) {
+    return insight.condition == "ALERT" || insight.conditionClass == "WARNING";
+}
+
+function extractIdeal(insight) {
+    return insight.condition === "IDEAL";
+}
