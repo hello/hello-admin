@@ -81,7 +81,7 @@ class FirmwareView(FirmwareRequestHandler):
         self.render_to_response(template_file='templates/firmware.html',
                                 context={'title': 'Firmware'})
 
-class ConfigurationView(ProtectedRequestHandler):
+class ConfigurationView(SuperEngineerRequestHandler):
     """
     Returns a panel for monitoring team device IDs and groups (teams) by feature.
     """
