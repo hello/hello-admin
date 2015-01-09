@@ -121,6 +121,15 @@ class BatteryView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/battery.html',
                                 context={'title': 'Battery'})
 
+class PairingView(ProtectedRequestHandler):
+    """
+    Returns a panel for monitoring potential timeline viewing
+    """
+    def get(self):
+        self.render_to_response(template_file='templates/pairing.html',
+                                context={'title': 'Pairing'})
+
+
 class ErrorView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/error.html',

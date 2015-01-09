@@ -159,7 +159,7 @@ var UserSearchCanvas = React.createClass({
         $.ajax({
           url: "/api/devices",
           dataType: 'json',
-          type: 'POST',
+          type: 'GET',
           data: {email: email},
           success: function(response) {
             if (response.error) {
