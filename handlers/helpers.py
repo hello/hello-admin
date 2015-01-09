@@ -135,6 +135,8 @@ class BaseRequestHandler(webapp2.RequestHandler):
                 if filter_fields != []:
                     response_data = extract_dicts_by_fields(response_data, filter_fields)
                 output.set_data(response_data)
+            if not response.ok:
+                response.raise_for_status()
 
         except Exception as e:
             output.set_error(display_error(e))
