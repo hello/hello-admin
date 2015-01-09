@@ -43,18 +43,6 @@ var UserSearchTable = React.createClass({
                 tableRows.push(row);
             }
         });
-        var numberOfZenTickets = this.props.zenTickets.length,
-            lastTicket = this.props.zenTickets[numberOfZenTickets-1],
-            lastTicketCreated = this.props.zenTickets.length > 0 ? lastTicket.created_at: null,
-            lastTicketSubject = this.props.zenTickets.length > 0 ? lastTicket.subject: null,
-            lastTicketLink = this.props.zenTickets.length > 0 ? <a target="_blank" href={"https://helloinc.zendesk.com/agent/tickets/" + lastTicket.id}>{"https://helloinc.zendesk.com/agent/tickets/" + lastTicket.id}</a>: null;
-
-
-
-        tableRows.push(<UserSearchTableRow rowAttr="# Zen tickets" rowVal={numberOfZenTickets} />);
-        tableRows.push(<UserSearchTableRow rowAttr="last ticket created" rowVal={lastTicketCreated} />);
-        tableRows.push(<UserSearchTableRow rowAttr="last ticket subject" rowVal={lastTicketSubject} />);
-        tableRows.push(<UserSearchTableRow rowAttr="last ticket url" rowVal={lastTicketLink} />);
 
         if (this.props.devices.length > 0) {
           this.props.devices.forEach(function(device){
@@ -72,6 +60,17 @@ var UserSearchTable = React.createClass({
             tableRows.push(<UserSearchTableRow rowAttr={deviceLabel} rowVal={deviceDetail} />);
           })
         }
+
+        var numberOfZenTickets = this.props.zenTickets.length,
+            lastTicket = this.props.zenTickets[numberOfZenTickets-1],
+            lastTicketCreated = this.props.zenTickets.length > 0 ? lastTicket.created_at: null,
+            lastTicketSubject = this.props.zenTickets.length > 0 ? lastTicket.subject: null,
+            lastTicketLink = this.props.zenTickets.length > 0 ? <a target="_blank" href={"https://helloinc.zendesk.com/agent/tickets/" + lastTicket.id}>{"https://helloinc.zendesk.com/agent/tickets/" + lastTicket.id}</a>: null;
+
+        tableRows.push(<UserSearchTableRow rowAttr="# Zen tickets" rowVal={numberOfZenTickets} />);
+        tableRows.push(<UserSearchTableRow rowAttr="last ticket created" rowVal={lastTicketCreated} />);
+        tableRows.push(<UserSearchTableRow rowAttr="last ticket subject" rowVal={lastTicketSubject} />);
+        tableRows.push(<UserSearchTableRow rowAttr="last ticket url" rowVal={lastTicketLink} />);
 
         var tableClasses = "table table-condensed table-responsive " + this.props.stage;
         var tableHeaders = <tr>
@@ -134,29 +133,6 @@ var UserSearchCanvas = React.createClass({
         });
 
         $.ajax({
-          url: "/api/zendesk",
-          dataType: 'json',
-          type: 'GET',
-          data: {email: email},
-          success: function(response) {
-            if (response.error) {
-                this.setState({
-                    zenTickets: []
-                });
-            }
-            else {
-                this.setState({zenTickets: response.data});
-            }
-          }.bind(this),
-          error: function(xhr, status, err) {
-            this.setState({
-                zenTickets: []
-            });
-            console.error(this.props.url, status, err);
-          }.bind(this)
-        });
-
-        $.ajax({
           url: "/api/devices",
           dataType: 'json',
           type: 'GET',
@@ -174,6 +150,29 @@ var UserSearchCanvas = React.createClass({
           error: function(xhr, status, err) {
             this.setState({
                 devices: []
+            });
+            console.error(this.props.url, status, err);
+          }.bind(this)
+        });
+
+        $.ajax({
+          url: "/api/zendesk",
+          dataType: 'json',
+          type: 'GET',
+          data: {email: email},
+          success: function(response) {
+            if (response.error) {
+                this.setState({
+                    zenTickets: []
+                });
+            }
+            else {
+                this.setState({zenTickets: response.data});
+            }
+          }.bind(this),
+          error: function(xhr, status, err) {
+            this.setState({
+                zenTickets: []
             });
             console.error(this.props.url, status, err);
           }.bind(this)
