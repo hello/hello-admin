@@ -1,0 +1,15 @@
+{% extends "templates/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block extrastatic %}
+
+    <script type="text/jsx" src="/static/js/pairing.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/pairing.css" />
+
+{% endblock %}
+
+{% block content %}
+   <div class="row" id="container">
+        <div class="col-xs-12" id="pairing"></div>
+    </div>
+{% endblock %}
+

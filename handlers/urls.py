@@ -42,6 +42,7 @@ from handlers.views import UserView
 from handlers.views import ZendeskView
 from handlers.views import TroubleshootView
 from handlers.views import TimelineView
+from handlers.views import PairingView
 
 
 cron_routes = [
@@ -94,7 +95,8 @@ page_routes = [
     ('/users/?$', UserView),
     ('/zendesk/?$', ZendeskView),
     ('/troubleshoot/?$', TroubleshootView),
-    ('/timeline/?$', TimelineView)
+    ('/timeline/?$', TimelineView),
+    ('/pairing/?$', PairingView),
 ]
 
 hello_admin_app = webapp2.WSGIApplication(
