@@ -107,6 +107,29 @@ var UserSearchCanvas = React.createClass({
           return;
         }
         history.pushState({}, '', '/users/?email=' + email);
+         $.ajax({
+          url: "/api/devices",
+          dataType: 'json',
+          type: 'GET',
+          data: {email: email},
+          success: function(response) {
+            if (response.error) {
+                this.setState({
+                    devices: []
+                });
+            }
+            else {
+                this.setState({devices: response.data});
+            }
+          }.bind(this),
+          error: function(xhr, status, err) {
+            this.setState({
+                devices: []
+            });
+            console.error(this.props.url, status, err);
+          }.bind(this)
+        });
+
         $.ajax({
           url: "/api/user",
           dataType: 'json',
@@ -127,29 +150,6 @@ var UserSearchCanvas = React.createClass({
             this.setState({
                 users: {},
                 searchAlert: "☹ Query failed"
-            });
-            console.error(this.props.url, status, err);
-          }.bind(this)
-        });
-
-        $.ajax({
-          url: "/api/devices",
-          dataType: 'json',
-          type: 'GET',
-          data: {email: email},
-          success: function(response) {
-            if (response.error) {
-                this.setState({
-                    devices: []
-                });
-            }
-            else {
-                this.setState({devices: response.data});
-            }
-          }.bind(this),
-          error: function(xhr, status, err) {
-            this.setState({
-                devices: []
             });
             console.error(this.props.url, status, err);
           }.bind(this)
