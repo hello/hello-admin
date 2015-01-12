@@ -1,13 +1,5 @@
 /** @jsx React.DOM */
 
-var today = new Date();
-var last14days = new Date();
-last14days.setDate(last14days.getDate() - 14);
-
-var datepickerFormat = d3.time.format("%m/%d/%Y %I:%M:%S %p");
-var todayInDatepickerFormat = datepickerFormat(today);
-var last14daysInDatepickerFormat = datepickerFormat(last14days);
-
 var LogTable = React.createClass({
    render: function(){
        var logTableRows = [], that = this;
@@ -132,8 +124,10 @@ var DebugLog = React.createClass({
     handleSubmit: function(){
         var textInput = $('#text-input').val(),
             devicesInput = $('#devices-input').val(),
-            startInput = getUTCEpochFromLocalTime($('#start-time').val()),
-            endInput = getUTCEpochFromLocalTime($('#end-time').val());
+            startInputHuman = $('#start-time').val() || getCustomDate(-14),
+            endInputHuman = $('#end-time').val() || getCustomDate(0),
+            startInput = getUTCEpochFromLocalTime(startInputHuman),
+            endInput = getUTCEpochFromLocalTime(endInputHuman);
         $.ajax({
           url: "/api/debug_log",
           dataType: 'json',
@@ -146,7 +140,7 @@ var DebugLog = React.createClass({
               end_time: endInput
           },
           success: function(response) {
-            history.pushState({}, '', '/debug_log/?text=' + textInput + '&devices=' + devicesInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + $('#start-time').val() + '&end=' + $('#end-time').val());
+            history.pushState({}, '', '/debug_log/?text=' + textInput + '&devices=' + devicesInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + startInputHuman + '&end=' + endInputHuman);
             if (response.error) {
                 this.setState({
                     logs: [],
@@ -186,13 +180,13 @@ var DebugLog = React.createClass({
         return (<div>
             <form onSubmit={this.handleSubmit}>
               <Row>
-                <LongDatetimePicker placeHolder="start time" id="start-time" size="2" defaultDate={last14daysInDatepickerFormat} maxDate={todayInDatepickerFormat}  />
-                <LongDatetimePicker placeHolder="end time" id="end-time" size="2" defaultDate={todayInDatepickerFormat} maxDate={todayInDatepickerFormat} />
+                <LongDatetimePicker placeHolder="start (14 days ago)" id="start-time" size="2" />
+                <LongDatetimePicker placeHolder="end (now)" id="end-time" size="2" />
                 <Col xs={3} sm={3} md={3} lg={3}>
                   <input className="form-control" id="text-input" placeholder='Text e.g UART' />
                 </Col>
                 <Col xs={4} sm={4} md={4} lg={4}>
-                  <LongTagsInput id="devices-input" tagClass="label label-info" placeHolder="Enter Devices/Emails (multiple)" />
+                  <LongTagsInput id="devices-input" tagClass="label label-info" placeHolder="Devices/Emails (multiple)" />
                 </Col>
                 <Col xs={1} sm={1} md={1} lg={1}>
                   <Button bsStyle="success" type="submit"><Glyphicon glyph="search"/></Button>

@@ -75,3 +75,10 @@ function getLocalDateFromUTCEpoch(utcSeconds, needOffset, offsetMilliseconds) {
   }
   return d.toLocaleString() || "";
 }
+
+function getCustomDate(dayOffset) {
+    var lastNdays = new Date();
+    lastNdays.setDate(lastNdays.getDate() + dayOffset);
+    var datepickerFormat = d3.time.format("%m/%d/%Y %I:%M:%S %p");
+    return datepickerFormat(lastNdays);
+}
