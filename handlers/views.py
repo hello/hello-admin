@@ -123,7 +123,7 @@ class BatteryView(ProtectedRequestHandler):
 
 class PairingView(ProtectedRequestHandler):
     """
-    Returns a panel for monitoring potential timeline viewing
+    Returns a panel for register/unregister senses/pills
     """
     def get(self):
         self.render_to_response(template_file='templates/pairing.html',

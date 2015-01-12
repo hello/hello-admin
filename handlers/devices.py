@@ -21,9 +21,9 @@ class DeviceAPI(ProtectedRequestHandler):
         log.debug("attempting to unregister {} {}".format(device_type, device_id))
 
         self.hello_request(
-            api_url="devices/pill",
+            api_url="devices/{}".format(device_type),
             type="POST",
-            body_data=json.dumps({'pill_id': device_id}),
+            body_data=json.dumps({'{}_id'.format(device_type): device_id}),
             impersonatee_token=impersonatee_token
         )
 
