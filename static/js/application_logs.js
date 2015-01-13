@@ -1,13 +1,5 @@
 /** @jsx React.DOM */
 
-var today = new Date();
-var last14days = new Date();
-last14days.setDate(last14days.getDate() - 14);
-
-var datepickerFormat = d3.time.format("%m/%d/%Y %I:%M:%S %p");
-var todayInDatepickerFormat = datepickerFormat(today);
-var last14daysInDatepickerFormat = datepickerFormat(last14days);
-
 var LogTable = React.createClass({
    render: function(){
        var logTableRows = [], that = this;
@@ -146,8 +138,10 @@ var DebugLog = React.createClass({
             levelsInput = $('#levels-input').val(),
             originsInput = $('#origins-input').val(),
             versionsInput = $('#versions-input').val(),
-            startInput = getUTCEpochFromLocalTime($('#start-time').val()),
-            endInput = getUTCEpochFromLocalTime($('#end-time').val());
+            startInputHuman = $('#start-time').val() || getCustomDate(-14),
+            endInputHuman = $('#end-time').val() || getCustomDate(0),
+            startInput = getUTCEpochFromLocalTime(startInputHuman),
+            endInput = getUTCEpochFromLocalTime(endInputHuman);
         $.ajax({
           url: "/api/application_logs",
           dataType: 'json',
@@ -162,7 +156,7 @@ var DebugLog = React.createClass({
               end_time: endInput
           },
           success: function(response) {
-            history.pushState({}, '', '/application_logs/?text=' + textInput + '&levels=' + levelsInput + '&origins=' + originsInput + '&versions=' + versionsInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + $('#start-time').val() + '&end=' + $('#end-time').val());
+            history.pushState({}, '', '/application_logs/?text=' + textInput + '&levels=' + levelsInput + '&origins=' + originsInput + '&versions=' + versionsInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + startInputHuman + '&end=' + endInputHuman);
             if (response.error) {
                 this.setState({
                     logs: [],
@@ -202,8 +196,8 @@ var DebugLog = React.createClass({
         return (<div>
             <form onSubmit={this.handleSubmit}>
               <Row>
-                <LongDatetimePicker placeHolder="start time" id="start-time" size="3" defaultDate={last14daysInDatepickerFormat} maxDate={todayInDatepickerFormat}  />
-                <LongDatetimePicker placeHolder="end time" id="end-time" size="3" defaultDate={todayInDatepickerFormat} maxDate={todayInDatepickerFormat} />
+                <LongDatetimePicker placeHolder="start (default = 14 days ago)" id="start-time" size="3" />
+                <LongDatetimePicker placeHolder="end: (default = now)" id="end-time" size="3" />
                 <Col xs={3} sm={3} md={3} lg={3}>
                   <input className="form-control" id="text-input" placeholder='Text e.g: DiffInSeconds' />
                 </Col>
