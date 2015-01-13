@@ -129,6 +129,13 @@ class PairingView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/pairing.html',
                                 context={'title': 'Pairing'})
 
+class NotificationView(ProtectedRequestHandler):
+    """
+    Returns a panel for monitoring potential timeline viewing
+    """
+    def get(self):
+        self.render_to_response(template_file='templates/notification.html',
+                                context={'title': 'Notification'})
 
 class ErrorView(ProtectedRequestHandler):
     def get(self):
