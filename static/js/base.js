@@ -82,3 +82,13 @@ function getCustomDate(dayOffset) {
     var datepickerFormat = d3.time.format("%m/%d/%Y %I:%M:%S %p");
     return datepickerFormat(lastNdays);
 }
+
+function isValidRequest(r) {
+    return Object.keys(r).every(function(k){return r[k] && !r[k].isWhiteString()})
+}
+
+if (!Array.prototype.last){
+    Array.prototype.last = function(){
+        return this[this.length - 1];
+    };
+};

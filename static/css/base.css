@@ -22,7 +22,7 @@ body {font-size: 100%; color: rgb(32, 32, 32);;}
 #menu>a.menu-active, #sub-menu>a.menu-active {color: #B0FC23; text-decoration: none; -webkit-stroke-width: 7px;-webkit-stroke-color: #B0FC23; -webkit-fill-color: #B0FC23; text-shadow: 1px 0 20px #B0FC23;}
 #menu>a>span.glyphicon {margin: 0 7px;}
 
-#content {margin: 70px 15px 0 15px; font-family: Menlo,Monaco,Consolas,"Courier New",monospace; font-size: 85%;}
+#content {margin: 70px 15px 50px 15px; font-family: Menlo,Monaco,Consolas,"Courier New",monospace; font-size: 85%;}
 
 #footer {background: #F2F7FB url(image/menu-pattern.png); padding: 6px; color: gray; text-align: center; opacity: 0.5; width: 100%; position: fixed; bottom: 0;}
 
