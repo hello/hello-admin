@@ -27,7 +27,8 @@ var LongDatetimePicker = React.createClass({
             },
             useStrict: false,               //use "strict" when validating dates
             sideBySide: true,              //show the date and time picker side by side
-            daysOfWeekDisabled:[]
+            daysOfWeekDisabled:[],
+            glyphicon: "calendar"
         }
     },
     componentDidMount: function() {
@@ -53,7 +54,7 @@ var LongDatetimePicker = React.createClass({
           <div className={"col-xs-" + s + " col-sm-" + s + " col-md-" + s + " col-lg-" + s}>
               <p className="icon-addon addon-md">
                 {input}
-                <label className="glyphicon glyphicon-calendar"></label>
+                <label className={"glyphicon glyphicon-" + this.props.glyphicon}></label>
               </p>
           </div>
         )
