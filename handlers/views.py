@@ -137,6 +137,14 @@ class NotificationView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/notification.html',
                                 context={'title': 'Notification'})
 
+class MotionView(ProtectedRequestHandler):
+    """
+    Returns a panel for monitoring potential timeline viewing
+    """
+    def get(self):
+        self.render_to_response(template_file='templates/motion.html',
+                                context={'title': 'Motion'})
+
 class ErrorView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/error.html',
