@@ -69,3 +69,14 @@ class DeviceInactiveAPI(ProtectedRequestHandler):
             }
         )
 
+class DeviceKeyStoreHint(ProtectedRequestHandler):
+    """
+    Retrieve hints for key store of a device
+    """
+    def get(self):
+        device_id = self.request.get('device_id', default_value="")
+        self.hello_request(
+            api_url="devices/key_store_hints/{}".format(device_id),
+            type="GET"
+        )
+
