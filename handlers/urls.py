@@ -42,7 +42,9 @@ from handlers.views import UserView
 from handlers.views import ZendeskView
 from handlers.views import TroubleshootView
 from handlers.views import TimelineView
+from handlers.views import NotificationView
 from handlers.views import PairingView
+from handlers.notification import NotificationAPI
 
 
 cron_routes = [
@@ -72,6 +74,7 @@ api_routes = [
     ('/api/zendesk_stats/?$', ZendeskStatsAPI),
     ('/api/zendesk_stats_2/?$', ZendeskDailyStatsAPI),
     ('/api/timeline/?$', TimelineAPI),
+    ('/api/notification/?$', NotificationAPI),
 ]
 
 page_routes = [
@@ -97,6 +100,7 @@ page_routes = [
     ('/troubleshoot/?$', TroubleshootView),
     ('/timeline/?$', TimelineView),
     ('/pairing/?$', PairingView),
+    ('/notification/?$', NotificationView),
 ]
 
 hello_admin_app = webapp2.WSGIApplication(
