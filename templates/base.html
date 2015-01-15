@@ -39,7 +39,7 @@
             &nbsp;<a {% if title == "Users" %} class="menu-active"{% endif%} href='/'><span class="glyphicon glyphicon-user"></span><span>Users</span></a>|
             <a {% if title == "Troubleshoot" %} class="menu-active"{% endif%} href='/troubleshoot'><span class="glyphicon glyphicon-dashboard"></span><span>Troubleshoot</span></a>|
             <a {% if title == "Zendesk" %} class="menu-active"{% endif%} href='/zendesk'><span class="glyphicon glyphicon-headphones"></span><span>Zendesk</span></a>|
-            <a {% if title == "Sense" or title == "Timeline" or title == "Battery" %} class="menu-active"{% endif%} href='/timeline'><span class="glyphicon glyphicon-stats"></span><span>Data</span></a>|
+            <a {% if title == "Sense" or title == "Timeline" or title == "Battery" or title == "Motion"%} class="menu-active"{% endif%} href='/timeline'><span class="glyphicon glyphicon-stats"></span><span>Data</span></a>|
             <a {% if title == "Log" or title == "Application Logs" %} class="menu-active"{% endif%} href='/debug_log'><span class="glyphicon glyphicon-list-alt"></span><span>Logs</span></a>|
             <a {% if title == "Teams" or title == "Configuration" or title == "Firmware" or title == "Pairing" or title == "Notification" %} class="menu-active"{% endif%} href='/teams'><span class="glyphicon glyphicon-fire"></span><span>Operation</span></a>|
             <a {% if title == "Settings" %} class="menu-active"{% endif%} href='/settings'><span class="glyphicon glyphicon-wrench"></span><span>Settings</span></a>
@@ -47,9 +47,10 @@
             <br>
 
             <div id="sub-menu">
-            <a {% if title == "Timeline"%} class="menu-active"{% endif%} {% if title == "Sense" or title == "Battery"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/timeline'>&#10149; Timeline</a>
-            <a {% if title == "Sense"%} class="menu-active"{% endif%} {% if title == "Timeline" or title == "Battery"%} class="menu-inactive"{% endif%} class="menu-transparent"  href='/sense'>&#10149; Sense</a>
-            <a {% if title == "Battery"%} class="menu-active"{% endif%} {% if title == "Timeline" or title == "Sense"%} class="menu-inactive"{% endif%} class="menu-transparent"  href='/battery'>&#10149; Battery</a>
+            <a {% if title == "Timeline"%} class="menu-active"{% endif%} {% if title == "Sense" or title == "Battery" or title == "Motion"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/timeline'>&#10149; Timeline</a>
+            <a {% if title == "Sense"%} class="menu-active"{% endif%} {% if title == "Timeline" or title == "Battery" or title == "Motion"%} class="menu-inactive"{% endif%} class="menu-transparent"  href='/sense'>&#10149; Sense</a>
+            <a {% if title == "Battery"%} class="menu-active"{% endif%} {% if title == "Timeline" or title == "Sense" or title == "Motion"%} class="menu-inactive"{% endif%} class="menu-transparent"  href='/battery'>&#10149; Battery</a>
+            <a {% if title == "Motion"%} class="menu-active"{% endif%} {% if title == "Timeline" or title == "Sense" or title == "Battery"%} class="menu-inactive"{% endif%} class="menu-transparent"  href='/motion'>&#10149; Motion</a>
             <a {% if title == "Log" %} class="menu-active"{% endif%} {% if title == "Application Logs"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/debug_log'>&#10149; Sense Logs</a>
             <a {% if title == "Application Logs" %} class="menu-active"{% endif%} {% if title == "Log"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/application_logs'>&#10149; Application Logs</a>
             <a {% if title == "Teams" %} class="menu-active"{% endif%} {% if title == "Configuration" or title == "Firmware" or title == "Pairing" or title == "Notification" %} class="menu-inactive"{% endif%} class="menu-transparent" href='/teams'>&#10149; Teams</a>
