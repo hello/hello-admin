@@ -27,7 +27,7 @@ var UserSearchTable = React.createClass({
             if (attribute === 'dob' || attribute === 'last_modified') {
                 value = new Date(value).toLocaleString();
             }
-            var row = <UserSearchTableRow rowAttr={attribute} rowVal={value} />;
+            var row = (value) ? <UserSearchTableRow rowAttr={attribute} rowVal={value}/> : null;
 
             // Table rows start with email, name, id
             if (attribute === 'id') {
@@ -50,7 +50,8 @@ var UserSearchTable = React.createClass({
                 <span>{device.type}</span>, <br/>,
                 <a href={"/debug_log/?devices=" + device.device_id} target="_blank" title="Go to debug log">
                   <Label bsStyle= {device.state === "NORMAL" ? "success": "danger"}>{device.device_id}</Label>
-                </a>
+                </a>, <br/>,
+                <a href={"/key_store/?device=" + device.device_id}>view KeyStore</a>
             ];
             var deviceDetail = [
                 <span>last seen: {new Date(device.last_updated).toLocaleString()}</span>, <br/>,
@@ -61,16 +62,18 @@ var UserSearchTable = React.createClass({
           })
         }
 
-        var numberOfZenTickets = this.props.zenTickets.length,
-            lastTicket = this.props.zenTickets[numberOfZenTickets-1],
-            lastTicketCreated = this.props.zenTickets.length > 0 ? lastTicket.created_at: null,
-            lastTicketSubject = this.props.zenTickets.length > 0 ? lastTicket.subject: null,
-            lastTicketLink = this.props.zenTickets.length > 0 ? <a target="_blank" href={"https://helloinc.zendesk.com/agent/tickets/" + lastTicket.id}>{"https://helloinc.zendesk.com/agent/tickets/" + lastTicket.id}</a>: null;
-
-        tableRows.push(<UserSearchTableRow rowAttr="# Zen tickets" rowVal={numberOfZenTickets} />);
-        tableRows.push(<UserSearchTableRow rowAttr="last ticket created" rowVal={lastTicketCreated} />);
-        tableRows.push(<UserSearchTableRow rowAttr="last ticket subject" rowVal={lastTicketSubject} />);
-        tableRows.push(<UserSearchTableRow rowAttr="last ticket url" rowVal={lastTicketLink} />);
+        if(this.props.zenTickets.length > 0 ) {
+            var numberOfZenTickets = this.props.zenTickets.length;
+            var lastTicket = this.props.zenTickets.last();
+            var lastTicketCreated = lastTicket.created_at;
+            var lastTicketSubject = lastTicket.subject;
+            var lastTicketURL = "https://helloinc.zendesk.com/agent/tickets/" + lastTicket.id;
+            var lastTicketLink = <a target="_blank" href={lastTicketURL}>{lastTicketURL}</a>
+            tableRows.push(<UserSearchTableRow rowAttr="# Zen tickets" rowVal={numberOfZenTickets} />);
+            tableRows.push(<UserSearchTableRow rowAttr="last ticket created" rowVal={lastTicketCreated} />);
+            tableRows.push(<UserSearchTableRow rowAttr="last ticket subject" rowVal={lastTicketSubject} />);
+            tableRows.push(<UserSearchTableRow rowAttr="last ticket url" rowVal={lastTicketLink} />);
+        }
 
         var tableClasses = "table table-condensed table-responsive " + this.props.stage;
         var tableHeaders = <tr>

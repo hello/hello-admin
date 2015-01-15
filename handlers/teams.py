@@ -1,9 +1,9 @@
 import json
 import logging as log
-from handlers.helpers import FirmwareRequestHandler
+from handlers.helpers import ProtectedRequestHandler
 
 
-class TeamsAPI(FirmwareRequestHandler):
+class TeamsAPI(ProtectedRequestHandler):
     def get(self):
         mode = self.request.get('mode', default_value="")
         self.hello_request(
