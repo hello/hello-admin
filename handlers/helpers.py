@@ -117,6 +117,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         """
 
         output = ResponseOutput()
+        output.set_viewer(self.current_user.email())
         session = self.authorize_session(token=impersonatee_token)
         request_detail = {
             "headers": {'Content-Type': 'application/json'},
@@ -278,6 +279,7 @@ class ResponseOutput():
         self.data = []
         self.error = ""
         self.status = 401
+        self.viewer = ""
 
     def set_data(self, data):
         if not isinstance(data, list) and not isinstance(data, dict):
@@ -294,9 +296,15 @@ class ResponseOutput():
             raise TypeError("Response status must be an int or a longs")
         self.status = status
 
+    def set_viewer(self, viewer):
+        if not isinstance(viewer, str):
+            raise TypeError("Viewer must be a string")
+        self.viewer = viewer
+
     def get_serialized_output(self):
         return json.dumps({
             'data': self.data,
             'error': self.error,
-            'status': self.status
+            'status': self.status,
+            'viewer': self.viewer
         })
