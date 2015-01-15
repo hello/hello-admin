@@ -23,10 +23,10 @@ var NotificationMaestro = React.createClass({
                 data: JSON.stringify(requestData),
                 success: function (response) {
                     console.log(response);
-                    that.setState({alert: "Message sent! Check your phone in a bit :)"});
+                    that.setState({alert: "Message sent to " + requestData.receiver + "! Check it out in a bit. Make sure push notification is enabled on receiver's phone)"});
                 }.bind(that),
                 error: function (e) {
-                    that.setState({unlinkToken: ""});
+                    that.setState({alert: e.toString});
                 }.bind(that)
             });
         }
