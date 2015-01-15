@@ -47,6 +47,7 @@ from handlers.views import NotificationView
 from handlers.views import PairingView
 from handlers.views import KeyStoreView
 from handlers.views import MotionView
+from handlers.setup import ViewPermissionAPI
 from handlers.notification import NotificationAPI
 from handlers.motion import MotionAPI
 
@@ -78,6 +79,7 @@ api_routes = [
     ('/api/zendesk_stats/?$', ZendeskStatsAPI),
     ('/api/zendesk_stats_2/?$', ZendeskDailyStatsAPI),
     ('/api/timeline/?$', TimelineAPI),
+    ('/api/viewer_permission/?$', ViewPermissionAPI),
     ('/api/notification/?$', NotificationAPI),
     ('/api/motion/?$', MotionAPI),
 ]
