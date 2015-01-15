@@ -138,8 +138,7 @@ class TokenAPI(ProtectedRequestHandler):
         output = {'data': [], 'error': ''}
 
         username = self.request.get("username", default_value="")
-        app = self.request.get("app", default_value="")
-
+        app = self.request.get("app", default_value="admin-data-viewer")
         tokens = AccessToken.query_tokens(username, app)
         output['data'] = [{'username': t.username, 'token': t.token, 'app': t.app} for t in tokens]
         self.response.write(json.dumps(output))
@@ -152,12 +151,14 @@ class TokenAPI(ProtectedRequestHandler):
         post_data = json.loads(self.request.body)
         username = post_data.get("username", "")
         app = post_data.get("app", "")
-        
+
+
+
         tokens = AccessToken.query_tokens(username, app)
         if tokens != []:
             output['data'] = {'token': tokens[0].token}
         else:
-            password = self.request.get("password", default_value="")
+            password = post_data.get("password", "")
             output['data'] = self.make_tokens(username, app, password)
         self.response.write(json.dumps(output))
 
@@ -170,6 +171,9 @@ class TokenAPI(ProtectedRequestHandler):
         username = put_data.get("username", "")
         app = put_data.get("app", "")
         password = put_data.get("password", "")
+
+        print username, app, password
+
         output['data'] = self.make_tokens(username, app, password)
         self.response.write(json.dumps(output))
 
@@ -421,7 +425,7 @@ class CreateGroupsAPI(SuperEngineerRequestHandler):
         """
         Populate groups entity
         """
-        output= {'data': [], 'error': ''}
+        output = {'data': [], 'error': ''}
         if settings.DEBUG:
             groups_data = {
                 'super_engineer': 'long@sayhello.com, tim@sayhello.com, benjo@sayhello.com, pang@sayhello.com',
