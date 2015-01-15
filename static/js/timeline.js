@@ -16,7 +16,7 @@ var TimelineContent = React.createClass({
             segments.forEach(function(segment) {
                 var date = <h2 className="event-date"><LongLabel bsStyle={labelColor(segment.event_type)} content={segment.id}/> {getLocalDateFromUTCEpoch(segment.timestamp/1000, false)}</h2>;
 
-                var message = <span className="cd-date">Message: <span className="event-message">{segment.message || "No event!"}</span></span>;
+                var message = <span className="cd-date">Message: <span className="event-message">{segment.message || "No message!"}</span></span>;
 
                 var duration = <p>Duration: <span>{segment.duration}</span></p>;
 
