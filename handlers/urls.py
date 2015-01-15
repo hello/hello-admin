@@ -9,6 +9,7 @@ from handlers.zendesk import ZendeskDailyStatsAPI
 from handlers.firmware import FirmwareAPI
 from handlers.devices import DeviceAPI
 from handlers.devices import DeviceInactiveAPI
+from handlers.devices import DeviceKeyStoreHint
 from handlers.metrics import BatteryAPI
 from handlers.devices import DeviceOwnersAPI
 from handlers.metrics import DebugLogAPI
@@ -44,6 +45,7 @@ from handlers.views import TroubleshootView
 from handlers.views import TimelineView
 from handlers.views import NotificationView
 from handlers.views import PairingView
+from handlers.views import KeyStoreView
 from handlers.views import MotionView
 from handlers.notification import NotificationAPI
 from handlers.motion import MotionAPI
@@ -63,6 +65,7 @@ api_routes = [
     ('/api/devices/?$', DeviceAPI),
     ('/api/devices/inactive/?$', DeviceInactiveAPI),
     ('/api/devices/owners/?$', DeviceOwnersAPI),
+    ('/api/devices/key_store/?$', DeviceKeyStoreHint),
     ('/api/features/?$', FeaturesAPI),
     ('/api/firmware/?$', FirmwareAPI),
     ('/api/presleep/?$', PreSleepAPI),
@@ -103,6 +106,7 @@ page_routes = [
     ('/timeline/?$', TimelineView),
     ('/pairing/?$', PairingView),
     ('/notification/?$', NotificationView),
+    ('/key_store/?$', KeyStoreView),
     ('/motion/?$', MotionView),
 ]
 
