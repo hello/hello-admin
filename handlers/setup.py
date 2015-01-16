@@ -6,7 +6,7 @@ import settings
 from models.setup import AppInfo, AdminUser, AccessToken, UserGroup
 from handlers.utils import display_error
 from handlers.helpers import make_oauth2_service, ProtectedRequestHandler, SuperEngineerRequestHandler
-from models.ext import ZendeskCredentials, SearchifyCredentials
+from models.ext import ZendeskCredentials, SearchifyCredentials, KeyStoreLocker
 
 
 class AppAPI(ProtectedRequestHandler):
@@ -420,6 +420,21 @@ class UpdateAdminAccessTokenAPI(SuperEngineerRequestHandler):
         self.redirect('/')
 
 
+class CreateKeyStoreLockerAPI(SuperEngineerRequestHandler):
+    def get(self):
+        """
+        Populate groups entity
+        """
+        output = {'data': [], 'error': ''}
+        if settings.DEBUG:
+            for key_id in ['pvt', 'dvt', 'mp']:
+                key_store_entity = KeyStoreLocker(id=key_id, private_key="Fill in private key")
+                key_store_entity.put()
+        else:
+            output['error'] = 'Not permitted to run on prod'
+
+        self.response.write(json.dumps(output))
+
 class CreateGroupsAPI(SuperEngineerRequestHandler):
     def get(self):
         """
@@ -441,7 +456,6 @@ class CreateGroupsAPI(SuperEngineerRequestHandler):
         else:
             output['error'] = 'Not permitted'
         self.response.write(json.dumps(output))
-
 
 class ViewPermissionAPI(ProtectedRequestHandler):
     def get(self):

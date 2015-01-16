@@ -1,5 +1,5 @@
 application: 'hello-admin'
-version: 15a
+version: 16
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -25,4 +25,6 @@ libraries:
 - name: webapp2
   version: "2.5.2"
 - name: jinja2
+  version: latest
+- name: pycrypto
   version: latest

@@ -18,6 +18,13 @@ class SearchifyCredentials(ndb.Model):
     def query_tokens(cls):
         return cls.query().fetch(1)
 
+class KeyStoreLocker(ndb.Model):
+    private_key = ndb.TextProperty(required=True)
+
+    @classmethod
+    def get_secret(cls):
+        return cls.query().order().fetch(1)
+
 class ZendeskDailyStats(ndb.Model):
     new_tickets = ndb.IntegerProperty(required=True, indexed=False)
     solved_tickets = ndb.IntegerProperty(required=True, indexed=False)

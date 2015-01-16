@@ -23,6 +23,7 @@ from handlers.setup import AppScopeAPI
 from handlers.setup import CreateAccountAPI
 from handlers.setup import CreateApplicationAgainstProdAPI
 from handlers.setup import CreateGroupsAPI
+from handlers.setup import CreateKeyStoreLockerAPI
 from handlers.setup import ProxyAPI
 from handlers.setup import TokenAPI
 from handlers.setup import RegisterPillAPI, SetupAPI
@@ -30,6 +31,7 @@ from handlers.setup import UpdateAdminAccessTokenAPI
 from handlers.teams import TeamsAPI
 from handlers.users import UserAPI
 from handlers.views import BatteryView
+from handlers.keys import KeysAPI
 from handlers.views import ChartHandler
 from handlers.views import ConfigurationView
 from handlers.views import DebugLogView
@@ -50,6 +52,7 @@ from handlers.views import MotionView
 from handlers.setup import ViewPermissionAPI
 from handlers.notification import NotificationAPI
 from handlers.motion import MotionAPI
+from handlers.views import KeysView
 
 cron_routes = [
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
@@ -61,6 +64,7 @@ api_routes = [
     ('/api/app_scope/?$', AppScopeAPI),
     ('/api/battery/?$', BatteryAPI),
     ('/api/create_groups/?$', CreateGroupsAPI),
+    ('/api/create_key_store_locker/?$', CreateKeyStoreLockerAPI),
     ('/api/debug_log/?$', DebugLogAPI),
     ('/api/application_logs/?$', ApplicationLogsAPI),
     ('/api/devices/?$', DeviceAPI),
@@ -82,6 +86,7 @@ api_routes = [
     ('/api/viewer_permission/?$', ViewPermissionAPI),
     ('/api/notification/?$', NotificationAPI),
     ('/api/motion/?$', MotionAPI),
+    ('/api/keys/?$', KeysAPI),
 ]
 
 page_routes = [
@@ -110,6 +115,7 @@ page_routes = [
     ('/notification/?$', NotificationView),
     ('/key_store/?$', KeyStoreView),
     ('/motion/?$', MotionView),
+    ('/keys/?$', KeysView),
 ]
 
 hello_admin_app = webapp2.WSGIApplication(

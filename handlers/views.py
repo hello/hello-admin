@@ -157,3 +157,8 @@ class ErrorView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/error.html',
                                 context={'title': 'Denied'})
+
+class KeysView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/keys.html',
+                                context={'title': 'Keys'})

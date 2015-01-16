@@ -1,0 +1,27 @@
+{% extends "templates/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block extrastatic %}
+
+    <script type="text/jsx" src="/static/js/keys.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/keys.css" />
+
+{% endblock %}
+
+{% block content %}
+{#    <h3>Keys</h3>#}
+{#    <hr class="fancy-line"/>#}
+{#    <form action="/api/keys/" method="POST">#}
+{#        <textarea name="blob" cols=50 rows=20>#}
+{#        </textarea>#}
+{##}
+{#        <p><input type="submit" value="provision" /></p>#}
+{#    </form>#}
+{#    </form>#}
+
+    <div class="row" id="container">
+        <h3 id="page-name">{{ title }}</h3>
+        <hr class="fancy-line"/>
+        <div class="col-xs-12" id="keys"></div>
+    </div>
+
+{% endblock %}
