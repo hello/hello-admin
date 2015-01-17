@@ -37,7 +37,7 @@
     <div id="header" class="row">
         <div id="menu" class="col-xs-11 col-sm-11 col-md-11 col-lg-11 col-xl-11">
             &nbsp;<a {% if title == "Users" %} class="menu-active"{% endif%} href='/'><span class="glyphicon glyphicon-user"></span><span>Users</span></a>|
-            <a {% if title == "Troubleshoot" %} class="menu-active"{% endif%} href='/troubleshoot'><span class="glyphicon glyphicon-dashboard"></span><span>Troubleshoot</span></a>|
+            <a {% if title == "Troubleshoot" or title == "Key Store" or title == "Keys" %} class="menu-active"{% endif%} href='/troubleshoot'><span class="glyphicon glyphicon-dashboard"></span><span>Troubleshoot</span></a>|
             <a {% if title == "Zendesk" %} class="menu-active"{% endif%} href='/zendesk'><span class="glyphicon glyphicon-headphones"></span><span>Zendesk</span></a>|
             <a {% if title == "Sense" or title == "Timeline" or title == "Battery" or title == "Motion"%} class="menu-active"{% endif%} href='/timeline'><span class="glyphicon glyphicon-stats"></span><span>Data</span></a>|
             <a {% if title == "Log" or title == "Application Logs" %} class="menu-active"{% endif%} href='/debug_log'><span class="glyphicon glyphicon-list-alt"></span><span>Logs</span></a>|
@@ -47,6 +47,9 @@
             <br>
 
             <div id="sub-menu">
+            <a {% if title == "Troubleshoot"%} class="menu-active"{% endif%} {% if title == "Keys" or title == "Key Store"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/troubleshoot'>&#10149; Inactive Devices</a>
+            <a {% if title == "Key Store"%} class="menu-active"{% endif%} {% if title == "Troubleshoot" or title == "Keys"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/key_store'>&#10149; View Key Hints</a>
+            <a {% if title == "Keys"%} class="menu-active"{% endif%} {% if title == "Troubleshoot" or title == "Key Store"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/keys'>&#10149; Provisioning</a>
             <a {% if title == "Timeline"%} class="menu-active"{% endif%} {% if title == "Sense" or title == "Battery" or title == "Motion"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/timeline'>&#10149; Timeline</a>
             <a {% if title == "Sense"%} class="menu-active"{% endif%} {% if title == "Timeline" or title == "Battery" or title == "Motion"%} class="menu-inactive"{% endif%} class="menu-transparent"  href='/sense'>&#10149; Sense</a>
             <a {% if title == "Battery"%} class="menu-active"{% endif%} {% if title == "Timeline" or title == "Sense" or title == "Motion"%} class="menu-inactive"{% endif%} class="menu-transparent"  href='/battery'>&#10149; Battery</a>
