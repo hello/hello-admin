@@ -81,8 +81,10 @@ class DeviceKeyStoreHint(ProtectedRequestHandler):
     """
     def get(self):
         device_id = self.request.get('device_id', default_value="")
+        device_type = self.request.get('device_type', default_value="")
+        print device_id, device_type
         self.hello_request(
-            api_url="devices/key_store_hints/{}".format(device_id),
+            api_url="devices/key_store_hints/{}/{}".format(device_type, device_id),
             type="GET"
         )
 
