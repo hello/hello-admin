@@ -116,7 +116,7 @@ var PairingMaestro = React.createClass({
             success: function(response) {
                 console.log(response);
                 if (response.status === 204) {
-                    this.setState({unlinkAlert: "Successfully unregistered device ".concat(deviceInput)});
+                    this.setState({unlinkAlert: "Successfully unregistered device " + deviceInput + " for user " + $("#username-input-unlink").val()});
                 }
                 else if (response.status === 500) {
                     this.setState({unlinkAlert: "Error 500: failed to unlink device, very likely that device has already been unlinked by this user or other users who share it. Basically you cannot unlink a device twice given the database schema at the moment. Tim probably can explain why"});
@@ -176,7 +176,7 @@ var PairingMaestro = React.createClass({
             <Col xs={5} sm={5} md={5} lg={4} xl={3}>
                 <form onSubmit={this.handleLink}>
                     <h3>Link a sense/pill</h3><hr className="fancy-line"/>
-                    <Row onMouseLeave={this.listDevices}>
+                    <Row>
                         <Input id="username-input-link" type="text" addonBefore={<Glyphicon glyph="user"/>} placeholder="email" />
                     </Row>
                     <Row>

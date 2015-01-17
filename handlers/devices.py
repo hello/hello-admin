@@ -18,7 +18,7 @@ class DeviceAPI(ProtectedRequestHandler):
         device_id = self.request.get('device_id', default_value="")
         device_type = self.request.get('device_type', default_value="")
         impersonatee_token = self.request.get('impersonatee_token', default_value="")
-        log.debug("attempting to unregister {} {}".format(device_type, device_id))
+        log.debug("attempting to register {} {}".format(device_type, device_id))
 
         self.hello_request(
             api_url="devices/{}".format(device_type),
@@ -32,8 +32,14 @@ class DeviceAPI(ProtectedRequestHandler):
         device_type = self.request.get('device_type', default_value="")
         impersonatee_token = self.request.get('impersonatee_token', default_value="")
         log.debug("attempting to unregister {} {}".format(device_type, device_id))
+
+        if device_type == "sense":
+            api_url = "devices/sense/{}/user".format(device_id)
+        else:
+            api_url = "devices/pill/{}".format(device_id)
+
         self.hello_request(
-            api_url="devices/{}/{}".format(device_type, device_id),
+            api_url=api_url,
             type="DELETE",
             impersonatee_token=impersonatee_token,
         )
@@ -75,8 +81,10 @@ class DeviceKeyStoreHint(ProtectedRequestHandler):
     """
     def get(self):
         device_id = self.request.get('device_id', default_value="")
+        device_type = self.request.get('device_type', default_value="")
+        print device_id, device_type
         self.hello_request(
-            api_url="devices/key_store_hints/{}".format(device_id),
+            api_url="devices/key_store_hints/{}/{}".format(device_type, device_id),
             type="GET"
         )
 
