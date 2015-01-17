@@ -1,5 +1,5 @@
 import hashlib
-
+import json
 from helpers import ProtectedRequestHandler
 from Crypto.PublicKey import RSA
 from handlers.helpers import ResponseOutput
@@ -25,25 +25,46 @@ def extract_key(content):
 class KeysAPI(ProtectedRequestHandler):
     def get(self):
         blob = self.request.get("blob", default_value="")
+        stage = self.request.get("stage", default_value="")
+
         output = ResponseOutput()
         output.set_status(self.response.status_int)
-
+        output.set_viewer(self.current_user.email())
         try:
-            priv = KeyStoreLocker.get_by_id('dvt')
+            priv = KeyStoreLocker.get_by_id(stage)
             if not priv:
-                raise RuntimeError('No secret key found!')
+                raise RuntimeError('No secret key found for {} !'.format(stage))
 
             h = blob.decode('hex')
             KEY = RSA.importKey(priv.private_key)
             a = KEY.decrypt(h)
-            device_id, key = extract_key(a)
+            device_id, public_key = extract_key(a)
+
             output.set_data({
                 'device_id': device_id,
-                'key': key
+                'public_key': public_key,
             })
 
         except Exception as e:
             output.set_error(e.message)
 
         self.render_response(output)
+
+    def post(self):
+        device_type = self.request.get("device_type", default_value="")
+        device_id = self.request.get("device_id", default_value="")
+        public_key = self.request.get("public_key", default_value="")
+        metadata = self.request.get("metadata", default_value="")
+
+        print device_type, device_id, public_key, metadata
+        print json.loads(metadata).keys()
+        self.hello_request(
+            api_url="provision/{}".format(device_type),
+            type="POST",
+            body_data=json.dumps({
+                "metadata": metadata,
+                "public_key": public_key,
+                "device_id": device_id
+            }),
+        )
 
