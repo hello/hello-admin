@@ -29,6 +29,7 @@ var KeysMaestro = React.createClass({
                             public_key: response.data.public_key,
                             metadata: prepareMetadata(response.viewer, remark)
                         };
+                        var thisDevice = response.data.device_id ;
                         $.ajax({
                             url: "api/keys",
                             type: "POST",
@@ -37,7 +38,7 @@ var KeysMaestro = React.createClass({
                             success: function(response) {
                                 console.log(response);
                                 if (response.error === "") {
-                                    that.setState({alert: "Successfully stored key for " + deviceType + " ID " + response.data.device_id});
+                                    that.setState({alert: "Successfully stored key for " + deviceType + " ID " + thisDevice});
                                 }
                                 else {
                                         that.setState({alert: "Error: " + response.error});
