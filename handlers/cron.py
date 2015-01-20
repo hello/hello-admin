@@ -58,11 +58,11 @@ class ZendeskCronHandler(BaseRequestHandler):
 
             tickets_status = output['data']['total_breakdown']['status']
             zendesk_cron_stats = ZendeskDailyStats(
-                ## id = "2014-11-12", Need to fig out
-                new_tickets= tickets_status['new'],
-                open_tickets= tickets_status['open'],
-                solved_tickets= tickets_status['solved'],
-                closed_tickets= tickets_status['closed'],
+                new_tickets=tickets_status['new'],
+                open_tickets=tickets_status['open'],
+                pending_tickets=tickets_status['pending'],
+                solved_tickets=tickets_status['solved'],
+                closed_tickets=tickets_status['closed']
             )
 
             zendesk_cron_stats.put()

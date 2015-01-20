@@ -29,6 +29,7 @@ class ZendeskDailyStats(ndb.Model):
     new_tickets = ndb.IntegerProperty(required=True, indexed=False)
     solved_tickets = ndb.IntegerProperty(required=True, indexed=False)
     open_tickets = ndb.IntegerProperty(required=True, indexed=False)
+    pending_tickets = ndb.IntegerProperty(required=True, indexed=False)
     closed_tickets = ndb.IntegerProperty(required=True, indexed=False)
     created_at = ndb.DateTimeProperty(auto_now_add=True)
 
