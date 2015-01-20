@@ -6,7 +6,7 @@ var yesterday = d3.time.format("%m-%d-%Y")(d);
 
 var LineChart = React.createClass({
     getDefaultProps: function() {
-        return {id: "line-chart"}
+        return {id: "line-chart", xlabel: "X", ylabel: "Y"}
     },
     render: function() {
         var that = this;
@@ -21,11 +21,11 @@ var LineChart = React.createClass({
                 .showXAxis(true);
 
             lineChart.xAxis
-                .axisLabel('Stepwise')
+                .axisLabel(that.props.xlabel)
                 .tickFormat(function(d) { return d3.time.format('%b %d %H:%M')(new Date(d)); });
 
             lineChart.yAxis
-                .axisLabel('Acceleration')
+                .axisLabel(that.props.ylabel)
                 .tickFormat(function(d) {return d;});
 
             lineChart.isArea(true);
@@ -119,13 +119,13 @@ var MotionMaestro = React.createClass({
             <Row><Col xs={6} sm={6} md={6}><Alert bsStyle="info">No data !</Alert></Col></Row>;
 
         var stepwiseChart = (this.state.filteredData.length === 0) ? null :
-            <Row><LineChart id="motion-stepwise-chart" data={manipulateLineData(this.state.filteredData, true)}/></Row>;
+            <Row><LineChart id="motion-stepwise-chart" data={manipulateLineData(this.state.filteredData, true)} xlabel="Stepwise" ylabel="Acceleration"/></Row>;
 
         var lineChart = (this.state.filteredData.length === 0) ? null :
-            <Row><LineChart id="motion-continuous-chart" data={manipulateLineData(this.state.filteredData)}/></Row>;
+            <Row><LineChart id="motion-continuous-chart" data={manipulateLineData(this.state.filteredData)} xlabel="Continuous" ylabel="Acceleration"/></Row>;
 
         var stairChart = (this.state.filteredData.length === 0) ? null :
-            <Row><LineChart id="motion-discrete-chart" data={manipulateStairData(this.state.filteredData)}/></Row>;
+            <Row><LineChart id="motion-discrete-chart" data={manipulateStairData(this.state.filteredData)} xlabel="Discrete" ylabel="Acceleration"/></Row>;
 
         return (<div>
             <form onSubmit={this.getMotionData} className="row">
@@ -190,7 +190,7 @@ function manipulateStairData(rawData) {
     rawData.forEach(function(point) {
         var y = point.value !== -1 ? Math.abs(point.value) : point.value * 1000;
         points.push({
-            x: point.timestamp - 30,
+            x: point.timestamp,
             y: 0
         });
         points.push({
@@ -198,11 +198,11 @@ function manipulateStairData(rawData) {
             y: y
         });
         points.push({
-            x: point.timestamp + 30,
+            x: point.timestamp + 30000,
             y: y
         });
         points.push({
-            x: point.timestamp + 30,
+            x: point.timestamp + 30000,
             y: 0
         });
     });
