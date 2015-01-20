@@ -29,7 +29,7 @@ class ZendeskAPI(CustomerExperienceRequestHandler):
 
         try:
             if not user_email:
-                raise RuntimeError("Missing input: user email");
+                raise RuntimeError("Missing input: user email")
             zen_response = requests.get(search_url, auth=zen_auth)
 
             if zen_response.ok:
@@ -82,9 +82,9 @@ class ZendeskStatsAPI(CustomerExperienceRequestHandler):
         elif start_date:
             search_url = zen_api + "{}>{}".format(date_type, start_date)
         elif end_date:
-            search_url =  zen_api + "{}<{}".format(date_type, end_date)
+            search_url = zen_api + "{}<{}".format(date_type, end_date)
         else:
-            search_url =  zen_api + "{}".format(date_type)
+            search_url = zen_api + "{}".format(date_type)
 
         zen_auth = (zendesk_cred.email_account + '/token', zendesk_cred.api_token)
 
@@ -117,7 +117,7 @@ class ZendeskStatsAPI(CustomerExperienceRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class ZendeskDailyStatsAPI(CustomerExperienceRequestHandler):
+class ZendeskHistoryAPI(CustomerExperienceRequestHandler):
     def get(self):
         output = {'data': [], 'error': ''}
         try:
@@ -131,5 +131,32 @@ class ZendeskDailyStatsAPI(CustomerExperienceRequestHandler):
                 })
         except Exception as e:
             output['error'] = display_error(e)
+
+        self.response.write(json.dumps(output))
+
+class ZendeskNowAPI(CustomerExperienceRequestHandler):
+    def get(self):
+        output = {'data': {'status': {}, 'recipient': {}}, 'error': ''}
+        info_query = ZendeskCredentials.query()
+        results = info_query.fetch(1)
+
+        if not results:
+            self.error(500)
+
+        zendesk_cred = results[0]
+        zen_auth = (zendesk_cred.email_account + '/token', zendesk_cred.api_token)
+        try:
+            for ticket_type in ['new', 'open', 'pending', 'solved', 'closed']:
+                zen_url = "{}/api/v2/search.json?query=type:ticket%20status:{}".format(zendesk_cred.domain, ticket_type)
+                zen_response = requests.get(zen_url, auth=zen_auth)
+                if zen_response.ok:
+                    output['data']['status'].update({ticket_type: zen_response.json()['count']})
+            for ticket_recipient in ['support@helloinc.zendesk.com', 'support@hello.is', 'contact@hello.is', '']:
+                zen_url = "{}/api/v2/search.json?query=type:ticket%20recipient:{}".format(zendesk_cred.domain, ticket_recipient)
+                zen_response = requests.get(zen_url, auth=zen_auth)
+                if zen_response.ok:
+                    output['data']['recipient'].update({ticket_recipient or 'unknown_recipient': zen_response.json()['count']})
+        except Exception as e:
+            output['error'] += display_error(e)
 
         self.response.write(json.dumps(output))

@@ -5,7 +5,8 @@ from handlers.cron import ZendeskCronHandler
 from handlers.cron import SearchifyPurge
 from handlers.zendesk import ZendeskAPI
 from handlers.zendesk import ZendeskStatsAPI
-from handlers.zendesk import ZendeskDailyStatsAPI
+from handlers.zendesk import ZendeskHistoryAPI
+from handlers.zendesk import ZendeskNowAPI
 from handlers.firmware import FirmwareAPI
 from handlers.devices import DeviceAPI
 from handlers.devices import DeviceInactiveAPI
@@ -53,6 +54,8 @@ from handlers.setup import ViewPermissionAPI
 from handlers.notification import NotificationAPI
 from handlers.motion import MotionAPI
 from handlers.views import KeysView
+from handlers.views import ZendeskHistoryView
+from handlers.views import ZendeskNowView
 
 cron_routes = [
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
@@ -81,7 +84,8 @@ api_routes = [
     ('/api/user/?$', UserAPI),
     ('/api/zendesk/?$', ZendeskAPI),
     ('/api/zendesk_stats/?$', ZendeskStatsAPI),
-    ('/api/zendesk_stats_2/?$', ZendeskDailyStatsAPI),
+    ('/api/zendesk_history/?$', ZendeskHistoryAPI),
+    ('/api/zendesk_now/?$', ZendeskNowAPI),
     ('/api/timeline/?$', TimelineAPI),
     ('/api/viewer_permission/?$', ViewPermissionAPI),
     ('/api/notification/?$', NotificationAPI),
