@@ -120,6 +120,8 @@ page_routes = [
     ('/key_store/?$', KeyStoreView),
     ('/motion/?$', MotionView),
     ('/keys/?$', KeysView),
+    ('/zendesk_history/?$', ZendeskHistoryView),
+    ('/zendesk_now/?$', ZendeskNowView),
 ]
 
 hello_admin_app = webapp2.WSGIApplication(
