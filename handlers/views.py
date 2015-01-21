@@ -16,9 +16,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 
 class ChartHandler(ProtectedRequestHandler):
-    """
-    Returns a timeline of sleep events
-    """
+    """Returns a timeline of sleep events"""
     def get(self):
         template = JINJA_ENVIRONMENT.get_template('templates/charts.html')
         tokens = AccessToken.query_tokens()
@@ -26,33 +24,25 @@ class ChartHandler(ProtectedRequestHandler):
         self.response.write(template.render({'tokens': tokens, 'day': day}))
 
 class UserView(ProtectedRequestHandler):
-    """
-    Returns a portal to quickly look for recent users and search for users.
-    """
+    """Returns a portal to quickly look for recent users and search for users."""
     def get(self):
         self.render_to_response(template_file='templates/users.html',
                                 context={'title': 'Users'})
 
 class SenseVisualView(ProtectedRequestHandler):
-    """
-    Returns graphs of data from Sense (temperature, humidity, particulates, light)
-    """
+    """Returns graphs of data from Sense (temperature, humidity, particulates, light)"""
     def get(self):
         self.render_to_response(template_file='templates/sense.html',
                                 context={'title': 'Sense'})
 
 class ZendeskView(CustomerExperienceRequestHandler):
-    """
-    Returns zendesk statistics, underconstruction
-    """
+    """Returns zendesk statistics, underconstruction"""
     def get(self):
          self.render_to_response(template_file='templates/zendesk.html',
                                 context={'title': 'Zendesk'})
 
 class SettingsView(SuperEngineerRequestHandler):
-    """
-    Returns a panel for manipulating apps, accounts
-    """
+    """Returns a panel for manipulating apps, accounts"""
     def get(self):
         self.render_to_response(template_file='templates/settings.html',
                                 context={'title': 'Settings'})
@@ -66,89 +56,67 @@ class DebugLogView(ProtectedRequestHandler):
                                 context={'title': 'Log'})
 
 class ApplicationLogsView(ProtectedRequestHandler):
-    """
-    Returns a beautiful & comfy log viewer
-    """
+    """Returns a beautiful & comfy log viewer"""
     def get(self):
         self.render_to_response(template_file='templates/application_logs.html',
                                 context={'title': 'Application Logs'})
 
 class FirmwareView(FirmwareRequestHandler):
-    """
-    Returns a panel for moderating firmware content
-    """
+    """Returns a panel for moderating firmware content"""
     def get(self):
         self.render_to_response(template_file='templates/firmware.html',
                                 context={'title': 'Firmware'})
 
 class ConfigurationView(SuperEngineerRequestHandler):
-    """
-    Returns a panel for monitoring team device IDs and groups (teams) by feature.
-    """
+    """Returns a panel for monitoring team device IDs and groups (teams) by feature."""
     def get(self):
         self.render_to_response(template_file='templates/configuration.html',
                                 context={'title': 'Configuration'})
 
 class TeamsView(ProtectedRequestHandler):
-    """
-    Returns a panel for monitoring groups of devices & users
-    """
+    """Returns a panel for monitoring groups of devices & users"""
     def get(self):
         self.render_to_response(template_file='templates/teams.html',
                                 context={'title': 'Teams'})
 
 class TroubleshootView(ProtectedRequestHandler):
-    """
-    Returns a panel for monitoring potential in-troube devices
-    """
+    """Returns a panel for monitoring potential in-troube devices"""
     def get(self):
         self.render_to_response(template_file='templates/troubleshoot.html',
                                 context={'title': 'Troubleshoot'})
 
 class TimelineView(ProtectedRequestHandler):
-    """
-    Returns a panel for monitoring potential timeline viewing
-    """
+    """Returns a panel for monitoring potential timeline viewing"""
     def get(self):
         self.render_to_response(template_file='templates/timeline.html',
                                 context={'title': 'Timeline'})
 
 class BatteryView(ProtectedRequestHandler):
-    """
-    Returns a panel for monitoring potential timeline viewing
-    """
+    """Returns a panel for monitoring potential timeline viewing"""
     def get(self):
         self.render_to_response(template_file='templates/battery.html',
                                 context={'title': 'Battery'})
 
 class PairingView(ProtectedRequestHandler):
-    """
-    Returns a panel for register/unregister senses/pills
-    """
+    """Returns a panel for register/unregister senses/pills"""
     def get(self):
         self.render_to_response(template_file='templates/pairing.html',
                                 context={'title': 'Pairing'})
 
 class NotificationView(ProtectedRequestHandler):
-    """
-    Returns a panel for monitoring potential timeline viewing
-    """
+    """Returns a panel for monitoring potential timeline viewing"""
     def get(self):
         self.render_to_response(template_file='templates/notification.html',
                                 context={'title': 'Notification'})
 
 class KeyStoreView(FirmwareRequestHandler):
-    """
-    Returns a panel for monitoring potential timeline viewing
-    """
+    """Returns a panel for monitoring potential timeline viewing"""
     def get(self):
         self.render_to_response(template_file='templates/key_store.html',
                                 context={'title': 'Key Store'})
 
 class MotionView(ProtectedRequestHandler):
-    """
-    Returns a panel for monitoring potential timeline viewing
-    """
+    """Returns a panel for monitoring potential timeline viewing"""
     def get(self):
         self.render_to_response(template_file='templates/motion.html',
                                 context={'title': 'Motion'})
@@ -162,3 +130,13 @@ class KeysView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/keys.html',
                                 context={'title': 'Keys'})
+
+class ZendeskHistoryView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/zendesk_history.html',
+                                context={'title': 'Zendesk History'})
+
+class ZendeskNowView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/zendesk_now.html',
+                                context={'title': 'Zendesk Now'})

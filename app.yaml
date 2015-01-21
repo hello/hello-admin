@@ -13,7 +13,10 @@ handlers:
 - url: /cron/zendesk_daily_stats
   script: handlers.urls.hello_admin_app
   login: admin
-- url: /cron/searchify_purge
+- url: /cron/sense_logs_purge
+  script: handlers.urls.hello_admin_app
+  login: admin
+- url: /cron/application_logs_purge
   script: handlers.urls.hello_admin_app
   login: admin
 - url: .*

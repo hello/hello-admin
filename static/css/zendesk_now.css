@@ -1,0 +1,6 @@
+::-webkit-scrollbar {display: none;}
+span.glyphicon-search, span.glyphicon-filter {top: 1px; font-size: 15px;}
+button.btn-circle {margin: 0; height: 37px; width: 37px; padding: 3px;}
+div.c3-chart {height: 500px;}
+.c3-legend-item { font-size: 12px !important; margin-bottom: 15px !important;}
+.chart-remark {font-size: 80%; margin-left: 40px; font-style: italic;}

@@ -2,6 +2,9 @@ cron:
 - description: zendesk daily stats
   url: /cron/zendesk_daily_stats
   schedule: every day 08:05
-- description: searchify purge
-  url: /cron/searchify_purge
+- description: sense logs purge
+  url: /cron/sense_logs_purge
+  schedule: every 1 mins
+- description: application logs purge
+  url: /cron/application_logs_purge
   schedule: every 1 mins
