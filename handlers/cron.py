@@ -71,29 +71,12 @@ class ZendeskCronHandler(BaseRequestHandler):
             log.error('ERROR: {}'.format(display_error(e)))
 
 
-class SearchifyPurge(BaseRequestHandler):
-    def get(self):
+class SearchifyHandler(BaseRequestHandler):
+    def get_searchify_index(self, index):
         searchify_entity= SearchifyCredentials.query().fetch(1)
         if not searchify_entity:
             raise RuntimeError("Missing AppInfo. Bailing.")
-        searchify_cred = searchify_entity[0]
-        debug_log_api = ApiClient(searchify_cred.api_client)
-        sense_logs_index = debug_log_api.get_index('sense-logs')
-        last_month = datetime.datetime.now() + datetime.timedelta(days=-14)
-
-        old_docs_list = []
-        for q in ['text:uart', 'text:uploading', 'text:sending', 'text:complete', 'text:success', 'text:Texas', 'text:dev']:
-            old_docs_list += self.identify_old_docs(index=sense_logs_index, query=q, time_threshold=last_month, start=0, limit=50)
-        old_docs_to_be_deleted_list = list(set(old_docs_list))[:50]
-        output = {
-            'old_docs_to_be_deleted': old_docs_to_be_deleted_list,
-            'count': len(old_docs_to_be_deleted_list),
-        }
-        try:
-            output['searchify_response'] = self.delete_old_docs(sense_logs_index, old_docs_to_be_deleted_list)
-        except Exception as e:
-            output['error'] = e.message
-        self.response.write(json.dumps(output))
+        return ApiClient(searchify_entity[0].api_client).get_index(index)
 
     def identify_old_docs(self, index, query, time_threshold, start, limit):
         delete_docid_list = []
@@ -106,5 +89,56 @@ class SearchifyPurge(BaseRequestHandler):
                 delete_docid_list.append(s['docid'])
         return delete_docid_list
 
+    def gather_purge_ids(self, index, query_keywords, time_threshold):
+        old_docs_list = []
+        for q in query_keywords:
+            old_docs_list += self.identify_old_docs(index=index, query=q, time_threshold=time_threshold, start=0, limit=50)
+        return list(set(old_docs_list))[:50]
+
     def delete_old_docs(self, index, docid_list):
         return index.delete_documents(docid_list)
+
+
+class SenseLogsPurge(SearchifyHandler):
+    def get(self):
+        sense_logs_index = self.get_searchify_index('sense-logs')
+
+        old_docs_to_be_deleted_list = self.gather_purge_ids(
+            sense_logs_index,
+            ['text:uart', 'text:uploading', 'text:sending', 'text:complete', 'text:success', 'text:Texas', 'text:dev'],
+            datetime.datetime.now() + datetime.timedelta(days=-14)
+        )
+
+        output = {
+            'old_docs_to_be_deleted': old_docs_to_be_deleted_list,
+            'count': len(old_docs_to_be_deleted_list),
+            }
+        try:
+            output['searchify_response'] = self.delete_old_docs(sense_logs_index, old_docs_to_be_deleted_list)
+        except Exception as e:
+            output['error'] = e.message
+        self.response.write(json.dumps(output))
+
+
+
+
+class ApplicationLogsPurge(SearchifyHandler):
+    def get(self):
+        application_logs_index = self.get_searchify_index('application-logs')
+
+        old_docs_to_be_deleted_list = self.gather_purge_ids(
+            application_logs_index,
+            ['text:DEBUG', 'text:INFO'],
+            datetime.datetime.now() + datetime.timedelta(days=-7)
+        )
+        
+        output = {
+            'old_docs_to_be_deleted': old_docs_to_be_deleted_list,
+            'count': len(old_docs_to_be_deleted_list),
+            }
+        try:
+            output['searchify_response'] = self.delete_old_docs(application_logs_index, old_docs_to_be_deleted_list)
+        except Exception as e:
+            output['error'] = e.message
+        self.response.write(json.dumps(output))
+

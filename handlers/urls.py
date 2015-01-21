@@ -2,7 +2,8 @@ import webapp2
 import settings
 from handlers.configuration import FeaturesAPI
 from handlers.cron import ZendeskCronHandler
-from handlers.cron import SearchifyPurge
+from handlers.cron import SenseLogsPurge
+from handlers.cron import ApplicationLogsPurge
 from handlers.zendesk import ZendeskAPI
 from handlers.zendesk import ZendeskStatsAPI
 from handlers.zendesk import ZendeskHistoryAPI
@@ -59,7 +60,8 @@ from handlers.views import ZendeskNowView
 
 cron_routes = [
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
-    ('/cron/searchify_purge', SearchifyPurge),
+    ('/cron/sense_logs_purge', SenseLogsPurge),
+    ('/cron/application_logs_purge', ApplicationLogsPurge),
 ]
 
 api_routes = [
