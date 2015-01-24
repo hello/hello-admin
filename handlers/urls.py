@@ -57,6 +57,7 @@ from handlers.motion import MotionAPI
 from handlers.views import KeysView
 from handlers.views import ZendeskHistoryView
 from handlers.views import ZendeskNowView
+from handlers.views import CreateKeyView
 
 cron_routes = [
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
@@ -124,6 +125,7 @@ page_routes = [
     ('/keys/?$', KeysView),
     ('/zendesk_history/?$', ZendeskHistoryView),
     ('/zendesk_now/?$', ZendeskNowView),
+    ('/provision/?$', CreateKeyView),
 ]
 
 hello_admin_app = webapp2.WSGIApplication(
