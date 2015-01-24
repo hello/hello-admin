@@ -1,0 +1,22 @@
+{% extends "templates/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <h3>Keys</h3>
+    <hr class="fancy-line"/>
+    <form method="POST" action="/api/create_key_store_locker/">
+        <p>
+            <select name="key_id">
+                <option value="pvt">PVT</option>
+            </select>
+        </p>
+        <p>
+            <textarea name="keys">
+            </textarea>
+        </p>
+        <p>
+            <input type="submit" />
+        </p>
+    </form>
+    </div>
+{% endblock %}

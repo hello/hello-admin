@@ -140,3 +140,9 @@ class ZendeskNowView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/zendesk_now.html',
                                 context={'title': 'Zendesk Now'})
+
+class CreateKeyView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/create_key.html',
+                                context={'title': 'Create Key'})
+

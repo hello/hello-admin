@@ -432,8 +432,26 @@ class CreateKeyStoreLockerAPI(SuperEngineerRequestHandler):
                 key_store_entity.put()
         else:
             output['error'] = 'Not permitted to run on prod'
-
         self.response.write(json.dumps(output))
+
+    def post(self):
+        """
+        Save provisioning keys to datastore
+        """
+        output = {'data': [], 'error': ''}
+        key = self.request.get('keys', '')
+        key_id = self.request.get('key_id', '')
+        if not key_id or not key:
+            output['error'] = 'Missing key id or key'
+            self.response.write(json.dumps(output))
+
+        priv = KeyStoreLocker.get_by_id(key_id)
+        priv.private_key = key
+        priv.put()
+        self.redirect('/')
+
+
+
 
 class CreateGroupsAPI(SuperEngineerRequestHandler):
     def get(self):
