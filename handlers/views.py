@@ -146,3 +146,7 @@ class CreateKeyView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/create_key.html',
                                 context={'title': 'Create Key'})
 
+class RoomConditionsView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/room_conditions.html',
+                                context={'title': 'Room Conditions'})

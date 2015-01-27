@@ -35,6 +35,22 @@ class PreSleepAPI(ProtectedRequestHandler):
         )
 
 
+class RoomConditionsAPI(ProtectedRequestHandler):
+     def get(self):
+         """
+         Grab temperature, humidity, paraticualtes (air quality), light and sound data
+         """
+         email = self.request.get('email', default_value='')
+         sensor = self.request.get('sensor', default_value='')
+         resolution = self.request.get('resolution', default_value='')
+         current_ts = int(time.time() * 1000)
+         self.hello_request(
+             api_url="room/admin/{}/{}/{}".format(email, sensor, resolution),
+             url_params={'from': current_ts},
+             type="GET"
+         )
+
+
 class SenseLogsAPI(ProtectedRequestHandler):
     """
     Retrieve debug logs

@@ -18,6 +18,7 @@ from handlers.metrics import SenseLogsAPI
 from handlers.metrics import ApplicationLogsAPI
 from handlers.metrics import SearchifyStatsAPI
 from handlers.metrics import PreSleepAPI
+from handlers.metrics import RoomConditionsAPI
 from handlers.metrics import TimelineAPI
 from handlers.metrics import TroubleshootAPI
 from handlers.setup import AppAPI
@@ -58,6 +59,7 @@ from handlers.views import KeysView
 from handlers.views import ZendeskHistoryView
 from handlers.views import ZendeskNowView
 from handlers.views import CreateKeyView
+from handlers.views import RoomConditionsView
 from handlers.keys import PillProvisionAPI
 from handlers.keys import PillKeyDecryptAPI
 from handlers.keys import PillKeyProvision
@@ -131,6 +133,9 @@ page_routes = [
     ('/zendesk_history/?$', ZendeskHistoryView),
     ('/zendesk_now/?$', ZendeskNowView),
     ('/provision/?$', CreateKeyView),
+    ('/room_conditions/?$', RoomConditionsView),
+]
+
 file_upload_routes = [
     ('/pill_bin_upload', PillKeyDecryptAPI),
     ('/pill_bin_upload/([^/]+)/([^/]+)', PillProvisionAPI),
