@@ -1,5 +1,5 @@
 application: 'hello-admin'
-version: 17b
+version: 17d
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -14,6 +14,9 @@ handlers:
   script: handlers.urls.hello_admin_app
   login: admin
 - url: /cron/sense_logs_purge
+  script: handlers.urls.hello_admin_app
+  login: admin
+- url: /cron/application_logs_purge_queue
   script: handlers.urls.hello_admin_app
   login: admin
 - url: /cron/application_logs_purge
