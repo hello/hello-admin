@@ -151,8 +151,8 @@ class ZendeskNowAPI(CustomerExperienceRequestHandler):
                 zen_response = requests.get(zen_url, auth=zen_auth)
                 if zen_response.ok:
                     output['data']['status'].update({ticket_type: zen_response.json()['count']})
-            for ticket_recipient in ['support@helloinc.zendesk.com', 'support@hello.is', 'contact@hello.is', '']:
-                zen_url = "{}/api/v2/search.json?query=type:ticket%20recipient:{}".format(zendesk_cred.domain, ticket_recipient)
+            for ticket_recipient in ['support@helloinc.zendesk.com', 'support@hello.is', 'contact@hello.is', 'chat', 'web_form']:
+                zen_url = "{}/api/v2/search.json?query=type:ticket%20via:{}".format(zendesk_cred.domain, ticket_recipient)
                 zen_response = requests.get(zen_url, auth=zen_auth)
                 if zen_response.ok:
                     output['data']['recipient'].update({ticket_recipient or 'unknown_recipient': zen_response.json()['count']})
