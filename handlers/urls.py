@@ -4,6 +4,7 @@ from handlers.configuration import FeaturesAPI
 from handlers.cron import ZendeskCronHandler
 from handlers.cron import SenseLogsPurge
 from handlers.cron import ApplicationLogsPurge
+from handlers.cron import ApplicationLogsPurgeQueue
 from handlers.zendesk import ZendeskAPI
 from handlers.zendesk import ZendeskStatsAPI
 from handlers.zendesk import ZendeskHistoryAPI
@@ -68,6 +69,7 @@ cron_routes = [
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
     ('/cron/sense_logs_purge', SenseLogsPurge),
     ('/cron/application_logs_purge', ApplicationLogsPurge),
+    ('/cron/application_logs_purge_queue', ApplicationLogsPurgeQueue)
 ]
 
 api_routes = [

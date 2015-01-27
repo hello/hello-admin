@@ -11,7 +11,7 @@ from models.ext import ZendeskCredentials
 from models.ext import ZendeskDailyStats
 from indextank import ApiClient
 
-
+from google.appengine.api import taskqueue
 class ZendeskCronHandler(BaseRequestHandler):
     def get(self):
         output = {'data': []}
@@ -89,11 +89,11 @@ class SearchifyHandler(BaseRequestHandler):
                 delete_docid_list.append(s['docid'])
         return delete_docid_list
 
-    def gather_purge_ids(self, index, query_keywords, time_threshold):
+    def gather_purge_ids(self, index, query_keywords, time_threshold, maxdocs=50):
         old_docs_list = []
         for q in query_keywords:
             old_docs_list += self.identify_old_docs(index=index, query=q, time_threshold=time_threshold, start=0, limit=50)
-        return list(set(old_docs_list))[:50]
+        return list(set(old_docs_list))[:maxdocs]
 
     def delete_old_docs(self, index, docid_list):
         return index.delete_documents(docid_list)
@@ -123,22 +123,38 @@ class SenseLogsPurge(SearchifyHandler):
 
 
 class ApplicationLogsPurge(SearchifyHandler):
-    def get(self):
+    def post(self):
         application_logs_index = self.get_searchify_index('application-logs')
-
-        old_docs_to_be_deleted_list = self.gather_purge_ids(
-            application_logs_index,
-            ['text:DEBUG', 'text:INFO', 'text:ERROR', 'text:WARN'],
-            datetime.datetime.now() + datetime.timedelta(days=-5)
-        )
-        
-        output = {
-            'old_docs_to_be_deleted': old_docs_to_be_deleted_list,
-            'count': len(old_docs_to_be_deleted_list),
-            }
+        output = {}
+        tolerance_in_days = {
+            'DEBUG': 5,
+            'INFO': 5,
+            'ERROR': 7,
+            'WARN': 7
+        }
         try:
-            output['searchify_response'] = self.delete_old_docs(application_logs_index, old_docs_to_be_deleted_list)
+            for t in ['DEBUG', 'INFO', 'ERROR', 'WARN']:
+                old_docs_to_be_deleted_list = self.gather_purge_ids(
+                    application_logs_index,
+                    ['text:{}'.format(t)],
+                    datetime.datetime.now() - datetime.timedelta(days=tolerance_in_days[t]),
+                    maxdocs=50
+                )
+
+                output[t] = {
+                    'old_docs_to_be_deleted': old_docs_to_be_deleted_list,
+                    'count': len(old_docs_to_be_deleted_list),
+                    'searchify_response': self.delete_old_docs(application_logs_index, old_docs_to_be_deleted_list)
+                }
+
         except Exception as e:
             output['error'] = e.message
         self.response.write(json.dumps(output))
+
+
+class ApplicationLogsPurgeQueue(SearchifyHandler):
+    def get(self):
+        taskqueue.add(url='/cron/application_logs_purge')
+        self.response.write(json.dumps({'queue': 'active'}))
+
 

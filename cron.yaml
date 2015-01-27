@@ -5,6 +5,6 @@ cron:
 - description: sense logs purge
   url: /cron/sense_logs_purge
   schedule: every 1 mins
-- description: application logs purge
-  url: /cron/application_logs_purge
+- description: application logs purge queue
+  url: /cron/application_logs_purge_queue
   schedule: every 1 mins

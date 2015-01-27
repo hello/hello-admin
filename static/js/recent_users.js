@@ -176,7 +176,7 @@ var RecentUsersBox = React.createClass({
     },
     componentDidMount: function() {
         var thisRecentUsersBox = this,
-            refresh_period = 2*60*1000;
+            refresh_period = 3600*1000;
         thisRecentUsersBox.loadRecentUsersFromServer();
         setInterval(function () {thisRecentUsersBox.loadRecentUsersFromServer();}, refresh_period);
     },
