@@ -119,10 +119,7 @@ var MotionMaestro = React.createClass({
             <Row><Col xs={6} sm={6} md={6}><Alert bsStyle="info">No data !</Alert></Col></Row>;
 
         var stepwiseChart = (this.state.filteredData.length === 0) ? null :
-            <Row><LineChart id="motion-stepwise-chart" data={manipulateLineData(this.state.filteredData, true)} xlabel="Stepwise" ylabel="Acceleration"/></Row>;
-
-        var lineChart = (this.state.filteredData.length === 0) ? null :
-            <Row><LineChart id="motion-continuous-chart" data={manipulateLineData(this.state.filteredData)} xlabel="Continuous" ylabel="Acceleration"/></Row>;
+            <Row><LineChart id="motion-stepwise-chart" data={manipulateStepwiseData(this.state.filteredData, true)} xlabel="Stepwise" ylabel="Acceleration"/></Row>;
 
         var stairChart = (this.state.filteredData.length === 0) ? null :
             <Row><LineChart id="motion-discrete-chart" data={manipulateStairData(this.state.filteredData)} xlabel="Discrete" ylabel="Acceleration"/></Row>;
@@ -147,7 +144,6 @@ var MotionMaestro = React.createClass({
             </form>
             {alert}
             {stepwiseChart}
-            {lineChart}
             {stairChart}
         </div>)
     }
@@ -163,7 +159,7 @@ function reformatDate(dateString) {
     return [year, month, date].join("-");
 }
 
-function manipulateLineData(rawData, stepwise) {
+function manipulateStepwiseData(rawData, stepwise) {
     var points = [];
     rawData.forEach(function(point, index) {
         var y = point.value !== -1 ? Math.abs(point.value) : point.value * 1000;
