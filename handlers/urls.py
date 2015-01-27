@@ -14,7 +14,7 @@ from handlers.devices import DeviceInactiveAPI
 from handlers.devices import DeviceKeyStoreHint
 from handlers.metrics import BatteryAPI
 from handlers.devices import DeviceOwnersAPI
-from handlers.metrics import DebugLogAPI
+from handlers.metrics import SenseLogsAPI
 from handlers.metrics import ApplicationLogsAPI
 from handlers.metrics import SearchifyStatsAPI
 from handlers.metrics import PreSleepAPI
@@ -33,7 +33,6 @@ from handlers.setup import UpdateAdminAccessTokenAPI
 from handlers.teams import TeamsAPI
 from handlers.users import UserAPI
 from handlers.views import BatteryView
-from handlers.keys import KeysAPI
 from handlers.keys import SenseKeyProvision
 from handlers.views import ChartHandler
 from handlers.views import ConfigurationView
@@ -75,7 +74,7 @@ api_routes = [
     ('/api/battery/?$', BatteryAPI),
     ('/api/create_groups/?$', CreateGroupsAPI),
     ('/api/create_key_store_locker/?$', CreateKeyStoreLockerAPI),
-    ('/api/debug_log/?$', DebugLogAPI),
+    ('/api/debug_log/?$', SenseLogsAPI),
     ('/api/application_logs/?$', ApplicationLogsAPI),
     ('/api/devices/?$', DeviceAPI),
     ('/api/devices/inactive/?$', DeviceInactiveAPI),

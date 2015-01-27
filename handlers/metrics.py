@@ -22,7 +22,7 @@ class PreSleepAPI(ProtectedRequestHandler):
 
         sensor = self.request.get('sensor', default_value='humidity')
         resolution = self.request.get('resolution', default_value='day')
-        timezone_offset = int(self.request.get('timezone_offset', default_value=8*3600*1000))
+        # timezone_offset = int(self.request.get('timezone_offset', default_value=8*3600*1000))
         # current_ts = int(time.time() * 1000) - timezone_offset
         current_ts = int(time.time() * 1000)
         impersonatee_token = self.request.get('impersonatee_token', default_value=None)
@@ -35,7 +35,7 @@ class PreSleepAPI(ProtectedRequestHandler):
         )
 
 
-class DebugLogAPI(ProtectedRequestHandler):
+class SenseLogsAPI(ProtectedRequestHandler):
     """
     Retrieve debug logs
     """
