@@ -34,6 +34,7 @@ from handlers.teams import TeamsAPI
 from handlers.users import UserAPI
 from handlers.views import BatteryView
 from handlers.keys import KeysAPI
+from handlers.keys import SenseKeyProvision
 from handlers.views import ChartHandler
 from handlers.views import ConfigurationView
 from handlers.views import DebugLogView
@@ -58,6 +59,9 @@ from handlers.views import KeysView
 from handlers.views import ZendeskHistoryView
 from handlers.views import ZendeskNowView
 from handlers.views import CreateKeyView
+from handlers.keys import PillProvisionAPI
+from handlers.keys import PillKeyDecryptAPI
+from handlers.keys import PillKeyProvision
 
 cron_routes = [
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
@@ -93,7 +97,9 @@ api_routes = [
     ('/api/viewer_permission/?$', ViewPermissionAPI),
     ('/api/notification/?$', NotificationAPI),
     ('/api/motion/?$', MotionAPI),
-    ('/api/keys/?$', KeysAPI),
+    ('/api/sense_key_provision/?$', SenseKeyProvision),
+    ('/api/pill_key_provision/?$', PillKeyProvision),
+    ('/api/room_conditions/?$', RoomConditionsAPI),
 ]
 
 page_routes = [
@@ -126,9 +132,12 @@ page_routes = [
     ('/zendesk_history/?$', ZendeskHistoryView),
     ('/zendesk_now/?$', ZendeskNowView),
     ('/provision/?$', CreateKeyView),
+file_upload_routes = [
+    ('/pill_bin_upload', PillKeyDecryptAPI),
+    ('/pill_bin_upload/([^/]+)/([^/]+)', PillProvisionAPI),
 ]
 
 hello_admin_app = webapp2.WSGIApplication(
-    routes=cron_routes + api_routes + page_routes,
+    routes=cron_routes + api_routes + page_routes + file_upload_routes,
     debug=settings.DEBUG
 )

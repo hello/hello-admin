@@ -2,8 +2,16 @@
 {% block title %}{{ title }}{% endblock %}
 {% block extrastatic %}
 
-    <script type="text/jsx" src="/static/js/keys.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/keys.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/jquery.fileupload.css" />
+
+    <script type="text/javascript" src="/static/js/third-party/jquery.ui.widget.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/jquery.iframe-transport.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/jquery.fileupload.js"></script>
+
+    <script type="text/jsx" src="/static/js/sense_key_provision.js"></script>
+    <script type="text/jsx" src="/static/js/pill_key_provision.js"></script>
+
 
 {% endblock %}
 
@@ -19,9 +27,8 @@
 {#    </form>#}
 
     <div class="row" id="container">
-        <h3 id="page-name">{{ title }}</h3>
-        <hr class="fancy-line"/>
-        <div class="col-xs-12" id="keys"></div>
+        <div id="sense-key-provision"></div>
+        <div id="pill-key-provision"></div>
     </div>
 
 {% endblock %}
