@@ -128,8 +128,8 @@ class ApplicationLogsPurge(SearchifyHandler):
 
         old_docs_to_be_deleted_list = self.gather_purge_ids(
             application_logs_index,
-            ['text:DEBUG', 'text:INFO'],
-            datetime.datetime.now() + datetime.timedelta(days=-7)
+            ['text:DEBUG', 'text:INFO', 'text:ERROR', 'text:WARN'],
+            datetime.datetime.now() + datetime.timedelta(days=-5)
         )
         
         output = {
