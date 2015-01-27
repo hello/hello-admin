@@ -7,6 +7,8 @@ from handlers.helpers import ProtectedRequestHandler
 from models.ext import SearchifyCredentials
 from indextank import ApiClient
 from utils import stripStringToList
+from collections import defaultdict
+from handlers.helpers import ResponseOutput
 
 class PreSleepAPI(ProtectedRequestHandler):
     def get(self):
@@ -227,12 +229,30 @@ class TimelineAPI(ProtectedRequestHandler):
             impersonatee_token="10.d246f438c7c444f3bc3685ca654fd23f"
         )
 
+
 class BatteryAPI(ProtectedRequestHandler):
     def get(self):
-        email = self.request.get('email')
-        print email
-        self.hello_request(
-            api_url="devices/pill/{}/status".format(email),
-            type="GET",
-            impersonatee_token="10.d246f438c7c444f3bc3685ca654fd23f"
-        )
+        email = self.request.get('email', '')
+        pill_id = self.request.get('pill_id', '')
+        battery_data = ResponseOutput()
+        
+        if email:
+            battery_data = self.hello_request(
+                api_url="devices/pill/{}/status".format(email),
+                type="GET",
+                test_mode=True
+            )
+        elif pill_id:
+            battery_data = self.hello_request(
+                api_url="devices/pill/id/{}/status".format(pill_id),
+                type="GET",
+                test_mode=True
+            )
+
+        battery_by_pill_id = defaultdict(list)
+        for d in battery_data.data:
+            battery_by_pill_id['pill{}'.format(d['deviceId'])].append(d)
+        self.response.write(json.dumps({'data': dict(battery_by_pill_id).values()}))
+
+
+
