@@ -18,6 +18,7 @@ var jFileUpload = React.createClass({
                     that.setState({alert: "Successfully decrypted key for pill " + thisDevice});
                     postRequestData['device_id'] = thisDevice;
                     postRequestData['public_key'] = file.pill_key;
+                    postRequestData['remark'] = $('#pill-remark-input').val();
                 });
                 $.ajax({
                     url: "api/pill_key_provision",
@@ -61,6 +62,7 @@ var jFileUpload = React.createClass({
             <div id="progress" className="progress">
                 <div className="progress-bar progress-bar-success"></div>
             </div>
+            <Input id="pill-remark-input" type="textarea" placeholder="Leave a remark (optional)"/>
             {alert}
             <br/>
         </Col>)

@@ -127,20 +127,18 @@ class BaseRequestHandler(webapp2.RequestHandler):
             request_detail['data'] = body_data
         if url_params:
             request_detail['params'] = url_params
-        try:
-            response = getattr(OAuth2Session, type.lower())(session, api_url, **request_detail)
-            output.set_status(response.status_code)
 
-            if response.status_code == 200:
-                response_data = response.json()
-                if filter_fields != []:
-                    response_data = extract_dicts_by_fields(response_data, filter_fields)
-                output.set_data(response_data)
-            if not response.ok:
-                response.raise_for_status()
+        response = getattr(OAuth2Session, type.lower())(session, api_url, **request_detail)
+        output.set_status(response.status_code)
 
-        except Exception as e:
-            output.set_error(display_error(e))
+        if response.status_code == 200:
+            response_data = response.json()
+            if filter_fields != []:
+                response_data = extract_dicts_by_fields(response_data, filter_fields)
+            output.set_data(response_data)
+
+        if not response.ok:
+            output.set_error(response.content)
 
         if test_mode is True:
             return output

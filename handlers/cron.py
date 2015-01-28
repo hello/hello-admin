@@ -125,27 +125,24 @@ class SenseLogsPurge(SearchifyHandler):
 class ApplicationLogsPurge(SearchifyHandler):
     def post(self):
         application_logs_index = self.get_searchify_index('application-logs')
-        output = {}
-        tolerance_in_days = {
-            'DEBUG': 5,
-            'INFO': 5,
-            'ERROR': 7,
-            'WARN': 7
-        }
-        try:
-            for t in ['DEBUG', 'INFO', 'ERROR', 'WARN']:
-                old_docs_to_be_deleted_list = self.gather_purge_ids(
-                    application_logs_index,
-                    ['text:{}'.format(t)],
-                    datetime.datetime.now() - datetime.timedelta(days=tolerance_in_days[t]),
-                    maxdocs=50
-                )
+        level = self.request.get('level')
+        tolerance_in_days = int(self.request.get('tolerance_in_days', 7))
 
-                output[t] = {
-                    'old_docs_to_be_deleted': old_docs_to_be_deleted_list,
-                    'count': len(old_docs_to_be_deleted_list),
-                    'searchify_response': self.delete_old_docs(application_logs_index, old_docs_to_be_deleted_list)
-                }
+        output = {'level': level}
+
+        try:
+            old_docs_to_be_deleted_list = self.gather_purge_ids(
+                application_logs_index,
+                ['text:{}'.format(level)],
+                datetime.datetime.now() - datetime.timedelta(days=tolerance_in_days),
+                maxdocs=50
+            )
+
+            output.update({
+                'old_docs_to_be_deleted': old_docs_to_be_deleted_list,
+                'count': len(old_docs_to_be_deleted_list),
+                'searchify_response': self.delete_old_docs(application_logs_index, old_docs_to_be_deleted_list)
+            })
 
         except Exception as e:
             output['error'] = e.message
@@ -154,7 +151,30 @@ class ApplicationLogsPurge(SearchifyHandler):
 
 class ApplicationLogsPurgeQueue(SearchifyHandler):
     def get(self):
-        taskqueue.add(url='/cron/application_logs_purge')
+        queue_sizes = {
+            'DEBUG': 3,
+            'INFO': 3,
+            'WARN': 1,
+            'ERROR': 1,
+        }
+
+        tolerance_in_days = {
+            'DEBUG': 3,
+            'INFO': 3,
+            'WARN': 1,
+            'ERROR': 1,
+        }
+
+        for level in ['DEBUG', 'INFO', 'WARN', 'ERROR']:
+            for j in range(queue_sizes[level]):
+                taskqueue.add(
+                    url='/cron/application_logs_purge',
+                    params={
+                        'level': 'DEBUG',
+                        'tolerance_in_days': tolerance_in_days[level]
+                    }
+                )
+
         self.response.write(json.dumps({'queue': 'active'}))
 
 

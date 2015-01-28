@@ -68,7 +68,7 @@ from handlers.keys import PillKeyProvision
 cron_routes = [
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
     ('/cron/sense_logs_purge', SenseLogsPurge),
-    ('/cron/application_logs_purge', ApplicationLogsPurge),
+    ('/cron/application_logs_purge/?$', ApplicationLogsPurge),
     ('/cron/application_logs_purge_queue', ApplicationLogsPurgeQueue)
 ]
 

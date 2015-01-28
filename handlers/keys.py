@@ -90,14 +90,16 @@ class PillKeyProvision(ProtectedRequestHandler):
     def post(self):
         device_id = self.request.get("device_id", default_value="")
         public_key = self.request.get("public_key", default_value="")
+        remark = self.request.get("remark", default_value="")
 
         self.hello_request(
             api_url="provision/pill",
             type="POST",
             body_data=json.dumps({
                 "metadata": json.dumps({
-                    "viewer": self.current_user.email(),
-                    "created_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    "provisioned_by": self.current_user.email(),
+                    "provisioned_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "remark": remark
                 }),
                 "public_key": public_key,
                 "device_id": device_id

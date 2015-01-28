@@ -47,7 +47,7 @@ var KeyStoreMaestro = React.createClass({
                     console.log(response);
                     if (response.error === "") {
                         that.pushHistory(deviceInput, typeInput);
-                        that.setState({alert: "Key store: " + capitalizeVisiblePart(response.data.hint)});
+                        that.setState({alert: "AES Key: " + capitalizeVisiblePart(response.data.key) + "\n\r Metadata: " + response.data.metadata});
                     }
                     else {
                         that.setState({alert: response.error});
