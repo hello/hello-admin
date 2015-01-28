@@ -84,13 +84,9 @@ React.renderComponent(<KeysMaestro />, document.getElementById('sense-key-provis
 
 function prepareMetadata(viewer, remark) {
     var metadata = {
-        viewer: viewer,
-        remark: remark,
-        extraInfo: {
-            platform: navigator.platform,
-            userAgent: navigator.userAgent,
-            viewedAt: new Date().toLocaleString()
-        }
+        provisioned_by: viewer,
+        provisioned_at: new Date().toLocaleString(),
+        remark: remark
     };
     console.log(metadata);
     return JSON.stringify(metadata);
