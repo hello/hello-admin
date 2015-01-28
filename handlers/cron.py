@@ -123,7 +123,7 @@ class SenseLogsPurge(SearchifyHandler):
 
 
 class ApplicationLogsPurge(SearchifyHandler):
-    def post(self):
+    def get(self):
         application_logs_index = self.get_searchify_index('application-logs')
         level = self.request.get('level')
         tolerance_in_days = int(self.request.get('tolerance_in_days', 7))
@@ -132,37 +132,40 @@ class ApplicationLogsPurge(SearchifyHandler):
 
         try:
             old_docs_to_be_deleted_list = self.gather_purge_ids(
-                application_logs_index,
-                ['text:{}'.format(level)],
-                datetime.datetime.now() - datetime.timedelta(days=tolerance_in_days),
+                index=application_logs_index,
+                query_keywords=['text:{}'.format(level)],
+                time_threshold=datetime.datetime.now() - datetime.timedelta(days=tolerance_in_days),
                 maxdocs=50
             )
+
 
             output.update({
                 'old_docs_to_be_deleted': old_docs_to_be_deleted_list,
                 'count': len(old_docs_to_be_deleted_list),
-                'searchify_response': self.delete_old_docs(application_logs_index, old_docs_to_be_deleted_list)
+                'searchify_response': self.delete_old_docs(application_logs_index, old_docs_to_be_deleted_list) if old_docs_to_be_deleted_list else "No docs to be deleted"
             })
 
         except Exception as e:
             output['error'] = e.message
+            if 'HTTP 400' in e.message:
+                log.info('No Docs ID to be deleted for level {} - tolerance = {} days'.format(level, tolerance_in_days))
         self.response.write(json.dumps(output))
 
 
 class ApplicationLogsPurgeQueue(SearchifyHandler):
     def get(self):
         queue_sizes = {
-            'DEBUG': 3,
+            'DEBUG': 1,
             'INFO': 3,
-            'WARN': 1,
+            'WARN': 2,
             'ERROR': 1,
         }
 
         tolerance_in_days = {
             'DEBUG': 4,
             'INFO': 4,
-            'WARN': 7,
-            'ERROR': 7,
+            'WARN': 6,
+            'ERROR': 6,
         }
 
         for level in ['DEBUG', 'INFO', 'WARN', 'ERROR']:
@@ -170,9 +173,10 @@ class ApplicationLogsPurgeQueue(SearchifyHandler):
                 taskqueue.add(
                     url='/cron/application_logs_purge',
                     params={
-                        'level': 'DEBUG',
+                        'level': '{}'.format(level),
                         'tolerance_in_days': tolerance_in_days[level]
-                    }
+                    },
+                    method="GET"
                 )
 
         self.response.write(json.dumps({'queue': 'active'}))
