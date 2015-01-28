@@ -150,3 +150,8 @@ class RoomConditionsView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/room_conditions.html',
                                 context={'title': 'Room Conditions'})
+
+class LabelView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/label.html',
+                                context={'title': 'Label !'})

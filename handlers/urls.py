@@ -61,9 +61,11 @@ from handlers.views import ZendeskHistoryView
 from handlers.views import ZendeskNowView
 from handlers.views import CreateKeyView
 from handlers.views import RoomConditionsView
+from handlers.views import LabelView
 from handlers.keys import PillProvisionAPI
 from handlers.keys import PillKeyDecryptAPI
 from handlers.keys import PillKeyProvision
+from handlers.label_data import LabelDataAPI
 
 cron_routes = [
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
@@ -103,6 +105,7 @@ api_routes = [
     ('/api/sense_key_provision/?$', SenseKeyProvision),
     ('/api/pill_key_provision/?$', PillKeyProvision),
     ('/api/room_conditions/?$', RoomConditionsAPI),
+    ('/api/label_data/?$', LabelDataAPI),
 ]
 
 page_routes = [
@@ -136,6 +139,7 @@ page_routes = [
     ('/zendesk_now/?$', ZendeskNowView),
     ('/provision/?$', CreateKeyView),
     ('/room_conditions/?$', RoomConditionsView),
+    ('/room/?$', LabelView),
 ]
 
 file_upload_routes = [
