@@ -1,0 +1,29 @@
+{% extends "templates/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block extrastatic %}
+
+
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-datetimepicker.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/c3.min.css" />
+    <link rel="stylesheet" href="/static/css/label.css">
+
+    <script type="text/javascript" src="/static/js/third-party/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/moment.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/d3.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/c3.min.js"></script>
+
+    <script type="text/jsx" src="/static/js/third-party/long-datetimepicker.js"></script>
+    <script type="text/jsx" src="/static/js/room-conditions/c3_chart_with_click_hanlder.js"></script>
+    <script type="text/jsx" src="/static/js/room-conditions/sound.js"></script>
+    <script type="text/jsx" src="/static/js/room-conditions/label.js"></script>
+
+
+{% endblock %}
+
+{% block content %}
+    <div class="row" id="container">
+        <div class="col-xs-12" id="room"></div>
+    </div>
+{% endblock %}
+
