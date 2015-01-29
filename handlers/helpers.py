@@ -3,6 +3,7 @@ import os
 import settings
 import webapp2
 import json
+import logging as log
 from copy import copy
 from google.appengine.api import users
 from models.setup import AppInfo, UserGroup
@@ -281,7 +282,7 @@ class ResponseOutput():
 
     def set_data(self, data):
         if not isinstance(data, list) and not isinstance(data, dict):
-            raise TypeError("Response data must be a list or a dict")
+            log.warning("Response data is neither a list nor a dict")
         self.data = data
 
     def set_error(self, error):
