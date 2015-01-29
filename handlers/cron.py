@@ -164,8 +164,8 @@ class ApplicationLogsPurgeQueue(SearchifyHandler):
         tolerance_in_days = {
             'DEBUG': 4,
             'INFO': 4,
-            'WARN': 6,
-            'ERROR': 6,
+            'WARN': 7,
+            'ERROR': 10,
         }
 
         for level in ['DEBUG', 'INFO', 'WARN', 'ERROR']:
