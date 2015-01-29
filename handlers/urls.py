@@ -139,7 +139,7 @@ page_routes = [
     ('/zendesk_now/?$', ZendeskNowView),
     ('/provision/?$', CreateKeyView),
     ('/room_conditions/?$', RoomConditionsView),
-    ('/room/?$', LabelView),
+    ('/label/?$', LabelView),
 ]
 
 file_upload_routes = [
