@@ -1,14 +1,12 @@
 import json
 from helpers import ProtectedRequestHandler
+import logging as log
 
 class LabelDataAPI(ProtectedRequestHandler):
     def post(self):
         body = json.loads(self.request.body)
-
-        post_data = {field: body.get(field) for field in ['email', 'night', 'ts_utc', 'tz_offset', 'label']}
-
         self.hello_request(
-            api_url="datascience/label",
+            api_url="datascience/batch_label",
             type="POST",
-            body_data=json.dumps(post_data)
+            body_data=json.dumps(body)
         )
