@@ -49,7 +49,6 @@ class ZendeskAPI(CustomerExperienceRequestHandler):
 
         except Exception as e:
             output['error'] = display_error(e)
-            log.error('ERROR: {}'.format(display_error(e)))
 
         self.response.write(json.dumps(output))
 
@@ -112,7 +111,6 @@ class ZendeskStatsAPI(CustomerExperienceRequestHandler):
 
         except Exception as e:
             output['error'] = display_error(e)
-            log.error('ERROR: {}'.format(display_error(e)))
 
         self.response.write(json.dumps(output))
 
