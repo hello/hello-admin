@@ -28,7 +28,7 @@ var LabelDataForm =  React.createClass({
             <Modal pra title="Label data">
                 <div className="modal-body">
                     <Input id="label-input" type="select">
-                        <option value="none">None</option>
+                        <option value="none">Select a label</option>
                         <option value="make_bed">Make Bed</option>
                         <option value="went_to_bed">Went To Bed</option>
                         <option value="fall_asleep">Fall Asleep</option>
@@ -62,6 +62,8 @@ var C3BaseChartWithClickHandler = React.createClass({
             data: [],
             chartType: "spline",
             stackable: false,
+            xAttr: "datetime",
+            tzOffsetAttr: "offset_millis",
             axis: {
                 x: {
                     tick: {
@@ -118,7 +120,7 @@ var C3BaseChartWithClickHandler = React.createClass({
                 type: that.props.chartType,
                 json: that.props.data,
                 keys: {
-                    x: 'datetime',
+                    x: that.props.xAttr || 'datetime',
                     value: categories
                 },
                 groups: stackingGroups,
@@ -129,13 +131,19 @@ var C3BaseChartWithClickHandler = React.createClass({
                     var clickedDataPoint = that.props.data[arguments[0].index];
                     postData = {
                         "email": $('#email-input').val(),
-                        "night": d3.time.format('%Y-%m-%d')(new Date(clickedDataPoint.datetime)),
-                        "ts_utc": clickedDataPoint.datetime,
-                        "tz_offset": clickedDataPoint.offset_millis
+                        "night": d3.time.format('%Y-%m-%d')(new Date(clickedDataPoint[that.props.xAttr])),
+                        "ts_utc": clickedDataPoint[that.props.xAttr],
+                        "tz_offset": clickedDataPoint[that.props.tzOffsetAttr]
                     };
                     $('#modal-post').val(JSON.stringify(postData));
                     $('#modal-trigger').click();
-                }
+
+                },
+                selection: {
+                    draggable: true
+                },
+                ondragstart: function() {alert('dragstart');},
+                ondragend: function() {alert('dragend');}
             },
             axis: that.props.axis,
             bar: that.props.bar,
