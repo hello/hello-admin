@@ -3,22 +3,36 @@
 var LabelDataForm =  React.createClass({
     handleLabel: function() {
         var that = this;
-        var postData = JSON.parse($('#modal-post').val());
-        postData.label = $('#label-input').val();
-        var labeledData = JSON.stringify(postData);
+        var dataSet = that.props.parent.props.data;
+        console.log(dataSet);
+        var offSetInMillisecond = Number($('#offset-input').val()) * 60*1000;
+        var xAttr = that.props.parent.props.xAttr;
+        var tzOffsetAttr = that.props.parent.props.tzOffsetAttr;
+        var labelledData = dataSet.map(function(d, index){
+            if (index >= that.props.labelStartIndex && d[xAttr] <= dataSet[that.props.labelStartIndex][xAttr] + offSetInMillisecond) {
+                return {
+                    email: $('#email-input').val(),
+                    label: $('#label-input').val(),
+                    night: d3.time.format('%Y-%m-%d')(new Date(d[xAttr])),
+                    ts_utc: d[xAttr],
+                    tz_offset: d[tzOffsetAttr]
+                }
+            }
+        }).filter(function(d){return d !== undefined});
+        console.log(labelledData);
         $.ajax({
             url: "/api/label_data",
             dataType: 'json',
             type: 'POST',
-            data: labeledData,
+            data: JSON.stringify(labelledData),
             success: function(response) {
                 console.log(response);
                 that.props.onRequestHide();
-                if (response.status === 204) {
-                    that.props.parent.setState({labelStatus: "Successfully labelled " + labeledData});
+                if (response.status === 204 || response.status === 200) {
+                    that.props.parent.setState({labelStatus: "Successfully labelled \n" + JSON.stringify(labelledData, undefined, 2)});
                 }
                 else {
-                    that.props.parent.setState({labelStatus: "Failed to label " + labeledData + "\nError: "  + response.error});
+                    that.props.parent.setState({labelStatus: "Failed to label \n" + JSON.stringify(labelledData, undefined, 2) + "\nError: "  + response.error});
                 }
             }
         });
@@ -39,6 +53,7 @@ var LabelDataForm =  React.createClass({
                         <option value="got_up_at_night">Got Up At Night</option>
                         <option value="other_disturbance">Other Disturbance</option>
                     </Input>
+                    <Input id="offset-input" type="text" placeholder="Enter forward offset in minutes"/>
                 </div>
                 <div className="modal-footer">
                     <Button onClick={this.handleLabel}>POST <Glyphicon glyph="send"/></Button>
@@ -53,7 +68,8 @@ var LabelDataForm =  React.createClass({
 var C3BaseChartWithClickHandler = React.createClass({
     getInitialState: function() {
         return {
-            labelStatus: ""
+            labelStatus: "",
+            labelStartIndex: 0
         }
     },
     getDefaultProps: function() {
@@ -128,14 +144,7 @@ var C3BaseChartWithClickHandler = React.createClass({
                 onclick: function() {
                     console.log(arguments);
                     console.log(that.props.data[arguments[0].index]);
-                    var clickedDataPoint = that.props.data[arguments[0].index];
-                    postData = {
-                        "email": $('#email-input').val(),
-                        "night": d3.time.format('%Y-%m-%d')(new Date(clickedDataPoint[that.props.xAttr])),
-                        "ts_utc": clickedDataPoint[that.props.xAttr],
-                        "tz_offset": clickedDataPoint[that.props.tzOffsetAttr]
-                    };
-                    $('#modal-post').val(JSON.stringify(postData));
+                    that.setState({labelStartIndex: arguments[0].index});
                     $('#modal-trigger').click();
 
                 },
@@ -153,10 +162,9 @@ var C3BaseChartWithClickHandler = React.createClass({
         });
         var alert = that.state.labelStatus.isWhiteString() ? null : <Alert>{that.state.labelStatus}</Alert>;
         return(<div>
-            <ModalTrigger modal={<LabelDataForm parent={that} />}>
+            <ModalTrigger modal={<LabelDataForm parent={that} labelStartIndex={that.state.labelStartIndex} />}>
                 <Button id="modal-trigger" bsStyle="primary">Label Data</Button>
             </ModalTrigger>
-            <Input id="modal-post" type="text"/>
             <div id={this.props.id} className="c3-chart"></div>
             {alert}
         </div>)
