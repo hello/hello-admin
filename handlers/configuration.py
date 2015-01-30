@@ -13,7 +13,7 @@ class FeaturesAPI(ProtectedRequestHandler):
         req = json.loads(self.request.body)
 
         feature = req.get('feature', '')
-        ids = req.get('ids', '').split(",")
+        ids = req.get('ids', '').strip()
 
         groups = req.get('groups') or []
         percentage = req.get('percentage', 0)
@@ -23,7 +23,7 @@ class FeaturesAPI(ProtectedRequestHandler):
             type="PUT",
             body_data=json.dumps({
                 'name': feature,
-                'ids': [j.strip() for j in ids] if len(ids) > 0 else [],
+                'ids': [j.strip() for j in ids.split(",")] if ids != "" else [],
                 'groups': groups,
                 'percentage': percentage
             })

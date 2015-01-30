@@ -15,8 +15,8 @@ class TeamsAPI(ProtectedRequestHandler):
         req = json.loads(self.request.body)
 
         group = req.get('group', "")
-        raw_ids = req.get('ids', "").split(",")
-        ids = [j.strip() for j in raw_ids] if len(raw_ids) > 0 else []
+        raw_ids = req.get('ids', "").strip()
+        ids = [j.strip() for j in raw_ids.split(",")] if raw_ids != "" else []
 
         mode = req.get('mode', "")
         action = req.get('action', "")
