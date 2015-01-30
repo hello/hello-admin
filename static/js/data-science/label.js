@@ -14,6 +14,7 @@ var RoomConditionsMaestro = React.createClass({
             sound: [],
             light: [],
             motion: [],
+            currentLabels: [],
             chartType: "bar",
             chartCategory: "sound"
         }
@@ -75,6 +76,20 @@ var RoomConditionsMaestro = React.createClass({
                 that.pushHistory(emailInput, dateInput);
             }
         });
+
+        var currentLabelsRequest = {email: emailInput, night: reformatDate(dateInput)};
+        $.ajax({
+            url: "/api/label_data",
+            type: 'GET',
+            data: currentLabelsRequest,
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                if (!response.error.isWhiteString()) {
+                    that.setState({currentLabels: response.data});
+                }
+            }
+        });
         return false;
     },
 
@@ -89,15 +104,15 @@ var RoomConditionsMaestro = React.createClass({
     render: function() {
         var chartWithLabel = null;
         if (this.state.chartCategory === 'sound') {
-            chartWithLabel = <Row><SoundChartWithLabel data={this.state.sound} chartType={this.state.chartType} /></Row>;
+            chartWithLabel = <SoundChartWithLabel data={this.state.sound} chartType={this.state.chartType} />;
         }
         else if (this.state.chartCategory === 'light') {
-            chartWithLabel = <Row><LightChartWithLabel data={this.state.light} chartType={this.state.chartType} /></Row>;
+            chartWithLabel = <LightChartWithLabel data={this.state.light} chartType={this.state.chartType} />;
         }
         else if (this.state.chartCategory === 'motion') {
-            chartWithLabel = <Row><MotionChartWithLabel data={this.state.motion} chartType={this.state.chartType} /></Row>;
+            chartWithLabel = <MotionChartWithLabel data={this.state.motion} chartType={this.state.chartType} />;
         }
-
+        var currentLabels = this.state.currentLabels.length === 0 ? null: prettify_json(this.state.currentLabels, 'label');
         return (<div>
             <form className="row" onSubmit={this.downloadData}>
                 <Col xs={3} sm={3} md={3} lg={3} xl={3}>
@@ -119,7 +134,15 @@ var RoomConditionsMaestro = React.createClass({
                     <Input type="select" id="chart-type" onChange={this.handleChartType}>{chartOptions}</Input>
                 </Col>
             </form>
-            {chartWithLabel}
+            <Row>
+                <Col xs={9} sm={9} md={9} lg={9} xl={9}>
+                    {chartWithLabel}
+                </Col>
+                <Col xs={3} sm={3} md={3} lg={3} xl={3}>
+                    <span>Current Labels</span>
+                    {currentLabels}
+                </Col>
+            </Row>
         </div>)
     }
 });
@@ -133,4 +156,15 @@ function reformatDate(dateString) {
     var month = dateComponents[0];
     var date = dateComponents[1];
     return [year, month, date].join("-");
+}
+
+function prettify_json(objects, title_field) {
+  var divs = [];
+  $.each(objects, function(index, dict){
+    divs.push(<div>
+      <Label bsStyle="success">{dict[title_field]}</Label>
+      <pre className="alert-default">{JSON.stringify(dict || 'Sorry, no match|', null, 3)}</pre>
+    </div>);
+  });
+  return divs
 }
