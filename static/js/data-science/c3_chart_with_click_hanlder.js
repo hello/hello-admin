@@ -1,18 +1,45 @@
 /** @jsx React.DOM */
 
 var LabelDataForm =  React.createClass({
+    getInitialState: function() {
+        return {t1: "", t2: ""}
+    },
+
+    componentDidMount: function() {
+        this.updateRangeInfo();
+    },
+
+    updateRangeInfo: function() {
+
+        var dataSet = this.props.parent.props.data;
+        var xAttr = this.props.parent.props.xAttr;
+        var durationInMillisecond = Number($('#duration-input').val()) * 60*1000;
+
+        console.log('me', xAttr, durationInMillisecond);
+
+        this.setState({
+            t1: d3.time.format('%b %d %H:%M:%S')(new Date(dataSet[this.props.labelStartIndex][xAttr])),
+            t2: d3.time.format('%b %d %H:%M:%S')(new Date(dataSet[this.props.labelStartIndex][xAttr] + durationInMillisecond))
+        });
+    },
+
     handleLabel: function() {
         var that = this;
         var dataSet = that.props.parent.props.data;
         console.log(dataSet);
-        var offSetInMillisecond = Number($('#offset-input').val()) * 60*1000;
+        var durationInMillisecond = Number($('#duration-input').val()) * 60*1000;
         var xAttr = that.props.parent.props.xAttr;
         var tzOffsetAttr = that.props.parent.props.tzOffsetAttr;
+
         var labelledData = dataSet.map(function(d, index){
-            if (index >= that.props.labelStartIndex && d[xAttr] <= dataSet[that.props.labelStartIndex][xAttr] + offSetInMillisecond) {
+            /*      This is for labeling massively, not used right now */
+            //            if (index >= that.props.labelStartIndex && d[xAttr] <= dataSet[that.props.labelStartIndex][xAttr] + durationInMillisecond) {
+            if (index === that.props.labelStartIndex) {
                 return {
                     email: $('#email-input').val(),
                     label: $('#label-input').val(),
+                    duration_millis: durationInMillisecond,
+                    note: $('#notes-input').val(),
                     night: d3.time.format('%Y-%m-%d')(new Date(d[xAttr])),
                     ts_utc: d[xAttr],
                     tz_offset: d[tzOffsetAttr]
@@ -39,7 +66,7 @@ var LabelDataForm =  React.createClass({
     },
     render: function() {
         return this.transferPropsTo(
-            <Modal pra title="Label data">
+            <Modal pra title={"Label data between " + this.state.t1 + " and " + this.state.t2 + "(Pacific time)"}>
                 <div className="modal-body">
                     <Input id="label-input" type="select">
                         <option value="none">Select a label</option>
@@ -53,7 +80,8 @@ var LabelDataForm =  React.createClass({
                         <option value="got_up_at_night">Got Up At Night</option>
                         <option value="other_disturbance">Other Disturbance</option>
                     </Input>
-                    <Input id="offset-input" type="text" placeholder="Enter forward offset in minutes"/>
+                    <Input id="duration-input" type="text" onChange={this.updateRangeInfo} placeholder="Enter duration in minutes"/>
+                    <Input id="notes-input" type="text" placeholder="Leave a remark (optional)"/>
                 </div>
                 <div className="modal-footer">
                     <Button onClick={this.handleLabel}>POST <Glyphicon glyph="send"/></Button>
