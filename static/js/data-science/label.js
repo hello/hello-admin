@@ -85,9 +85,7 @@ var RoomConditionsMaestro = React.createClass({
             dataType: 'json',
             success: function(response) {
                 console.log(response);
-                if (!response.error.isWhiteString()) {
-                    that.setState({currentLabels: response.data});
-                }
+                that.setState({currentLabels: response.data});
             }
         });
         return false;

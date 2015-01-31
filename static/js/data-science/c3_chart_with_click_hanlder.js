@@ -71,9 +71,9 @@ var LabelDataForm =  React.createClass({
                     <Input id="label-input" type="select">
                         <option value="none">Select a label</option>
                         <option value="make_bed">Make Bed</option>
-                        <option value="went_to_bed">Went To Bed</option>
-                        <option value="fall_asleep">Fall Asleep</option>
-                        <option value="awake">Awake</option>
+                        <option value="went_to_bed">Got In Bed</option>
+                        <option value="fall_asleep">Start Sleep</option>
+                        <option value="awake">Stop Sleep</option>
                         <option value="out_of_bed">Out Of Bed</option>
                         <option value="awake_in_bed">Awake In Bed</option>
                         <option value="sound_disturbance">Sound Disturbance</option>
