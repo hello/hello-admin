@@ -155,3 +155,8 @@ class LabelView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/label.html',
                                 context={'title': 'Label !'})
+
+class AlarmsView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/alarms.html',
+                                context={'title': 'Alarms'})
