@@ -201,10 +201,10 @@ function formatAlarmDateTime(dt) {
 
 function binaryOptions(condition) {
     return condition === true ? [
-        <option>True</option>,
+        <option selected="selected">True</option>,
         <option>False</option>
     ]:[
-        <option>False</option>,
+        <option selected="selected">False</option>,
         <option>True</option>
     ]
 }

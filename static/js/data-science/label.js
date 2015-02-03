@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-var chartOptions = ["bar", "area", "line", "step", "spline", "area-spline", "area-step"].map(function(c){
+var chartOptions = ["area", "bar", "line", "step", "spline", "area-spline", "area-step"].map(function(c){
     return <option value={c}>{c.capitalize() + " Chart"}</option>;
 });
 
@@ -15,8 +15,8 @@ var RoomConditionsMaestro = React.createClass({
             light: [],
             motion: [],
             currentLabels: [],
-            chartType: "bar",
-            chartCategory: "sound"
+            chartType: "area",
+            chartCategory: "motion"
         }
     },
 
@@ -38,26 +38,10 @@ var RoomConditionsMaestro = React.createClass({
     },
 
     downloadData: function() {
-        var emailInput = $('#email-input').val();
+        var emailInput = $('#email-input').val().trim();
         var dateInput = $('#date-input').val();
         var that = this;
-        ['sound', 'light'].forEach(function(sensor){
-            var roomRequest = {email: emailInput, sensor: sensor, resolution: "day", ts: getUTCEpochFromLocalTime(new Date(dateInput), true)*1000};
-            console.log(roomRequest);
-            $.ajax({
-                url: "/api/room_conditions",
-                type: "GET",
-                data: roomRequest,
-                dataType: "json",
-                success: function(response) {
-                    console.log(response);
-                    that.pushHistory(emailInput);
-                    var sensorData = {};
-                    sensorData[sensor] = response.data;
-                    that.setState(sensorData);
-                }
-            });
-        });
+
         var motionRequest = {email: emailInput, date: reformatDate(dateInput)};
         $.ajax({
             url: "/api/motion",
@@ -75,6 +59,24 @@ var RoomConditionsMaestro = React.createClass({
                 }
                 that.pushHistory(emailInput, dateInput);
             }
+        });
+
+        ['sound', 'light'].forEach(function(sensor){
+            var roomRequest = {email: emailInput, sensor: sensor, resolution: "day", ts: prepareFromTsCursor(dateInput)};
+            console.log(roomRequest);
+            $.ajax({
+                url: "/api/room_conditions",
+                type: "GET",
+                data: roomRequest,
+                dataType: "json",
+                success: function(response) {
+                    console.log(response);
+                    that.pushHistory(emailInput);
+                    var sensorData = {};
+                    sensorData[sensor] = response.data;
+                    that.setState(sensorData);
+                }
+            });
         });
 
         var currentLabelsRequest = {email: emailInput, night: reformatDate(dateInput)};
@@ -101,15 +103,16 @@ var RoomConditionsMaestro = React.createClass({
 
     render: function() {
         var chartWithLabel = null;
-        if (this.state.chartCategory === 'sound') {
+        if (this.state.chartCategory === 'motion') {
+            chartWithLabel = <MotionChartWithLabel data={this.state.motion} chartType={this.state.chartType} />;
+        }
+        else if (this.state.chartCategory === 'sound') {
             chartWithLabel = <SoundChartWithLabel data={this.state.sound} chartType={this.state.chartType} />;
         }
         else if (this.state.chartCategory === 'light') {
             chartWithLabel = <LightChartWithLabel data={this.state.light} chartType={this.state.chartType} />;
         }
-        else if (this.state.chartCategory === 'motion') {
-            chartWithLabel = <MotionChartWithLabel data={this.state.motion} chartType={this.state.chartType} />;
-        }
+
         var currentLabels = this.state.currentLabels.length === 0 ? null: prettify_json(this.state.currentLabels, 'label');
         return (<div>
             <form className="row" onSubmit={this.downloadData}>
@@ -119,9 +122,9 @@ var RoomConditionsMaestro = React.createClass({
                 <LongDatetimePicker size="2" placeHolder="date" id="date-input" pickTime={false} format="MM-DD-YYYY" defaultDate={yesterday} />
                 <Col xs={2} sm={2} md={2} lg={2} xl={2}>
                     <Input id="chart-category" type="select" onChange={this.handleChartCategory}>
+                        <option value="motion">Motion</option>
                         <option value="sound">Sound</option>
                         <option value="light">Light</option>
-                        <option value="motion">Motion</option>
                     </Input>
                 </Col>
 
@@ -165,4 +168,12 @@ function prettify_json(objects, title_field) {
     </div>);
   });
   return divs
+}
+
+function prepareFromTsCursor(dt) {
+    // From a night date, "from" cursor is defined by getting next day's 11am
+    var dateInput = new Date(dt);
+    dateInput.setDate(dateInput.getDate() + 1);
+    dateInput.setHours(11);
+    return dateInput.getTime();
 }
