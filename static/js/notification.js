@@ -13,23 +13,20 @@ var NotificationMaestro = React.createClass({
             body: $("#body-input").val()
         };
         console.log(requestData);
-        if (isValidRequest(requestData) === true) {
-            console.log(" good request");
-            $.ajax({
-                url: "/api/notification",
-                type: "POST",
-                dataType: 'json',
-                contentType: 'application/json',
-                data: JSON.stringify(requestData),
-                success: function (response) {
-                    console.log(response);
-                    that.setState({alert: "Message sent to " + requestData.receiver + "! Check it out in a bit. Make sure push notification is enabled on receiver's phone)"});
-                }.bind(that),
-                error: function (e) {
-                    that.setState({alert: e.toString});
-                }.bind(that)
-            });
-        }
+        $.ajax({
+            url: "/api/notification",
+            type: "POST",
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify(requestData),
+            success: function (response) {
+                console.log(response);
+                that.setState({alert: "Message sent to " + requestData.receiver + "! Check it out in a bit. Make sure push notification is enabled on receiver's phone)"});
+            }.bind(that),
+            error: function (e) {
+                that.setState({alert: e.toString});
+            }.bind(that)
+        });
         return false;
     },
     render: function() {
