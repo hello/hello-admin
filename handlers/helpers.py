@@ -133,11 +133,13 @@ class BaseRequestHandler(webapp2.RequestHandler):
         output.set_status(response.status_code)
 
         if response.status_code == 200:
-            response_data = response.json()
-            if filter_fields != []:
-                response_data = extract_dicts_by_fields(response_data, filter_fields)
-            output.set_data(response_data)
-
+            try:
+                response_data = response.json()
+                if filter_fields != []:
+                    response_data = extract_dicts_by_fields(response_data, filter_fields)
+                output.set_data(response_data)
+            except ValueError:
+                output.set_data({})
         if not response.ok:
             output.set_error(response.content)
 
