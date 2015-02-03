@@ -9,8 +9,6 @@ class NotificationAPI(ProtectedRequestHandler):
         details = body.get('details')
         body_messages = body.get('body')
 
-        print receiver, target, details, body_messages
-
         self.hello_request(
             api_url="notifications/send/{}".format(receiver),
             type="POST",
