@@ -3,25 +3,41 @@
 var SideBar = React.createClass({
    render: function() {
        return (<ListGroup>
-           <ListGroupItem bsStyle="default" href="/users">Users</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/timeline">Timeline</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/sense">Room Data</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/battery">Pill Status</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/motion">Motion Data</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/debug_log">Sense Logs</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/application_logs">Application Logs</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/label">Label Data</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/alarms">Alarms Admin</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/troubleshoot">Inactive Devices</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/key_store">Keystore Hints</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/keys">Keystore Provision</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/zendesk_now">Zendesk Now</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/zendesk_history">Zendesk History</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/teams">Teams</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/configuration">Configuration</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/firmware">Firmware</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/pairing">Pairing</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/notification">Notification</ListGroupItem>
+           <ListGroupItem bsStyle="info">Home</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/users">&#10149; Users</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/troubleshoot">&#10149; Inactive Devices</ListGroupItem>
+
+           <ListGroupItem bsStyle="info">Data</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/timeline">&#10149; Timeline</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/sense">&#10149; Room Conditions</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/battery">&#10149; Pill Status</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/motion">&#10149; Motion</ListGroupItem>
+
+           <ListGroupItem bsStyle="info">Logs</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/debug_log">&#10149; Sense</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/application_logs">&#10149; Application</ListGroupItem>
+
+           <ListGroupItem bsStyle="info">Data Science</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/label">&#10149; Label</ListGroupItem>
+
+           <ListGroupItem bsStyle="info">Keystore</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/key_store">&#10149; Keystore Hints</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/keys">&#10149; Keystore Provision</ListGroupItem>
+
+           <ListGroupItem bsStyle="info">Zendesk</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/zendesk_now">&#10149; Zendesk Now</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/zendesk_history">&#10149; Zendesk History</ListGroupItem>
+
+           <ListGroupItem bsStyle="info">Operation</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/teams">&#10149; Teams</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/configuration">&#10149; Configuration</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/firmware">&#10149; Firmware</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/pairing">&#10149; Pairing</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/notification">&#10149; Notification</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/alarms">&#10149; Alarms</ListGroupItem>
+
+           <ListGroupItem bsStyle="info">Admin only</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/settings">&#10149; Settings</ListGroupItem>
        </ListGroup>)
    }
 });
