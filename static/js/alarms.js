@@ -11,14 +11,14 @@ var Alarms = React.createClass({
         var alarms = this.props.parent.state.alarms.map(function(alarm, index) {
             return [
                 <tr className="alarm">
-                    <td><LongDatetimePicker size="12" id={"alarm"+index} placeHolder="input an alarm" className="alarm-input" defaultDate={formatAlarmDateTime(alarm)}/></td>,
+                    <td><LongDatetimePicker size="12" id={"alarm"+index} placeHolder="input an alarm" className="alarm-input" format="MM-DD-YYYY HH:mm" defaultDate={formatAlarmDateTime(alarm)}/></td>,
                     <td><select className="repeated form-control" >{binaryOptions(alarm.repeated)}</select></td>,
                     <td><select className="enabled form-control" >{binaryOptions(alarm.enabled)}</select></td>,
                     <td><select className="editable form-control" >{binaryOptions(alarm.editable)}</select></td>,
                     <td><select className="smart form-control" >{binaryOptions(alarm.smart)}</select></td>,
                     <td><input className="sound form-control" type="text" value={JSON.stringify(alarm.sound)}/></td>
                     <td><input className="week-days form-control" type="text" value={JSON.stringify(alarm.day_of_week)}/></td>
-                    <td><Button className="remove-row" id={index} onClick={that.cool}><Glyphicon id={index} glyph="remove"/></Button></td>
+                    <td><Button className="remove-row" id={index} onClick={that.cool}><Glyphicon id={index} glyph="remove"/> Remove</Button></td>
                 </tr>
             ];
         });
@@ -99,7 +99,7 @@ var AlarmsMaster = React.createClass({
             futureDateTime.setMinutes(futureDateTime.getMinutes() + 5);
             alarms.push({
                 year: futureDateTime.getFullYear(),
-                month: futureDateTime.getMonth(),
+                month: futureDateTime.getMonth() + 1,
                 day_of_month: futureDateTime.getDate(),
                 hour: futureDateTime.getHours(),
                 minute: futureDateTime.getMinutes(),
@@ -126,7 +126,7 @@ var AlarmsMaster = React.createClass({
             var alarmTd = $(alarmRow).children();
             return {
                 year: alarmDateTime.getFullYear(),
-                month: alarmDateTime.getMonth(),
+                month: alarmDateTime.getMonth() + 1,
                 day_of_month: alarmDateTime.getDate(),
                 hour: alarmDateTime.getHours(),
                 minute: alarmDateTime.getMinutes(),
@@ -157,7 +157,8 @@ var AlarmsMaster = React.createClass({
             success: function(response) {
                 console.log('alarm', response);
                 if (response.status === 200) {
-                    that.setState({alarms: response.data});
+                    that.setState({alarms: []});
+                    that.handleSubmit();
                 }
                 else {
                     that.setState({error: response.error});
@@ -182,10 +183,10 @@ var AlarmsMaster = React.createClass({
             <Alarms parent={this} removeAlarm={this.removeAlarm} />
             <Row>
                 <Col xs={3} sm={3} md={3} lg={3} xl={3} xsOffset={3} smOffset={3} mdOffset={3} lgOffset={3} xlOffset={3}>
-                    <Button onClick={this.addAlarm}><Glyphicon glyph="plus"/></Button>
+                    <Button onClick={this.addAlarm}><Glyphicon glyph="plus"/> Add</Button>
                 </Col>
                 <Col xs={3} sm={3} md={3} lg={3} xl={3}>
-                    <Button onClick={this.setAlarms}><Glyphicon glyph="save"/></Button>
+                    <Button onClick={this.setAlarms}><Glyphicon glyph="send"/> Save</Button>
                 </Col>
             </Row>
         </div>)
@@ -195,8 +196,8 @@ var AlarmsMaster = React.createClass({
 React.renderComponent(<AlarmsMaster />, document.getElementById('alarms'));
 
 function formatAlarmDateTime(dt) {
-    var alarmDateTime = new Date(dt.year, dt.month, dt.day_of_month, dt.hour, dt.minute);
-    return d3.time.format("%m-%d-%Y %I:%M:%S %p")(alarmDateTime);
+    var alarmDateTime = new Date(dt.year, dt.month - 1, dt.day_of_month, dt.hour, dt.minute);
+    return d3.time.format("%m-%d-%Y %H:%M")(alarmDateTime);
 }
 
 function binaryOptions(condition) {
