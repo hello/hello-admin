@@ -208,12 +208,15 @@ var TimelineMaestro = React.createClass({
                 <Col xs={3} md={3}>
                     <Input id="filter-input" addonBefore={<Glyphicon glyph="filter"/>} type="select" onChange={this.handleFilter}>
                         <option value="events" selected>Events only</option>
-                        <option value="sunrise">Sunrise only</option>
-                        <option value="wakeup">Wake-Up only</option>
-                        <option value="motion">Motion only</option>
-                        <option value="sleep">Sleep only</option>
-                        <option value="lights_out">Lights out only</option>
-                        <option value="light">Light only</option>
+                        <option value="SUNRISE">Sunrise only</option>
+                        <option value="WAKE_UP">Wake-Up only</option>
+                        <option value="MOTION">Motion only</option>
+                        <option value="SLEEP">Sleep only</option>
+                        <option value="LIGHTS_OUT">Lights out only</option>
+                        <option value="LIGHT">Light only</option>
+                        <option value="IN_BED">In bed only</option>
+                        <option value="SLEEPING">Sleeping only</option>
+                        <option value="OUT_OF_BED">Out of bed only</option>
                         <option value="all">All data</option>
                     </Input>
                 </Col>
@@ -240,7 +243,10 @@ function labelColor(eventType) {
         MOTION: "label-motion",
         SLEEP: "label-sleep",
         LIGHTS_OUT: "label-lights-out",
-        LIGHT: "label-light"
+        LIGHT: "label-light",
+        IN_BED: "label-in-bed",
+        SLEEPING: "label-sleeping",
+        OUT_OF_BED: "label-out-of-bed"
     };
     return assignColor[eventType] || "label-no-event";
 }
@@ -252,7 +258,10 @@ function timelineSVG(eventType) {
         MOTION: "motion.svg",
         SLEEP: "sleep.svg",
         LIGHTS_OUT: "lights_out.svg",
-        LIGHT: "light.svg"
+        LIGHT: "light.svg",
+        IN_BED: "in_bed.svg",
+        SLEEPING: "sleeping.svg",
+        OUT_OF_BED: "out_of_bed.svg"
     };
     return assignSVG[eventType] || "unknown.svg";
 }
@@ -264,26 +273,21 @@ function timelineBackground(eventType) {
         MOTION: "timeline-motion",
         SLEEP: "timeline-sleep",
         LIGHTS_OUT: "timeline-lights-out",
-        LIGHT: "timeline-light"
+        LIGHT: "timeline-light",
+        IN_BED: "timeline-in-bed",
+        SLEEPING: "timeline-sleeping",
+        OUT_OF_BED: "timeline-out-of-bed"
     };
     return assignBackground[eventType] || "timeline-no-event";
 }
 
 function filterEvents(segments, type) {
-    var mapType = {
-        sunrise: "SUNRISE",
-        wakeup: "WAKE_UP",
-        motion: "MOTION",
-        sleep: "SLEEP",
-        lights_out: "LIGHTS_OUT",
-        light: "LIGHT"
-    };
     return segments.filter(function(s){
         if (type === "events") {
             return s.event_type !== "";
         }
         else {
-            return s.event_type === mapType[type];
+            return s.event_type === type;
         }
     });
 }
