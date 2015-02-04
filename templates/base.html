@@ -18,6 +18,7 @@
     <script type="text/javascript" src="/static/js/third-party/underscore.min.js"></script>
     <script type="text/javascript" src="/static/js/third-party/typeahead.js"></script>
     <script type="text/jsx" src="/static/js/base.js"></script>
+    <script type="text/jsx" src="/static/js/sidebar.js"></script>
 
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-xl.css"/>
@@ -34,47 +35,16 @@
 </head>
 <body>
 
-    <div id="header" class="row">
-        <div id="menu" class="col-xs-11 col-sm-11 col-md-11 col-lg-11 col-xl-11">
-            &nbsp;<a {% if title == "Users" %} class="menu-active"{% endif%} href='/'><span class="glyphicon glyphicon-user"></span><span>Users</span></a>|
-            <a {% if title == "Troubleshoot" or title == "Key Store" or title == "Keys" %} class="menu-active"{% endif%} href='/troubleshoot'><span class="glyphicon glyphicon-dashboard"></span><span>Troubleshoot</span></a>|
-            <a {% if title == "Zendesk Now" or title == "Zendesk History" %} class="menu-active"{% endif%} href='/zendesk_now'><span class="glyphicon glyphicon-headphones"></span><span>Zendesk</span></a>|
-            <a {% if title == "Sense" or title == "Timeline" or title == "Battery" or title == "Motion"%} class="menu-active"{% endif%} href='/timeline'><span class="glyphicon glyphicon-stats"></span><span>Data</span></a>|
-            <a {% if title == "Log" or title == "Application Logs" %} class="menu-active"{% endif%} href='/debug_log'><span class="glyphicon glyphicon-list-alt"></span><span>Logs</span></a>|
-            <a {% if title == "Teams" or title == "Configuration" or title == "Firmware" or title == "Pairing" or title == "Notification" %} class="menu-active"{% endif%} href='/teams'><span class="glyphicon glyphicon-fire"></span><span>Operation</span></a>|
-            <a {% if title == "Settings" %} class="menu-active"{% endif%} href='/settings'><span class="glyphicon glyphicon-wrench"></span><span>Settings</span></a>
-
-            <br>
-
-            <div id="sub-menu">
-            <a {% if title == "Zendesk Now"%} class="menu-active"{% endif%} {% if title == "Zendesk History"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/zendesk_now'>&#10149; Now</a>
-            <a {% if title == "Zendesk History"%} class="menu-active"{% endif%} {% if title == "Zendesk Now"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/zendesk_history'>&#10149; History</a>
-            <a {% if title == "Troubleshoot"%} class="menu-active"{% endif%} {% if title == "Keys" or title == "Key Store"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/troubleshoot'>&#10149; Inactive Devices</a>
-            <a {% if title == "Key Store"%} class="menu-active"{% endif%} {% if title == "Troubleshoot" or title == "Keys"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/key_store'>&#10149; View Key Hints</a>
-            <a {% if title == "Keys"%} class="menu-active"{% endif%} {% if title == "Troubleshoot" or title == "Key Store"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/keys'>&#10149; Key Provision</a>
-            <a {% if title == "Timeline"%} class="menu-active"{% endif%} {% if title == "Sense" or title == "Battery" or title == "Motion"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/timeline'>&#10149; Timeline</a>
-            <a {% if title == "Sense"%} class="menu-active"{% endif%} {% if title == "Timeline" or title == "Battery" or title == "Motion"%} class="menu-inactive"{% endif%} class="menu-transparent"  href='/sense'>&#10149; Sense</a>
-            <a {% if title == "Battery"%} class="menu-active"{% endif%} {% if title == "Timeline" or title == "Sense" or title == "Motion"%} class="menu-inactive"{% endif%} class="menu-transparent"  href='/battery'>&#10149; Battery</a>
-            <a {% if title == "Motion"%} class="menu-active"{% endif%} {% if title == "Timeline" or title == "Sense" or title == "Battery"%} class="menu-inactive"{% endif%} class="menu-transparent"  href='/motion'>&#10149; Motion</a>
-            <a {% if title == "Log" %} class="menu-active"{% endif%} {% if title == "Application Logs"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/debug_log'>&#10149; Sense Logs</a>
-            <a {% if title == "Application Logs" %} class="menu-active"{% endif%} {% if title == "Log"%} class="menu-inactive"{% endif%} class="menu-transparent" href='/application_logs'>&#10149; Application Logs</a>
-            <a {% if title == "Teams" %} class="menu-active"{% endif%} {% if title == "Configuration" or title == "Firmware" or title == "Pairing" or title == "Notification" %} class="menu-inactive"{% endif%} class="menu-transparent" href='/teams'>&#10149; Teams</a>
-            <a {% if title == "Configuration" %} class="menu-active"{% endif%} {% if title == "Teams" or title == "Firmware" or title == "Pairing" or title == "Notification" %} class="menu-inactive"{% endif%} class="menu-transparent" href='/configuration'>&#10149; Configuration</a>
-            <a {% if title == "Firmware" %} class="menu-active"{% endif%} {% if title == "Configuration" or title == "Teams" or title == "Pairing" or title == "Notification" %} class="menu-inactive"{% endif%} class="menu-transparent" href='/firmware'>&#10149; Firmware</a>
-            <a {% if title == "Pairing" %} class="menu-active"{% endif%} {% if title == "Teams" or title == "Firmware" or title == "Configuration" or title == "Notification" %} class="menu-inactive"{% endif%} class="menu-transparent" href='/pairing'>&#10149; Pairing</a>
-            <a {% if title == "Notification" %} class="menu-active"{% endif%} {% if title == "Teams" or title == "Firmware" or title == "Configuration" or title == "Pairing" %} class="menu-inactive"{% endif%} class="menu-transparent" href='/notification'>&#10149; Notification</a>
-            </div>
+{#        <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">#}
+{#            <span>Hi {{user}}!</span><br>#}
+{#            <a href="{{logout_url}}"> Logout</a>#}
+{#        </div>#}
+    <div class="row">
+        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2" id="sidebar"></div>
+        <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 col-xl-10" id="content">
+            {% block content %}
+            {% endblock %}
         </div>
-
-        <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
-            <span>Hi {{user}}!</span><br>
-            <a href="{{logout_url}}"> Logout</a>
-        </div>
-    </div>
-
-    <div class="row" id="content">
-        {% block content %}
-        {% endblock %}
     </div>
     <div id="footer">
         hello-admin app version: {{version}}
