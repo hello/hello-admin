@@ -8,6 +8,7 @@ var LongDatetimePicker = React.createClass({
             size: "3",
             minDate: "1/1/1970",
             maxDate: "12/12/3000",
+            format : 'MM/DD/YYYY HH:mm:ss',
             pickDate: true,                 //en/disables the date picker
             pickTime: true,                 //en/disables the time picker
             useMinutes: true,               //en/disables the minutes picker
