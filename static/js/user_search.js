@@ -53,7 +53,7 @@ var UserSearchTable = React.createClass({
             var deviceLabel = [
                 <span>{device.type}</span>, <br/>,
                 debugLogLink, <br/>,
-                <a href={"/key_store/?device=" + device.device_id + "&type=" + device.type.toLowerCase()}>view KeyStore</a>
+                <a href={"/key_store/?device=" + device.device_id + "&type=" + device.type.toLowerCase()} target="_blank">view KeyStore</a>
             ];
             var deviceDetail = [
                 <span>last seen: {new Date(device.last_updated).toLocaleString()}</span>, <br/>,
