@@ -12,7 +12,6 @@ var jFileUpload = React.createClass({
             replaceFileInput: true,
             dataType: 'json',
             done: function (e, data) {
-                console.log(data);
                 $.each(data.result.files, function (index, file) {
                     thisDevice = file.pill_id;
                     that.setState({alert: "Successfully decrypted key for pill " + thisDevice});
@@ -36,7 +35,9 @@ var jFileUpload = React.createClass({
                         setTimeout(function(){thisProgressBar.css('width','0%');}, 1000);
                     }
                 });
-
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                that.setState({alert: XMLHttpRequest.responseText.split('Error: ').last().split("<")[0]});
             },
             progressall: function (e, data) {
                 var progress = parseInt(data.loaded / data.total * 100, 10);
