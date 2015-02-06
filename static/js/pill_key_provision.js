@@ -7,6 +7,7 @@ var jFileUpload = React.createClass({
     componentDidMount: function() {
         var url = "/pill_bin_upload", that = this, postRequestData = {}, thisDevice;
         var thisProgressBar = $('.progress-bar');
+
         $('#fileupload').fileupload({
             url: url,
             replaceFileInput: true,
@@ -30,14 +31,15 @@ var jFileUpload = React.createClass({
                             that.setState({alert: "Successfully stored key for pill " + thisDevice});
                         }
                         else {
-                                that.setState({alert: "Error: " + response.error});
+                            that.setState({alert: "Error: " + response.error});
                         }
                         setTimeout(function(){thisProgressBar.css('width','0%');}, 1000);
                     }
                 });
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
-                that.setState({alert: XMLHttpRequest.responseText.split('Error: ').last().split("<")[0]});
+                var serverError = XMLHttpRequest.responseText.split("h1>").last().split("<")[0];
+                that.setState({alert: serverError + " \n sha do not match!"});
             },
             progressall: function (e, data) {
                 var progress = parseInt(data.loaded / data.total * 100, 10);
