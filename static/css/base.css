@@ -23,6 +23,7 @@ body {font-size: 100%; color: rgb(32, 32, 32);;}
 #menu>a>span.glyphicon {margin: 0 7px;}
 
 #sidebar {margin: 3px 0 0 0; max-width: 200px; font-family: Menlo,Monaco,Consolas,"Courier New",monospace; font-size: 85%;}
+.sidebar-group {font-weight: bold;}
 .list-group-item {background: #F9FAFD; -moz-box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); -webkit-box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); font-family: "Century Gothic",CenturyGothic,AppleGothic,sans-serif;}
 #content {margin: 40px 0 50px 0; font-family: Menlo,Monaco,Consolas,"Courier New",monospace; font-size: 85%;}
 
