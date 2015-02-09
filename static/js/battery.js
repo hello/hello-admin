@@ -134,7 +134,8 @@ var BatteryChart = React.createClass({
             dataType: "json",
             data: requestData,
             success: function(response) {
-                that.setState({data: response.data});
+                console.log(response.data);
+                that.setState({data: filterData(response.data)});
                 that.pushHistory(searchInput);
             }
         });
@@ -177,3 +178,15 @@ var BatteryChart = React.createClass({
     }
 });
 React.renderComponent(<BatteryChart />, document.getElementById('battery'));
+
+function filterData(data) {
+    return data.map(function(s){
+        return s.map(function(d){
+            console.log(d);
+            if (d.lastSeen < Math.pow(10, 12)) {
+                d.lastSeen *= 1000;
+            }
+            return d;s
+        });
+    });
+}
