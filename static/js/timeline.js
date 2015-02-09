@@ -12,7 +12,9 @@ var TimelineContent = React.createClass({
                 filterEvents(this.props.data[0].segments, this.props.filterStatus)
                 : this.props.data[0].segments;
             console.log(segments);
-
+            console.log(this.props.data[0].message);
+            var message = this.props.data[0].message;
+            blocks.push(<h1>{message}</h1>)
             segments.forEach(function(segment) {
                 var date = <h2 className="event-date"><LongLabel bsStyle={labelColor(segment.event_type)} content={segment.id}/> {new Date(segment.timestamp).toString()}</h2>;
 
@@ -55,7 +57,8 @@ var TimelineContent = React.createClass({
                 );
             });
         }
-        return (<div className="col-xl-6 col-xl-offset-3 col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-12 col-xs-12">
+        return (
+            <div className="col-xl-6 col-xl-offset-3 col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-12 col-xs-12">
             <section id="cd-timeline" class="cd-container">
                 {blocks}
             </section>
