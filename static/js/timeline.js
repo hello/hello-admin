@@ -13,8 +13,8 @@ var TimelineContent = React.createClass({
                 : this.props.data[0].segments;
             console.log(segments);
             console.log(this.props.data[0].message);
-            var message = this.props.data[0].message;
-            blocks.push(<h1>{message}</h1>)
+            var hoursMessage = this.props.data[0].message;
+            blocks.push(<h1 id="hours-message">{hoursMessage}</h1>)
             segments.forEach(function(segment) {
                 var date = <h2 className="event-date"><LongLabel bsStyle={labelColor(segment.event_type)} content={segment.id}/> {new Date(segment.timestamp).toString()}</h2>;
 
@@ -72,10 +72,11 @@ var TimelineMaestro = React.createClass({
                 message: "",
                 score: 0,
                 insights: [],
+                statistics: {},
                 date: "",
                 segments: []
             }],
-            filterStatus: "events"
+            filterStatus: "key_events"
         };
     },
 
@@ -188,16 +189,18 @@ var TimelineMaestro = React.createClass({
     },
 
     render: function() {
+        var that = this;
         var timelineContent = (this.state.data[0].segments.length === 0) ?
             null:
             <TimelineContent data={this.state.data} filterStatus={this.state.filterStatus}/>;
-        var negMessages = this.state.data[0].insights.filter(function(i){return i.condition == "WARNING" || i.conditionClass == "ALERT";}).map(function(i){return i.message}).join("<br/><br/>");
-        var negInsights = (negMessages.length === 0) ? null:
-            <Alert bsStyle="warning"><span className="insights" dangerouslySetInnerHTML={{__html: negMessages}}/></Alert>;
 
-        var posMessages = this.state.data[0].insights.filter(function(i){return i.condition == "IDEAL"}).map(function(i){return i.message}).join("<br/>");
-        var posInsights = (posMessages.length === 0) ? null:
-            <Alert bsStyle="success"><span className="insights" dangerouslySetInnerHTML={{__html: posMessages}}/></Alert>;
+        var insights = this.state.data[0].insights.join("<br/>");
+        var insightsPanel = insights.length === 0 ? <Alert bsStyle="danger">No insights found &#9785;</Alert> :
+            <Alert bsStyle="warning"><span className="insights" dangerouslySetInnerHTML={{__html: insights}}/></Alert>;
+
+        var stats = Object.keys(this.state.data[0].statistics).map(function(k){return k + " : " + that.state.data[0].statistics[k]}).join("<br/>");
+        var statsPanel = stats.length === 0 ? <Alert bsStyle="danger">No stats found &#9785;</Alert> :
+            <Alert bsStyle="success"><span className="insights" dangerouslySetInnerHTML={{__html: stats}}/></Alert>;
 
         return(<code className="nonscript">
             <form onSubmit={this.handleSubmit} className="row">
@@ -210,26 +213,23 @@ var TimelineMaestro = React.createClass({
                 </Col>
                 <Col xs={3} md={3}>
                     <Input id="filter-input" addonBefore={<Glyphicon glyph="filter"/>} type="select" onChange={this.handleFilter}>
-                        <option value="events" selected>Events only</option>
+                        <option value="key_events" selected>Key events only</option>
+                        <option value="events" selected>All events</option>
                         <option value="SUNRISE">Sunrise only</option>
-                        <option value="WAKE_UP">Wake-Up only</option>
                         <option value="MOTION">Motion only</option>
-                        <option value="SLEEP">Sleep only</option>
                         <option value="LIGHTS_OUT">Lights out only</option>
                         <option value="LIGHT">Light only</option>
-                        <option value="IN_BED">In bed only</option>
                         <option value="SLEEPING">Sleeping only</option>
-                        <option value="OUT_OF_BED">Out of bed only</option>
-                        <option value="all">All data</option>
+                        <option value="all">All raw data</option>
                     </Input>
                 </Col>
             </form>
             <Row id="insights-info">
-                <Col xs={3} sm={3} md={3} lg={3} xl={3} xsOffset={2} mdOffset={2} smOffset={2} lgOffset={2} xlOffset={2}>{negInsights}</Col>
+                <Col xs={3} sm={3} md={3} lg={3} xl={3} xsOffset={2} mdOffset={2} smOffset={2} lgOffset={2} xlOffset={2}>{insightsPanel}</Col>
                 <Col id="score-bar" xs={2} sm={2} md={2} lg={2} xl={2}>
                     <LongCircularBar score={this.state.data[0].score} />
                 </Col>
-                <Col xs={3} md={3} sm={3} lg={3} xl={3}>{posInsights}</Col>
+                <Col xs={3} md={3} sm={3} lg={3} xl={3}>{statsPanel}</Col>
             </Row>
             {timelineContent}
         </code>)
@@ -288,6 +288,9 @@ function filterEvents(segments, type) {
     return segments.filter(function(s){
         if (type === "events") {
             return s.event_type !== "";
+        }
+        else if (type === "key_events"){
+            return  ["IN_BED", "SLEEP", "WAKE_UP", "OUT_OF_BED"].indexOf(s.event_type) > -1
         }
         else {
             return s.event_type === type;

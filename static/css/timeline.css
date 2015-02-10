@@ -498,3 +498,4 @@ canvas {background-color: #e9f0f5;}
 h2.event-date {font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;}
 span.insights {font-size: 11px; font-family: fantasy; font-weight: bold;}
 span.event-message {color: red; font-family: fantasy; font-weight: bold;}
+#hours-message {font-weight: bold; text-align: center;}
