@@ -11,8 +11,6 @@ var TimelineContent = React.createClass({
             var segments = this.props.filterStatus !== "all" ?
                 filterEvents(this.props.data[0].segments, this.props.filterStatus)
                 : this.props.data[0].segments;
-            console.log(segments);
-            console.log(this.props.data[0].message);
             var hoursMessage = this.props.data[0].message;
             blocks.push(<h1 id="hours-message">{hoursMessage}</h1>)
             segments.forEach(function(segment) {
@@ -160,8 +158,6 @@ var TimelineMaestro = React.createClass({
             date: reformatDate(dateInput)
         };
 
-        console.log(requestData);
-
         if (requestData.email.isWhiteString() || requestData.date.isWhiteString()) {
             return false;
         }
@@ -190,15 +186,14 @@ var TimelineMaestro = React.createClass({
 
     render: function() {
         var that = this;
-        var timelineContent = (this.state.data[0].segments.length === 0) ?
-            null:
+        var timelineContent =
+            (this.state.data[0].segments.length === 0) ? <Alert>No segments found!</Alert>:
             <TimelineContent data={this.state.data} filterStatus={this.state.filterStatus}/>;
 
-        var insights = this.state.data[0].insights.join("<br/>");
+        var insights = this.state.data[0].insights.map(function(i){return i.message}).join("<br/>");
         var insightsPanel = insights.length === 0 ? <Alert bsStyle="danger">No insights found &#9785;</Alert> :
             <Alert bsStyle="warning"><span className="insights" dangerouslySetInnerHTML={{__html: insights}}/></Alert>;
-
-        var stats = Object.keys(this.state.data[0].statistics).map(function(k){return k + " : " + that.state.data[0].statistics[k]}).join("<br/>");
+        var stats = this.state.data[0].statistics && this.state.data[0].statistics !== {} ? Object.keys(this.state.data[0].statistics).map(function(k){return k + " : " + that.state.data[0].statistics[k]}).join("<br/>"): "Invalid Data";
         var statsPanel = stats.length === 0 ? <Alert bsStyle="danger">No stats found &#9785;</Alert> :
             <Alert bsStyle="success"><span className="insights" dangerouslySetInnerHTML={{__html: stats}}/></Alert>;
 
@@ -225,11 +220,11 @@ var TimelineMaestro = React.createClass({
                 </Col>
             </form>
             <Row id="insights-info">
-                <Col xs={3} sm={3} md={3} lg={3} xl={3} xsOffset={2} mdOffset={2} smOffset={2} lgOffset={2} xlOffset={2}>{insightsPanel}</Col>
+                <Col xs={3} sm={3} md={3} lg={3} xl={3} xsOffset={2} mdOffset={2} smOffset={2} lgOffset={2} xlOffset={2}>{statsPanel}</Col>
                 <Col id="score-bar" xs={2} sm={2} md={2} lg={2} xl={2}>
                     <LongCircularBar score={this.state.data[0].score} />
                 </Col>
-                <Col xs={3} md={3} sm={3} lg={3} xl={3}>{statsPanel}</Col>
+                <Col xs={4} md={4} sm={4} lg={4} xl={4}>{insightsPanel}</Col>
             </Row>
             {timelineContent}
         </code>)
@@ -249,7 +244,8 @@ function labelColor(eventType) {
         LIGHT: "label-light",
         IN_BED: "label-in-bed",
         SLEEPING: "label-sleeping",
-        OUT_OF_BED: "label-out-of-bed"
+        OUT_OF_BED: "label-out-of-bed",
+        ALARM: "label-alarm"
     };
     return assignColor[eventType] || "label-no-event";
 }
@@ -264,7 +260,8 @@ function timelineSVG(eventType) {
         LIGHT: "light.svg",
         IN_BED: "in_bed.svg",
         SLEEPING: "sleeping.svg",
-        OUT_OF_BED: "out_of_bed.svg"
+        OUT_OF_BED: "out_of_bed.svg",
+        ALARM: "alarm.svg"
     };
     return assignSVG[eventType] || "unknown.svg";
 }
@@ -279,7 +276,8 @@ function timelineBackground(eventType) {
         LIGHT: "timeline-light",
         IN_BED: "timeline-in-bed",
         SLEEPING: "timeline-sleeping",
-        OUT_OF_BED: "timeline-out-of-bed"
+        OUT_OF_BED: "timeline-out-of-bed",
+        ALARM: "timeline-alarm"
     };
     return assignBackground[eventType] || "timeline-no-event";
 }
@@ -290,7 +288,7 @@ function filterEvents(segments, type) {
             return s.event_type !== "";
         }
         else if (type === "key_events"){
-            return  ["IN_BED", "SLEEP", "WAKE_UP", "OUT_OF_BED"].indexOf(s.event_type) > -1
+            return  ["IN_BED", "SLEEP", "WAKE_UP", "OUT_OF_BED", "ALARM"].indexOf(s.event_type) > -1
         }
         else {
             return s.event_type === type;
