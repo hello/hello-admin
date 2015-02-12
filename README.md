@@ -22,11 +22,14 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
 
 - Populate Credentials for Local
   1. Create AppInfo, AppUser, ZendeskCredentials, SearchifyCredentials by visiting localhost:8080/create/app_against_prod
-  This action will initiate default entities for those essential credentials 
-  2. Create group entity by visiting http://localhost:8080/api/create_groups
-  This action will initiate default user groups (Firmware, Software, etc)
+    
+    This action will wipe out current entities and initiate default entities for those essential credentials 
+  2. Create group entity by visiting http://localhost:8080/api/create_groups 
+    
+    This action will initiate default user groups (Firmware, Software, etc)
   3. Create key store locker by visiting http://localhost:8080/api/create_key_store_locker
-  This action will initiate empty RSA private key for sense on dvt, pvt and mp phases.
+    
+    This action will initiate empty RSA private key for sense on dvt, pvt and mp phases.
   4. Update entities at http://localhost:8000/datastore (Port may not be 8000)
   5. **Flush memcache**
   6. Finally, visit localhost:8080/update
