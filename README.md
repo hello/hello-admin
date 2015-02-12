@@ -39,8 +39,8 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
   2. Comment these 2 lines out:
     
     ```
-      ~~if settings.DEBUG is False:~~
-          ~~self.restrict()~~
+      if settings.DEBUG is False:
+          self.restrict()
     ```
   3. Deploy the change to a version, let's say `setup`
   4. Do all the steps stated above for local, except that the base url now is https://setup-dot-hello-admin.appspot.com instead of http://localhost:8080
