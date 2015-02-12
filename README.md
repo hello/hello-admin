@@ -20,21 +20,8 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
 
 ### Setup
 
-- Populate Credentials for Local
-  1. Create AppInfo, AppUser, ZendeskCredentials, SearchifyCredentials by visiting localhost:8080/api/setup
-    
-    This action will wipe out current entities and initiate default entities for those essential credentials 
-  2. Create group entity by visiting http://localhost:8080/api/create_groups 
-    
-    This action will initiate default user groups (Firmware, Software, etc)
-  3. Create key store locker by visiting http://localhost:8080/api/create_key_store_locker
-    
-    This action will initiate empty RSA private key for sense on dvt, pvt and mp phases.
-  4. Update entities at http://localhost:8000/datastore (Port may not be 8000)
-  5. **Flush memcache**
-  6. Finally, visit localhost:8080/update
-
-- Populate Credentials for Prod
+- Populate Credentials for Local: Goto http://localhost:8080/setup
+- Populate Credentials for Prod:
   1. Go to https://github.com/hello/hello-admin-app/blob/master/handlers/helpers.py#L200 to edit method `__init__(self, request, response)` of class ProtectedRequestHandler
   2. Comment these 2 lines out:
     
@@ -43,8 +30,15 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
           self.restrict()
     ```
   3. Deploy the change to a version, let's say `setup` (Set `version: setup` at `app.yaml` before deploying)
-  4. Do all the steps stated above for local, except that the base url now is https://setup-dot-hello-admin.appspot.com instead of http://localhost:8080
-  5. Revert the change to bring back restriction on prod for all other versions. It maybe a good idea to keep a `setup` version always available around just in case.
+  4. Follow instruction at https://setup-dot-hello-admin.appspot.com/setup
+  5. If you can't get to https://setup-dot-hello-admin.appspot.com/setup, do:
+    1. Create AppInfo, AppUser, ZendeskCredentials, SearchifyCredentials by visiting https://setup-dot-hello-admin.appspot.com/api/setup
+    2. If needed, recreate user-group entity by visiting https://setup-dot-hello-admin.appspot.com/api/create_groups 
+    3. If needed, recreate key store locker by visiting https://setup-dot-hello-admin.appspot.com/api/create_key_store_locker
+    4. Above actions wipe out current entities and init defaults. You want to update them at https://appengine.google.com/datastore/explorer?&app_id=s~hello-admin. For RSA keys, you want to use https://setup-dot-hello-admin.appspot.com/provision because GAE doesn't allow text changes on prod
+    5. **Flush memcache**
+    6. Finally, visit https://setup-dot-hello-admin.appspot.com/update
+    7. Remember not to check the changes in step 2 in master because we want restriction on all other versions. It maybe a good idea to keep a `setup` version around just in case.
 
 - Update Current Credentials
   1. Visit: https://appengine.google.com/datastore/explorer?&app_id=s~hello-admin
