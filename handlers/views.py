@@ -1,6 +1,7 @@
 import datetime as dt
 import jinja2
 import os
+from handlers.helpers import BaseRequestHandler
 from handlers.helpers import ProtectedRequestHandler
 from handlers.helpers import CustomerExperienceRequestHandler
 from handlers.helpers import FirmwareRequestHandler
@@ -161,7 +162,7 @@ class AlarmsView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/alarms.html',
                                 context={'title': 'Alarms'})
 
-class SetupView(ProtectedRequestHandler):
+class SetupView(BaseRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/setup.html',
                                 context={'title': 'Setup'})

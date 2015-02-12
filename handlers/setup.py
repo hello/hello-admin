@@ -260,24 +260,24 @@ class RegisterPillAPI(ProtectedRequestHandler):
 class SetupAPI(SuperEngineerRequestHandler):
     def get(self):
         admin_user = AdminUser(
-            id='dev',
+            id=settings.ENVIRONMENT,
             username='replace me with a real user',
             password='with with correct pw'
         )
         admin_user.put()
 
         app_info = AppInfo(
-            id='dev',
-            client_id=settings.PROD_CLIENT,
-            endpoint=settings.PROD_API,
-            access_token='updateme'
+            id=settings.ENVIRONMENT,
+            client_id=settings.DEV_CLIENT,
+            endpoint=settings.DEV_API,
+            access_token='will be created by /update'
         )
         app_info.put()
 
         zendesk_credentials = ZendeskCredentials(
             id=settings.ENVIRONMENT,
-            domain='https://something.zendesk.com',
-            email_account='email@sayhello.com',
+            domain='https://helloinc.zendesk.com',
+            email_account='marina@sayhello.com',
             api_token='ask_marina'
         )
         zendesk_credentials.put()
@@ -287,6 +287,7 @@ class SetupAPI(SuperEngineerRequestHandler):
             api_client='ask_tim'
         )
         searchify_credentials.put()
+        self.response.write("Essential credentials initialized!")
 
 class UpdateAdminAccessTokenAPI(SuperEngineerRequestHandler):
     """
@@ -377,11 +378,10 @@ class CreateKeyStoreLockerAPI(SuperEngineerRequestHandler):
         """
         Populate groups entity
         """
-        output = {'data': [], 'error': ''}
         for key_id in ['pvt', 'dvt', 'mp']:
             key_store_entity = KeyStoreLocker(id=key_id, private_key="Fill in private key")
             key_store_entity.put()
-        self.response.write(json.dumps(output))
+        self.response.write("Empty RSA private keys for sense provision initialized !")
 
     def post(self):
         """
@@ -398,8 +398,6 @@ class CreateKeyStoreLockerAPI(SuperEngineerRequestHandler):
         priv.private_key = key
         priv.put()
         self.redirect('/')
-
-
 
 
 class CreateGroupsAPI(ProtectedRequestHandler):
