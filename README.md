@@ -42,7 +42,7 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
       if settings.DEBUG is False:
           self.restrict()
     ```
-  3. Deploy the change to a version, let's say `setup`
+  3. Deploy the change to a version, let's say `setup` (Set `version: setup` at `app.yaml` before deploying)
   4. Do all the steps stated above for local, except that the base url now is https://setup-dot-hello-admin.appspot.com instead of http://localhost:8080
   5. Revert the change to bring back restriction on prod for all other versions. It maybe a good idea to keep a `setup` version always available around just in case.
 
