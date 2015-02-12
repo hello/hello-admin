@@ -187,7 +187,7 @@ var TimelineMaestro = React.createClass({
     render: function() {
         var that = this;
         var timelineContent =
-            (this.state.data[0].segments.length === 0) ? <Alert>No segments found!</Alert>:
+            (this.state.data[0].segments.length === 0) ? <span>No segments found !</span>:
             <TimelineContent data={this.state.data} filterStatus={this.state.filterStatus}/>;
 
         var insights = this.state.data[0].insights.map(function(i){return i.message}).join("<br/>");
