@@ -21,7 +21,6 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
 ### Setup
 
 - Populate Credentials for Local
-  These following actions will wipe out the current datastore entities and create new defaults.
   1. Create AppInfo, AppUser, ZendeskCredentials, SearchifyCredentials by visiting localhost:8080/create/app_against_prod
   This action will initiate default entities for those essential credentials 
   2. Create group entity by visiting http://localhost:8080/api/create_groups
