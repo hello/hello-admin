@@ -38,17 +38,15 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
 ### More setup
 - Create New Apps:
   - Using current UI at : https://hello-admin.appspot.com/settings
-  - If you can't get to that, you want to make a call to @POST https://hello-admin.appspot.com/api/app
+  - If you can't get to that, you want to make a call to  @POST https://dev-api.hello.is/v1/applications
       with `postData` = {
         "name": "app name"
         "scopes": ["scope1", "scope2"]
-        description: "description",
-        client_id: "clientId",
-        client_secret: "clientSecret",
-        redirect_uri: "redirect URL"
+        "description": "description",
+        "client_id": "clientId",
+        "client_secret": "clientSecret",
+        "redirect_uri": "redirect URL"
       } 
       with a token that has ADMINISTRATION_WRITE scope
-  - If even above step doesn't work, make a call to @POST https://dev-api.hello.is/v1/applications
-    with same `postData` pattern and token. 
 - Create New Tokens For An User:
   - Using current UI at : https://hello-admin.appspot.com/settings
