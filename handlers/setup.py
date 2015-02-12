@@ -152,8 +152,6 @@ class TokenAPI(ProtectedRequestHandler):
         username = post_data.get("username", "")
         app = post_data.get("app", "")
 
-
-
         tokens = AccessToken.query_tokens(username, app)
         if tokens != []:
             output['data'] = {'token': tokens[0].token}
@@ -261,38 +259,34 @@ class RegisterPillAPI(ProtectedRequestHandler):
 
 class CreateApplicationAgainstProdAPI(SuperEngineerRequestHandler):
     def get(self):
-        """
-        Just helpful for local dev
-        """
-        if settings.DEBUG:
-            admin_user = AdminUser(
-                id='dev',
-                username='replace me with a real user',
-                password='with with correct pw'
-            )
-            admin_user.put()
+        admin_user = AdminUser(
+            id='dev',
+            username='replace me with a real user',
+            password='with with correct pw'
+        )
+        admin_user.put()
 
-            app_info = AppInfo(
-                id='dev',
-                client_id=settings.PROD_CLIENT,
-                endpoint=settings.PROD_API,
-                access_token='updateme'
-            )
-            app_info.put()
+        app_info = AppInfo(
+            id='dev',
+            client_id=settings.PROD_CLIENT,
+            endpoint=settings.PROD_API,
+            access_token='updateme'
+        )
+        app_info.put()
 
-            zendesk_credentials = ZendeskCredentials(
-                id=settings.ENVIRONMENT,
-                domain='https://something.zendesk.com',
-                email_account='email@sayhello.com',
-                api_token='ask_marina'
-            )
-            zendesk_credentials.put()
+        zendesk_credentials = ZendeskCredentials(
+            id=settings.ENVIRONMENT,
+            domain='https://something.zendesk.com',
+            email_account='email@sayhello.com',
+            api_token='ask_marina'
+        )
+        zendesk_credentials.put()
 
-            searchify_credentials = SearchifyCredentials(
-                id=settings.ENVIRONMENT,
-                api_client='ask_tim'
-            )
-            searchify_credentials.put()
+        searchify_credentials = SearchifyCredentials(
+            id=settings.ENVIRONMENT,
+            api_client='ask_tim'
+        )
+        searchify_credentials.put()
 
 
 class SetupAPI(SuperEngineerRequestHandler):
@@ -426,12 +420,9 @@ class CreateKeyStoreLockerAPI(SuperEngineerRequestHandler):
         Populate groups entity
         """
         output = {'data': [], 'error': ''}
-        if settings.DEBUG:
-            for key_id in ['pvt', 'dvt', 'mp']:
-                key_store_entity = KeyStoreLocker(id=key_id, private_key="Fill in private key")
-                key_store_entity.put()
-        else:
-            output['error'] = 'Not permitted to run on prod'
+        for key_id in ['pvt', 'dvt', 'mp']:
+            key_store_entity = KeyStoreLocker(id=key_id, private_key="Fill in private key")
+            key_store_entity.put()
         self.response.write(json.dumps(output))
 
     def post(self):
@@ -459,20 +450,19 @@ class CreateGroupsAPI(SuperEngineerRequestHandler):
         Populate groups entity
         """
         output = {'data': [], 'error': ''}
-        if settings.DEBUG:
-            groups_data = {
-                'super_engineer': 'long@sayhello.com, tim@sayhello.com, benjo@sayhello.com, pang@sayhello.com',
-                'customer_experience': 'marina@sayhello.com, chrisl@sayhello.com',
-                'software': 'pang@sayhello.com, benjo@sayhello.com',
-                'hardware': 'scott@sayhello.com, ben@sayhello.com',
-                'firmware': 'chris@sayhello.com, kingshy@sayhello.com',
-                'elite_admin': 'long@sayhello.com, tim@sayhello.com'
-            }
-            groups_entity = UserGroup(**groups_data)
-            groups_entity.put()
-            output['data'] = groups_data
-        else:
-            output['error'] = 'Not permitted'
+
+        groups_data = {
+            'super_engineer': 'long@sayhello.com, tim@sayhello.com, benjo@sayhello.com, pang@sayhello.com',
+            'customer_experience': 'marina@sayhello.com, chrisl@sayhello.com',
+            'software': 'pang@sayhello.com, benjo@sayhello.com',
+            'hardware': 'scott@sayhello.com, ben@sayhello.com',
+            'firmware': 'chris@sayhello.com, kingshy@sayhello.com',
+            'elite_admin': 'long@sayhello.com, tim@sayhello.com'
+        }
+        groups_entity = UserGroup(**groups_data)
+        groups_entity.put()
+        output['data'] = groups_data
+
         self.response.write(json.dumps(output))
 
 class ViewPermissionAPI(ProtectedRequestHandler):
