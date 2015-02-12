@@ -33,7 +33,7 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
 
 - Populate Credentials for Prod
   1. Go to https://github.com/hello/hello-admin-app/blob/master/handlers/helpers.py#L200 to edit method `__init__(self, request, response)` of class ProtectedRequestHandler
-  2. Command these 2 lines out:
+  2. Comment these 2 lines out:
     
     ```
       if settings.DEBUG is False:
@@ -41,7 +41,7 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
     ```
   3. Deploy the change to a version, let's say `setup`
   4. Do all the steps stated above for local, except that the base url now is https://setup-dot-hello-admin.appspot.com instead of http://localhost:8080
-  5. Revert the change to bring back restriction on prod for all other versions
+  5. Revert the change to bring back restriction on prod for all other versions. It maybe a good idea to keep a `setup` version always available around just in case.
 
 - Update Current Credentials
   1. Visit: https://appengine.google.com/datastore/explorer?&app_id=s~hello-admin
