@@ -25,7 +25,6 @@ from handlers.metrics import TroubleshootAPI
 from handlers.setup import AppAPI
 from handlers.setup import AppScopeAPI
 from handlers.setup import CreateAccountAPI
-from handlers.setup import CreateApplicationAgainstProdAPI
 from handlers.setup import CreateGroupsAPI
 from handlers.setup import CreateKeyStoreLockerAPI
 from handlers.setup import ProxyAPI
@@ -63,6 +62,7 @@ from handlers.views import CreateKeyView
 from handlers.views import RoomConditionsView
 from handlers.views import LabelView
 from handlers.views import AlarmsView
+from handlers.views import SetupView
 from handlers.keys import PillProvisionAPI
 from handlers.keys import PillKeyDecryptAPI
 from handlers.keys import PillKeyProvision
@@ -116,7 +116,6 @@ page_routes = [
     ('/battery/?$', BatteryView),
     ('/charts', ChartHandler),
     ('/configuration/?$', ConfigurationView),
-    ('/create/app_against_prod', CreateApplicationAgainstProdAPI),
     ('/create_account', CreateAccountAPI),
     ('/debug_log/?$', DebugLogView),
     ('/application_logs/?$', ApplicationLogsView),
@@ -126,7 +125,7 @@ page_routes = [
     ('/register_pill', RegisterPillAPI),
     ('/sense/?$', SenseVisualView),
     ('/settings/?$', SettingsView),
-    ('/setup', SetupAPI),
+    ('/api/setup', SetupAPI),
     ('/teams/?$', TeamsView),
     ('/update', UpdateAdminAccessTokenAPI),
     ('/users/?$', UserView),
@@ -144,6 +143,7 @@ page_routes = [
     ('/room_conditions/?$', RoomConditionsView),
     ('/label/?$', LabelView),
     ('/alarms/?$', AlarmsView),
+    ('/setup/?$', SetupView),
 ]
 
 file_upload_routes = [

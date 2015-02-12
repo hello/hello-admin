@@ -257,7 +257,7 @@ class RegisterPillAPI(ProtectedRequestHandler):
         )
 
 
-class CreateApplicationAgainstProdAPI(SuperEngineerRequestHandler):
+class SetupAPI(SuperEngineerRequestHandler):
     def get(self):
         admin_user = AdminUser(
             id='dev',
@@ -287,48 +287,6 @@ class CreateApplicationAgainstProdAPI(SuperEngineerRequestHandler):
             api_client='ask_tim'
         )
         searchify_credentials.put()
-
-
-class SetupAPI(SuperEngineerRequestHandler):
-    """
-    Create entities for AppInfo, AdminUser and ZendeskCredentials
-    """
-    def get(self):
-
-        env = AdminUser.get_by_id(settings.ENVIRONMENT)
-        if env is not None:
-            self.response.write('Credentials already existed')
-            return
-
-        admin_user = AdminUser(
-            id=settings.ENVIRONMENT,
-            username='username',
-            password='password'
-        )
-        admin_user.put()
-
-        app_info = AppInfo(
-            id=settings.ENVIRONMENT,
-            client_id=settings.CLIENT_ID,
-            endpoint='updateme',
-            access_token='updateme'
-        )
-        app_info.put()
-
-        zendesk_credentials = ZendeskCredentials(
-            id=settings.ENVIRONMENT,
-            domain='https://something.zendesk.com',
-            email_account='email@sayhello.com',
-            api_token='ask_marina'
-        )
-        zendesk_credentials.put()
-
-        searchify_credentials = SearchifyCredentials(
-            id=settings.ENVIRONMENT,
-            api_client='ask_tim'
-        )
-        searchify_credentials.put()
-
 
 class UpdateAdminAccessTokenAPI(SuperEngineerRequestHandler):
     """
@@ -444,7 +402,7 @@ class CreateKeyStoreLockerAPI(SuperEngineerRequestHandler):
 
 
 
-class CreateGroupsAPI(SuperEngineerRequestHandler):
+class CreateGroupsAPI(ProtectedRequestHandler):
     def get(self):
         """
         Populate groups entity
@@ -452,11 +410,11 @@ class CreateGroupsAPI(SuperEngineerRequestHandler):
         output = {'data': [], 'error': ''}
 
         groups_data = {
-            'super_engineer': 'long@sayhello.com, tim@sayhello.com, benjo@sayhello.com, pang@sayhello.com',
+            'super_engineer': 'long@sayhello.com, tim@sayhello.com, pang@sayhello.com, chris@sayhello.com, jchen@sayhello.com',
             'customer_experience': 'marina@sayhello.com, chrisl@sayhello.com',
             'software': 'pang@sayhello.com, benjo@sayhello.com',
             'hardware': 'scott@sayhello.com, ben@sayhello.com',
-            'firmware': 'chris@sayhello.com, kingshy@sayhello.com',
+            'firmware': 'chris@sayhello.com, kingshy@sayhello.com, benjo@sayhello.com, jchen@sayhello.com',
             'elite_admin': 'long@sayhello.com, tim@sayhello.com'
         }
         groups_entity = UserGroup(**groups_data)
