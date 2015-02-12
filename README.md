@@ -21,7 +21,7 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
 ### Setup
 
 - Populate Credentials for Local
-  1. Create AppInfo, AppUser, ZendeskCredentials, SearchifyCredentials by visiting localhost:8080/create/app_against_prod
+  1. Create AppInfo, AppUser, ZendeskCredentials, SearchifyCredentials by visiting localhost:8080/api/setup
     
     This action will wipe out current entities and initiate default entities for those essential credentials 
   2. Create group entity by visiting http://localhost:8080/api/create_groups 
