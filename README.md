@@ -59,8 +59,8 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
       - For RSA keys, you want to use https://setup-dot-hello-admin.appspot.com/provision because GAE doesn't allow text changes on prod
     5. **Flush memcache**
     6. Finally, visit https://setup-dot-hello-admin.appspot.com/update
-    7. Remember not to check the changes in step iii in master because we want restriction on all other versions. It maybe a good idea to keep a `setup` version around just in case.
-    8. AccessToken entities in datastore need to be purged: All the expired tokens there need to be removed, otherwise we may keep calling java server using dead tokens (esp. after a migration).
+  6. Remember not to check the changes in step iii in master because we want restriction on all other versions. It maybe a good idea to keep a `setup` version around just in case.
+  7. AccessToken entities in datastore need to be purged: All the expired tokens there need to be removed, otherwise we may keep calling java server using dead tokens (esp. after a migration).
 
 - Update Current Credentials
   1. Visit: https://appengine.google.com/datastore/explorer?&app_id=s~hello-admin
