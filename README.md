@@ -32,7 +32,7 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
   6. Finally, visit localhost:8080/update
 
 - Populate Credentials for Prod
-  1. Go to https://github.com/hello/hello-admin-app/blob/master/handlers/helpers.py#L200 to edit method self.restrict() of class ProtectedRequestHandler
+  1. Go to https://github.com/hello/hello-admin-app/blob/master/handlers/helpers.py#L200 to edit method `__init__(self, request, response)` of class ProtectedRequestHandler
   2. Command these 2 lines out:
     
     ```
