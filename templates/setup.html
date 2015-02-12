@@ -13,12 +13,15 @@
     <p>2. Next, go to GAE's <a target="_blank" href="http://localhost:8000/datastore">local datastore</a> or <a target="_blank" href="https://appengine.google.com/datastore/explorer?&app_id=s~hello-admin">prod datastore</a> to fill in credentials, save and <strong>flush memcache</strong></p>
     <br>
 
-    <p>3. It is optional to <a target="_blank" href="/api/create_groups"> recreate user groups</a> as the current ones shall prevail</p>
-    <p>&nbsp;&nbsp;&nbsp;This action will wipe out current entities of UserGroup if existed and initiate default user groups.</p>
-    <p>&nbsp;&nbsp;&nbsp;If you did perform this action, you might want to repeat step 2 to add yourself to super engineer group.</p>
+    <p>3. Let's <a target="_blank" href="/update">update to make setup effective</a></p>
     <br>
 
-    <p>4. It is also optional to <a target="_blank" href="/api/create_key_store_locker">recreate RSA private keys</a> for sense provision</p>
+    <p>4. It is optional to <a target="_blank" href="/api/create_groups"> recreate user groups</a> as the current ones shall prevail</p>
+    <p>&nbsp;&nbsp;&nbsp;This action will wipe out current entities of UserGroup if existed and initiate default user groups.</p>
+    <p>&nbsp;&nbsp;&nbsp;If you did perform this action, you might want to repeat steps 2 and 3 to add yourself to super engineer group.</p>
+    <br>
+
+    <p>5. It is also optional to <a target="_blank" href="/api/create_key_store_locker">recreate RSA private keys</a> for sense provision</p>
     <p>&nbsp;&nbsp;&nbsp;This action will wipe out current RSA private keys if existed and initiate empty ones for sense on DVT, PVT and MP phases.</p>
     <p>&nbsp;&nbsp;&nbsp;If you did perform this action, you might want to <a target="_blank" href="/provision">recreate RSA private keys for sense provision</a>.</p>
     <br>
