@@ -18,12 +18,9 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
   - ZendeskCredentials: zendesk API endpoint
   - ZendeskDailyStats: zendesk daily cron data
 
-- Update Current Credentials
-  1. Visit: https://appengine.google.com/datastore/explorer?&app_id=s~hello-admin
-  2. Change AppInfo / AdminUser /   
-  3. Flush memcache
+### Setup
 
-- Populate Credentials (for local dev, esp. after your local java server connects to a new database)
+- Populate Credentials for Local
   These following actions will wipe out the current datastore entities and create new defaults.
   1. Create AppInfo, AppUser, ZendeskCredentials, SearchifyCredentials by visiting localhost:8080/create/app_against_prod
   This action will initiate default entities for those essential credentials 
@@ -32,11 +29,29 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
   3. Create key store locker by visiting http://localhost:8080/api/create_key_store_locker
   This action will initiate empty RSA private key for sense on dvt, pvt and mp phases.
   4. Update entities at http://localhost:8000/datastore (Port may not be 8000)
-  5. Flush memcache
-  6. Finally, visit localhost:PORT/update
+  5. **Flush memcache**
+  6. Finally, visit localhost:8080/update
+
+- Populate Credentials for Prod
+  1. Go to https://github.com/hello/hello-admin-app/blob/master/handlers/helpers.py#L200 to edit method self.restrict() of class ProtectedRequestHandler
+  2. Command these 2 lines out:
+    
+    ```
+      if settings.DEBUG is False:
+      self.restrict()
+    ```
+  3. Deploy the change to a version, let's say `setup`
+  4. Do all the steps stated above for local, except that the base url now is https://setup-dot-hello-admin.appspot.com instead of http://localhost:8080
+  5. Revert the change to bring back restriction on prod for all other versions
+
+- Update Current Credentials
+  1. Visit: https://appengine.google.com/datastore/explorer?&app_id=s~hello-admin
+  2. Change AppInfo / AdminUser /   
+  3. **Flush memcache**
+ 
 
 ### More setup
-- Create New Apps:
+- Create Additional Apps:
   - Using current UI at : https://hello-admin.appspot.com/settings
   - If you can't get to that, you want to make a call to  @POST https://dev-api.hello.is/v1/applications
       with `postData` = {
@@ -48,5 +63,10 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
         "redirect_uri": "redirect URL"
       } 
       with a token that has ADMINISTRATION_WRITE scope
-- Create New Tokens For An User:
+- Create new tokens for an user:
   - Using current UI at : https://hello-admin.appspot.com/settings
+- View saved tokens per app/user
+  https://hello-admin.appspot.com/api/tokens/?app=admin-data-viewer
+  https://hello-admin.appspot.com/api/tokens/?username=tim@home.com
+  https://hello-admin.appspot.com/api/tokens/?app=admin-data-viewer&username=kdm3@sayhello.com
+
