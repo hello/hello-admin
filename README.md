@@ -68,7 +68,7 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
 - Create new tokens for an user:
   - Using current UI at : https://hello-admin.appspot.com/settings
 - View saved tokens per app/user
-  https://hello-admin.appspot.com/api/tokens/?app=admin-data-viewer
-  https://hello-admin.appspot.com/api/tokens/?username=tim@home.com
-  https://hello-admin.appspot.com/api/tokens/?app=admin-data-viewer&username=kdm3@sayhello.com
+  - https://hello-admin.appspot.com/api/tokens/?app=admin-data-viewer
+  - https://hello-admin.appspot.com/api/tokens/?username=tim@home.com
+  - https://hello-admin.appspot.com/api/tokens/?app=admin-data-viewer&username=kdm3@sayhello.com
 
