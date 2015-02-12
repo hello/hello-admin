@@ -22,6 +22,22 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
 
 - Populate Credentials for Local: Goto http://localhost:8080/setup
 - Populate Credentials for Prod:
+  0. Generate a gae admin account like `gae@sayhello.com` by calling @POST /v1/account. See Registration class.
+  0. Generate an OAuth application by calling @POST /v1/applications with 
+    ```
+    post_data = {
+      "name": "GAE Admin app", 
+      "client_id": "gae_admin", 
+      "client_secret": "gae secret", 
+      "redirect_uri": "https://hello-admin.appspot.com", 
+      "scopes": ["AUTH", "ADMINISTRATION_READ", "ADMINISTRATION_WRITE"], 
+      "description": "admin oauth app"
+    }. 
+    ```
+    
+    You need a token with scope ADMINISTRATION_WRITE but will realize tokens can only be created by calling @POST /v1/oauth2/token with a post data specifying client_id of the application which you don't currently have. Ask Tim to do deploy a soft API allowing you to **get_or_create** a token with any client_id, i.e. if the posted client_id doesn't belong to any known applications, that api will create a new application and return the token associated with it. In this case, we want a `gae_admin` token for `gae@sayhello.com`
+    
+
   1. Go to https://github.com/hello/hello-admin-app/blob/master/handlers/helpers.py#L200 to edit method `__init__(self, request, response)` of class ProtectedRequestHandler
   2. Comment these 2 lines out:
     
@@ -31,6 +47,7 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
     ```
   3. Deploy the change to a version, let's say `setup` (Set `version: setup` at `app.yaml` before deploying)
   4. Follow instruction at https://setup-dot-hello-admin.appspot.com/setup
+  
   5. If you can't get to https://setup-dot-hello-admin.appspot.com/setup, do:
     1. Create AppInfo, AppUser, ZendeskCredentials, SearchifyCredentials by visiting https://setup-dot-hello-admin.appspot.com/api/setup
     2. If needed, recreate user-group entity by visiting https://setup-dot-hello-admin.appspot.com/api/create_groups 
