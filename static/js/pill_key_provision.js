@@ -2,10 +2,10 @@
 
 var jFileUpload = React.createClass({
     getInitialState: function() {
-        return {alert: ""}
+        return {alert: []}
     },
     componentDidMount: function() {
-        var url = "/pill_bin_upload", that = this, postRequestData = {}, thisDevice;
+        var url = "/pill_bin_upload", that = this;
         var thisProgressBar = $('.progress-bar');
 
         $('#fileupload').fileupload({
@@ -14,32 +14,56 @@ var jFileUpload = React.createClass({
             dataType: 'json',
             done: function (e, data) {
                 $.each(data.result.files, function (index, file) {
-                    thisDevice = file.pill_id;
-                    that.setState({alert: "Successfully decrypted key for pill " + thisDevice});
-                    postRequestData['device_id'] = thisDevice;
-                    postRequestData['public_key'] = file.pill_key;
-                    postRequestData['remark'] = $('#pill-remark-input').val();
-                });
-                $.ajax({
-                    url: "api/pill_key_provision",
-                    type: "POST",
-                    dataType: 'json',
-                    data: postRequestData,
-                    success: function(response) {
-                        console.log(response);
-                        if (response.error === "") {
-                            that.setState({alert: "Successfully stored key for pill " + thisDevice});
-                        }
-                        else {
-                            that.setState({alert: "Error: " + response.error});
-                        }
-                        setTimeout(function(){thisProgressBar.css('width','0%');}, 1000);
+                    if (file.pill_id !== null) {
+                        var postRequestData = {};
+                        console.log(file.pill_id, file.pill_key);
+//                        that.setState({alert: "Successfully decrypted key for pill " + file.pill_id});
+                        postRequestData['device_id'] = file.pill_id;
+                        postRequestData['public_key'] = file.pill_key;
+                        postRequestData['remark'] = $('#pill-remark-input').val();
+
+                        $.ajax({
+                            url: "api/pill_key_provision",
+                            type: "POST",
+                            dataType: 'json',
+                            data: postRequestData,
+                            success: function (response) {
+                                console.log(response);
+                                if (response.error === "") {
+                                    that.setState({alert: that.state.alert.concat({
+                                        file: file.name,
+                                        pill: file.pill_id,
+                                        status: "success",
+                                        statusColor: "default"
+                                    })});
+                                }
+                                else {
+                                    that.setState({alert: that.state.alert.concat({
+                                        file: file.name,
+                                        pill: file.pill_id,
+                                        status: "decrypted but not stored",
+                                        statusColor: "danger"
+                                    })});
+                                }
+                                setTimeout(function () {
+                                    thisProgressBar.css('width', '0%');
+                                }, 1000);
+                            }
+                        });
+                    }
+                    else {
+                        that.setState({alert: that.state.alert.concat({
+                            file: file.name,
+                            pill: "n/a",
+                            status: "sha do not match",
+                            statusColor: "danger"
+                        })});
                     }
                 });
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 var serverError = XMLHttpRequest.responseText.split("h1>").last().split("<")[0];
-                that.setState({alert: serverError + " \n sha do not match!"});
+                that.setState({alert: serverError});
             },
             progressall: function (e, data) {
                 var progress = parseInt(data.loaded / data.total * 100, 10);
@@ -50,11 +74,27 @@ var jFileUpload = React.createClass({
 
     },
     render: function() {
-         var alert = (this.state.alert === "") ? null:
-            <Alert bsStyle="info">{this.state.alert}</Alert>;
-        return(<Col xs={4} sm={4} md={4} xsOffset={2} smOffset={2} mdOffset={2}>
+        var alert = null;
+        if (this.state.alert.length > 0) {
+            alert = <Table bordered>
+                    <thead><tr>
+                        <th className="alert-info">File</th>
+                        <th className="alert-info">Pill</th>
+                        <th className="alert-info">Status</th>
+                    </tr></thead>
+                    <tbody>
+                        {this.state.alert.reverse().map(function(t){return <tr>
+                            <td className={t.statusColor}>{t.file}</td>
+                            <td className={t.statusColor}>{t.pill}</td>
+                            <td className={t.statusColor}>{t.status}</td>
+                        </tr>})}
+                    </tbody>
+                </Table>;
+        }
+
+        return(<Col xs={7} sm={7} md={7} lg={7} xl={7} xsOffset={1} smOffset={1} mdOffset={1} lgOffset={1} xlOffset={1}>
             <h3>Pill Key Provision</h3><hr className="fancy-line"/><br/>
-            <p> Select ONE file by dragging here or browsing !</p><br/>
+            <p> Select one or multiple files by dragging here or browsing !</p><br/>
             <span className="btn btn-success fileinput-button">
                 <i className="glyphicon glyphicon-plus"></i>
                 <span> Browse ...</span>
