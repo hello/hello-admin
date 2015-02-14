@@ -63,7 +63,7 @@ var KeysMaestro = React.createClass({
         var alert = (this.state.alert === "") ? null:
             <Alert bsStyle="info">{this.state.alert}</Alert>;
 
-        return (<Col xs={4} sm={4} md={4} xsOffset={1} smOffset={1} mdOffset={1}>
+        return (<Col xs={4} sm={4} md={4} lg={4} xl={4}>
             <h3>Sense Key Provision</h3><hr className="fancy-line"/><br/>
             <form onSubmit={this.handleSubmit}>
                 <Input id="sense-stage-input" type="select">

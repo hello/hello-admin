@@ -284,7 +284,7 @@ def display_info(binary):
         print "SHA1: %s\r\n" % sha_1
         print "SHA1-CALCULATED: %s\r\n" % sha_calculated
         print "Checksum Failed!"
-        raise RuntimeError("sha do not match!")
+        pill_id = None
 
     return {
        "pill_id": pill_id,
