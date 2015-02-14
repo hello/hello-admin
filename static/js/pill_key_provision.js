@@ -76,7 +76,7 @@ var jFileUpload = React.createClass({
     render: function() {
         var alert = null;
         if (this.state.alert.length > 0) {
-            alert = <Table bordered>
+            alert = <Table bordered id="bulk-pill-provision-results">
                     <thead><tr>
                         <th className="alert-info">File</th>
                         <th className="alert-info">Pill</th>
@@ -85,7 +85,9 @@ var jFileUpload = React.createClass({
                     <tbody>
                         {this.state.alert.reverse().map(function(t){return <tr>
                             <td className={t.statusColor}>{t.file}</td>
-                            <td className={t.statusColor}>{t.pill}</td>
+                            <td className={t.statusColor}> {t.pill === "n/a" ? "n/a":
+                                <a href={"/key_store/?device="+t.pill+"&type=pill"} target="_blank">{t.pill}</a>}
+                            </td>
                             <td className={t.statusColor}>{t.status}</td>
                         </tr>})}
                     </tbody>
