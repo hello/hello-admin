@@ -182,11 +182,12 @@ React.renderComponent(<BatteryChart />, document.getElementById('battery'));
 function filterData(data) {
     return data.map(function(s){
         return s.map(function(d){
-            console.log(d);
             if (d.lastSeen < Math.pow(10, 12)) {
                 d.lastSeen *= 1000;
             }
-            return d;s
+            return d;
+        }).filter(function(f){
+            return f.lastSeen >= new Date().getTime() - 10*24*3600*1000;
         });
     });
 }
