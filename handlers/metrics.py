@@ -242,7 +242,6 @@ class TimelineAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="timeline/admin/{}/{}".format(email, date),
             type="GET",
-            impersonatee_token="10.d246f438c7c444f3bc3685ca654fd23f"
         )
 
 

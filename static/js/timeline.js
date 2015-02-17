@@ -187,13 +187,13 @@ var TimelineMaestro = React.createClass({
     render: function() {
         var that = this;
         var timelineContent =
-            (this.state.data[0].segments.length === 0) ? <span>No segments found !</span>:
+            (this.state.data[0] && this.state.data[0].segments && this.state.data[0].segments.length === 0) ? <span>No segments found !</span>:
             <TimelineContent data={this.state.data} filterStatus={this.state.filterStatus}/>;
 
         var insights = this.state.data[0].insights.map(function(i){return i.message}).join("<br/>");
         var insightsPanel = insights.length === 0 ? <Alert bsStyle="danger">No insights found &#9785;</Alert> :
             <Alert bsStyle="warning"><span className="insights" dangerouslySetInnerHTML={{__html: insights}}/></Alert>;
-        var stats = this.state.data[0].statistics && this.state.data[0].statistics !== {} ? Object.keys(this.state.data[0].statistics).map(function(k){return k + " : " + that.state.data[0].statistics[k]}).join("<br/>"): "Invalid Data";
+        var stats = this.state.data[0].statistics && this.state.data[0].statistics !== {} ? Object.keys(this.state.data[0].statistics).map(function(k){return k + " : " + that.state.data[0].statistics[k]}).join("<br/>"): that.state.data[0].message;
         var statsPanel = stats.length === 0 ? <Alert bsStyle="danger">No stats found &#9785;</Alert> :
             <Alert bsStyle="success"><span className="insights" dangerouslySetInnerHTML={{__html: stats}}/></Alert>;
 
