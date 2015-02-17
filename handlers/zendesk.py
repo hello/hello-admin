@@ -41,10 +41,11 @@ class ZendeskAPI(CustomerExperienceRequestHandler):
                 if zen_response.ok:
                     tickets += zen_response.json().get('results', [])
 
-            tickets = sorted(tickets, key=lambda k: iso_to_utc_timestamp(k.get('created_at')))
-
             if not tickets:
-                raise RuntimeError("fail to retrieve {}'s tickets")
+                # raise RuntimeError("fail to retrieve {}'s tickets")
+                tickets = []
+                
+            tickets = sorted(tickets, key=lambda k: iso_to_utc_timestamp(k.get('created_at')))
             output['data'] = tickets
 
         except Exception as e:
