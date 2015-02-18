@@ -51,7 +51,7 @@ var AlarmsMaster = React.createClass({
         var requestData = {
             username: $('#email-input').val(),
             password: $('#password-input').val(),
-            app: "admin-alarms"
+            app: "admin-data-viewer"
         };
         $.ajax({
             url: '/api/tokens',
