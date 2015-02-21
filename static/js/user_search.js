@@ -46,7 +46,11 @@ var UserSearchTable = React.createClass({
 
         if (this.props.devices.length > 0) {
           this.props.devices.forEach(function(device){
-            var debugLogLink = device.type === "PILL" ? <Label bsStyle= {device.state === "NORMAL" ? "success": "danger"}>{device.device_id}</Label>:
+            var debugLogLink = device.type === "PILL" ?
+                <a href={"/battery/?search=" + device.device_id} target="_blank" title="See pill status">
+                  <Label bsStyle= {device.state === "NORMAL" ? "success": "danger"}>{device.device_id}</Label>
+                </a>
+                :
                 <a href={"/debug_log/?devices=" + device.device_id} target="_blank" title="Go to debug log">
                   <Label bsStyle= {device.state === "NORMAL" ? "success": "danger"}>{device.device_id}</Label>
                 </a>;
