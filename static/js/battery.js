@@ -56,7 +56,7 @@ var c3Chart = React.createClass({
                     y2: {
                         show: true,
                         label: {
-                            text: "Uptime (milliseconds)",
+                            text: "Uptime (seconds)",
                             position: 'outer-middle'
                         }
                     }

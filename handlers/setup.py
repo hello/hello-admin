@@ -197,7 +197,7 @@ class TokenAPI(ProtectedRequestHandler):
         hello = make_oauth2_service(app_info_model)
 
         data = {
-            "grant_type": "password",
+            "grant_type": "PASSWORD",
             "client_id": app,
             "client_secret": '',
             "username": username,

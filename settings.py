@@ -2,10 +2,10 @@ import os
 
 DEBUG = False
 ENVIRONMENT = 'prod'
-CLIENT_ID = 'gae'
+CLIENT_ID = 'sense-admin'
 
-PROD_CLIENT = 'gae_admin'
-PROD_API = 'https://dev-api.hello.is/v1/'
+PROD_CLIENT = 'sense-admin'
+PROD_API = 'https://api.hello.is/v1/'
 
 DEV_CLIENT = 'gae_admin'
 DEV_API = 'http://localhost:9999/v1/'
