@@ -1,7 +1,9 @@
 ### Hello Admin App
 Internal Tools for Hello Team
 
-[https://hello-admin.appspot.com/](https://hello-admin.appspot.com/)
+- master branch is responsible for [https://hello-admin.appspot.com/](https://hello-admin.appspot.com/) which points to production database
+- [dev branch](https://github.com/hello/hello-admin-app/tree/dev) is responsible for [https://dev-dot-hello-admin.appspot.com/](https://dev-dot-hello-admin.appspot.com/) which points to dev database
+- **never** merge dev to master
 
 Requires a @sayhello.com email address.
 hello-admin is authorized through our Google Apps Account. If you want deploy changes, you need to be added to the list of administrators for the app. Let me (tim@sayhello.com) know and I'll add you.
