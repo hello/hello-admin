@@ -63,11 +63,13 @@ from handlers.views import RoomConditionsView
 from handlers.views import LabelView
 from handlers.views import AlarmsView
 from handlers.views import SetupView
+from handlers.views import PasswordResetView
 from handlers.keys import PillProvisionAPI
 from handlers.keys import PillKeyDecryptAPI
 from handlers.keys import PillKeyProvision
 from handlers.label_data import LabelDataAPI
 from handlers.alarms import AlarmsAPI
+from handlers.users import PasswordResetAPI
 
 cron_routes = [
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
@@ -109,6 +111,7 @@ api_routes = [
     ('/api/room_conditions/?$', RoomConditionsAPI),
     ('/api/label_data/?$', LabelDataAPI),
     ('/api/alarms/?$', AlarmsAPI),
+    ('/api/password_reset/?$', PasswordResetAPI),
 ]
 
 page_routes = [
@@ -144,6 +147,7 @@ page_routes = [
     ('/label/?$', LabelView),
     ('/alarms/?$', AlarmsView),
     ('/setup/?$', SetupView),
+    ('/password_reset/?$', PasswordResetView),
 ]
 
 file_upload_routes = [

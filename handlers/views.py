@@ -166,3 +166,8 @@ class SetupView(BaseRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/setup.html',
                                 context={'title': 'Setup'})
+
+class PasswordResetView(BaseRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/password_reset.html',
+                                context={'title': 'Password Reset'})
