@@ -41,7 +41,7 @@ var jFileUpload = React.createClass({
                                     that.setState({alert: that.state.alert.concat({
                                         file: file.name,
                                         pill: file.pill_id,
-                                        status: "decrypted but not stored",
+                                        status: "decrypted but not stored because " + response.error,
                                         statusColor: "danger"
                                     })});
                                 }
