@@ -3,7 +3,7 @@ var Header = React.createClass({
     render: function() {
         var cx = React.addons.classSet;
         var envProd, envDev;
-        if (document.URL === "https://hello-admin.appspot.com/") {
+        if (document.URL.indexOf("dev") < 0) {
             envProd = cx({
                 activeEnv: true,
                 env: true
