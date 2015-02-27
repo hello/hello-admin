@@ -18,8 +18,8 @@ body {font-size: 100%; color: rgb(32, 32, 32);;}
 #menu>a, #sub-menu>a {color: deepskyblue;margin-right: 10px;}
 #sub-menu>a {font-size: 90%;}
 #sub-menu {margin-left: 10% !important; margin-top: 10px;}
-#menu>a:hover, #sub-menu>a:hover {text-decoration: none; -webkit-stroke-width: 7px;-webkit-stroke-color: #B0FC23; -webkit-fill-color: #B0FC23; text-shadow: 1px 0 20px #B0FC23;}
-#menu>a.menu-active, #sub-menu>a.menu-active {color: #B0FC23; text-decoration: none; -webkit-stroke-width: 7px;-webkit-stroke-color: #B0FC23; -webkit-fill-color: #B0FC23; text-shadow: 1px 0 20px #B0FC23;}
+a.env:hover {text-decoration: none; -webkit-stroke-width: 7px;-webkit-stroke-color: #B0FC23; -webkit-fill-color: #B0FC23; text-shadow: 1px 0 20px #B0FC23; color: #5AFC23;}
+a.activeEnv {color: #B0FC23; text-decoration: none; -webkit-stroke-width: 7px;-webkit-stroke-color: #B0FC23; -webkit-fill-color: #B0FC23; text-shadow: 1px 0 20px #B0FC23;}
 #menu>a>span.glyphicon {margin: 0 7px;}
 
 #sidebar {margin: 3px 0 0 0; max-width: 200px; font-family: Menlo,Monaco,Consolas,"Courier New",monospace; font-size: 85%;}
