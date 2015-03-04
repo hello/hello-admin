@@ -279,5 +279,15 @@ function logsFilter(data, start, end) {
          return log;
        }
     });
-    return filtered_logs.reverse();
+    return filtered_logs.sort(compareTimestamp);
+}
+
+function compareTimestamp(log1, log2) {
+    if (log1.timestamp < log2.timestamp) {
+        return -1;
+    }
+    if (log1.timestamp > log2.timestamp) {
+        return 1;
+    }
+    return 0;
 }
