@@ -10,7 +10,7 @@ var SideBar = React.createClass({
 
            <ListGroupItem bsStyle="info" className="sidebar-group">Data</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/timeline">&#10149; Timeline</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/sense">&#10149; Room Conditions</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/room_conditions">&#10149; Room Conditions</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/battery">&#10149; Pill Status</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/motion">&#10149; Motion</ListGroupItem>
 
