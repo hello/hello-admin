@@ -5,6 +5,7 @@ import webapp2
 import hashlib
 import binascii
 import datetime
+import logging as log
 
 from helpers import ProtectedRequestHandler
 from Crypto.PublicKey import RSA
@@ -28,18 +29,19 @@ ALL_FILES_ACCEPTED = True
 
 def extract_key(content):
   blob = "".join("{:02x}".format(ord(c)) for c in content)
-  print "-> blob", blob
   pad = blob[:160]
   key = blob[162:194]
   device_id = blob[196:212]
   sha1 = blob[214:-2]
-  print "-> pad", pad, len(pad)
-  print "-> key", key, len(key)
-  print "-> device_id", device_id, len(device_id)
-  print "->sha", sha1, len(sha1)
+
   m = hashlib.sha1()
   m.update(content[81:-21])
   if sha1 != m.hexdigest():
+      log.error("-> blob %s", blob)
+      log.error("-> pad: %s, %d", pad, len(pad))
+      log.error("-> key: %s, %d", key, len(key))
+      log.error("-> device_id: %s, %d", device_id, len(device_id))
+      log.error("->sha: %s, %d", sha1, len(sha1))
       raise RuntimeError("sha do not match!")
   return device_id.upper(), key.upper()
 

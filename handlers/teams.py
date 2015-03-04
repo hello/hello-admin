@@ -35,10 +35,11 @@ class TeamsAPI(ProtectedRequestHandler):
             "delete-group": "DELETE"
         }
 
+        body_data = {"name": group, "ids": ids}
         request_specs = {
             "api_url": "teams/{}/{}".format(mode, group) if action == "delete-group" else "teams/{}".format(mode),
             "type": request_type_map[action],
-            "body_data": json.dumps({"name": group, "ids": ids})
+            "body_data": json.dumps(body_data)
         }
 
         if action == "remove":
@@ -47,3 +48,11 @@ class TeamsAPI(ProtectedRequestHandler):
                 self.hello_request(**request_specs)
         else:
             self.hello_request(**request_specs)
+
+        request_context = self._extra_context({})
+        message_text = "%s updated teams: %s. ids :%s" % (
+                request_context['user'],
+                body_data['name'],
+                ','.join(body_data['ids'])
+        )
+        self.send_to_slack(message_text)
