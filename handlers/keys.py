@@ -100,7 +100,7 @@ class PillKeyProvision(ProtectedRequestHandler):
             body_data=json.dumps({
                 "metadata": json.dumps({
                     "provisioned_by": self.current_user.email(),
-                    "provisioned_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "provisioned_at_utc": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     "remark": remark
                 }),
                 "public_key": public_key,
