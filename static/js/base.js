@@ -76,6 +76,10 @@ function getLocalDateFromUTCEpoch(utcSeconds, needOffset, offsetMilliseconds) {
   return d.toLocaleString() || "";
 }
 
+function getFullDateTimeStringFromUTC(utcSeconds) {
+    return new Date(utcSeconds*1000).toString();
+}
+
 function getCustomDate(dayOffset) {
     var lastNdays = new Date();
     lastNdays.setDate(lastNdays.getDate() + dayOffset);
