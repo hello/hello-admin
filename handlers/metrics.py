@@ -141,12 +141,11 @@ class ApplicationLogsAPI(ProtectedRequestHandler):
         start_time = self.request.get('start_time', default_value="")
         end_time = self.request.get('end_time', default_value="")
 
-        searchify_entity = settings.SEARCHIFY
-
         try:
-            if not searchify_entity:
+            searchify_cred = settings.SEARCHIFY
+            if not searchify_cred:
                 raise RuntimeError("Missing Searchify Credentials. Bailing.")
-            searchify_cred = searchify_entity[0]
+
             debug_log_api = ApiClient(searchify_cred.api_client)
 
             index = debug_log_api.get_index('application-logs')
