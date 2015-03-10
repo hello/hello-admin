@@ -13,20 +13,7 @@ indexes:
 - kind: AccessToken
   properties:
   - name: app
-  - name: created
-    direction: desc
-
-- kind: AccessToken
-  properties:
-  - name: app
+  - name: env
   - name: username
   - name: created
     direction: desc
-
-- kind: DevAccessToken
-  properties:
-  - name: app
-  - name: username
-  - name: created
-    direction: desc
-

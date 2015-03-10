@@ -1,10 +1,9 @@
 import json
-import logging as log
 import requests
+import settings
 from handlers.analysis import get_zendesk_stats
 from handlers.helpers import CustomerExperienceRequestHandler
 from handlers.utils import display_error
-from models.ext import ZendeskCredentials
 from models.ext import ZendeskDailyStats
 from utils import iso_to_utc_timestamp
 
@@ -17,12 +16,11 @@ class ZendeskAPI(CustomerExperienceRequestHandler):
         """
         output = {'data': [], 'error': ''}
         user_email = self.request.get('email')
-        zendesk_entity = ZendeskCredentials.query().fetch(1)
 
-        if not zendesk_entity:
+        zendesk_cred = settings.ZENDESK
+        if not zendesk_cred:
             self.error(500)
 
-        zendesk_cred = zendesk_entity[0]
         tickets = []
         search_url = "{}/api/v2/search.json?query=type:ticket%20requester:{}".format(zendesk_cred.domain, user_email)
         zen_auth = (zendesk_cred.email_account + '/token', zendesk_cred.api_token)
@@ -62,13 +60,10 @@ class ZendeskStatsAPI(CustomerExperienceRequestHandler):
         end_date = self.request.get('end_date')  ## yyyy-mm-dd
         date_type = self.request.get('date_type', default_value="created")
 
-        info_query = ZendeskCredentials.query()
-        results = info_query.fetch(1)
-
-        if not results:
+        zendesk_cred = settings.ZENDESK
+        if not zendesk_cred:
             self.error(500)
 
-        zendesk_cred = results[0]
         tickets = []
 
         zen_api = "{}/api/v2/search.json?query=type:ticket%20".format(zendesk_cred.domain)
@@ -132,13 +127,11 @@ class ZendeskHistoryAPI(CustomerExperienceRequestHandler):
 class ZendeskNowAPI(CustomerExperienceRequestHandler):
     def get(self):
         output = {'data': {'status': {}, 'recipient': {}}, 'error': ''}
-        info_query = ZendeskCredentials.query()
-        results = info_query.fetch(1)
 
-        if not results:
+        zendesk_cred = settings.ZENDESK
+        if not zendesk_cred:
             self.error(500)
 
-        zendesk_cred = results[0]
         zen_auth = (zendesk_cred.email_account + '/token', zendesk_cred.api_token)
         try:
             for ticket_type in ['new', 'open', 'pending', 'solved', 'closed']:

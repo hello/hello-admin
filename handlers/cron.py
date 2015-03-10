@@ -2,12 +2,11 @@ import datetime
 import json
 import logging as log
 import requests
+import settings
 from handlers.analysis import get_zendesk_stats
 from handlers.helpers import BaseRequestHandler
 from handlers.utils import display_error
 from handlers.utils import get_current_pacific_datetime
-from models.ext import SearchifyCredentials
-from models.ext import ZendeskCredentials
 from models.ext import ZendeskDailyStats
 from indextank import ApiClient
 
@@ -15,13 +14,7 @@ from google.appengine.api import taskqueue
 class ZendeskCronHandler(BaseRequestHandler):
     def get(self):
         output = {'data': []}
-        info_query = ZendeskCredentials.query()
-        results = info_query.fetch(1)
-
-        if not results:
-            self.error(500)
-
-        zendesk_cred = results[0]
+        zendesk_cred = settings.ZENDESK
         tickets = []
 
         zen_api = "{}/api/v2/search.json?query=type:ticket%20".format(zendesk_cred.domain)
@@ -73,7 +66,7 @@ class ZendeskCronHandler(BaseRequestHandler):
 
 class SearchifyHandler(BaseRequestHandler):
     def get_searchify_index(self, index):
-        searchify_entity= SearchifyCredentials.query().fetch(1)
+        searchify_entity = settings.SEARCHIFY
         if not searchify_entity:
             raise RuntimeError("Missing AppInfo. Bailing.")
         return ApiClient(searchify_entity[0].api_client).get_index(index)

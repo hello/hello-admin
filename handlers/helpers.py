@@ -6,11 +6,9 @@ import json
 import logging as log
 from copy import copy
 from google.appengine.api import users
-from models.setup import AppInfo, UserGroup
 from rauth import OAuth2Service
 from rauth.session import OAuth2Session
 from utils import stripStringToList
-from utils import display_error
 from utils import extract_dicts_by_fields
 import requests
 
@@ -85,18 +83,15 @@ class BaseRequestHandler(webapp2.RequestHandler):
         :param token: token issued to user to use an specific app
         :type token: str
         """
-        info_query = AppInfo.query().order(-AppInfo.created)
-        results = info_query.fetch(1)
 
-        if not results:
+
+        if settings.APP_INFO is None:
             self.error(500)
-            self.response.write("Missing AppInfo. Bailing.")
-
-        app_info_model = results[0]
-        hello = make_oauth2_service(app_info_model)
+            self.response.write("Missing AppInfo!")
+        hello = make_oauth2_service(settings.APP_INFO)
 
         if token is None:  # token could be set to impersonate an user otherwise
-            token = app_info_model.access_token
+            token = settings.APP_INFO.access_token
         return hello.get_session(token)
 
     def hello_request(self, api_url, body_data="", url_params={}, type="GET"
@@ -227,7 +222,7 @@ class ProtectedRequestHandler(BaseRequestHandler):
     ## Retrieve groups grom DataStore
     @property
     def groups_entity(self):
-        return UserGroup.query_groups().fetch(1)[0]
+        return settings.USER_GROUP
 
     def super_engineer(self):
         return stripStringToList(self.groups_entity.super_engineer)
