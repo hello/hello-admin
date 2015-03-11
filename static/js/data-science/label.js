@@ -50,7 +50,7 @@ var RoomConditionsMaestro = React.createClass({
             dataType: 'json',
             success: function(response) {
                 that.setState({motion: response.data.map(function(d){
-                    d.userTimestamp = d.timestamp - d.timezone_offset;
+                    d.userTimestamp = d.timestamp + d.timezone_offset;
                     return d;
                 })});
                 console.log("motion data", that.state.motion);
@@ -76,7 +76,7 @@ var RoomConditionsMaestro = React.createClass({
                     that.pushHistory(emailInput);
                     var sensorData = {};
                     sensorData[sensor] = response.data.map(function(d){
-                        d.userTimestamp = d.datetime - d.offset_millis;
+                        d.userTimestamp = d.datetime + d.offset_millis;
                         return d;
                     });
                     console.log(sensor + " data", sensorData[sensor]);
