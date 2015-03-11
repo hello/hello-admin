@@ -288,7 +288,7 @@ function filterEvents(segments, type) {
             return s.event_type !== "";
         }
         else if (type === "key_events"){
-            return  ["IN_BED", "SLEEP", "WAKE_UP", "OUT_OF_BED", "ALARM"].indexOf(s.event_type) > -1
+            return  ["LIGHTS_OUT", "IN_BED", "SLEEP", "WAKE_UP", "OUT_OF_BED", "ALARM"].indexOf(s.event_type) > -1
         }
         else {
             return s.event_type === type;
