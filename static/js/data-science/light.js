@@ -72,6 +72,7 @@ var LightChartWithLabel = React.createClass({
                 colors={{
                     value: "orange"
                 }}
+                xAttr="userTimestamp"
             />
         )
     }

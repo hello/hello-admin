@@ -72,6 +72,8 @@ var SoundChartWithLabel = React.createClass({
                 colors={{
                     value: "brown"
                 }}
+                xAttr="userTimestamp"
+
             />
         )
     }
