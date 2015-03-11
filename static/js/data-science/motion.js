@@ -72,7 +72,7 @@ var MotionChartWithLabel = React.createClass({
                 colors={{
                     value: "brown"
                 }}
-                xAttr="timestamp"
+                xAttr="userTimestamp"
                 tzOffsetAttr="timezone_offset"
             />
         )

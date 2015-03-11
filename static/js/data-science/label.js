@@ -49,8 +49,11 @@ var RoomConditionsMaestro = React.createClass({
             data: motionRequest,
             dataType: 'json',
             success: function(response) {
-                console.log(response);
-                that.setState({motion: response.data});
+                that.setState({motion: response.data.map(function(d){
+                    d.userTimestamp = d.timestamp - d.timezone_offset;
+                    return d;
+                })});
+                console.log("motion data", that.state.motion);
                 if (response.data.length === 0) {
                     that.setState({alert: "No data"});
                 }
@@ -70,10 +73,13 @@ var RoomConditionsMaestro = React.createClass({
                 data: roomRequest,
                 dataType: "json",
                 success: function(response) {
-                    console.log(response);
                     that.pushHistory(emailInput);
                     var sensorData = {};
-                    sensorData[sensor] = response.data;
+                    sensorData[sensor] = response.data.map(function(d){
+                        d.userTimestamp = d.datetime - d.offset_millis;
+                        return d;
+                    });
+                    console.log(sensor + " data", sensorData[sensor]);
                     that.setState(sensorData);
                 }
             });
@@ -86,7 +92,7 @@ var RoomConditionsMaestro = React.createClass({
             data: currentLabelsRequest,
             dataType: 'json',
             success: function(response) {
-                console.log(response);
+                console.log("labels data", response.data);
                 that.setState({currentLabels: response.data});
             }
         });
@@ -135,6 +141,7 @@ var RoomConditionsMaestro = React.createClass({
                     <Input type="select" id="chart-type" onChange={this.handleChartType}>{chartOptions}</Input>
                 </Col>
             </form>
+            <h6> All times follow user local timezone </h6>
             <Row>
                 <Col xs={9} sm={9} md={9} lg={9} xl={9}>
                     {chartWithLabel}
