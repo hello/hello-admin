@@ -19,6 +19,7 @@ var Row = ReactBootstrap.Row;
 var TabbedArea = ReactBootstrap.TabbedArea;
 var Table = ReactBootstrap.Table;
 var TabPane = ReactBootstrap.TabPane;
+var Panel = ReactBootstrap.Panel;
 
 function getParameterByName(name) {
   name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");

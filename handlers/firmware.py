@@ -6,12 +6,12 @@ class FirmwareAPI(FirmwareRequestHandler):
     '''Enables OTA firmware updates'''
 
     def get(self):
-        source = self.request.get('source', default_value="")
-        device_id = self.request.get('device_id', default_value="")
+        firmware_version = self.request.get('firmware_version', default_value="")
 
         self.hello_request(
-            api_url="firmware/source/{}".format(source) if source else "firmware/{}/0".format(device_id),
-            type="GET"
+            api_url="firmware/devices/",
+            type="GET",
+            url_params={'firmware_version': firmware_version}
         )
 
 
@@ -37,4 +37,24 @@ class FirmwareAPI(FirmwareRequestHandler):
         self.hello_request(
             api_url="firmware/{}".format(device_id),
             type="DELETE",
+        )
+
+class FirmwareInfoAPI(FirmwareRequestHandler):
+
+    def get(self):
+        self.hello_request(
+            api_url="firmware/list/",
+            type="GET"
+        )
+
+class FirmwareHistoryAPI(FirmwareRequestHandler):
+
+
+    def get(self):
+        device_id = self.request.get('device_id', default_value="")
+
+        self.hello_request(
+            api_url="firmware/history/",
+            type="GET",
+            url_params={'device_id': device_id}
         )

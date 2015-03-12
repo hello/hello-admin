@@ -20,6 +20,26 @@ var headerStyle = {
     'sd_card_path': 'alert-danger'
 };
 
+var LinkToFWSearch = React.createClass({
+    populateFirmwareVersion: function(){
+        $('#firmware_version').focus().val(this.props.firmware_version);
+        $("#firmware_version_search").click();
+    },
+    render: function() {
+        return <span className="cursor-custom" onClick={this.populateFirmwareVersion}>{this.props.firmware_version}</span>
+    }
+});
+
+var LinkToFWHistorySearch = React.createClass({
+    populateDeviceID: function(){
+        $('#device_id').focus().val(this.props.device_id);
+        $("#device_history_search").click();
+    },
+    render: function() {
+        return <span className="cursor-custom" onClick={this.populateDeviceID}>{this.props.device_id}</span>
+    }
+});
+
 var FirmwareMatrixHeaders = React.createClass({
     render: function() {
         var firmwareFields = [<th className="alert-success">s3_key</th>];
@@ -57,6 +77,104 @@ var FirmwareMatrixRows = React.createClass({
     }
 });
 
+
+var DeviceListHeaders = React.createClass({
+    render: function() {
+        return (<thead>
+        <tr>
+            <th className='alert-warning'>Firmware Version: {this.props.firmware_version}</th>
+            <th className='alert-warning'></th>
+        </tr>
+        <tr>
+            <th className='alert-warning'>Timestamp</th>
+            <th className='alert-warning'>Device ID</th>
+        </tr></thead>)
+    }
+});
+var FirmwareListHeaders = React.createClass({
+    render: function() {
+        return (<thead><tr>
+            <th className='alert-info'>FW Version</th>
+            <th className='alert-info'># of Devices Seen</th>
+        </tr></thead>)
+    }
+});
+var HistoryListHeaders = React.createClass({
+    render: function() {
+        return (<thead>
+        <tr>
+            <th className='alert-success'>Device ID: {this.props.device_id}</th>
+            <th className='alert-success'></th>
+        </tr>
+        <tr>
+            <th className='alert-success'>Timestamp</th>
+            <th className='alert-success'>FW Version</th>
+        </tr></thead>)
+    }
+});
+
+var FirmwareListRows = React.createClass({
+    render: function() {
+        var firmwareListRows = [];
+        this.props.fwList.forEach(function(fw){
+            firmwareListRows.push(
+                            <tr>
+                                <td>
+                                <LinkToFWSearch firmware_version={fw.version} />
+                                {" (" + parseInt(fw.version, 10).toString(16) + ")"}
+                                </td>
+                                <td>{fw.count}</td>
+                            </tr>
+                        );
+
+        });
+        return (<tbody>
+            {firmwareListRows}
+        </tbody>)
+    }
+});
+
+var DeviceListRows = React.createClass({
+    render: function() {
+        var deviceListRows = [];
+        this.props.fwDevices.forEach(function(device){
+            var timestamp = new Date(Number(device.timestamp));
+            deviceListRows.push(
+                            <tr>
+                                <td>{timestamp.toLocaleString()}</td>
+                                <td>
+                                <LinkToFWHistorySearch device_id={device.device_id} />
+                                </td>
+                            </tr>
+                        );
+
+        });
+        return (<tbody>
+            {deviceListRows}
+        </tbody>)
+    }
+});
+
+var HistoryListRows = React.createClass({
+    render: function() {
+        var historyListRows = [];
+        for(var i in this.props.firmwareHistory){
+        var timestamp = new Date(Number(i));
+            historyListRows.push(
+                <tr>
+                    <td>{timestamp.toLocaleString()}</td>
+                    <td>
+                    <LinkToFWSearch firmware_version={this.props.firmwareHistory[i]} />
+                    </td>
+                </tr>
+            );
+         }
+        return (<tbody>
+            {historyListRows}
+        </tbody>)
+    }
+});
+
 var FirmwareMatrix = React.createClass({
    render: function() {
         return (
@@ -68,12 +186,47 @@ var FirmwareMatrix = React.createClass({
    }
 });
 
+var FirmwareList = React.createClass({
+   render: function() {
+        return (
+            <Table responsive condensed bordered>
+              <FirmwareListHeaders/>
+              <FirmwareListRows fwList={this.props.fwList}/>
+            </Table>
+        )
+   }
+});
+
+var DeviceList = React.createClass({
+   render: function() {
+        return (
+            <Table responsive condensed bordered>
+              <DeviceListHeaders firmware_version={this.props.fwVersion}/>
+              <DeviceListRows fwDevices={this.props.fwDevices}/>
+            </Table>
+        )
+   }
+});
+
+var HistoryList = React.createClass({
+   render: function() {
+        return (
+            <Table responsive condensed bordered>
+              <HistoryListHeaders device_id={this.props.device_id}/>
+              <HistoryListRows firmwareHistory={this.props.fwHistory}/>
+            </Table>
+        )
+   }
+});
+
 var FirmwareMaestro = React.createClass({
     getInitialState: function() {
         return {
             getError: "",
             putError: "",
             s3Keys: [],
+            fwDevices: [],
+            fwList: [],
             headers: Object.keys(inputType),
             updateStatus: 0,
             removeStatus: 0,
@@ -82,10 +235,15 @@ var FirmwareMaestro = React.createClass({
         }
     },
     componentDidMount: function(e) {
-        var sourceFromURL = getParameterByName('source');
-        if (sourceFromURL) {
-          $('#sourceInput').val(sourceFromURL);
-          this.retrieve(e);
+        var firmware_version = getParameterByName('firmware_version');
+        if (firmware_version) {
+          $('#firmware_version').val(firmware_version);
+          this.deviceList(e);
+        }
+        var device_id = getParameterByName('device_id');
+            if (device_id) {
+              $('#device_id').val(device_id);
+              this.fwHistoryList(e);
         }
 
     },
@@ -125,6 +283,84 @@ var FirmwareMaestro = React.createClass({
           }.bind(this)
         });
     },
+    fwList: function() {
+                console.log("listing firmwares");
+                var sourceInput = $('#sourceInput').val();
+                history.pushState({}, '', '/firmware/');
+
+                $.ajax({ //nested ajax to avoid race condition
+                  url: '/api/firmware/info',
+                  dataType: 'json',
+                  type: 'GET',
+                  success: function(response) {
+                    if (response.error !== "") {
+                        this.setState({fwList: []});
+                        this.setState({getError: response.error});
+                    }
+                    else {
+                        this.setState({fwList: response.data});
+                        this.setState({getError: ""});
+                        // Type ahead some default values:
+                    }
+                  }.bind(this),
+                  error: function(xhr, status, err) {
+                    console.error(status, err);
+                  }.bind(this)
+                });
+            },
+    fwHistoryList: function() {
+            console.log("fetching firmware history");
+            var device_id = $('#device_id').val();
+            history.pushState({}, '', '/firmware/?device_id=' + device_id);
+            $.ajax({ //nested ajax to avoid race condition
+              url: '/api/firmware/history',
+              dataType: 'json',
+              data: {'device_id': device_id},
+              type: 'GET',
+              success: function(response) {
+
+                if (response.error !== "") {
+                    this.setState({fwHistory: Object});
+                    this.setState({getError: response.error});
+                }
+                else {
+                    this.setState({fwHistory: response.data});
+                    this.setState({device_id: device_id});
+                    this.setState({getError: ""});
+                }
+              }.bind(this),
+              error: function(xhr, status, err) {
+                console.error(status, err);
+              }.bind(this)
+            });
+        },
+    deviceList: function() {
+            console.log("listing");
+
+            var firmware_version = $('#firmware_version').val();
+            history.pushState({}, '', '/firmware/?firmware_version=' + firmware_version);
+            $.ajax({ //nested ajax to avoid race condition
+              url: '/api/firmware',
+              dataType: 'json',
+              data: {'firmware_version': firmware_version},
+              type: 'GET',
+              success: function(response) {
+                if (response.error !== "") {
+                    this.setState({fwDevices: []});
+                    this.setState({getError: response.error});
+                }
+                else {
+                    this.setState({fwDevices: response.data});
+                    this.setState({fwVersion: firmware_version});
+                    this.setState({getError: ""});
+                    // Type ahead some default values:
+                }
+              }.bind(this),
+              error: function(xhr, status, err) {
+                console.error(status, err);
+              }.bind(this)
+            });
+        },
     update: function() {
         console.log("updating");
         var updateData = [];
@@ -213,6 +449,7 @@ var FirmwareMaestro = React.createClass({
           }.bind(this)
         });
     },
+
     render: function() {
         var inputStyle = React.addons.classSet({
             info: this.state.getError === "" && this.state.s3Keys.length === 0,
@@ -222,6 +459,15 @@ var FirmwareMaestro = React.createClass({
         var getResult = this.state.s3Keys.length === 0 ?
             <Alert bsStyle="default">{this.state.error}</Alert> :
             <FirmwareMatrix s3Keys={this.state.s3Keys} headers={this.state.headers}/>;
+        var listResult = this.state.fwDevices.length === 0 ?
+            <Alert bsStyle="default">{this.state.error}</Alert> :
+            <DeviceList fwDevices={this.state.fwDevices} fwVersion={this.state.fwVersion}/>;
+        var countResult = this.state.fwList.length === 0 ?
+            <Alert bsStyle="default">{this.state.error}</Alert> :
+            <FirmwareList fwList={this.state.fwList}/>;
+        var historyResult = (typeof this.state.fwHistory == "undefined") ?
+            <Alert bsStyle="default">{this.state.error}</Alert> :
+            <HistoryList fwHistory={this.state.fwHistory} device_id={this.state.device_id}/>;
         var edit = this.state.s3Keys.length === 0 ?
             null:
             <div className="row">
@@ -257,31 +503,48 @@ var FirmwareMaestro = React.createClass({
 
         return (<div>
             <TabbedArea defaultActiveKey={1}>
-              <TabPane key={1} tab="Update firmware for a device">
+              <TabPane key={1} tab="Firmware History">
                 <p/><p/>
-                <div className="row">
-                  <div className="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-                    <Input id="sourceInput"type="text" bsStyle={inputStyle} placeholder="Source (as s3 prefix), e.g.: chris-dev" hasFeedback />
-                  </div>
-                  <div className="col-xs-2 col-sm2 col-md-2 col-lg-2">
-                    <Button bsStyle="primary" onClick={this.retrieve}><Glyphicon glyph="search"/></Button>
+
+                <div className="col">
+                  <div className="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                    <Button bsStyle="primary" onClick={this.fwList}><Glyphicon glyph="list"/> List All FW Seen</Button>
                   </div>
                 </div>
-                {getResult}
-                {edit}
-                {putResult}
-              </TabPane>
-              <TabPane key={2} tab="View/Remove all updates from a device">
-                <p/><p/>
-                <div className="row">
-                  <div className="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-                    <Input id="deleteDevice" type="text" bsStyle={inputStyle} placeholder="Device ID to view/remove firmware" />
+                <div className="col">
+                  <div className="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                    <Input id="device_id" type="text" bsStyle={inputStyle} placeholder="Get Device FW History." hasFeedback />
                   </div>
-                  <div className="col-xs-2 col-sm2 col-md-2 col-lg-2">
-                    <Button bsStyle="warning" onClick={this.viewFiles}><Glyphicon glyph="search"/></Button>
+                  <div className="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+                    <Button id="device_history_search" bsStyle="success" onClick={this.fwHistoryList} type='submit'><Glyphicon glyph="search"/></Button>
+                  </div>
+                </div>
+                <div className="col">
+                  <div className="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                    <Input id="firmware_version" type="text" bsStyle={inputStyle} placeholder="Get seen devices for FW Version." hasFeedback />
+                  </div>
+                  <div className="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+                    <Button id="firmware_version_search" bsStyle="warning" onClick={this.deviceList} type='submit'><Glyphicon glyph="search"/></Button>
                   </div>
                   {remove}
                 </div>
+
+               <Col xs={5} md={5}>
+                <Panel header="Firmware Seen">
+                    {countResult}
+                </Panel>
+                <Panel header="Device Firmware History">
+                    {historyResult}
+                </Panel>
+                </Col>
+                <Col xs={7} md={7}>
+                    <Panel header="Device List">
+                        {listResult}
+                    </Panel>
+                </Col>
+                {getResult}
+                {edit}
+                {putResult}
                 {deviceFiles}
                 {deleteResult}
               </TabPane>

@@ -3,7 +3,7 @@ table.table>thead>tr>th {text-align: left;}
 div.checkbox input[type=checkbox] {margin: 0;}
 div.checkbox {margin-top: 40px;}
 table.table-bordered>thead>tr>th, table.table-bordered>tbody>tr>td {border: 1px dashed brown;}
-table.table>thead>tr>th{font: 11px "Comic Sans MS", cursive, sans-serif; text-align: center;}
+table.table>thead>tr>th{font: 11px "Helvetica", sans-serif; text-align: center;}
 div.checkbox {display: table-cell;}
 table.table input[type="text"] {margin-top: 12px;}
 table.table input[type="checkbox"] {margin-left: 45px;}
