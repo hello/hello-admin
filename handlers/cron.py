@@ -69,12 +69,12 @@ class SearchifyHandler(BaseRequestHandler):
         searchify_entity = settings.SEARCHIFY
         if not searchify_entity:
             raise RuntimeError("Missing AppInfo. Bailing.")
-        return ApiClient(searchify_entity[0].api_client).get_index(index)
+        return ApiClient(searchify_entity.api_client).get_index(index)
 
     def identify_old_docs(self, index, query, time_threshold, start, limit):
         delete_docid_list = []
         # Customize function 100 to present oldest documents first regardless of relevance to query
-        index.add_function(100, "age + 0*relevance")
+        index.add_function(100, "age + 0*re
         search_uploading = index.search(query=query, fetch_fields=['timestamp'], start=start, length=limit, scoring_function=100)['results']
 
         for s in search_uploading:
