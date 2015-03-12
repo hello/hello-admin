@@ -224,7 +224,13 @@ class SearchifyStatsAPI(ProtectedRequestHandler):
         try:
             searchify_cred = settings.SEARCHIFY
             searchify_api = ApiClient(searchify_cred.api_client)
-            output['data'] = [i._get_metadata() for i in searchify_api.list_indexes()]
+            sense_log_index = searchify_api.get_index("sense-logs")
+            sense_log_index.add_function(159, "-age")
+            hello_sense_log_latest_ts = sense_log_index.search(query="text:hello", scoring_function=159)["results"][0]["docid"]
+            output['data'] = {
+                'latest sense log containing "hello"': hello_sense_log_latest_ts,
+                "summary": [i._get_metadata() for i in searchify_api.list_indexes()]
+            }
         except Exception as e:
             output['error'] = display_error(e)
         self.response.write(json.dumps(output))
