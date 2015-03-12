@@ -240,7 +240,6 @@ class TimelineAPI(ProtectedRequestHandler):
     def get(self):
         email = self.request.get('email')
         date = self.request.get('date')
-        print email, date
         self.hello_request(
             api_url="timeline/admin/{}/{}".format(email, date),
             type="GET",
