@@ -14,7 +14,7 @@ var TimelineContent = React.createClass({
             var hoursMessage = this.props.data[0].message;
             blocks.push(<h1 id="hours-message">{hoursMessage}</h1>)
             segments.forEach(function(segment) {
-                var date = <h2 className="event-date"><LongLabel bsStyle={labelColor(segment.event_type)} content={segment.id}/> {new Date(segment.timestamp).toString()}</h2>;
+                var date = <h2 className="event-date"><LongLabel bsStyle={labelColor(segment.event_type)} content={segment.id}/> {new Date(segment.timestamp + segment.offset_millis).toUTCString().replace("GMT", "  (User local timezone offset is " + (segment.offset_millis/3600000).toString() + " hours)")}</h2>;
 
                 var message = <span className="cd-date">Message: <span className="event-message">{segment.message || "No message!"}</span></span>;
 
@@ -288,7 +288,7 @@ function filterEvents(segments, type) {
             return s.event_type !== "";
         }
         else if (type === "key_events"){
-            return  ["IN_BED", "SLEEP", "WAKE_UP", "OUT_OF_BED", "ALARM"].indexOf(s.event_type) > -1
+            return  ["LIGHTS_OUT", "IN_BED", "SLEEP", "WAKE_UP", "OUT_OF_BED", "ALARM"].indexOf(s.event_type) > -1
         }
         else {
             return s.event_type === type;

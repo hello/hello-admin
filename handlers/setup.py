@@ -1,10 +1,8 @@
 import json
 import logging as log
 import urllib
-
 import settings
 from models.setup import AppInfo, AdminUser, AccessToken, UserGroup
-from handlers.utils import display_error
 from handlers.helpers import make_oauth2_service, ProtectedRequestHandler, SuperEngineerRequestHandler
 from models.ext import ZendeskCredentials, SearchifyCredentials, KeyStoreLocker
 
@@ -170,8 +168,6 @@ class TokenAPI(ProtectedRequestHandler):
         app = put_data.get("app", "")
         password = put_data.get("password", "")
 
-        print username, app, password
-
         output['data'] = self.make_tokens(username, app, password)
         self.response.write(json.dumps(output))
 
@@ -186,7 +182,7 @@ class TokenAPI(ProtectedRequestHandler):
         :type password: str
         :return: dict {'token': <token>}
         """
-        app_info_model = AppInfo.get_by_id(settings.ENVIRONMENT)
+        app_info_model = settings.APP_INFO
 
         if app_info_model is None:
             self.error(500)
@@ -234,7 +230,8 @@ class TokenAPI(ProtectedRequestHandler):
         token = AccessToken(
             username=username,
             token=access_token,
-            app=app
+            app=app,
+            env=settings.ENVIRONMENT
         )
         token.put()
         return {'token': access_token}
@@ -268,14 +265,13 @@ class SetupAPI(SuperEngineerRequestHandler):
 
         app_info = AppInfo(
             id=settings.ENVIRONMENT,
-            client_id=settings.DEV_CLIENT,
-            endpoint=settings.DEV_API,
+            client_id=settings.DEFAULT_LOCAL_DEV_CLIENT_ID,
+            endpoint=settings.DEFAULT_LOCAL_API_URL,
             access_token='will be created by /update'
         )
         app_info.put()
 
         zendesk_credentials = ZendeskCredentials(
-            id=settings.ENVIRONMENT,
             domain='https://helloinc.zendesk.com',
             email_account='marina@sayhello.com',
             api_token='ask_marina'
@@ -283,7 +279,6 @@ class SetupAPI(SuperEngineerRequestHandler):
         zendesk_credentials.put()
 
         searchify_credentials = SearchifyCredentials(
-            id=settings.ENVIRONMENT,
             api_client='ask_tim'
         )
         searchify_credentials.put()
@@ -294,8 +289,8 @@ class UpdateAdminAccessTokenAPI(SuperEngineerRequestHandler):
     Update access token after admin user and app info entities are updated and memcache is flushed
     """
     def get(self):
-        admin_user = AdminUser.get_by_id(settings.ENVIRONMENT)
-        app_info_model = AppInfo.get_by_id(settings.ENVIRONMENT)
+        admin_user = settings.ADMIN_USER
+        app_info_model = settings.APP_INFO
 
         if admin_user is None:
 
@@ -432,4 +427,3 @@ class ViewPermissionAPI(ProtectedRequestHandler):
             "has_access_to_customers_data": viewer in self.customer_experience() or viewer in self.super_engineer()
         }
         self.response.write(json.dumps(output))
-

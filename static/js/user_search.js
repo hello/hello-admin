@@ -107,11 +107,10 @@ var UserSearchCanvas = React.createClass({
         }
     },
     handleSubmit: function(e) {
-        console.log('submitted');
         if (e) {
             e.preventDefault();
         }
-        var email = this.refs.email.getDOMNode().value.trim().toLowerCase();
+        var email = this.refs.email.getDOMNode().value.trim();
         if (!email) {
           return;
         }
@@ -128,6 +127,7 @@ var UserSearchCanvas = React.createClass({
                 });
             }
             else {
+                console.log(response.data);
                 this.setState({devices: response.data});
             }
           }.bind(this),

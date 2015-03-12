@@ -27,7 +27,7 @@ var PairingMaestro = React.createClass({
         var requestData = {
             username: $('#username-input-unlink').val(),
             password: $('#password-input-unlink').val(),
-            app: "admin-register-devices"
+            app: "admin-data-viewer"
         };
         $.ajax({
             url: '/api/tokens',
@@ -52,7 +52,7 @@ var PairingMaestro = React.createClass({
         var requestData = {
             username: $('#username-input-link').val(),
             password: $('#password-input-link').val(),
-            app: "admin-register-devices"
+            app: "admin-data-viewer"
         };
         $.ajax({
             url: '/api/tokens',

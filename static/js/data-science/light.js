@@ -13,7 +13,7 @@ var LightChart = React.createClass({
                 axis={{
                     x: {
                         tick: {
-                            format: function (x) { return d3.time.format('%b %d %H:%M')(new Date(x)); }
+                            format: function (x) { return d3.time.format.utc('%b %d %H:%M')(new Date(x)); }
                         },
                         label: {
                             text: "Time",
@@ -52,7 +52,7 @@ var LightChartWithLabel = React.createClass({
                 axis={{
                     x: {
                         tick: {
-                            format: function (x) { return d3.time.format('%b %d %H:%M')(new Date(x)); }
+                            format: function (x) { return d3.time.format.utc('%b %d %H:%M')(new Date(x)); }
                         },
                         label: {
                             text: "Time",
@@ -72,6 +72,7 @@ var LightChartWithLabel = React.createClass({
                 colors={{
                     value: "orange"
                 }}
+                xAttr="userTimestamp"
             />
         )
     }

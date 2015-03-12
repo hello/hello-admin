@@ -7,7 +7,6 @@ var c3Chart = React.createClass({
     },
     render: function() {
         var that = this, categories = [];
-        console.log(that.props.data);
         if (that.props.data) {
             categories = Object.keys(that.props.data).filter(function(k){return that.props.data[k] > 0}).sort();
             var colors = {};

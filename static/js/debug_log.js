@@ -25,7 +25,7 @@ var LogTable = React.createClass({
 
             var ts = [
                 <span className="label label-default">{log.docid.split('-')[0]}</span>, <br/>, <br/>,
-                getLocalDateFromUTCEpoch(Number(log.timestamp)), <br/>, <br/>,
+                getFullDateTimeStringFromUTC(Number(log.timestamp)), <br/>, <br/>,
                 <em>%s Count: {matchCount}</em>, <br/>,
                 <em>\n Count: {nCount}</em>, <br/>,
                 <em>\r Count: {rCount}</em>
@@ -279,5 +279,15 @@ function logsFilter(data, start, end) {
          return log;
        }
     });
-    return filtered_logs.reverse();
+    return filtered_logs.sort(compareTimestamp);
+}
+
+function compareTimestamp(log1, log2) {
+    if (log1.timestamp < log2.timestamp) {
+        return -1;
+    }
+    if (log1.timestamp > log2.timestamp) {
+        return 1;
+    }
+    return 0;
 }

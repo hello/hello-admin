@@ -18,8 +18,8 @@ var LabelDataForm =  React.createClass({
         console.log('me', xAttr, durationInMillisecond);
 
         this.setState({
-            t1: d3.time.format('%b %d %H:%M:%S')(new Date(dataSet[this.props.labelStartIndex][xAttr])),
-            t2: d3.time.format('%b %d %H:%M:%S')(new Date(dataSet[this.props.labelStartIndex][xAttr] + durationInMillisecond))
+            t1: d3.time.format.utc('%b %d %H:%M:%S')(new Date(dataSet[this.props.labelStartIndex][xAttr])),
+            t2: d3.time.format.utc('%b %d %H:%M:%S')(new Date(dataSet[this.props.labelStartIndex][xAttr] + durationInMillisecond))
         });
     },
 
@@ -41,7 +41,7 @@ var LabelDataForm =  React.createClass({
                     duration_millis: durationInMillisecond,
                     note: $('#notes-input').val(),
                     night: d3.time.format('%Y-%m-%d')(new Date($('#date-input').val())),
-                    ts_utc: d[xAttr],
+                    ts_utc: d[xAttr] - d[tzOffsetAttr],
                     tz_offset: d[tzOffsetAttr]
                 }
             }
@@ -68,7 +68,7 @@ var LabelDataForm =  React.createClass({
         return this.transferPropsTo(
             <Modal pra title={"You are labeling data for night " + d3.time.format('%Y-%m-%d')(new Date($('#date-input').val()))}>
                 <div className="modal-body">
-                    <p>{"From " + this.state.t1 + " to " + this.state.t2 + "(Pacific time)"}</p><br/>
+                    <p>{"From " + this.state.t1 + " to " + this.state.t2 + " (User Local Time)"}</p><br/>
                     <Input id="label-input" type="select">
                         <option value="none">Select a label</option>
                         <option value="make_bed">Make Bed</option>
