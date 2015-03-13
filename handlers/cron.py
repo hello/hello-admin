@@ -97,9 +97,9 @@ class SenseLogsPurge(SearchifyHandler):
         sense_logs_index = self.get_searchify_index('sense-logs')
 
         old_docs_to_be_deleted_list = self.gather_purge_ids(
-            sense_logs_index,
-            ['text:uart', 'text:uploading', 'text:sending', 'text:complete', 'text:success', 'text:Texas', 'text:dev'],
-            datetime.datetime.now() + datetime.timedelta(days=-14)
+            index=sense_logs_index,
+            query_keywords=['text:uart', 'text:uploading', 'text:sending', 'text:complete', 'text:success', 'text:Texas', 'text:dev', 'text:hello'],
+            time_threshold=datetime.datetime.now() + datetime.timedelta(days=-14)
         )
 
         output = {
@@ -126,7 +126,7 @@ class ApplicationLogsPurge(SearchifyHandler):
         try:
             old_docs_to_be_deleted_list = self.gather_purge_ids(
                 index=application_logs_index,
-                query_keywords=['text:{}'.format(level)],
+                query_keywords=['text:{}'.format(level),'text:hello' ],
                 time_threshold=datetime.datetime.now() - datetime.timedelta(days=tolerance_in_days),
                 maxdocs=50
             )
@@ -155,10 +155,10 @@ class ApplicationLogsPurgeQueue(SearchifyHandler):
         }
 
         tolerance_in_days = {
-            'DEBUG': 4,
-            'INFO': 4,
-            'WARN': 7,
-            'ERROR': 10,
+            'DEBUG': 3,
+            'INFO': 3,
+            'WARN': 4,
+            'ERROR': 7,
         }
 
         for level in ['DEBUG', 'INFO', 'WARN', 'ERROR']:
