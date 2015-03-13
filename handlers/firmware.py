@@ -7,11 +7,13 @@ class FirmwareAPI(FirmwareRequestHandler):
 
     def get(self):
         firmware_version = self.request.get('firmware_version', default_value="")
+        range_start = self.request.get('range_start', default_value="0")
+        range_end = self.request.get('range_end', default_value="100")
 
         self.hello_request(
             api_url="firmware/devices/",
             type="GET",
-            url_params={'firmware_version': firmware_version}
+            url_params={'firmware_version': firmware_version, 'range_start': range_start, 'range_end': range_end}
         )
 
 

@@ -230,6 +230,8 @@ var FirmwareMaestro = React.createClass({
             headers: Object.keys(inputType),
             updateStatus: 0,
             removeStatus: 0,
+            rangeStart: 0,
+            rangeEnd: 14,
             files: [],
             viewDeviceError: ""
         }
@@ -241,9 +243,9 @@ var FirmwareMaestro = React.createClass({
           this.deviceList(e);
         }
         var device_id = getParameterByName('device_id');
-            if (device_id) {
-              $('#device_id').val(device_id);
-              this.fwHistoryList(e);
+        if (device_id) {
+          $('#device_id').val(device_id);
+          this.fwHistoryList(e);
         }
 
     },
@@ -336,13 +338,15 @@ var FirmwareMaestro = React.createClass({
         },
     deviceList: function() {
             console.log("listing");
-
             var firmware_version = $('#firmware_version').val();
+            var range_end = $('#device-count').val();
             history.pushState({}, '', '/firmware/?firmware_version=' + firmware_version);
             $.ajax({ //nested ajax to avoid race condition
               url: '/api/firmware',
               dataType: 'json',
-              data: {'firmware_version': firmware_version},
+              data: {'firmware_version': firmware_version,
+                    'range_start': this.state.rangeStart,
+                    'range_end': range_end},
               type: 'GET',
               success: function(response) {
                 if (response.error !== "") {
@@ -352,6 +356,7 @@ var FirmwareMaestro = React.createClass({
                 else {
                     this.setState({fwDevices: response.data});
                     this.setState({fwVersion: firmware_version});
+                    this.setState({rangeEnd: range_end});
                     this.setState({getError: ""});
                     // Type ahead some default values:
                 }
@@ -361,6 +366,13 @@ var FirmwareMaestro = React.createClass({
               }.bind(this)
             });
         },
+    changeRange: function() {
+                console.log("listing");
+                var firmware_version = $('#firmware_version').val();
+                var range_end = $('#device-count').val();
+                history.pushState({}, '', '/firmware/?firmware_version=' + firmware_version + '&range_end=' + range_end);
+                this.deviceList();
+            },
     update: function() {
         console.log("updating");
         var updateData = [];
@@ -513,7 +525,7 @@ var FirmwareMaestro = React.createClass({
                 </div>
                 <div className="col">
                   <div className="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-                    <Input id="device_id" type="text" bsStyle={inputStyle} placeholder="Get Device FW History." hasFeedback />
+                    <Input id="device_id" type="text" bsStyle={inputStyle} placeholder="<Enter Device ID>" hasFeedback />
                   </div>
                   <div className="col-xs-1 col-sm-1 col-md-1 col-lg-1">
                     <Button id="device_history_search" bsStyle="success" onClick={this.fwHistoryList} type='submit'><Glyphicon glyph="search"/></Button>
@@ -521,7 +533,7 @@ var FirmwareMaestro = React.createClass({
                 </div>
                 <div className="col">
                   <div className="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-                    <Input id="firmware_version" type="text" bsStyle={inputStyle} placeholder="Get seen devices for FW Version." hasFeedback />
+                    <Input id="firmware_version" type="text" bsStyle={inputStyle} placeholder="<Enter FW Version>" hasFeedback />
                   </div>
                   <div className="col-xs-1 col-sm-1 col-md-1 col-lg-1">
                     <Button id="firmware_version_search" bsStyle="warning" onClick={this.deviceList} type='submit'><Glyphicon glyph="search"/></Button>
@@ -531,7 +543,9 @@ var FirmwareMaestro = React.createClass({
 
                <Col xs={5} md={5}>
                 <Panel header="Firmware Seen">
+                    <div id="fw_seen">
                     {countResult}
+                    </div>
                 </Panel>
                 <Panel header="Device Firmware History">
                     {historyResult}
@@ -539,7 +553,18 @@ var FirmwareMaestro = React.createClass({
                 </Col>
                 <Col xs={7} md={7}>
                     <Panel header="Device List">
+                    <Input type="select" id="device-count" onChange={this.changeRange} addonBefore="Device Count:">
+                      <option selected value="9">10</option>
+                      <option value="19">20</option>
+                      <option value="49">50</option>
+                      <option value="99">100</option>
+                      <option value="499">500</option>
+                      <option value="999">1000</option>
+                      <option value="-1">All Devices</option>
+                    </Input>
+                        <div id="device_list">
                         {listResult}
+                        </div>
                     </Panel>
                 </Col>
                 {getResult}
