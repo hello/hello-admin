@@ -74,9 +74,9 @@ from handlers.alarms import AlarmsAPI
 from handlers.users import PasswordResetAPI
 
 cron_routes = [
-    ('/cron/zendesk_daily_stats', ZendeskCronHandler),
     ('/cron/sense_logs_purge', SenseLogsPurge),
     ('/cron/application_logs_purge/?$', ApplicationLogsPurge),
+    ('/cron/zendesk_daily_stats', ZendeskCronHandler),
     ('/cron/application_logs_purge_queue', ApplicationLogsPurgeQueue)
 ]
 
