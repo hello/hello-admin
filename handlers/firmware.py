@@ -54,7 +54,6 @@ class FirmwareHistoryAPI(FirmwareRequestHandler):
         device_id = self.request.get('device_id', default_value="")
 
         self.hello_request(
-            api_url="firmware/history/",
-            type="GET",
-            url_params={'device_id': device_id}
+            api_url="firmware/{}/history".format(device_id),
+            type="GET"
         )
