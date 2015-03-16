@@ -98,8 +98,8 @@ class SenseLogsPurge(SearchifyHandler):
 
         old_docs_to_be_deleted_list = self.gather_purge_ids(
             index=sense_logs_index,
-            query_keywords=['text:uart', 'text:uploading', 'text:sending', 'text:complete', 'text:success', 'text:Texas', 'text:dev', 'text:hello'],
-            time_threshold=datetime.datetime.now() + datetime.timedelta(days=-14)
+            query_keywords=['text:uart', 'text:uploading', 'text:sending', 'text:complete', 'text:success', 'text:dev', 'text:hello', 'text:morpheus'],
+            time_threshold=datetime.datetime.now() + datetime.timedelta(days=-10)
         )
 
         output = {
