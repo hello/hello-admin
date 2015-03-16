@@ -158,17 +158,18 @@ var DeviceListRows = React.createClass({
 var HistoryListRows = React.createClass({
     render: function() {
         var historyListRows = [];
-        for(var i in this.props.firmwareHistory){
-        var timestamp = new Date(Number(i));
+        Object.keys(this.props.firmwareHistory).sort().reverse().forEach(function(key){
+            var timestamp = new Date(Number(key));
             historyListRows.push(
                 <tr>
                     <td>{timestamp.toLocaleString()}</td>
                     <td>
-                    <LinkToFWSearch firmware_version={this.props.firmwareHistory[i]} />
+                    <LinkToFWSearch firmware_version={this[key]} />
                     </td>
                 </tr>
             );
-         }
+        }, this.props.firmwareHistory);
+        
         return (<tbody>
             {historyListRows}
         </tbody>)
