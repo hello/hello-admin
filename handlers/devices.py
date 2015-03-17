@@ -1,6 +1,9 @@
-from handlers.helpers import ProtectedRequestHandler
 import logging as log
 import json
+
+from handlers.helpers import ProtectedRequestHandler
+
+
 class DeviceAPI(ProtectedRequestHandler):
     """Retrieve devices list and their specs"""
 
@@ -87,4 +90,5 @@ class DeviceKeyStoreHint(ProtectedRequestHandler):
             api_url="devices/key_store_hints/{}/{}".format(device_type, device_id),
             type="GET"
         )
+
 

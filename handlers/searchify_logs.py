@@ -1,53 +1,11 @@
 import json
 import logging as log
-import time
-import settings
-from handlers.utils import display_error
 from handlers.helpers import ProtectedRequestHandler
+from handlers.utils import stripStringToList, display_error
 from indextank import ApiClient
-from utils import stripStringToList
-from collections import defaultdict
-from handlers.helpers import ResponseOutput
+import settings
 
-class PreSleepAPI(ProtectedRequestHandler):
-    def get(self):
-        """
-        Grab temperature
-        - request input:
-            sensor (required: one of ["humidity", "particulates", "temperature"])
-            token (required for each user)
-            resolution (required : week or day)
-        """
-
-        sensor = self.request.get('sensor', default_value='humidity')
-        resolution = self.request.get('resolution', default_value='day')
-        # timezone_offset = int(self.request.get('timezone_offset', default_value=8*3600*1000))
-        # current_ts = int(time.time() * 1000) - timezone_offset
-        current_ts = int(time.time() * 1000)
-        impersonatee_token = self.request.get('impersonatee_token', default_value=None)
-
-        self.hello_request(
-            api_url="room/{}/{}".format(sensor, resolution),
-            url_params={'from': current_ts},
-            impersonatee_token=impersonatee_token,
-            type="GET"
-        )
-
-
-class RoomConditionsAPI(ProtectedRequestHandler):
-    def get(self):
-        """
-        Grab temperature, humidity, paraticualtes (air quality), light and sound data
-        """
-        email = self.request.get('email', default_value='')
-        sensor = self.request.get('sensor', default_value='')
-        resolution = self.request.get('resolution', default_value='')
-        ts = int(self.request.get('ts', int(time.time() * 1000)))
-        self.hello_request(
-            api_url="datascience/admin/{}/{}/{}".format(email, sensor, resolution),
-            url_params={'from': ts},
-            type="GET"
-        )
+__author__ = 'zet'
 
 
 class SenseLogsAPI(ProtectedRequestHandler):
@@ -80,13 +38,13 @@ class SenseLogsAPI(ProtectedRequestHandler):
             else:
                 scoring_function = 'doc.var[0]'
 
-            index.add_function(300, scoring_function)
+            index.add_function(3, scoring_function)
             search_params = {
                 'query': 'text:UART',
                 'category_filters': {},
                 'fetch_fields': ['text', 'timestamp'],
                 'length': max_results,
-                'scoring_function': 300
+                'scoring_function': 3
             }
 
             if text_input:
@@ -159,13 +117,13 @@ class ApplicationLogsAPI(ProtectedRequestHandler):
             else:
                 scoring_function = 'doc.var[0]'
 
-            index.add_function(300, scoring_function)
+            index.add_function(3, scoring_function)
             search_params = {
                 'query': 'text:data',
                 'category_filters': {},
                 'fetch_fields': ['text', 'timestamp'],
                 'length': max_results,
-                'scoring_function': 300
+                'scoring_function': 3
             }
 
             levels_list = []
@@ -194,27 +152,6 @@ class ApplicationLogsAPI(ProtectedRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class TroubleshootAPI(ProtectedRequestHandler):
-    """
-    Retrieve inactie device
-    """
-    def get(self):
-        page = self.request.get('page', default_value=1)
-        start = self.request.get('start', default_value=0)
-        since = self.request.get('since', default_value=0)
-        threshold = self.request.get('threshold', default_value=0)
-        self.hello_request(
-            api_url="devices/inactive",
-            type="GET",
-            url_params={
-                'page': page,
-                'start': start,
-                'since': since,
-                'threshold': threshold
-            }
-        )
-
-
 class SearchifyStatsAPI(ProtectedRequestHandler):
     """
     Retrieve current count of docs on searchify
@@ -225,8 +162,7 @@ class SearchifyStatsAPI(ProtectedRequestHandler):
             searchify_cred = settings.SEARCHIFY
             searchify_api = ApiClient(searchify_cred.api_client)
             sense_log_index = searchify_api.get_index("sense-logs")
-            sense_log_index.add_function(159, "-age")
-            hello_sense_log_latest_ts = sense_log_index.search(query="text:hello", scoring_function=159)["results"][0]["docid"]
+            hello_sense_log_latest_ts = sense_log_index.search(query="text:hello", scoring_function=0)["results"][0]["docid"]
             output['data'] = {
                 'latest sense log containing "hello"': hello_sense_log_latest_ts,
                 "summary": [i._get_metadata() for i in searchify_api.list_indexes()]
@@ -234,41 +170,3 @@ class SearchifyStatsAPI(ProtectedRequestHandler):
         except Exception as e:
             output['error'] = display_error(e)
         self.response.write(json.dumps(output))
-
-
-class TimelineAPI(ProtectedRequestHandler):
-    def get(self):
-        email = self.request.get('email')
-        date = self.request.get('date')
-        self.hello_request(
-            api_url="timeline/admin/{}/{}".format(email, date),
-            type="GET",
-        )
-
-
-class BatteryAPI(ProtectedRequestHandler):
-    def get(self):
-        email = self.request.get('email', '')
-        pill_id = self.request.get('pill_id', '')
-        battery_data = ResponseOutput()
-        
-        if email:
-            battery_data = self.hello_request(
-                api_url="devices/pill/{}/status".format(email),
-                type="GET",
-                test_mode=True
-            )
-        elif pill_id:
-            battery_data = self.hello_request(
-                api_url="devices/pill/id/{}/status".format(pill_id),
-                type="GET",
-                test_mode=True
-            )
-
-        battery_by_pill_id = defaultdict(list)
-        for d in battery_data.data:
-            battery_by_pill_id['pill{}'.format(d['deviceId'])].append(d)
-        self.response.write(json.dumps({'data': dict(battery_by_pill_id).values()}))
-
-
-
