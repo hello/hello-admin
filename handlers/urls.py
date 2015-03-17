@@ -1,10 +1,15 @@
 import webapp2
+from handlers.pill_status import PillStatusAPI
+from handlers.deprecated import InactiveDevicesAPI, PreSleepAPI
+from handlers.searchify_logs import SenseLogsAPI, ApplicationLogsAPI, SearchifyStatsAPI
+from handlers.timeline import TimelineAPI
 import settings
 from handlers.configuration import FeaturesAPI
 from handlers.cron import ZendeskCronHandler
 from handlers.cron import SenseLogsPurge
+from handlers.cron import SenseLogsPurgeByDeviceIDs
 from handlers.cron import ApplicationLogsPurge
-from handlers.cron import ApplicationLogsPurgeQueue
+from handlers.cron import SearchifyLogsPurgeQueue
 from handlers.zendesk import ZendeskAPI
 from handlers.zendesk import ZendeskStatsAPI
 from handlers.zendesk import ZendeskHistoryAPI
@@ -15,15 +20,8 @@ from handlers.firmware import FirmwareHistoryAPI
 from handlers.devices import DeviceAPI
 from handlers.devices import DeviceInactiveAPI
 from handlers.devices import DeviceKeyStoreHint
-from handlers.metrics import BatteryAPI
 from handlers.devices import DeviceOwnersAPI
-from handlers.metrics import SenseLogsAPI
-from handlers.metrics import ApplicationLogsAPI
-from handlers.metrics import SearchifyStatsAPI
-from handlers.metrics import PreSleepAPI
-from handlers.metrics import RoomConditionsAPI
-from handlers.metrics import TimelineAPI
-from handlers.metrics import TroubleshootAPI
+from handlers.room_conditions import RoomConditionsAPI
 from handlers.setup import AppAPI
 from handlers.setup import AppScopeAPI
 from handlers.setup import CreateAccountAPI
@@ -76,14 +74,15 @@ from handlers.users import PasswordResetAPI
 cron_routes = [
     ('/cron/sense_logs_purge', SenseLogsPurge),
     ('/cron/application_logs_purge/?$', ApplicationLogsPurge),
+    ('/cron/sense_logs_purge_by_device_ids/?$', SenseLogsPurgeByDeviceIDs),
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
-    ('/cron/application_logs_purge_queue', ApplicationLogsPurgeQueue)
+    ('/cron/searchify_logs_purge_queue', SearchifyLogsPurgeQueue)
 ]
 
 api_routes = [
     ('/api/app/?$', AppAPI),
     ('/api/app_scope/?$', AppScopeAPI),
-    ('/api/battery/?$', BatteryAPI),
+    ('/api/battery/?$', PillStatusAPI),
     ('/api/create_groups/?$', CreateGroupsAPI),
     ('/api/create_key_store_locker/?$', CreateKeyStoreLockerAPI),
     ('/api/debug_log/?$', SenseLogsAPI),
@@ -99,7 +98,7 @@ api_routes = [
     ('/api/presleep/?$', PreSleepAPI),
     ('/api/tokens/?$', TokenAPI),
     ('/api/teams/?$', TeamsAPI),
-    ('/api/troubleshoot/?$', TroubleshootAPI),
+    ('/api/troubleshoot/?$', InactiveDevicesAPI),
     ('/api/searchify_stats/?$', SearchifyStatsAPI),
     ('/api/user/?$', UserAPI),
     ('/api/zendesk/?$', ZendeskAPI),

@@ -199,7 +199,7 @@ var DebugLog = React.createClass({
                 <LongDatetimePicker placeHolder="start (default = 14 days ago)" id="start-time" size="3" />
                 <LongDatetimePicker placeHolder="end: (default = now)" id="end-time" size="3" />
                 <Col xs={3} sm={3} md={3} lg={3}>
-                  <input className="form-control" id="text-input" placeholder='Text e.g: DiffInSeconds' />
+                  <input className="form-control" id="text-input" placeholder='Text e.g: network' />
                 </Col>
                 <Col xs={2} sm={2} md={2} lg={2}>
                     <input id="case-check" type="checkbox" onChange={this.handleCaseChange} /> Case Insensitive
