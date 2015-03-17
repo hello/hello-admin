@@ -107,7 +107,7 @@ class SenseLogsPurge(SearchifyHandler):
         old_docs_to_be_deleted_list = self.gather_purge_ids(
             index=sense_logs_index,
             query_keywords=['text:uart', 'text:uploading', 'text:sending', 'text:complete', 'text:success', 'text:dev', 'text:hello', 'text:morpheus'],
-            time_threshold=datetime.datetime.now() + datetime.timedelta(days=-7)
+            time_threshold=datetime.datetime.now() + datetime.timedelta(days=-4)
         )
 
         output = {
@@ -201,11 +201,11 @@ class SearchifyLogsPurgeQueue(SearchifyHandler):
                     method="GET"
                 )
 
-        for d in ignore_devices:
+        for d in range(len(ignore_devices)):
             taskqueue.add(
                 url='/cron/sense_logs_purge_by_device_ids',
                 params={
-                    'device_id': d,
+                    'device_index': d,
                     'tolerance_in_days': 1
                 },
                 method="GET"
