@@ -150,10 +150,10 @@ var BatteryChart = React.createClass({
 
         return (<div>
             <form className="row" onSubmit={this.handleSubmit}>
-                <Col xs={3} sm={3} md={3} xsOffset={1} smOffset={1} mdOffset={1}>
-                    <Input id="search-input" type="text" placeholder="Enter email / part of pill ID"/>
+                <Col xs={3} sm={3} md={3}>
+                    <Input id="search-input" type="text" placeholder="email / pill ID partial"/>
                 </Col>
-                <Col xs={2} sm={2} md={2}>
+                <Col xs={1} sm={1} md={1}>
                     <Button bsStyle="info" bsSize="large" className="btn-circle" type="submit"><Glyphicon glyph="search"/></Button>
                 </Col>
                 <Col xs={2} sm={2} md={2}>
@@ -186,8 +186,17 @@ function filterData(data) {
                 d.lastSeen *= 1000;
             }
             return d;
-        }).filter(function(f){
-            return f.lastSeen >= new Date().getTime() - 10*24*3600*1000;
-        });
+        }).sort(compareTimestamp).slice(-169, -1);
     });
 }
+
+function compareTimestamp(log1, log2) {
+    if (log1.lastSeen < log2.lastSeen) {
+        return -1;
+    }
+    if (log1.lastSeen > log2.lastSeen) {
+        return 1;
+    }
+    return 0;
+}
+
