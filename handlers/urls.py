@@ -7,7 +7,6 @@ import settings
 from handlers.configuration import FeaturesAPI
 from handlers.cron import ZendeskCronHandler
 from handlers.cron import SenseLogsPurge
-from handlers.cron import SenseLogsPurgeByDeviceIDs
 from handlers.cron import ApplicationLogsPurge
 from handlers.cron import SearchifyLogsPurgeQueue
 from handlers.zendesk import ZendeskAPI
@@ -74,7 +73,6 @@ from handlers.users import PasswordResetAPI
 cron_routes = [
     ('/cron/sense_logs_purge', SenseLogsPurge),
     ('/cron/application_logs_purge/?$', ApplicationLogsPurge),
-    ('/cron/sense_logs_purge_by_device_ids/?$', SenseLogsPurgeByDeviceIDs),
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
     ('/cron/searchify_logs_purge_queue', SearchifyLogsPurgeQueue)
 ]
