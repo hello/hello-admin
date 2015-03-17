@@ -152,7 +152,7 @@ class ApplicationLogsPurge(SearchifyHandler):
 class SenseLogsPurgeByDeviceIDs(SearchifyHandler):
     def get(self):
         sense_logs_index = self.get_searchify_index('sense-logs')
-        device_id = ignore_devices[int(self.request.get('device_id'))]
+        device_id = self.request.get('device_id')
         output = {'device_id': device_id}
         try:
             old_docs_to_be_deleted_list = self.gather_purge_ids(
@@ -162,6 +162,7 @@ class SenseLogsPurgeByDeviceIDs(SearchifyHandler):
                 maxdocs=50,
                 exception_keywords=["ALARM RINGING", "GET DEVICE ID"]
             )
+            log.debug("Special purge delete count {}".format(len(old_docs_to_be_deleted_list)))
             output.update({
                 'old_docs_to_be_deleted': old_docs_to_be_deleted_list,
                 'count': len(old_docs_to_be_deleted_list),
@@ -200,11 +201,11 @@ class SearchifyLogsPurgeQueue(SearchifyHandler):
                     method="GET"
                 )
 
-        for i in range(len(ignore_devices)):
+        for d in ignore_devices:
             taskqueue.add(
                 url='/cron/sense_logs_purge_by_device_ids',
                 params={
-                    'device_id': i,
+                    'device_id': d,
                     'tolerance_in_days': 1
                 },
                 method="GET"
