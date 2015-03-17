@@ -10,16 +10,7 @@ handlers:
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
-- url: /cron/sense_logs_purge
-  script: handlers.urls.hello_admin_app
-  login: admin
-- url: /cron/application_logs_purge
-  script: handlers.urls.hello_admin_app
-  login: admin
-- url: /cron/zendesk_daily_stasts
-  script: handlers.urls.hello_admin_app
-  login: admin
-- url: /cron/application_logs_purge_queue
+- url: /cron/.*
   script: handlers.urls.hello_admin_app
   login: admin
 - url: .*
