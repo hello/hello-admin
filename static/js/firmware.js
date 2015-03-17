@@ -115,17 +115,16 @@ var HistoryListHeaders = React.createClass({
 
 var FirmwareListRows = React.createClass({
     render: function() {
-        var firmwareListRows = [];
-        this.props.fwList.forEach(function(fw){
-            firmwareListRows.push(
-                            <tr>
-                                <td>
-                                <LinkToFWSearch firmware_version={fw.version} />
-                                {" (" + parseInt(fw.version, 10).toString(16) + ")"}
-                                </td>
-                                <td>{fw.count}</td>
-                            </tr>
-                        );
+        var firmwareListRows = this.props.fwList.map(function(fw){
+            return(
+                <tr>
+                    <td>
+                    <LinkToFWSearch firmware_version={fw.version} />
+                    {" (" + parseInt(fw.version, 10).toString(16) + ")"}
+                    </td>
+                    <td>{fw.count}</td>
+                </tr>
+            );
 
         });
         return (<tbody>
@@ -136,18 +135,16 @@ var FirmwareListRows = React.createClass({
 
 var DeviceListRows = React.createClass({
     render: function() {
-        var deviceListRows = [];
-        this.props.fwDevices.forEach(function(device){
+        var deviceListRows = this.props.fwDevices.map(function(device){
             var timestamp = new Date(Number(device.timestamp));
-            deviceListRows.push(
-                            <tr>
-                                <td>{timestamp.toLocaleString()}</td>
-                                <td>
-                                <LinkToFWHistorySearch device_id={device.device_id} />
-                                </td>
-                            </tr>
-                        );
-
+            return(
+                <tr>
+                    <td>{timestamp.toLocaleString()}</td>
+                    <td>
+                    <LinkToFWHistorySearch device_id={device.device_id} />
+                    </td>
+                </tr>
+            );
         });
         return (<tbody>
             {deviceListRows}
@@ -157,10 +154,9 @@ var DeviceListRows = React.createClass({
 
 var HistoryListRows = React.createClass({
     render: function() {
-        var historyListRows = [];
-        Object.keys(this.props.firmwareHistory).sort().reverse().forEach(function(key){
+        var historyListRows = Object.keys(this.props.firmwareHistory).sort().reverse().map(function(key){
             var timestamp = new Date(Number(key));
-            historyListRows.push(
+            return(
                 <tr>
                     <td>{timestamp.toLocaleString()}</td>
                     <td>
