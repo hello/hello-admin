@@ -1,14 +1,13 @@
 import json
+import time
 import logging as log
 import settings
 
-from handlers.helpers import FirmwareRequestHandler
+from handlers.helpers import FirmwareRequestHandler, ProtectedRequestHandler
 from handlers.helpers import ProtectedRequestHandler
 from handlers.helpers import make_oauth2_service
 from models.setup import AccessToken
 from models.setup import AppInfo
-
-
 
 class FirmwareAPIDeprecated(FirmwareRequestHandler):
     '''Enables OTA firmware updates'''
@@ -153,3 +152,49 @@ class CreateTokenAPI(ProtectedRequestHandler):
         token.put()
 
         self.response.write(json.dumps({'access_token': access_token}))
+
+
+class PreSleepAPI(ProtectedRequestHandler):
+    def get(self):
+        """
+        Grab temperature
+        - request input:
+            sensor (required: one of ["humidity", "particulates", "temperature"])
+            token (required for each user)
+            resolution (required : week or day)
+        """
+
+        sensor = self.request.get('sensor', default_value='humidity')
+        resolution = self.request.get('resolution', default_value='day')
+        # timezone_offset = int(self.request.get('timezone_offset', default_value=8*3600*1000))
+        # current_ts = int(time.time() * 1000) - timezone_offset
+        current_ts = int(time.time() * 1000)
+        impersonatee_token = self.request.get('impersonatee_token', default_value=None)
+
+        self.hello_request(
+            api_url="room/{}/{}".format(sensor, resolution),
+            url_params={'from': current_ts},
+            impersonatee_token=impersonatee_token,
+            type="GET"
+        )
+
+
+class InactiveDevicesAPI(ProtectedRequestHandler):
+    """
+    Retrieve inactie device
+    """
+    def get(self):
+        page = self.request.get('page', default_value=1)
+        start = self.request.get('start', default_value=0)
+        since = self.request.get('since', default_value=0)
+        threshold = self.request.get('threshold', default_value=0)
+        self.hello_request(
+            api_url="devices/inactive",
+            type="GET",
+            url_params={
+                'page': page,
+                'start': start,
+                'since': since,
+                'threshold': threshold
+            }
+        )
