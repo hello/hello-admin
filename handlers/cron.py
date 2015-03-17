@@ -2,12 +2,11 @@ import datetime
 import json
 import logging as log
 import requests
+import settings
 from handlers.analysis import get_zendesk_stats
 from handlers.helpers import BaseRequestHandler
 from handlers.utils import display_error
 from handlers.utils import get_current_pacific_datetime
-from models.ext import SearchifyCredentials
-from models.ext import ZendeskCredentials
 from models.ext import ZendeskDailyStats
 from indextank import ApiClient
 
@@ -15,13 +14,7 @@ from google.appengine.api import taskqueue
 class ZendeskCronHandler(BaseRequestHandler):
     def get(self):
         output = {'data': []}
-        info_query = ZendeskCredentials.query()
-        results = info_query.fetch(1)
-
-        if not results:
-            self.error(500)
-
-        zendesk_cred = results[0]
+        zendesk_cred = settings.ZENDESK
         tickets = []
 
         zen_api = "{}/api/v2/search.json?query=type:ticket%20".format(zendesk_cred.domain)
@@ -73,10 +66,10 @@ class ZendeskCronHandler(BaseRequestHandler):
 
 class SearchifyHandler(BaseRequestHandler):
     def get_searchify_index(self, index):
-        searchify_entity= SearchifyCredentials.query().fetch(1)
+        searchify_entity = settings.SEARCHIFY
         if not searchify_entity:
             raise RuntimeError("Missing AppInfo. Bailing.")
-        return ApiClient(searchify_entity[0].api_client).get_index(index)
+        return ApiClient(searchify_entity.api_client).get_index(index)
 
     def identify_old_docs(self, index, query, time_threshold, start, limit):
         delete_docid_list = []
@@ -104,9 +97,9 @@ class SenseLogsPurge(SearchifyHandler):
         sense_logs_index = self.get_searchify_index('sense-logs')
 
         old_docs_to_be_deleted_list = self.gather_purge_ids(
-            sense_logs_index,
-            ['text:uart', 'text:uploading', 'text:sending', 'text:complete', 'text:success', 'text:Texas', 'text:dev'],
-            datetime.datetime.now() + datetime.timedelta(days=-14)
+            index=sense_logs_index,
+            query_keywords=['text:uart', 'text:uploading', 'text:sending', 'text:complete', 'text:success', 'text:Texas', 'text:dev', 'text:hello'],
+            time_threshold=datetime.datetime.now() + datetime.timedelta(days=-14)
         )
 
         output = {
@@ -133,7 +126,7 @@ class ApplicationLogsPurge(SearchifyHandler):
         try:
             old_docs_to_be_deleted_list = self.gather_purge_ids(
                 index=application_logs_index,
-                query_keywords=['text:{}'.format(level)],
+                query_keywords=['text:{}'.format(level),'text:hello' ],
                 time_threshold=datetime.datetime.now() - datetime.timedelta(days=tolerance_in_days),
                 maxdocs=50
             )
@@ -162,10 +155,10 @@ class ApplicationLogsPurgeQueue(SearchifyHandler):
         }
 
         tolerance_in_days = {
-            'DEBUG': 4,
-            'INFO': 4,
-            'WARN': 7,
-            'ERROR': 10,
+            'DEBUG': 3,
+            'INFO': 3,
+            'WARN': 4,
+            'ERROR': 7,
         }
 
         for level in ['DEBUG', 'INFO', 'WARN', 'ERROR']:

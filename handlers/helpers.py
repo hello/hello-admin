@@ -6,12 +6,11 @@ import json
 import logging as log
 from copy import copy
 from google.appengine.api import users
-from models.setup import AppInfo, UserGroup
 from rauth import OAuth2Service
 from rauth.session import OAuth2Session
 from utils import stripStringToList
-from utils import display_error
 from utils import extract_dicts_by_fields
+import requests
 
 this_file_path = os.path.dirname(__file__)
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -20,6 +19,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     autoescape=True
 )
 
+SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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'
 
 class BaseRequestHandler(webapp2.RequestHandler):
     def log_and_redirect(self, redirect_path, redirect_message):
@@ -78,27 +78,25 @@ class BaseRequestHandler(webapp2.RequestHandler):
         s = self.render(template_file, template_values=context)
         self.response.write(s)
 
-    def authorize_session(self, token=None):
+    def authorize_session(self, app_info, token=None):
         """
         :param token: token issued to user to use an specific app
         :type token: str
         """
-        info_query = AppInfo.query().order(-AppInfo.created)
-        results = info_query.fetch(1)
-
-        if not results:
-            self.error(500)
-            self.response.write("Missing AppInfo. Bailing.")
-
-        app_info_model = results[0]
-        hello = make_oauth2_service(app_info_model)
+        if app_info is not None:
+            hello = make_oauth2_service(app_info)
+        else:
+            if settings.APP_INFO is None:
+                self.error(500)
+                self.response.write("Missing AppInfo!")
+            hello = make_oauth2_service(settings.APP_INFO)
 
         if token is None:  # token could be set to impersonate an user otherwise
-            token = app_info_model.access_token
+            token = settings.APP_INFO.access_token
         return hello.get_session(token)
 
     def hello_request(self, api_url, body_data="", url_params={}, type="GET"
-                          , impersonatee_token=None, test_mode=False, filter_fields=[]):
+                          , impersonatee_token=None, test_mode=False, filter_fields=[], override_app_info=None):
         """
         :param api_url: api URL
         :type api_url: str
@@ -119,7 +117,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
 
         output = ResponseOutput()
         output.set_viewer(self.current_user.email())
-        session = self.authorize_session(token=impersonatee_token)
+        session = self.authorize_session(app_info=override_app_info, token=impersonatee_token)
         request_detail = {
             "headers": {'Content-Type': 'application/json'},
         }
@@ -157,6 +155,13 @@ class BaseRequestHandler(webapp2.RequestHandler):
 
     def error_log(self):
         return
+
+    def send_to_slack(self, message_text=''):
+        try:
+            slack_payload = {'text' : message_text, "icon_emoji": ":ghost:", "username": "deploy-bot"}
+            requests.post(SLACK_WEBHOOK_URL, data=json.dumps(slack_payload), headers={"Content-Type": "application/json"})
+        except Exception, e:
+            log.error("Slack notification failed: %s", e)
 
 def make_oauth2_service(app_info_model):
     """
@@ -218,7 +223,7 @@ class ProtectedRequestHandler(BaseRequestHandler):
     ## Retrieve groups grom DataStore
     @property
     def groups_entity(self):
-        return UserGroup.query_groups().fetch(1)[0]
+        return settings.USER_GROUP
 
     def super_engineer(self):
         return stripStringToList(self.groups_entity.super_engineer)

@@ -13,7 +13,7 @@ var SoundChart = React.createClass({
                 axis={{
                     x: {
                         tick: {
-                            format: function (x) { return d3.time.format('%b %d %H:%M')(new Date(x)); }
+                            format: function (x) { return d3.time.format.utc('%b %d %H:%M')(new Date(x)); }
                         },
                         label: {
                             text: "Time",
@@ -52,7 +52,7 @@ var SoundChartWithLabel = React.createClass({
                 axis={{
                     x: {
                         tick: {
-                            format: function (x) { return d3.time.format('%b %d %H:%M')(new Date(x)); }
+                            format: function (x) { return d3.time.format.utc('%b %d %H:%M')(new Date(x)); }
                         },
                         label: {
                             text: "Time",
@@ -72,6 +72,8 @@ var SoundChartWithLabel = React.createClass({
                 colors={{
                     value: "brown"
                 }}
+                xAttr="userTimestamp"
+
             />
         )
     }

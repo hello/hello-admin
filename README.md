@@ -1,8 +1,8 @@
 ### Hello Admin App
 Internal Tools for Hello Team
 
-- master branch is responsible for [https://hello-admin.appspot.com/](https://hello-admin.appspot.com/) which points to production database
-- [dev branch](https://github.com/hello/hello-admin-app/tree/dev) is responsible for [https://dev-dot-hello-admin.appspot.com/](https://dev-dot-hello-admin.appspot.com/) which points to dev database
+- dev version domain should always start with `dev`, i.e [https://dev-dot-hello-admin.appspot.com/](https://dev-dot-hello-admin.appspot.com/) which points to dev database
+- env is auto-detected in [settings] (https://github.com/hello/hello-admin-app/blob/master/settings.py)
 - **never** merge dev to master
 
 Requires a @sayhello.com email address.

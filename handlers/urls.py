@@ -10,6 +10,8 @@ from handlers.zendesk import ZendeskStatsAPI
 from handlers.zendesk import ZendeskHistoryAPI
 from handlers.zendesk import ZendeskNowAPI
 from handlers.firmware import FirmwareAPI
+from handlers.firmware import FirmwareInfoAPI
+from handlers.firmware import FirmwareHistoryAPI
 from handlers.devices import DeviceAPI
 from handlers.devices import DeviceInactiveAPI
 from handlers.devices import DeviceKeyStoreHint
@@ -72,9 +74,9 @@ from handlers.alarms import AlarmsAPI
 from handlers.users import PasswordResetAPI
 
 cron_routes = [
-    ('/cron/zendesk_daily_stats', ZendeskCronHandler),
     ('/cron/sense_logs_purge', SenseLogsPurge),
     ('/cron/application_logs_purge/?$', ApplicationLogsPurge),
+    ('/cron/zendesk_daily_stats', ZendeskCronHandler),
     ('/cron/application_logs_purge_queue', ApplicationLogsPurgeQueue)
 ]
 
@@ -92,6 +94,8 @@ api_routes = [
     ('/api/devices/key_store/?$', DeviceKeyStoreHint),
     ('/api/features/?$', FeaturesAPI),
     ('/api/firmware/?$', FirmwareAPI),
+    ('/api/firmware/info/?$', FirmwareInfoAPI),
+    ('/api/firmware/history/?$', FirmwareHistoryAPI),
     ('/api/presleep/?$', PreSleepAPI),
     ('/api/tokens/?$', TokenAPI),
     ('/api/teams/?$', TeamsAPI),

@@ -24,8 +24,8 @@ var UserSearchTable = React.createClass({
     render: function() {
         var tableRows = [];
         $.each(this.props.users, function(attribute, value){
-            if (attribute === 'dob' || attribute === 'last_modified') {
-                value = new Date(value).toLocaleString();
+            if (attribute === 'last_modified') {
+                value = new Date(value).toString();
             }
             var row = (value) ? <UserSearchTableRow rowAttr={attribute} rowVal={value}/> : null;
 
@@ -107,11 +107,10 @@ var UserSearchCanvas = React.createClass({
         }
     },
     handleSubmit: function(e) {
-        console.log('submitted');
         if (e) {
             e.preventDefault();
         }
-        var email = this.refs.email.getDOMNode().value.trim().toLowerCase();
+        var email = this.refs.email.getDOMNode().value.trim();
         if (!email) {
           return;
         }
@@ -128,6 +127,7 @@ var UserSearchCanvas = React.createClass({
                 });
             }
             else {
+                console.log(response.data);
                 this.setState({devices: response.data});
             }
           }.bind(this),

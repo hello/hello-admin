@@ -1,10 +1,9 @@
 import json
 import logging as log
-import re
 import time
+import settings
 from handlers.utils import display_error
 from handlers.helpers import ProtectedRequestHandler
-from models.ext import SearchifyCredentials
 from indextank import ApiClient
 from utils import stripStringToList
 from collections import defaultdict
@@ -63,13 +62,11 @@ class SenseLogsAPI(ProtectedRequestHandler):
         devices_input = self.request.get('devices', default_value="")
         start_time = self.request.get('start_time', default_value="")
         end_time = self.request.get('end_time', default_value="")
-
-        searchify_entity = SearchifyCredentials.query().fetch(1)
+        searchify_cred = settings.SEARCHIFY
 
         try:
-            if not searchify_entity:
-                raise RuntimeError("Missing AppInfo. Bailing.")
-            searchify_cred = searchify_entity[0]
+            if searchify_cred is None:
+                raise RuntimeError("Missing Searchify Credentials")
             debug_log_api = ApiClient(searchify_cred.api_client)
 
             index = debug_log_api.get_index('sense-logs')
@@ -144,12 +141,11 @@ class ApplicationLogsAPI(ProtectedRequestHandler):
         start_time = self.request.get('start_time', default_value="")
         end_time = self.request.get('end_time', default_value="")
 
-        searchify_entity = SearchifyCredentials.query().fetch(1)
-
         try:
-            if not searchify_entity:
+            searchify_cred = settings.SEARCHIFY
+            if not searchify_cred:
                 raise RuntimeError("Missing Searchify Credentials. Bailing.")
-            searchify_cred = searchify_entity[0]
+
             debug_log_api = ApiClient(searchify_cred.api_client)
 
             index = debug_log_api.get_index('application-logs')
@@ -226,9 +222,15 @@ class SearchifyStatsAPI(ProtectedRequestHandler):
     def get(self):
         output = {'data': [], 'error': ''}
         try:
-            searchify_cred= SearchifyCredentials.query().get()
+            searchify_cred = settings.SEARCHIFY
             searchify_api = ApiClient(searchify_cred.api_client)
-            output['data'] = [i._get_metadata() for i in searchify_api.list_indexes()]
+            sense_log_index = searchify_api.get_index("sense-logs")
+            sense_log_index.add_function(159, "-age")
+            hello_sense_log_latest_ts = sense_log_index.search(query="text:hello", scoring_function=159)["results"][0]["docid"]
+            output['data'] = {
+                'latest sense log containing "hello"': hello_sense_log_latest_ts,
+                "summary": [i._get_metadata() for i in searchify_api.list_indexes()]
+            }
         except Exception as e:
             output['error'] = display_error(e)
         self.response.write(json.dumps(output))
@@ -238,7 +240,6 @@ class TimelineAPI(ProtectedRequestHandler):
     def get(self):
         email = self.request.get('email')
         date = self.request.get('date')
-        print email, date
         self.hello_request(
             api_url="timeline/admin/{}/{}".format(email, date),
             type="GET",

@@ -19,6 +19,7 @@ var Row = ReactBootstrap.Row;
 var TabbedArea = ReactBootstrap.TabbedArea;
 var Table = ReactBootstrap.Table;
 var TabPane = ReactBootstrap.TabPane;
+var Panel = ReactBootstrap.Panel;
 
 function getParameterByName(name) {
   name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
@@ -76,6 +77,10 @@ function getLocalDateFromUTCEpoch(utcSeconds, needOffset, offsetMilliseconds) {
   return d.toLocaleString() || "";
 }
 
+function getFullDateTimeStringFromUTC(utcSeconds) {
+    return new Date(utcSeconds*1000).toString();
+}
+
 function getCustomDate(dayOffset) {
     var lastNdays = new Date();
     lastNdays.setDate(lastNdays.getDate() + dayOffset);
@@ -91,4 +96,5 @@ if (!Array.prototype.last){
     Array.prototype.last = function(){
         return this[this.length - 1];
     };
-};
+}
+
