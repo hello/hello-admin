@@ -3,6 +3,7 @@ import json
 import logging as log
 import requests
 import settings
+from cron_helpers import ignore_devices
 from handlers.analysis import get_zendesk_stats
 from handlers.helpers import BaseRequestHandler
 from handlers.utils import display_error
@@ -106,7 +107,7 @@ class SenseLogsPurge(SearchifyHandler):
         old_docs_to_be_deleted_list = self.gather_purge_ids(
             index=sense_logs_index,
             query_keywords=['text:uart', 'text:uploading', 'text:sending', 'text:complete', 'text:success', 'text:dev', 'text:hello', 'text:morpheus'],
-            time_threshold=datetime.datetime.now() + datetime.timedelta(days=-7)
+            time_threshold=datetime.datetime.now() + datetime.timedelta(days=-4)
         )
 
         output = {
@@ -148,6 +149,30 @@ class ApplicationLogsPurge(SearchifyHandler):
                 log.info('No Docs ID to be deleted for level {} - tolerance = {} days'.format(level, tolerance_in_days))
         self.response.write(json.dumps(output))
 
+class SenseLogsPurgeByDeviceIDs(SearchifyHandler):
+    def get(self):
+        sense_logs_index = self.get_searchify_index('sense-logs')
+        device_id = self.request.get('device_id')
+        output = {'device_id': device_id}
+        try:
+            old_docs_to_be_deleted_list = self.gather_purge_ids(
+                index=sense_logs_index,
+                query_keywords=['device_id:{}'.format(device_id)],
+                time_threshold=datetime.datetime.now() - datetime.timedelta(days=2),
+                maxdocs=50,
+                exception_keywords=["ALARM RINGING", "GET DEVICE ID"]
+            )
+            log.debug("Special purge delete count {}".format(len(old_docs_to_be_deleted_list)))
+            output.update({
+                'old_docs_to_be_deleted': old_docs_to_be_deleted_list,
+                'count': len(old_docs_to_be_deleted_list),
+                'searchify_response': self.delete_old_docs(sense_logs_index, old_docs_to_be_deleted_list) if old_docs_to_be_deleted_list else "No docs to be deleted"
+            })
+        except Exception as e:
+            output['error'] = e.message
+            if 'HTTP 400' in e.message:
+                log.info('No Docs ID to be deleted')
+        self.response.write(json.dumps(output))
 
 class SearchifyLogsPurgeQueue(SearchifyHandler):
     def get(self):
@@ -175,6 +200,16 @@ class SearchifyLogsPurgeQueue(SearchifyHandler):
                     },
                     method="GET"
                 )
+
+        for d in range(len(ignore_devices)):
+            taskqueue.add(
+                url='/cron/sense_logs_purge_by_device_ids',
+                params={
+                    'device_index': d,
+                    'tolerance_in_days': 1
+                },
+                method="GET"
+            )
 
         self.response.write(json.dumps({'queue': 'active'}))
 

@@ -1,12 +1,13 @@
 import webapp2
 from handlers.pill_status import PillStatusAPI
-from handlers.deprecated import InactiveDevicesAPI, PreSleepAPI
+from handlers.deprecated import InactiveDevicesAPI
 from handlers.searchify_logs import SenseLogsAPI, ApplicationLogsAPI, SearchifyStatsAPI
 from handlers.timeline import TimelineAPI
 import settings
 from handlers.configuration import FeaturesAPI
 from handlers.cron import ZendeskCronHandler
 from handlers.cron import SenseLogsPurge
+from handlers.cron import SenseLogsPurgeByDeviceIDs
 from handlers.cron import ApplicationLogsPurge
 from handlers.cron import SearchifyLogsPurgeQueue
 from handlers.zendesk import ZendeskAPI
@@ -73,6 +74,7 @@ from handlers.users import PasswordResetAPI
 cron_routes = [
     ('/cron/sense_logs_purge', SenseLogsPurge),
     ('/cron/application_logs_purge/?$', ApplicationLogsPurge),
+    ('/cron/sense_logs_purge_by_device_ids/?$', SenseLogsPurgeByDeviceIDs),
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
     ('/cron/searchify_logs_purge_queue', SearchifyLogsPurgeQueue)
 ]
@@ -93,7 +95,6 @@ api_routes = [
     ('/api/firmware/?$', FirmwareAPI),
     ('/api/firmware/info/?$', FirmwareInfoAPI),
     ('/api/firmware/history/?$', FirmwareHistoryAPI),
-    ('/api/presleep/?$', PreSleepAPI),
     ('/api/tokens/?$', TokenAPI),
     ('/api/teams/?$', TeamsAPI),
     ('/api/troubleshoot/?$', InactiveDevicesAPI),
