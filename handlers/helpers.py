@@ -10,6 +10,7 @@ from rauth import OAuth2Service
 from rauth.session import OAuth2Session
 from utils import stripStringToList
 from utils import extract_dicts_by_fields
+from google.appengine.api import memcache
 import requests
 
 this_file_path = os.path.dirname(__file__)
@@ -148,6 +149,13 @@ class BaseRequestHandler(webapp2.RequestHandler):
 
     def render_response(self, output):
         return self.response.write(output.get_serialized_output())
+
+    def update_or_create_memcache(self, key, value, environment=""):
+        memcache_key = key + environment
+        if memcache.get(memcache_key) is not None:
+            memcache.set(memcache_key, value)
+        else:
+            memcache.add(memcache_key, value)
 
     @property
     def current_user(self):

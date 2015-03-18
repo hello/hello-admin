@@ -3,6 +3,7 @@ import os
 import json
 from handlers.helpers import BaseRequestHandler
 from handlers.helpers import ProtectedRequestHandler
+from google.appengine.api import memcache
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
