@@ -94,7 +94,7 @@ class SearchifyHandler(BaseRequestHandler):
         old_docs_list = []
         for q in query_keywords:
             old_docs_list += self.identify_old_docs(index=index, query=q, time_threshold=time_threshold, start=0, limit=50)
-        return list(set(old_docs_list))[:maxdocs]
+        return list(set(old_docs_list))
 
     def delete_old_docs(self, index, docid_list):
         return index.delete_documents(docid_list)
@@ -159,14 +159,40 @@ class SenseLogsPurgeByDeviceIDs(SearchifyHandler):
                 index=sense_logs_index,
                 query_keywords=['device_id:{}'.format(device_id)],
                 time_threshold=datetime.datetime.now() - datetime.timedelta(days=2),
-                maxdocs=50,
+                maxdocs=75,
                 exception_keywords=["ALARM RINGING", "GET DEVICE ID"]
             )
-            log.debug("Special purge delete count {}".format(len(old_docs_to_be_deleted_list)))
+            log.debug("Special sense logs purge delete count {}".format(len(old_docs_to_be_deleted_list)))
             output.update({
                 'old_docs_to_be_deleted': old_docs_to_be_deleted_list,
                 'count': len(old_docs_to_be_deleted_list),
                 'searchify_response': self.delete_old_docs(sense_logs_index, old_docs_to_be_deleted_list) if old_docs_to_be_deleted_list else "No docs to be deleted"
+            })
+        except Exception as e:
+            output['error'] = e.message
+            if 'HTTP 400' in e.message:
+                log.info('No Docs ID to be deleted')
+        self.response.write(json.dumps(output))
+
+
+class ApplicationLogsPurgeByText(SearchifyHandler):
+    def get(self):
+        application_logs_index = self.get_searchify_index('application-logs')
+        text = self.request.get('text')
+        output = {'text': text}
+        try:
+            old_docs_to_be_deleted_list = self.gather_purge_ids(
+                index=application_logs_index,
+                query_keywords=['text:{}'.format(text)],
+                time_threshold=datetime.datetime.now() - datetime.timedelta(days=1),
+                maxdocs=75,
+                exception_keywords=["DEBUG"]
+            )
+            log.debug("Special application logs purge delete count {}".format(len(old_docs_to_be_deleted_list)))
+            output.update({
+                'old_docs_to_be_deleted': old_docs_to_be_deleted_list,
+                'count': len(old_docs_to_be_deleted_list),
+                'searchify_response': self.delete_old_docs(application_logs_index, old_docs_to_be_deleted_list) if old_docs_to_be_deleted_list else "No docs to be deleted"
             })
         except Exception as e:
             output['error'] = e.message
@@ -190,26 +216,39 @@ class SearchifyLogsPurgeQueue(SearchifyHandler):
             'ERROR': 7,
         }
 
-        for level in ['DEBUG', 'INFO', 'WARN', 'ERROR']:
-            for j in range(queue_sizes[level]):
-                taskqueue.add(
-                    url='/cron/application_logs_purge',
-                    params={
-                        'level': '{}'.format(level),
-                        'tolerance_in_days': tolerance_in_days[level]
-                    },
-                    method="GET"
-                )
-
-        for d in range(len(ignore_devices)):
-            taskqueue.add(
-                url='/cron/sense_logs_purge_by_device_ids',
-                params={
-                    'device_index': d,
-                    'tolerance_in_days': 1
-                },
-                method="GET"
-            )
+        # for level in ['DEBUG', 'WARN', 'ERROR']:
+        #     for j in range(queue_sizes[level]):
+        #         taskqueue.add(
+        #             url='/cron/application_logs_purge',
+        #             params={
+        #                 'level': '{}'.format(level),
+        #                 'tolerance_in_days': tolerance_in_days[level]
+        #             },
+        #             method="GET",
+        #             queue_name="default"
+        #         ),
+        #
+        # for d in ignore_devices:
+        #     taskqueue.add(
+        #         url='/cron/sense_logs_purge_by_device_ids',
+        #         params={
+        #             'device_id': d,
+        #             'tolerance_in_days': 1
+        #         },
+        #         method="GET",
+        #         queue_name="sensespecialpurge"
+        #     )
+        #
+        # for r in range(2):
+        #     taskqueue.add(
+        #         url='/cron/application_logs_purge_by_text',
+        #         params={
+        #             'text': "info",
+        #             'tolerance_in_days': 1
+        #         },
+        #         method="GET",
+        #         queue_name="appspecialpurge"
+        #     )
 
         self.response.write(json.dumps({'queue': 'active'}))
 
