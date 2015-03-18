@@ -153,9 +153,9 @@ class BaseRequestHandler(webapp2.RequestHandler):
     def update_or_create_memcache(self, key, value, environment=""):
         memcache_key = key + environment
         if memcache.get(memcache_key) is not None:
-            memcache.set(memcache_key, value)
+            memcache.set(key=memcache_key, value=value, time=86400)
         else:
-            memcache.add(memcache_key, value)
+            memcache.add(key=memcache_key, value=value, time=86400)
 
     @property
     def current_user(self):
