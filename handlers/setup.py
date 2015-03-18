@@ -373,12 +373,7 @@ class UpdateAdminAccessTokenAPI(SuperEngineerRequestHandler):
             app_info_model.client_id
         log.info(msg)
 
-        self.update_or_create_memcache(key="app_info", value=settings.APP_INFO, environment=settings.ENVIRONMENT)
-        self.update_or_create_memcache(key="admin_user", value=settings.ADMIN_USER, environment=settings.ENVIRONMENT)
-        self.update_or_create_memcache(key="searchify_credentials", value=settings.SEARCHIFY)
-        self.update_or_create_memcache(key="zendesk_credentials", value=settings.ZENDESK)
-
-        self.redirect('/')
+        self.redirect('/refresh_memcache')
 
 
 class CreateKeyStoreLockerAPI(SuperEngineerRequestHandler):
