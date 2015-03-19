@@ -175,7 +175,6 @@ class SenseLogsAPI(SenseLogsHandler):
             'data': new_sense_logs_output['data'] + old_sense_logs_output['data'],
             'error': new_sense_logs_output['error'] + old_sense_logs_output['error'],
         }
-        print aggregate_output
         self.response.write(json.dumps(aggregate_output))
 
 
