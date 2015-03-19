@@ -69,6 +69,7 @@ from handlers.keys import PillKeyProvision
 from handlers.label_data import LabelDataAPI
 from handlers.alarms import AlarmsAPI
 from handlers.users import PasswordResetAPI
+from handlers.searchify_logs import WorkerLogsAPI
 from handlers.memcache import RefreshMemcache
 
 cron_routes = [
@@ -114,6 +115,7 @@ api_routes = [
     ('/api/label_data/?$', LabelDataAPI),
     ('/api/alarms/?$', AlarmsAPI),
     ('/api/password_reset/?$', PasswordResetAPI),
+    ('/api/worker_logs/?$', WorkerLogsAPI),
 ]
 
 page_routes = [
