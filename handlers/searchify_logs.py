@@ -41,7 +41,6 @@ class SenseLogsHandler(ProtectedRequestHandler):
             index.add_function(3, scoring_function)
             search_params = {
                 'query': 'text:UART',
-                'category_filters': {},
                 'fetch_fields': ['text', 'timestamp'],
                 'length': max_results,
                 'scoring_function': 3
@@ -49,6 +48,8 @@ class SenseLogsHandler(ProtectedRequestHandler):
 
             if text_input:
                 search_params['query'] = 'text:{}'.format(text_input)
+            else:
+                search_params['query'] = 'all:1'
 
             devices_list = []
             if devices_input:
@@ -65,15 +66,7 @@ class SenseLogsHandler(ProtectedRequestHandler):
                         devices_list.append(d)
                 search_params['category_filters'] = {'device_id': devices_list}
 
-            if not text_input and (not devices_input or not devices_list):
-                raise RuntimeError('No results')
-
-            if not text_input:
-                for d in devices_list:
-                    search_params['query'] = 'device_id:{}'.format(d)
-                    output['data'] += index.search(**search_params)['results']
-            else:
-                output['data'] = index.search(**search_params)['results']
+            output['data'] = index.search(**search_params)['results']
 
         except Exception as e:
             output['error'] = display_error(e)
@@ -136,11 +129,10 @@ class SearchifyLogsHandler(ProtectedRequestHandler):
 
             if text_input:
                 search_params['query'] = 'text:{}'.format(text_input)
-                output['data'] = index.search(**search_params)['results']
             else:
-                for level in levels_list:
-                    search_params['query'] = level
-                    output['data'] += index.search(**search_params)['results']
+                search_params['query'] = 'all:1'
+
+            output['data'] = index.search(**search_params)['results']
 
         except Exception as e:
             output['error'] = display_error(e)
@@ -157,6 +149,7 @@ class ApplicationLogsAPI(SearchifyLogsHandler):
     def get(self):
         new_application_logs_output = self.get_logs_by_index("application-logs-2015-03")
         old_application_logs_output = self.get_logs_by_index("application-logs")
+
         aggregate_output = {
             'data': new_application_logs_output['data'] + old_application_logs_output['data'],
             'error': new_application_logs_output['error'] + old_application_logs_output['error'],
@@ -171,6 +164,7 @@ class SenseLogsAPI(SenseLogsHandler):
     def get(self):
         new_sense_logs_output = self.get_logs_by_index("sense-logs-2015-03")
         old_sense_logs_output = self.get_logs_by_index("sense-logs")
+
         aggregate_output = {
             'data': new_sense_logs_output['data'] + old_sense_logs_output['data'],
             'error': new_sense_logs_output['error'] + old_sense_logs_output['error'],
