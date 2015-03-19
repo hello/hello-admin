@@ -70,6 +70,7 @@ from handlers.label_data import LabelDataAPI
 from handlers.alarms import AlarmsAPI
 from handlers.users import PasswordResetAPI
 from handlers.searchify_logs import WorkerLogsAPI
+from views import WorkerLogsView
 from handlers.memcache import RefreshMemcache
 
 cron_routes = [
@@ -152,6 +153,7 @@ page_routes = [
     ('/alarms/?$', AlarmsView),
     ('/setup/?$', SetupView),
     ('/password_reset/?$', PasswordResetView),
+    ('/worker_logs/?$', WorkerLogsView),
     ('/refresh_memcache/?$', RefreshMemcache),
 ]
 
