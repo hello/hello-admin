@@ -26,20 +26,6 @@ def encrypt_order(order_id, cipher=cipher):
     return EncodeAES(cipher, str(order_id)).replace('/', '-')
 
 
-# class OrdersView(ProtectedRequestHandler):
-#     """Search for order by order ID"""
-#     def get(self):
-#         self.render_to_response(template_file='templates/orders.html',
-#                                 context={'title': 'Orders'})
-#
-#     def post(self):
-#         order_id = self.request.get('order_id', '')
-#         if not order_id:
-#             self.redirect('/error')
-#
-#         context = {'order_link': encrypt_order(order_id), 'title' : 'Orders'}
-#         self.render_to_response(template_file='templates/orders.html', context=context)
-
 class OrdersAPI(ProtectedRequestHandler):
     def get(self):
         order_id = self.request.get('order_id', default_value='')
