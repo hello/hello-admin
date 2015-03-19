@@ -36,7 +36,7 @@ from handlers.views import BatteryView
 from handlers.keys import SenseKeyProvision
 from handlers.views import ChartHandler
 from handlers.views import ConfigurationView
-from handlers.views import DebugLogView
+from handlers.views import SenseLogsView
 from handlers.views import ApplicationLogsView
 from handlers.views import ErrorView
 from handlers.views import FirmwareView
@@ -86,7 +86,7 @@ api_routes = [
     ('/api/battery/?$', PillStatusAPI),
     ('/api/create_groups/?$', CreateGroupsAPI),
     ('/api/create_key_store_locker/?$', CreateKeyStoreLockerAPI),
-    ('/api/debug_log/?$', SenseLogsAPI),
+    ('/api/sense_logs/?$', SenseLogsAPI),
     ('/api/application_logs/?$', ApplicationLogsAPI),
     ('/api/devices/?$', DeviceAPI),
     ('/api/devices/inactive/?$', DeviceInactiveAPI),
@@ -125,7 +125,7 @@ page_routes = [
     ('/charts', ChartHandler),
     ('/configuration/?$', ConfigurationView),
     ('/create_account', CreateAccountAPI),
-    ('/debug_log/?$', DebugLogView),
+    ('/sense_logs/?$', SenseLogsView),
     ('/application_logs/?$', ApplicationLogsView),
     ('/error/?$', ErrorView),
     ('/firmware/?$', FirmwareView),

@@ -129,7 +129,7 @@ var DebugLog = React.createClass({
             startInput = getUTCEpochFromLocalTime(startInputHuman),
             endInput = getUTCEpochFromLocalTime(endInputHuman);
         $.ajax({
-          url: "/api/debug_log",
+          url: "/api/sense_logs",
           dataType: 'json',
           type: 'GET',
           data: {
@@ -140,7 +140,7 @@ var DebugLog = React.createClass({
               end_time: endInput
           },
           success: function(response) {
-            history.pushState({}, '', '/debug_log/?text=' + textInput + '&devices=' + devicesInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + startInputHuman + '&end=' + endInputHuman);
+            history.pushState({}, '', '/sense_logs/?text=' + textInput + '&devices=' + devicesInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + startInputHuman + '&end=' + endInputHuman);
             if (response.error) {
                 this.setState({
                     logs: [],
