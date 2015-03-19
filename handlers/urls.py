@@ -54,6 +54,7 @@ from handlers.views import MotionView
 from handlers.setup import ViewPermissionAPI
 from handlers.notification import NotificationAPI
 from handlers.motion import MotionAPI
+from handlers.views import OrdersView
 from handlers.views import KeysView
 from handlers.views import ZendeskHistoryView
 from handlers.views import ZendeskNowView
@@ -72,6 +73,7 @@ from handlers.users import PasswordResetAPI
 from handlers.searchify_logs import WorkerLogsAPI
 from views import WorkerLogsView
 from handlers.memcache import RefreshMemcache
+from handlers.orders import OrdersAPI
 
 cron_routes = [
     ('/cron/sense_logs_purge', SenseLogsPurge),
@@ -117,6 +119,7 @@ api_routes = [
     ('/api/alarms/?$', AlarmsAPI),
     ('/api/password_reset/?$', PasswordResetAPI),
     ('/api/worker_logs/?$', WorkerLogsAPI),
+    ('/api/orders/?$', OrdersAPI),
 ]
 
 page_routes = [
@@ -155,6 +158,7 @@ page_routes = [
     ('/password_reset/?$', PasswordResetView),
     ('/worker_logs/?$', WorkerLogsView),
     ('/refresh_memcache/?$', RefreshMemcache),
+    ('/orders/?$', OrdersView),
 ]
 
 file_upload_routes = [

@@ -40,6 +40,7 @@ var SideBar = React.createClass({
 
            <ListGroupItem bsStyle="info" className="sidebar-group">Admin only</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/settings">&#10149; Settings</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/orders">&#10149; Orders</ListGroupItem>
        </ListGroup>)
    }
 });
