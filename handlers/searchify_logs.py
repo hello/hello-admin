@@ -8,11 +8,11 @@ import settings
 __author__ = 'zet'
 
 
-class SenseLogsAPI(ProtectedRequestHandler):
+class SenseLogsHandler(ProtectedRequestHandler):
     """
     Retrieve debug logs
     """
-    def get(self):
+    def get_logs_by_index(self, index_name):
         output = {'data': [], 'error': ''}
 
         max_results = int(self.request.get('max_results', default_value=20))
@@ -79,10 +79,10 @@ class SenseLogsAPI(ProtectedRequestHandler):
             output['error'] = display_error(e)
             log.error('ERROR: {}'.format(display_error(e)))
 
-        self.response.write(json.dumps(output))
+        return output
 
 
-class SearchifyLogsAPI(ProtectedRequestHandler):
+class SearchifyLogsHandler(ProtectedRequestHandler):
     """
     Retrieve application logs
     """
@@ -146,23 +146,45 @@ class SearchifyLogsAPI(ProtectedRequestHandler):
             output['error'] = display_error(e)
             log.error('ERROR: {}'.format(display_error(e)))
 
-        self.response.write(json.dumps(output))
+        return output
 
 
-class ApplicationLogsAPI(SearchifyLogsAPI):
+
+class ApplicationLogsAPI(SearchifyLogsHandler):
+    """
+    Retrieve application logs
+    """
+    def get(self):
+        new_application_logs_output = self.get_logs_by_index("application-logs-2015-03")
+        old_application_logs_output = self.get_logs_by_index("application-logs")
+        aggregate_output = {
+            'data': new_application_logs_output['data'] + old_application_logs_output['data'],
+            'error': new_application_logs_output['error'] + old_application_logs_output['error'],
+        }
+        self.response.write(json.dumps(aggregate_output))
+
+
+class SenseLogsAPI(SenseLogsHandler):
+    """
+    Retrieve sense logs
+    """
+    def get(self):
+        new_sense_logs_output = self.get_logs_by_index("sense-logs-2015-03")
+        old_sense_logs_output = self.get_logs_by_index("sense-logs")
+        aggregate_output = {
+            'data': new_sense_logs_output['data'] + old_sense_logs_output['data'],
+            'error': new_sense_logs_output['error'] + old_sense_logs_output['error'],
+        }
+        print aggregate_output
+        self.response.write(json.dumps(aggregate_output))
+
+
+class WorkerLogsAPI(SearchifyLogsHandler):
     """
     Retrieve worker logs
     """
     def get(self):
-        self.get_logs_by_index("application-logs")
-
-
-class WorkerLogsAPI(SearchifyLogsAPI):
-    """
-    Retrieve worker logs
-    """
-    def get(self):
-        self.get_logs_by_index("workers-logs-2015-03")
+        self.response.write(json.dumps(self.get_logs_by_index("workers-logs-2015-03")))
 
 
 class SearchifyStatsAPI(ProtectedRequestHandler):
