@@ -5,6 +5,7 @@ import settings
 from models.setup import AppInfo, AdminUser, AccessToken, UserGroup
 from handlers.helpers import make_oauth2_service, ProtectedRequestHandler, SuperEngineerRequestHandler
 from models.ext import ZendeskCredentials, SearchifyCredentials, KeyStoreLocker
+from google.appengine.api import memcache
 
 
 class AppAPI(ProtectedRequestHandler):
@@ -262,6 +263,7 @@ class SetupAPI(SuperEngineerRequestHandler):
             password='with with correct pw'
         )
         admin_user.put()
+        self.update_or_create_memcache(key="admin_user", value=admin_user, environment=settings.ENVIRONMENT)
 
         app_info = AppInfo(
             id=settings.ENVIRONMENT,
@@ -270,6 +272,7 @@ class SetupAPI(SuperEngineerRequestHandler):
             access_token='will be created by /update'
         )
         app_info.put()
+        self.update_or_create_memcache(key="app_info", value=app_info, environment= settings.ENVIRONMENT)
 
         zendesk_credentials = ZendeskCredentials(
             domain='https://helloinc.zendesk.com',
@@ -277,11 +280,14 @@ class SetupAPI(SuperEngineerRequestHandler):
             api_token='ask_marina'
         )
         zendesk_credentials.put()
+        self.update_or_create_memcache(key="zendesk_credentials", value=zendesk_credentials)
 
         searchify_credentials = SearchifyCredentials(
             api_client='ask_tim'
         )
         searchify_credentials.put()
+        self.update_or_create_memcache(key="searchify_credentials", value=searchify_credentials)
+
         self.response.write("Essential credentials initialized!")
 
 class UpdateAdminAccessTokenAPI(SuperEngineerRequestHandler):
@@ -362,10 +368,12 @@ class UpdateAdminAccessTokenAPI(SuperEngineerRequestHandler):
         access_token = json_data['access_token']
         app_info_model.access_token = access_token
         app_info_model.put()
+        self.update_or_create_memcache(key="app_info", value=app_info_model, environment=settings.ENVIRONMENT)
         msg = "updated app client_id = %s successfully." % \
             app_info_model.client_id
         log.info(msg)
-        self.redirect('/')
+
+        self.redirect('/refresh_memcache')
 
 
 class CreateKeyStoreLockerAPI(SuperEngineerRequestHandler):
@@ -374,8 +382,13 @@ class CreateKeyStoreLockerAPI(SuperEngineerRequestHandler):
         Populate groups entity
         """
         for key_id in ['pvt', 'dvt', 'mp']:
-            key_store_entity = KeyStoreLocker(id=key_id, private_key="Fill in private key")
+            key_store_entity = KeyStoreLocker(
+                id=key_id,
+                private_key="Fill in private key for provisioning {} sense".format(key_id)
+            )
             key_store_entity.put()
+            self.update_or_create_memcache(key=key_id, value= key_store_entity)
+
         self.response.write("Empty RSA private keys for sense provision initialized !")
 
     def post(self):
@@ -391,7 +404,10 @@ class CreateKeyStoreLockerAPI(SuperEngineerRequestHandler):
 
         priv = KeyStoreLocker.get_by_id(key_id)
         priv.private_key = key
+
         priv.put()
+        self.update_or_create_memcache(key=key_id, value=priv)
+
         self.redirect('/')
 
 
@@ -412,9 +428,11 @@ class CreateGroupsAPI(ProtectedRequestHandler):
         }
         groups_entity = UserGroup(**groups_data)
         groups_entity.put()
+        self.update_or_create_memcache(key="user_group", value=groups_entity)
         output['data'] = groups_data
 
         self.response.write(json.dumps(output))
+
 
 class ViewPermissionAPI(ProtectedRequestHandler):
     def get(self):

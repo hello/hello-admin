@@ -69,6 +69,7 @@ from handlers.keys import PillKeyProvision
 from handlers.label_data import LabelDataAPI
 from handlers.alarms import AlarmsAPI
 from handlers.users import PasswordResetAPI
+from handlers.memcache import RefreshMemcache
 
 cron_routes = [
     ('/cron/sense_logs_purge', SenseLogsPurge),
@@ -149,6 +150,7 @@ page_routes = [
     ('/alarms/?$', AlarmsView),
     ('/setup/?$', SetupView),
     ('/password_reset/?$', PasswordResetView),
+    ('/refresh_memcache/?$', RefreshMemcache),
 ]
 
 file_upload_routes = [

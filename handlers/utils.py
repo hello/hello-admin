@@ -4,7 +4,7 @@ import logging as log
 from datetime import datetime
 import calendar
 import pytz
-
+from google.appengine.api import memcache
 
 
 utc_timezone = pytz.timezone("UTC")
@@ -71,3 +71,4 @@ def extract_dicts_by_fields(dicts, fields):
     if not isinstance(dicts, list) or not isinstance(fields, list):
         raise TypeError("Expecting input as lists")
     return [{field: d.get(field, None) for field in fields} for d in dicts]
+
