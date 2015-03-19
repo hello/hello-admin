@@ -82,13 +82,12 @@ class SenseLogsAPI(ProtectedRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class ApplicationLogsAPI(ProtectedRequestHandler):
+class SearchifyLogsAPI(ProtectedRequestHandler):
     """
     Retrieve application logs
     """
 
-    ## TODO: refactor this api and DebugLogAPI as they have many common parts.
-    def get(self):
+    def get_logs_by_index(self, index_name):
         output = {'data': [], 'error': ''}
 
         max_results = int(self.request.get('max_results', default_value=20))
@@ -104,9 +103,7 @@ class ApplicationLogsAPI(ProtectedRequestHandler):
             if not searchify_cred:
                 raise RuntimeError("Missing Searchify Credentials. Bailing.")
 
-            debug_log_api = ApiClient(searchify_cred.api_client)
-
-            index = debug_log_api.get_index('application-logs')
+            index = ApiClient(searchify_cred.api_client).get_index(index_name)
 
             if start_time.isdigit() and end_time.isdigit():
                 scoring_function = 'if((doc.var[0] - {})*(doc.var[0] - {}) < 0, doc.var[0], rel)'.format(start_time, end_time)
@@ -150,6 +147,22 @@ class ApplicationLogsAPI(ProtectedRequestHandler):
             log.error('ERROR: {}'.format(display_error(e)))
 
         self.response.write(json.dumps(output))
+
+
+class ApplicationLogsAPI(SearchifyLogsAPI):
+    """
+    Retrieve worker logs
+    """
+    def get(self):
+        self.get_logs_by_index("application-logs")
+
+
+class WorkerLogsAPI(SearchifyLogsAPI):
+    """
+    Retrieve worker logs
+    """
+    def get(self):
+        self.get_logs_by_index("workers-logs-2015-03")
 
 
 class SearchifyStatsAPI(ProtectedRequestHandler):

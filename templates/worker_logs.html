@@ -10,17 +10,18 @@
     <script type="text/javascript" src="/static/js/third-party/bootstrap-slider.js"></script>
     <script type="text/javascript" src="/static/js/third-party/bootstrap-tagsinput.js"></script>
     <script type="text/jsx" src="/static/js/third-party/long-tagsinput.js"></script>
-    <script type="text/jsx" src="/static/js/debug_log.js"></script>
+    <script type="text/jsx" src="/static/js/custom/long-label.js"></script>
+    <script type="text/jsx" src="/static/js/worker_logs.js"></script>
 
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-datetimepicker.min.css" />
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/spectrum.css" />
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-slider.css" />
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-tagsinput.css" />
-    <link rel="stylesheet" type="text/css" href="/static/css/debug_log.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/worker_logs.css" />
 {% endblock %}
 
 {% block content %}
-    <h3>Debug Log</h3>
+    <h3>{{title}}</h3>
     <hr class="fancy-line"/>
-    <div id="debug-log"></div>
+    <div id="application-logs"></div>
 {% endblock %}

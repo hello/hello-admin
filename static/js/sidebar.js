@@ -15,8 +15,9 @@ var SideBar = React.createClass({
            <ListGroupItem bsStyle="default" href="/motion">&#10149; Motion</ListGroupItem>
 
            <ListGroupItem bsStyle="info" className="sidebar-group">Logs</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/debug_log">&#10149; Sense</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/sense_logs">&#10149; Sense</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/application_logs">&#10149; Application</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/worker_logs">&#10149; Worker</ListGroupItem>
 
            <ListGroupItem bsStyle="info" className="sidebar-group">Data Science</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/label">&#10149; Label</ListGroupItem>

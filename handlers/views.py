@@ -48,19 +48,25 @@ class SettingsView(SuperEngineerRequestHandler):
         self.render_to_response(template_file='templates/settings.html',
                                 context={'title': 'Settings'})
 
-class DebugLogView(ProtectedRequestHandler):
+class SenseLogsView(ProtectedRequestHandler):
     """
-    Returns a beautiful & comfy log viewer
+    Returns sense logs viewer
     """
     def get(self):
-        self.render_to_response(template_file='templates/debug_log.html',
-                                context={'title': 'Log'})
+        self.render_to_response(template_file='templates/sense_logs.html',
+                                context={'title': 'Sense Logs'})
 
 class ApplicationLogsView(ProtectedRequestHandler):
-    """Returns a beautiful & comfy log viewer"""
+    """Returns application logs viewer"""
     def get(self):
         self.render_to_response(template_file='templates/application_logs.html',
                                 context={'title': 'Application Logs'})
+
+class WorkerLogsView(ProtectedRequestHandler):
+    """Returns worker logs viewer"""
+    def get(self):
+        self.render_to_response(template_file='templates/worker_logs.html',
+                                context={'title': 'Worker Logs'})
 
 class FirmwareView(FirmwareRequestHandler):
     """Returns a panel for moderating firmware content"""
