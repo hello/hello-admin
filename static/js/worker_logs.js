@@ -88,7 +88,7 @@ var DebugLog = React.createClass({
           $('#sliderValue').text(maxDocsFromURL);
         }
         else {
-          maxDocsFromURL = 20;
+          maxDocsFromURL = 100;
         }
         if (levelsInputFromURL) {
           $('#levels-input').val(levelsInputFromURL);
@@ -134,14 +134,14 @@ var DebugLog = React.createClass({
         this.setState({showLineBreaks: $('#whitespace-check').is(':checked')});
     },
     handleSubmit: function(){
-        var textInput = $('#text-input').val(),
-            levelsInput = $('#levels-input').val(),
-            originsInput = $('#origins-input').val(),
-            versionsInput = $('#versions-input').val(),
-            startInputHuman = $('#start-time').val() || getCustomDate(-14),
-            endInputHuman = $('#end-time').val() || getCustomDate(0),
-            startInput = getUTCEpochFromLocalTime(startInputHuman),
-            endInput = getUTCEpochFromLocalTime(endInputHuman);
+        var textInput = $('#text-input').val().trim(),
+            levelsInput = $('#levels-input').val().trim(),
+            originsInput = $('#origins-input').val().trim(),
+            versionsInput = $('#versions-input').val().trim(),
+            startInputHuman = $('#start-time').val().trim() ,
+            endInputHuman = $('#end-time').val().trim(),
+            startInput = startInputHuman.isWhiteString() ? "": getUTCEpochFromLocalTime(startInputHuman),
+            endInput = endInputHuman.isWhiteString() ? "": getUTCEpochFromLocalTime(endInputHuman);
         $.ajax({
           url: "/api/worker_logs",
           dataType: 'json',
@@ -156,7 +156,7 @@ var DebugLog = React.createClass({
               end_time: endInput
           },
           success: function(response) {
-            history.pushState({}, '', '/application_logs/?text=' + textInput + '&levels=' + levelsInput + '&origins=' + originsInput + '&versions=' + versionsInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + startInputHuman + '&end=' + endInputHuman);
+            history.pushState({}, '', '/worker_logs/?text=' + textInput + '&levels=' + levelsInput + '&origins=' + originsInput + '&versions=' + versionsInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + startInputHuman + '&end=' + endInputHuman);
             if (response.error) {
                 this.setState({
                     logs: [],
@@ -219,7 +219,7 @@ var DebugLog = React.createClass({
                   <LongTagsInput id="versions-input" tagClass="label label-info" placeHolder="Versions e.g: 0.1.321" />
                 </Col>
                 <Col xs={2} sm={2} md={2} lg={2}>
-                    <span id="slider-narration">Max docs per filter</span>: <span id="sliderValue">20</span>
+                    <span id="slider-narration">Max docs per filter</span>: <span id="sliderValue">100</span>
                     <input type="text" className="span2 slider" value="" data-slider-min="1" data-slider-max="150" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square" />
                 </Col>
                 <Col xs={1} sm={1} md={1} lg={1}>

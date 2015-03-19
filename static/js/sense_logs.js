@@ -60,7 +60,7 @@ var DebugLog = React.createClass({
             searchAlert: "",
             highlightColor: '#FF0000',
             caseInsensitive: true,
-            showLineBreaks: false
+            showLineBreaks: true
         };
     },
     componentDidMount: function() {
@@ -83,7 +83,7 @@ var DebugLog = React.createClass({
           $('#sliderValue').text(maxDocsFromURL);
         }
         else {
-          maxDocsFromURL = 20;
+          maxDocsFromURL = 100;
         }
         if (devicesInputFromURL) {
           $('#devices-input').val(devicesInputFromURL);
@@ -92,14 +92,14 @@ var DebugLog = React.createClass({
           $('#text-input').val(textInputFromURL);
         }
 
-        if (devicesInputFromURL || textInputFromURL)
-          that.handleSubmit();
+        that.handleSubmit();
 
         $('.slider').slider({value: Number(maxDocsFromURL)}).on('slide', function(slideEvt){
             $('#sliderValue').text(slideEvt.value);
         });
 
         $('#case-check').attr('checked', true);
+        $('#whitespace-check').attr('checked', true);
         $('#colorpick').spectrum({
             color: "#FF0000",
             clickoutFiresChange: true,
@@ -122,12 +122,12 @@ var DebugLog = React.createClass({
         this.setState({showLineBreaks: $('#whitespace-check').is(':checked')});
     },
     handleSubmit: function(){
-        var textInput = $('#text-input').val(),
-            devicesInput = $('#devices-input').val(),
-            startInputHuman = $('#start-time').val() || getCustomDate(-14),
-            endInputHuman = $('#end-time').val() || getCustomDate(0),
-            startInput = getUTCEpochFromLocalTime(startInputHuman),
-            endInput = getUTCEpochFromLocalTime(endInputHuman);
+        var textInput = $('#text-input').val().trim(),
+            devicesInput = $('#devices-input').val().trim(),
+            startInputHuman = $('#start-time').val().trim(),
+            endInputHuman = $('#end-time').val().trim(),
+            startInput = startInputHuman.isWhiteString() ? "": getUTCEpochFromLocalTime(startInputHuman),
+            endInput = endInputHuman.isWhiteString() ? "": getUTCEpochFromLocalTime(endInputHuman);
         $.ajax({
           url: "/api/sense_logs",
           dataType: 'json',
@@ -204,7 +204,7 @@ var DebugLog = React.createClass({
                     <input id="whitespace-check" type="checkbox" onChange={this.handleWhiteSpaceChange} /> Show Linebreaks
                 </Col>
                 <Col xs={4} sm={4} md={4} lg={4}>
-                  Max docs: <span id="sliderValue">20</span>&nbsp;&nbsp;&nbsp;
+                  Max docs: <span id="sliderValue">100</span>&nbsp;&nbsp;&nbsp;
                   <input type="text" className="span2 slider" value="" data-slider-min="1" data-slider-max="150" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square" />
                 </Col>
                 </Row>
