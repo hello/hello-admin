@@ -64,4 +64,5 @@ ul.dropdown-menu {min-width: 50px; opacity: 0.8;}
 button.btn:focus {outline: none !important;}
 a.menu-transparent, .menu-transparent>a {display: none;}
 a.menu-inactive {opacity: 0.5;}
+em {font-style: italic;}
 /*::-webkit-scrollbar {display: none;}*/

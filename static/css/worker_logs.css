@@ -5,6 +5,5 @@ table.table-bordered>thead>tr>th, table.table-bordered>tbody>tr>td {border: 1px 
 #filters {margin-top: 5px;}
 span.glyphicon-search {top: 1px; font-size: 18px;}
 button.btn-circle {margin: -27px; height: 50px; width: 50px;}
-#slider-narration {font-size: 10px;}
-span.label-suripu-service {background-color: rgba(223, 35, 114, 0.47); font-size: 11px;}
-span.label-suripu-app {background-color: rgba(70, 159, 205, 0.47); font-size: 11px;}
+#slider-narration {font-size: 9px;}
+span.label-suripu-workers {background-color: rgba(55, 78, 20, 0.47); font-size: 11px;}

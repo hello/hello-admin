@@ -26,9 +26,7 @@ var LogTable = React.createClass({
             var ts = [
                 <span className="label label-default">{log.docid.split('-')[0]}</span>, <br/>, <br/>,
                 getFullDateTimeStringFromUTC(Number(log.timestamp)), <br/>, <br/>,
-                <em>%s Count: {matchCount}</em>, <br/>,
-                <em>\n Count: {nCount}</em>, <br/>,
-                <em>\r Count: {rCount}</em>
+                <span>Keyword Count: {matchCount}</span>, <br/>
             ];
             var msgClasses = React.addons.classSet({
                 'col-lg-11': true,
@@ -210,6 +208,7 @@ var DebugLog = React.createClass({
                 </Row>
 
             </form><br/>
+            <p><em>Leaving all inputs blank will query latest documents</em></p>
             {result}
         </div>)
     }
