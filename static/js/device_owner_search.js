@@ -6,16 +6,20 @@ var OwnerEmail = React.createClass({
         $("#email-search-submit").click();
     },
     render: function() {
-        return (<p>
-            <span className="cursor-custom" onClick={this.populateUserSearchEmail}>{this.props.email}</span>
-        </p>)
+        var that = this;
+        var emailsList = that.props.deviceEmailPair.emails.map(function(item){
+             return <span className="cursor-custom" onClick={that.populateUserSearchEmail}>{item.email}&nbsp;</span>
+        });
+        return (<div><p>
+            <span>{that.props.deviceEmailPair.deviceId}&nbsp;</span>{emailsList}
+        </p><p/></div>)
     }
 });
 
 var DeviceOwnerSearch = React.createClass({
     getInitialState: function() {
       return {
-        emails: []
+        deviceEmailPairs: []
       }
     },
 
@@ -24,7 +28,7 @@ var DeviceOwnerSearch = React.createClass({
         e.preventDefault();
       }
       var that = this;
-      that.setState({emails: []});
+      that.setState({deviceEmailPairs: []});
       var deviceIdsInput = $('#device-ids-input').val().trim();
       history.pushState({}, '', '/users/?device_id=' + deviceIdsInput);
       console.log("sending GET", deviceIdsInput.split(","));
@@ -36,12 +40,14 @@ var DeviceOwnerSearch = React.createClass({
             type: 'GET',
             data: {device_id: deviceIdInput.trim()},
             success: function(response) {
-              console.log(response.data);
-              that.setState({emails: that.state.emails.concat(response.data)});
+              that.setState({deviceEmailPairs: that.state.deviceEmailPairs.concat([{
+                  deviceId: deviceIdInput,
+                  emails: response.data
+              }])});
             }.bind(this),
             error: function(e) {
               console.error(e);
-              this.setState({emails: []});
+              this.setState({deviceEmailPairs: []});
             }.bind(this)
           });
       });
@@ -57,14 +63,13 @@ var DeviceOwnerSearch = React.createClass({
     },
 
     render: function() {
-        console.log(this.state.emails);
-        var results = this.state.emails.map(function(email){
-                return <OwnerEmail email = {email}/>;
+        var results = this.state.deviceEmailPairs.map(function(deviceEmailPair){
+                return <OwnerEmail deviceEmailPair={deviceEmailPair}/>;
             });
         return (<form className="fancy-box" onSubmit={this.handleSubmit}>
             <Row className="row-lefty">
                 <Col className="col-paddingless" xs={10}>
-                    <LongTagsInput id="device-ids-input" tagClass="label label-info" placeHolder="Levels e.g: INFO, DEBUG" />
+                    <LongTagsInput id="device-ids-input" tagClass="label label-info" placeHolder="device ID" />
                 </Col>
                 <Col className="col-paddingless" xs={2}><Button id="device-id-submit" bsStyle="default" type="submit">
                   <Glyphicon glyph="search"/>
