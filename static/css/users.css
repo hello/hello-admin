@@ -3,3 +3,6 @@ table.table>thead>tr>th {text-align: left;}
 #email-filter{border-top-right-radius: 5px; border-bottom-right-radius: 5px}
 #token-display {margin: 0 auto; display: table; font-style: oblique;}
 #content {font-size: 80%;}
+.row-lefty {margin-left: 15px;}
+.col-paddingless {padding: 0 !important}
+.fancy-box {padding-bottom: 5px;}
