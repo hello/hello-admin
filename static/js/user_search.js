@@ -51,7 +51,7 @@ var UserSearchTable = React.createClass({
                   <Label bsStyle= {device.state === "NORMAL" ? "success": "danger"}>{device.device_id}</Label>
                 </a>
                 :
-                <a href={"/debug_log/?devices=" + device.device_id} target="_blank" title="Go to debug log">
+                <a href={"/sense_logs/?devices=" + device.device_id} target="_blank" title="Go to sense log">
                   <Label bsStyle= {device.state === "NORMAL" ? "success": "danger"}>{device.device_id}</Label>
                 </a>;
             var deviceLabel = [
