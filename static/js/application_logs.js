@@ -29,9 +29,7 @@ var LogTable = React.createClass({
             var ts = [
                 <LongLabel bsStyle={labelOriginColor(origin)} content={origin}/>, <br/>, <br/>,
                 getFullDateTimeStringFromUTC(Number(log.timestamp)), <br/>, <br/>,
-                <em>%s Count: {matchCount}</em>, <br/>,
-                <em>\n Count: {nCount}</em>, <br/>,
-                <em>\r Count: {rCount}</em>
+                <span>Keyword Count: {matchCount}</span>, <br/>
             ];
             var msgClasses = React.addons.classSet({
                 'col-lg-11': true,
@@ -212,7 +210,7 @@ var DebugLog = React.createClass({
                   <LongTagsInput id="levels-input" tagClass="label label-info" placeHolder="Levels e.g: INFO, DEBUG" />
                 </Col>
                 <Col xs={3} sm={3} md={3} lg={3}>
-                  <LongTagsInput id="origins-input" tagClass="label label-info" placeHolder="Origins e.g: suripu-app" />
+                  <LongTagsInput id="origins-input" tagClass="label label-info" placeHolder="Origins: suripu-research" />
                 </Col>
                 <Col xs={3} sm={3} md={3} lg={3}>
                   <LongTagsInput id="versions-input" tagClass="label label-info" placeHolder="Versions e.g: 0.1.321" />
@@ -226,6 +224,7 @@ var DebugLog = React.createClass({
                 </Col>
               </Row>
             </form><br/>
+            <p><em>Leaving all inputs blank will query latest documents</em></p>
             {result}
         </div>)
     }
