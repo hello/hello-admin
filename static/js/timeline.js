@@ -12,7 +12,9 @@ var TimelineContent = React.createClass({
                 filterEvents(this.props.data[0].segments, this.props.filterStatus)
                 : this.props.data[0].segments;
             var hoursMessage = this.props.data[0].message;
-            blocks.push(<h1 id="hours-message">{hoursMessage}</h1>)
+
+            blocks.push(<h1 id="hours-message">{hoursMessage}</h1>);
+
             segments.forEach(function(segment) {
                 var date = <h2 className="event-date"><LongLabel bsStyle={labelColor(segment.event_type)} content={segment.id}/> {new Date(segment.timestamp + segment.offset_millis).toUTCString().replace("GMT", "  (User local timezone offset is " + (segment.offset_millis/3600000).toString() + " hours)")}</h2>;
 
@@ -55,12 +57,12 @@ var TimelineContent = React.createClass({
                 );
             });
         }
-        return (
-            <div className="col-xl-6 col-xl-offset-3 col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-12 col-xs-12">
+
+        return (<Col xl={6} xlOffset={3} lg={8} lgOffset={2} md={8} mdOffset={2} sm={12} xs={12}>
             <section id="cd-timeline" class="cd-container">
                 {blocks}
             </section>
-        </div>)
+        </Col>)
     }
 });
 var TimelineMaestro = React.createClass({
@@ -96,6 +98,35 @@ var TimelineMaestro = React.createClass({
                 }
             });
         });
+    },
+
+    invalidateCache: function() {
+        var emailInput = $('#email-input').val();
+        var dateInput = $('#date-input').val();
+        var requestData = {
+            email: emailInput,
+            date: reformatDate(dateInput)
+        };
+
+        if (requestData.email.isWhiteString() || requestData.date.isWhiteString()) {
+            return false;
+        }
+
+        $.ajax({
+            url: "/api/timeline",
+            type: 'POST',
+            data: requestData,
+            dataType: 'json',
+            success: function(response) {
+                if (response.data === true) {
+                    location.reload();
+                }
+            },
+            error: function(e) {
+                console.log(e);
+            }
+        });
+        return false;
     },
 
     updateScore: function() {
@@ -199,7 +230,7 @@ var TimelineMaestro = React.createClass({
 
         return(<code className="nonscript">
             <form onSubmit={this.handleSubmit} className="row">
-                <LongDatetimePicker size="3" placeHolder="date" id="date-input" pickTime={false} format="MM-DD-YYYY" defaultDate={yesterday} />
+                <LongDatetimePicker size="2" placeHolder="date" id="date-input" pickTime={false} format="MM-DD-YYYY" defaultDate={yesterday} />
                 <Col xs={3} md={3}>
                     <Input id="email-input" type="text" addonBefore={<Glyphicon glyph="user"/>} placeholder="user email" />
                 </Col>
@@ -209,7 +240,6 @@ var TimelineMaestro = React.createClass({
                 <Col xs={3} md={3}>
                     <Input id="filter-input" addonBefore={<Glyphicon glyph="filter"/>} type="select" onChange={this.handleFilter}>
                         <option value="key_events" selected>Key events only</option>
-                        <option value="events" selected>All events</option>
                         <option value="SUNRISE">Sunrise only</option>
                         <option value="MOTION">Motion only</option>
                         <option value="LIGHTS_OUT">Lights out only</option>
@@ -217,6 +247,9 @@ var TimelineMaestro = React.createClass({
                         <option value="SLEEPING">Sleeping only</option>
                         <option value="all">All raw data</option>
                     </Input>
+                </Col>
+                <Col xs={1} sm={1} md={1} lg={1} xl={1}>
+                    <Button bsStyle="default" onClick={this.invalidateCache}><Glyphicon glyph="remove"/> Cache</Button>
                 </Col>
             </form>
             <Row id="insights-info">
@@ -284,11 +317,8 @@ function timelineBackground(eventType) {
 
 function filterEvents(segments, type) {
     return segments.filter(function(s){
-        if (type === "events") {
-            return s.event_type !== "";
-        }
-        else if (type === "key_events"){
-            return  ["LIGHTS_OUT", "IN_BED", "SLEEP", "WAKE_UP", "OUT_OF_BED", "ALARM"].indexOf(s.event_type) > -1
+        if (type === "key_events"){
+            return  ["LIGHTS_OUT", "IN_BED", "SLEEP", "WAKE_UP", "OUT_OF_BED", "ALARM", "MOTION"].indexOf(s.event_type) > -1
         }
         else {
             return s.event_type === type;
