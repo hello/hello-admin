@@ -2,6 +2,7 @@ import json
 import logging as log
 from handlers.helpers import ProtectedRequestHandler
 from handlers.utils import stripStringToList, display_error
+from handlers.utils import get_pacific_time_from_epoch_seconds
 from indextank import ApiClient
 import settings
 
@@ -140,13 +141,21 @@ class SearchifyStatsAPI(ProtectedRequestHandler):
         output = {'data': [], 'error': ''}
         try:
             searchify_cred = settings.SEARCHIFY
-            searchify_api = ApiClient(searchify_cred.api_client)
-            sense_log_index = searchify_api.get_index("sense-logs")
-            hello_sense_log_latest_ts = sense_log_index.search(query="text:hello", scoring_function=0)["results"][0]["docid"]
-            output['data'] = {
-                'latest sense log containing "hello"': hello_sense_log_latest_ts,
-                "summary": [i._get_metadata() for i in searchify_api.list_indexes()]
-            }
+            searchify_client = ApiClient(searchify_cred.api_client)
+
+            output['data'] = []
+            for index in sorted(searchify_client.list_indexes()):
+                oldest_ts = get_pacific_time_from_epoch_seconds(int(index.search("all:1", scoring_function=1)
+                    ['results'][0]['docid'].split('-')[-1])/1000)
+
+                newest_ts = get_pacific_time_from_epoch_seconds(int(index.search("all:1", scoring_function=0)
+                    ['results'][0]['docid'].split('-')[-1])/1000)
+
+                output['data'].append({
+                    "summary": index.__dict__,
+                    "oldest_ts": oldest_ts,
+                    "newest_ts": newest_ts
+                })
         except Exception as e:
             output['error'] = display_error(e)
         self.response.write(json.dumps(output))

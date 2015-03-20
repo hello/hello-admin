@@ -60,6 +60,10 @@ def stripStringToList(string, separator=","):
 def get_current_pacific_datetime():
     return datetime.now(pacific_timezone)
 
+def get_pacific_time_from_epoch_seconds(es):
+    return datetime.fromtimestamp(es).replace(tzinfo=utc_timezone)\
+                                              .astimezone(pacific_timezone).strftime("%d-%B-%Y %H:%M:%S %Z")
+
 
 def extract_dicts_by_fields(dicts, fields):
     """
