@@ -85,7 +85,7 @@ class SearchifyLogsHandler(ProtectedRequestHandler):
         filters = {}
 
         if levels_input:
-            filters.update({"level": stripStringToList(levels_input)})
+            filters.update({"level": map(lambda x:x.upper(), stripStringToList(levels_input))})
         if origins_input:
             filters.update({"origin": stripStringToList(origins_input)})
         if versions_input:
