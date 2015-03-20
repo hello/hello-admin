@@ -23,23 +23,27 @@ var DeviceOwnerSearch = React.createClass({
       if (e) {
         e.preventDefault();
       }
-      var deviceIdInput = $('#device-id-input').val().trim();
-      history.pushState({}, '', '/users/?device_id=' + deviceIdInput);
-      console.log("sending GET", deviceIdInput);
-      $.ajax({
-        url: '/api/devices/owners',
-        dataType: 'json',
-        contentType: 'application/json',
-        type: 'GET',
-        data: {device_id: deviceIdInput},
-        success: function(response) {
-          console.log(response.data);
-          this.setState({emails: response.data});
-        }.bind(this),
-        error: function(e) {
-          console.error(e);
-          this.setState({emails: []});
-        }.bind(this)
+      var that = this;
+      that.setState({emails: []});
+      var deviceIdsInput = $('#device-ids-input').val().trim();
+      history.pushState({}, '', '/users/?device_id=' + deviceIdsInput);
+      console.log("sending GET", deviceIdsInput.split(","));
+      deviceIdsInput.split(",").forEach(function(deviceIdInput){
+          $.ajax({
+            url: '/api/devices/owners',
+            dataType: 'json',
+            contentType: 'application/json',
+            type: 'GET',
+            data: {device_id: deviceIdInput.trim()},
+            success: function(response) {
+              console.log(response.data);
+              that.setState({emails: that.state.emails.concat(response.data)});
+            }.bind(this),
+            error: function(e) {
+              console.error(e);
+              this.setState({emails: []});
+            }.bind(this)
+          });
       });
       return false;
     },
@@ -47,30 +51,25 @@ var DeviceOwnerSearch = React.createClass({
     componentDidMount: function(e) {
         var deviceIdFromURL = getParameterByName('device_id');
         if (deviceIdFromURL) {
-          $("#device-id-input").val(deviceIdFromURL);
+          $("#device-ids-input").val(deviceIdFromURL);
           this.handleSubmit(e);
         }
     },
 
     render: function() {
-        var emails = [<p/>];
-        this.state.emails.forEach(function(email){
-            emails.push(<OwnerEmail email = {email}/>);
-        });
-        var results = this.state.emails.length === 0 ? <div>&#9731;</div> : emails;
+        console.log(this.state.emails);
+        var results = this.state.emails.map(function(email){
+                return <OwnerEmail email = {email}/>;
+            });
         return (<form className="fancy-box" onSubmit={this.handleSubmit}>
-            <div className="input-group input-group-md">
-              <span className="input-group-addon"><i className="glyphicon glyphicon-tasks"></i></span>
-              <div className="icon-addon addon-md">
-                <Input id="device-id-input" type="text" placeholder="query by EXACT device ID" />
-                <label for="device-id-input" className="glyphicon glyphicon-phone"></label>
-              </div>
-              <span className="input-group-btn">
-                <button id="device-id-submit" className="btn btn-default form-control" type="submit">
-                  <span className="glyphicon glyphicon-search"/>
-                </button>
-              </span>
-            </div>
+            <Row className="row-lefty">
+                <Col className="col-paddingless" xs={10}>
+                    <LongTagsInput id="device-ids-input" tagClass="label label-info" placeHolder="Levels e.g: INFO, DEBUG" />
+                </Col>
+                <Col className="col-paddingless" xs={2}><Button id="device-id-submit" bsStyle="default" type="submit">
+                  <Glyphicon glyph="search"/>
+                </Button></Col>
+            </Row>
             {results}
         </form>)
     }
