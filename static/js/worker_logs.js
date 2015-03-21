@@ -1,6 +1,12 @@
 /** @jsx React.DOM */
 
 var LogTable = React.createClass({
+   searchAroundByTs: function(e) {
+       clickedTs = new Date($(e.target).text()).getTime();
+       $('#start-time').val(d3.time.format("%m-%d-%Y %H:%M:%S")(new Date(clickedTs-5*1000*60)));
+       $('#end-time').val(d3.time.format("%m-%d-%Y %H:%M:%S")(new Date(clickedTs+5*1000*60)));
+       $('#submit').click().focus();
+   },
    render: function(){
        var logTableRows = [], that = this;
        that.props.logs.forEach(function(log){
@@ -28,7 +34,7 @@ var LogTable = React.createClass({
 
             var ts = [
                 <LongLabel bsStyle={labelOriginColor(origin)} content={origin}/>, <br/>, <br/>,
-                getFullDateTimeStringFromUTC(Number(log.timestamp)), <br/>, <br/>,
+                <a className="cursor-hand" onClick={that.searchAroundByTs}>{getFullDateTimeStringFromUTC(Number(log.timestamp))}</a>, <br/>, <br/>,
                 <span>Keyword Count: {matchCount}</span>, <br/>
             ];
             var msgClasses = React.addons.classSet({
@@ -220,7 +226,7 @@ var DebugLog = React.createClass({
                     <input type="text" className="span2 slider" value="" data-slider-min="1" data-slider-max="150" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square" />
                 </Col>
                 <Col xs={1} sm={1} md={1} lg={1}>
-                  <Button bsStyle="info" bsSize="large" className="btn-circle" type="submit"><Glyphicon glyph="search"/></Button>
+                  <Button id="submit" bsStyle="info" bsSize="large" className="btn-circle" type="submit"><Glyphicon glyph="search"/></Button>
                 </Col>
               </Row>
             </form><br/>
