@@ -150,12 +150,12 @@ class BaseRequestHandler(webapp2.RequestHandler):
     def render_response(self, output):
         return self.response.write(output.get_serialized_output())
 
-    def update_or_create_memcache(self, key, value, environment=""):
+    def update_or_create_memcache(self, key, value, environment="", time=86400):
         memcache_key = key + environment
         if memcache.get(memcache_key) is not None:
-            memcache.set(key=memcache_key, value=value, time=86400)
+            memcache.set(key=memcache_key, value=value, time=time)
         else:
-            memcache.add(key=memcache_key, value=value, time=86400)
+            memcache.add(key=memcache_key, value=value, time=time)
 
     @property
     def current_user(self):

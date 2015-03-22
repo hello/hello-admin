@@ -46,7 +46,7 @@ class RecentUsersAPI(ProtectedRequestHandler):
 
             combined_recent_users = (new_users + previously_cached_recent_users)[:MAX_RECENT_USERS_LENGTH]
 
-            self.update_or_create_memcache(key="recent_users", value=json.dumps(combined_recent_users), environment=settings.ENVIRONMENT)
+            self.update_or_create_memcache(key="recent_users", value=json.dumps(combined_recent_users), environment=settings.ENVIRONMENT, time=31536000)
             output.set_status(200)
             output.set_data(combined_recent_users)
 
