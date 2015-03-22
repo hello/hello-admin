@@ -29,7 +29,6 @@ def encrypt_order(order_id, cipher=cipher):
 class OrdersAPI(ProtectedRequestHandler):
     def get(self):
         order_id = self.request.get('order_id', default_value='')
-        print order_id
         output = ResponseOutput()
         output.set_viewer(self.current_user.email())
         try:
