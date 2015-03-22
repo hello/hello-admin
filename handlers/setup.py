@@ -83,7 +83,7 @@ class CreateAccountAPI(ProtectedRequestHandler):
             'Accept': 'application/json'
         }
 
-        session = self.authorize_session()
+        session = self.authorize_session(settings.APP_INFO)
 
         log.info("Submitting data")
         log.info(data)

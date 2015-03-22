@@ -74,6 +74,7 @@ from handlers.searchify_logs import WorkerLogsAPI
 from views import WorkerLogsView
 from handlers.memcache import RefreshMemcache
 from handlers.orders import OrdersAPI
+from handlers.users import RecentUsersAPI
 
 cron_routes = [
     ('/cron/sense_logs_purge', SenseLogsPurge),
@@ -104,6 +105,7 @@ api_routes = [
     ('/api/troubleshoot/?$', InactiveDevicesAPI),
     ('/api/searchify_stats/?$', SearchifyStatsAPI),
     ('/api/user/?$', UserAPI),
+    ('/api/users/recent/?$', RecentUsersAPI),
     ('/api/zendesk/?$', ZendeskAPI),
     ('/api/zendesk_stats/?$', ZendeskStatsAPI),
     ('/api/zendesk_history/?$', ZendeskHistoryAPI),
