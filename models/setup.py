@@ -43,3 +43,7 @@ class UserGroup(ndb.Model):
     hardware = ndb.StringProperty(required=True)
     software = ndb.StringProperty(required=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
+
+
+class RecentUsers(ndb.Model):
+    recent_users = ndb.StringProperty(required=True)

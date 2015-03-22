@@ -59,8 +59,9 @@ var UserTable = React.createClass({
             if (email_filter) {
                 return;
             }
-            rows.push(<UserRow user={user} userAttr={this.state.selectedAttr} key={user.email} />);
+            rows.push(<UserRow user={user} userAttr={this.state.selectedAttr} />);
         }.bind(this));
+
         return (
             <table id="recent-users-table" className="table table-condensed tablesorter" ref="sortableTable">
                 <thead>
@@ -157,10 +158,11 @@ var RecentUsersBox = React.createClass({
     },
     loadRecentUsersFromServer: function(){
         $.ajax({
-          url: '/api/user',
+          url: '/api/users/recent',
           dataType: 'json',
           type: 'GET',
           success: function(response) {
+            console.log(response);
             this.setState({
                 users: response.data
             });
