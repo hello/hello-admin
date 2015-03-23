@@ -89,7 +89,6 @@ class ZendeskStatsAPI(CustomerExperienceRequestHandler):
 
             # Keep querying on as long as paginating is possible
             while zen_response.json().get('next_page') is not None:
-                print len(tickets)
                 zen_response = requests.get(zen_response.json().get('next_page'), auth=zen_auth)
                 if zen_response.ok:
                     tickets += zen_response.json().get('results', [])

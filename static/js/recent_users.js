@@ -158,7 +158,7 @@ var RecentUsersBox = React.createClass({
     },
     loadRecentUsersFromServer: function(){
         $.ajax({
-          url: '/api/users/recent',
+          url: '/api/user',
           dataType: 'json',
           type: 'GET',
           success: function(response) {

@@ -278,14 +278,14 @@ def display_info(binary):
     sha_calculated = hashlib.sha1(binary[0:288]).digest()
     sha_match = sha_stored == sha_calculated
     if not sha_match:
-        print "ID: %s\r\n"  % pill_id
-        print "BLE: %s\r\n" % ble
-        print "AES: %s\r\n" % aes_key
-        print "FICR: %s\r\n" % ficr
-        print "HDWR KEY: %s\r\n" % key
-        print "SHA1: %s\r\n" % sha_1
-        print "SHA1-CALCULATED: %s\r\n" % sha_calculated
-        print "Checksum Failed!"
+        log.error("ID: {}".format(pill_id))
+        log.error("BLE: {}".format(ble))
+        log.error("AES: {}".format(aes_key))
+        log.error("FICR: {}".format(ficr))
+        log.error("HDWR KEY: {}".format(key))
+        log.error("SHA1: {}".format(sha_1))
+        log.error("SHA1-CALCULATED: {}".format(sha_calculated))
+        log.error("Checksum Failed!")
         pill_id = None
 
     return {
