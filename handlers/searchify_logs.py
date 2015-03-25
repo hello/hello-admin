@@ -13,6 +13,12 @@ class SearchifyLogsHandler(ProtectedRequestHandler):
     """
     Retrieve debug logs
     """
+
+    def normalize_epoch(self, ts, index_name):
+        if "sense" in index_name:
+            return ts
+        return 1000*int(ts)
+
     def get_logs_by_index(self, index_name, filters={}):
         output = {'data': [], 'error': ''}
 
@@ -34,11 +40,11 @@ class SearchifyLogsHandler(ProtectedRequestHandler):
 
             if start_time.isdigit() or end_time.isdigit():  # Use custom scoring function if there is time input
                 if not end_time.isdigit():
-                    scoring_function = 'if((doc.var[0] - {}) > 0, doc.var[0], rel)'.format(start_time)
+                    scoring_function = 'if((doc.var[0] - {}) > 0, doc.var[0], rel)'.format(self.normalize_epoch(start_time, index_name))
                 elif not start_time.isdigit():
-                    scoring_function = 'if((doc.var[0] - {}) < 0, doc.var[0], rel)'.format(end_time)
+                    scoring_function = 'if((doc.var[0] - {}) < 0, doc.var[0], rel)'.format(self.normalize_epoch(end_time, index_name))
                 else:
-                    scoring_function = 'if((doc.var[0] - {})*(doc.var[0] - {}) < 0, doc.var[0], rel)'.format(start_time, end_time)
+                    scoring_function = 'if((doc.var[0] - {})*(doc.var[0] - {}) < 0, doc.var[0], rel)'.format(self.normalize_epoch(start_time, index_name), self.normalize_epoch(end_time, index_name))
 
                 index.add_function(3, scoring_function)
                 searchify_query.set_scoring_function(3)
@@ -92,6 +98,7 @@ class SearchifyLogsHandler(ProtectedRequestHandler):
             filters.update({"version": stripStringToList(versions_input)})
 
         return self.get_logs_by_index(index_name, filters)
+
 
 
 class ApplicationLogsAPI(SearchifyLogsHandler):
@@ -194,3 +201,6 @@ class SearchifyQuery():
             'scoring_function': self.scoring_function,
             'length': self.length
         }
+
+
+
