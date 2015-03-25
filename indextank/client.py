@@ -6,7 +6,7 @@ import urlparse
 import base64
 import datetime
 
-from indextank.version import VERSION
+from version import VERSION
 __USER_AGENT = 'IndexTank-Python/' + VERSION
 
 class ApiClient(object):
@@ -236,21 +236,23 @@ class IndexClient(object):
         _, functions = _request('GET', self.__functions_url())
         return functions 
 
-    """
-    Searches the index
-    Arguments:
-        query: the query string
-        start: result # to start at
-        len: number of results to return
-        scoring_function: a number specifying the scoring function to use when sorting results for this query
-        snippet_fields: a list of field names to retrieve snippets for
-        fetch_fields: a list of field names to retrieve content for
-        category_filter: a string to list of strings map with the values to filter for the categories (faceting)
-        variables: map integer -> float with values for variables that can later be used in scoring function
-        docvar_filters: map integer (variable index) -> list of tuples (where each tuple has the two values of a range, allowing -Infinity or Infinity)
-        function_filters: map integer (function index) -> list of tuples (where each tuple has the two values of a range, allowing -Infinity or Infinity)
-    """
-    def search(self, query, start=None, length=None, scoring_function=None, snippet_fields=None, fetch_fields=None, category_filters=None, variables=None, docvar_filters=None, function_filters=None):
+    def search(self, query, start=None, length=None, scoring_function=None, snippet_fields=None, fetch_fields=None, category_filters=None, variables=None, docvar_filters=None, function_filters=None, fetch_variables=None, fetch_categories=None):
+        """
+        Searches the index
+        Arguments:
+            query: the query string
+            start: result # to start at
+            len: number of results to return
+            scoring_function: a number specifying the scoring function to use when sorting results for this query
+            snippet_fields: a list of field names to retrieve snippets for
+            fetch_fields: a list of field names to retrieve content for
+            category_filter: a string to list of strings map with the values to filter for the categories (faceting)
+            variables: map integer -> float with values for variables that can later be used in scoring function
+            docvar_filters: map integer (variable index) -> list of tuples (where each tuple has the two values of a range, allowing -Infinity or Infinity)
+            function_filters: map integer (function index) -> list of tuples (where each tuple has the two values of a range, allowing -Infinity or Infinity)
+            fetch_variables: if True, results include document variables
+            fetch_categories: if True, results include document categories 
+        """
         params = { 'q': query }
         if start is not None: params['start'] = start
         if length is not None: params['len'] = length
@@ -258,6 +260,8 @@ class IndexClient(object):
         if snippet_fields is not None: params['snippet'] = reduce(lambda x,y: x + ',' + y, snippet_fields)
         if fetch_fields is not None: params['fetch'] = reduce(lambda x,y: x + ',' + y, fetch_fields)
         if category_filters is not None: params['category_filters'] = json.dumps(category_filters)
+        if fetch_variables: params['fetch_variables'] = '*'
+        if fetch_categories: params['fetch_categories'] = '*'
         if variables:
             for k, v in variables.items():
                 params['var%d' % int(k)] = str(v)
@@ -294,18 +298,18 @@ class IndexClient(object):
                 raise InvalidQuery(e.msg)
             raise
 
-    """
-    Searches the index and deletes the found results
-    Arguments:
-        query: the query string
-        start: result # to start at
-        scoring_function: a number specifying the scoring function to use when sorting results for this query
-        category_filter: a string to list of strings map with the values to filter for the categories (faceting)
-        variables: map integer -> float with values for variables that can later be used in scoring function
-        docvar_filters: map integer (variable index) -> list of tuples (where each tuple has the two values of a range, allowing -Infinity or Infinity)
-        function_filters: map integer (function index) -> list of tuples (where each tuple has the two values of a range, allowing -Infinity or Infinity)
-    """
     def delete_by_search(self, query, start=None, scoring_function=None, category_filters=None, variables=None, docvar_filters=None, function_filters=None):
+        """
+        Searches the index and deletes the found results
+        Arguments:
+            query: the query string
+            start: result # to start at
+            scoring_function: a number specifying the scoring function to use when sorting results for this query
+            category_filter: a string to list of strings map with the values to filter for the categories (faceting)
+            variables: map integer -> float with values for variables that can later be used in scoring function
+            docvar_filters: map integer (variable index) -> list of tuples (where each tuple has the two values of a range, allowing -Infinity or Infinity)
+            function_filters: map integer (function index) -> list of tuples (where each tuple has the two values of a range, allowing -Infinity or Infinity)
+        """
         params = { 'q': query }
         if start is not None: params['start'] = start
         if scoring_function is not None: params['function'] = scoring_function
@@ -392,13 +396,25 @@ def _is_ok(status):
 def _request(method, url, params={}, data={}, headers={}):
     splits = urlparse.urlsplit(url)
     netloc = splits[1]
-    netloc_noauth = netloc.split('@')[1]
+    if '@' in netloc:
+        netloc_noauth = netloc.split('@')[1]
+    else:
+        netloc_noauth = netloc
+
     scheme = splits[0]
     path = splits[2]
     query = splits[3]
     fragment = splits[4]
+
     username = ''
-    password = netloc.split('@')[0][1:]
+    password = ''
+    if '@' in netloc:
+        password = netloc.split('@')[0][1:]
+    if ':' in netloc_noauth:
+        netloc_noauth, port = netloc_noauth.split(':')
+    else:
+        port = 80
+
     url = urlparse.urlunsplit((scheme, netloc_noauth, path, query, fragment))
     if method in ['GET', 'DELETE']:
         params = urllib.urlencode(params, True)
@@ -408,7 +424,7 @@ def _request(method, url, params={}, data={}, headers={}):
             else:
                 url += '&' + params
 
-    connection = httplib.HTTPConnection(netloc_noauth, 80)
+    connection = httplib.HTTPConnection(netloc_noauth, port)
     if username or password:
         credentials = "%s:%s" % (username, password)
         base64_credentials = base64.encodestring(credentials)
