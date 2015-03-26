@@ -65,4 +65,4 @@ button.btn:focus {outline: none !important;}
 a.menu-transparent, .menu-transparent>a {display: none;}
 a.menu-inactive {opacity: 0.5;}
 em {font-style: italic;}
-/*::-webkit-scrollbar {display: none;}*/
+::-webkit-scrollbar {display: none;}
