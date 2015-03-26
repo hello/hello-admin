@@ -44,9 +44,9 @@ var KeyStoreMaestro = React.createClass({
                 dataType: 'json',
                 data: requestData,
                 success: function (response) {
+                    that.pushHistory(deviceInput, typeInput);
                     console.log(response);
                     if (response.error === "") {
-                        that.pushHistory(deviceInput, typeInput);
                         that.setState({alert: "AES Key: " + capitalizeVisiblePart(response.data.key) + "\n\r Metadata: " + response.data.metadata});
                     }
                     else {
