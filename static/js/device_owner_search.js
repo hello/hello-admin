@@ -2,6 +2,7 @@
 
 var OwnerEmail = React.createClass({
     populateUserSearchEmail: function(e) {
+        $('#search-modes a[href="#by-email"]').tab('show');
         $('#email-search').focus().val($(e.target).text());
         $("#email-search-submit").click();
     },
