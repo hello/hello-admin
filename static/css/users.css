@@ -6,4 +6,4 @@ table.table>thead>tr>th {text-align: left;}
 .row-lefty {margin-left: 15px;}
 .col-paddingless {padding: 0 !important}
 .fancy-box {padding-bottom: 5px;}
-#search-panel {position: fixed;}
+#search-panel {position: fixed; margin-right: 15px; min-width: 41% !important}

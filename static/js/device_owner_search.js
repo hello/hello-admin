@@ -80,4 +80,4 @@ var DeviceOwnerSearch = React.createClass({
     }
 });
 
-React.renderComponent(<DeviceOwnerSearch/>, document.getElementById('device-owner-search'));
+React.renderComponent(<DeviceOwnerSearch/>, document.getElementById('by-devices'));
