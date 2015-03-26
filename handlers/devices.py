@@ -37,7 +37,7 @@ class DeviceAPI(ProtectedRequestHandler):
         log.debug("attempting to unregister {} {}".format(device_type, device_id))
 
         if device_type == "sense":
-            api_url = "devices/sense/{}/user".format(device_id)
+            api_url = "devices/sense/{}/all".format(device_id)
         else:
             api_url = "devices/pill/{}".format(device_id)
 
