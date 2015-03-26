@@ -94,7 +94,9 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
 ### Deploy API server
 - Commit changes to suripu 
 - Make sure config is right in .yml files
-- Merge, after the build is done, the scripts will be uploaded s3 
+- After merged, everything will be uploaded to s3 once the travis build is complete.
 - ssh to dev machine (ask Tim for creds)
-- Run [scripts/deploy.sh](https://github.com/hello/hello-admin-app/blob/master/scripts/deploy.sh) to download the latest suripu-admin jar & yml, update & restart suripu-admin
+- In /build, make `deploy-admin.sh` with content like  [scripts/deploy.sh](https://github.com/hello/hello-admin-app/blob/master/scripts/deploy.sh)
+- In /build, make `suripu-admin.conf` with the content like [scripts/suripu-admin.conf](https://github.com/hello/hello-admin-app/blob/master/scripts/suripu-admin.conf)
+- Run `deploy-admin.sh` to get the latest suripu-admin jar & yml, update & restart suripu-admin
 
