@@ -2,6 +2,7 @@
 
 var LinkToUserDashboard = React.createClass({
     populateUserSearchEmail: function(){
+        $('#search-modes a[href="#by-email"]').tab('show');
         $('#email-search').focus().val(this.props.email);
         $("#email-search-submit").click();
     },
@@ -62,7 +63,7 @@ var UserTable = React.createClass({
             rows.push(<UserRow user={user} userAttr={this.state.selectedAttr} />);
         }.bind(this));
 
-        return (
+        return (<div>
             <table id="recent-users-table" className="table table-condensed tablesorter" ref="sortableTable">
                 <thead>
                     <tr>
@@ -81,8 +82,10 @@ var UserTable = React.createClass({
                     </tr>
                 </thead>
                 <tbody>{rows}</tbody>
+
             </table>
-        );
+            <span className="narration">scroll down for more</span>
+        </div>);
     }
 });
 

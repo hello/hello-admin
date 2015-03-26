@@ -30,13 +30,13 @@ var UserSearchTable = React.createClass({
             var row = (value) ? <UserSearchTableRow rowAttr={attribute} rowVal={value}/> : null;
 
             // Table rows start with email, name, id
-            if (attribute === 'id') {
+            if (attribute === 'tz') {
+                tableRows.unshift(row);
+            }
+            else if (attribute === 'last_modified') {
                 tableRows.unshift(row);
             }
             else if (attribute === 'name') {
-                tableRows.unshift(row);
-            }
-            else if (attribute === 'email') {
                 tableRows.unshift(row);
             }
             else {
@@ -64,7 +64,7 @@ var UserSearchTable = React.createClass({
                 <span>state: {device.state}</span>, <br/>,
                 <span>firmware version: {device.firmware_version}</span>, <br/>
             ];
-            tableRows.push(<UserSearchTableRow rowAttr={deviceLabel} rowVal={deviceDetail} />);
+            tableRows.unshift(<UserSearchTableRow rowAttr={deviceLabel} rowVal={deviceDetail} />);
           })
         }
 
@@ -87,7 +87,7 @@ var UserSearchTable = React.createClass({
                              <th className="col-xs-3 col-md-3 col-lg-3">Value</th>
                            </tr>;
         var userSearchResult = this.props.users != [] && !$.isEmptyObject(this.props.users) ?
-                               <table className={tableClasses}>
+                               <table id="user-search-table" className={tableClasses}>
                                   <thead>{tableHeaders}</thead>
                                   <tbody>{tableRows}</tbody>
                                </table>
@@ -202,7 +202,6 @@ var UserSearchCanvas = React.createClass({
         return (<div className="fancy-box">
           <form onSubmit={this.handleSubmit}>
             <div className="input-group input-group-md">
-              <span className="input-group-addon"><i className="glyphicon glyphicon-tasks"></i></span>
               <div className="icon-addon addon-md">
                 <input
                     id="email-search"
