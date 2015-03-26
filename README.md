@@ -90,3 +90,10 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
   - https://hello-admin.appspot.com/api/tokens/?username=tim@home.com
   - https://hello-admin.appspot.com/api/tokens/?app=admin-data-viewer&username=kdm3@sayhello.com
 
+
+### Deploy API server
+- Commit changes to suripu 
+- Make sure config is right in .yml files
+- Merge, after the build is done, the scripts will be uploaded s3 
+- Run scripts/deploy.sh to download it, update symlink, update config and restart suripu-admin
+
