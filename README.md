@@ -95,5 +95,5 @@ hello-admin is authorized through our Google Apps Account. If you want deploy ch
 - Commit changes to suripu 
 - Make sure config is right in .yml files
 - Merge, after the build is done, the scripts will be uploaded s3 
-- Run scripts/deploy.sh to download it, update symlink, update config and restart suripu-admin
+- Run [scripts/deploy.sh](https://github.com/hello/hello-admin-app/blob/master/scripts/deploy.sh) to download it, update symlink, update config and restart suripu-admin
 
