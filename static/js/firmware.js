@@ -95,7 +95,7 @@ var FirmwareListHeaders = React.createClass({
     render: function() {
         return (<thead><tr>
             <th className='alert-info'>FW Version</th>
-            <th className='alert-info'># of Devices Seen</th>
+            <th className='alert-info'>&#35; of Devices Seen</th>
         </tr></thead>)
     }
 });

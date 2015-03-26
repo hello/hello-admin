@@ -22,10 +22,10 @@ a.env:hover {text-decoration: none; -webkit-stroke-width: 7px;-webkit-stroke-col
 a.activeEnv {color: #B0FC23; text-decoration: none; -webkit-stroke-width: 7px;-webkit-stroke-color: #B0FC23; -webkit-fill-color: #B0FC23; text-shadow: 1px 0 20px #B0FC23;}
 #menu>a>span.glyphicon {margin: 0 7px;}
 
-#sidebar {margin: 3px 0 0 0; max-width: 200px; font-family: Menlo,Monaco,Consolas,"Courier New",monospace; font-size: 85%;}
+#sidebar {margin: 3px 0 0 0; max-width: 200px; font-family: Menlo,Monaco,Consolas,"Courier New",monospace; font-size: 85%; height: 98vh; overflow-y: scroll;}
 .sidebar-group {font-weight: bold;}
 .list-group-item {background: #F9FAFD; -moz-box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); -webkit-box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); font-family: "Century Gothic",CenturyGothic,AppleGothic,sans-serif;}
-#content {margin: 40px 0 50px 0; font-family: Menlo,Monaco,Consolas,"Courier New",monospace; font-size: 85%;}
+#content {margin: 40px 0 0 0; font-family: Menlo,Monaco,Consolas,"Courier New",monospace; font-size: 85%;}
 
 #footer {background: #F2F7FB url(image/menu-pattern.png); padding: 6px; color: gray; text-align: center; opacity: 0.5; width: 100%; position: fixed; bottom: 0;}
 
@@ -65,4 +65,4 @@ button.btn:focus {outline: none !important;}
 a.menu-transparent, .menu-transparent>a {display: none;}
 a.menu-inactive {opacity: 0.5;}
 em {font-style: italic;}
-/*::-webkit-scrollbar {display: none;}*/
+::-webkit-scrollbar {display: none;}

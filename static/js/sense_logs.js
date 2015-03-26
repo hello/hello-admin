@@ -1,15 +1,15 @@
 /** @jsx React.DOM */
 
 var LogTable = React.createClass({
-   searchAroundByTs: function(e) {
-       clickedTs = new Date($(e.target).text()).getTime();
-       $('#start-time').val(d3.time.format("%m-%d-%Y %H:%M:%S")(new Date(clickedTs-5*1000*60)));
-       $('#end-time').val(d3.time.format("%m-%d-%Y %H:%M:%S")(new Date(clickedTs+5*1000*60)));
-       $('#submit').click().focus();
-   },
-   render: function(){
-       var logTableRows = [], that = this;
-       that.props.logs.forEach(function(log){
+    searchAroundByTs: function(e) {
+        clickedTs = new Date($(e.target).text()).getTime();
+        $('#start-time').val(d3.time.format("%m-%d-%Y %H:%M:%S")(new Date(clickedTs-5*1000*60)));
+        $('#end-time').val(d3.time.format("%m-%d-%Y %H:%M:%S")(new Date(clickedTs+5*1000*60)));
+        $('#submit').click().focus();
+    },
+    render: function(){
+        var logTableRows = [], that = this;
+        that.props.logs.forEach(function(log){
             var regexList = that.props.showLineBreaks === true ? []
                 : [new RegExp('\r', 'g'), new RegExp('\n', 'g')];
 
@@ -45,17 +45,17 @@ var LogTable = React.createClass({
                 <td className="col-lg-1 col-md-1 col-xs-1 col-sm-1">{ts}</td>
                 <td className={msgClasses}>{msg}</td>
             </tr>);
-       });
-       return (
+        });
+        return (
             <table className="table table-condensed table-striped table-bordered">
-              <thead><tr>
-                <th className="alert alert-success"><span className="glyphicon glyphicon-time"> Time</span></th>
-                <th className="alert alert-warning"><span className="glyphicon glyphicon-paperclip"> Messages</span></th>
-              </tr></thead>
-              <tbody>{logTableRows}</tbody>
+                <thead><tr>
+                    <th className="alert alert-success"><span className="glyphicon glyphicon-time"> Time</span></th>
+                    <th className="alert alert-warning"><span className="glyphicon glyphicon-paperclip"> Messages</span></th>
+                </tr></thead>
+                <tbody>{logTableRows}</tbody>
             </table>
-       )
-   }
+            )
+    }
 });
 var DebugLog = React.createClass({
     getInitialState: function(){
@@ -76,24 +76,24 @@ var DebugLog = React.createClass({
         var endFromURL = getParameterByName('end');
 
         if (startFromURL) {
-          $('#start-time').val(startFromURL);
+            $('#start-time').val(startFromURL);
         }
 
         if (endFromURL) {
-          $('#end-time').val(endFromURL);
+            $('#end-time').val(endFromURL);
         }
 
         if (maxDocsFromURL) {
-          $('#sliderValue').text(maxDocsFromURL);
+            $('#sliderValue').text(maxDocsFromURL);
         }
         else {
-          maxDocsFromURL = 100;
+            maxDocsFromURL = 100;
         }
         if (devicesInputFromURL) {
-          $('#devices-input').val(devicesInputFromURL);
+            $('#devices-input').val(devicesInputFromURL);
         }
         if (textInputFromURL) {
-          $('#text-input').val(textInputFromURL);
+            $('#text-input').val(textInputFromURL);
         }
 
         that.handleSubmit();
@@ -133,39 +133,39 @@ var DebugLog = React.createClass({
             startInput = startInputHuman.isWhiteString() ? "": getUTCEpochFromLocalTime(startInputHuman),
             endInput = endInputHuman.isWhiteString() ? "": getUTCEpochFromLocalTime(endInputHuman);
         $.ajax({
-          url: "/api/sense_logs",
-          dataType: 'json',
-          type: 'GET',
-          data: {
-              devices: devicesInput,
-              text: textInput,
-              max_results: $('#sliderValue').text(),
-              start_time: startInput,
-              end_time: endInput
-          },
-          success: function(response) {
-            history.pushState({}, '', '/sense_logs/?text=' + textInput + '&devices=' + devicesInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + startInputHuman + '&end=' + endInputHuman);
-            if (response.error) {
+            url: "/api/sense_logs",
+            dataType: 'json',
+            type: 'GET',
+            data: {
+                devices: devicesInput,
+                text: textInput,
+                max_results: $('#sliderValue').text(),
+                start_time: startInput,
+                end_time: endInput
+            },
+            success: function(response) {
+                history.pushState({}, '', '/sense_logs/?text=' + textInput + '&devices=' + devicesInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + startInputHuman + '&end=' + endInputHuman);
+                if (response.error) {
+                    this.setState({
+                        logs: [],
+                        searchAlert: "☹ " + response.error
+                    });
+                }
+                else {
+                    refinedLogs = logsFilter(response.data, startInput, endInput);
+                    this.setState({
+                        logs: refinedLogs,
+                        searchAlert: "found " + refinedLogs.length + " documents"
+                    });
+                }
+            }.bind(this),
+            error: function(xhr, status, err) {
                 this.setState({
                     logs: [],
-                    searchAlert: "☹ " + response.error
+                    searchAlert: "☹ Query failed"
                 });
-            }
-            else {
-                refinedLogs = logsFilter(response.data, startInput, endInput);
-                this.setState({
-                    logs: refinedLogs,
-                    searchAlert: "found " + refinedLogs.length + " documents"
-                });
-            }
-          }.bind(this),
-          error: function(xhr, status, err) {
-            this.setState({
-                logs: [],
-                searchAlert: "☹ Query failed"
-            });
-            console.error(this.props.url, status, err);
-          }.bind(this)
+                console.error(this.props.url, status, err);
+            }.bind(this)
         });
         return false;
     },
@@ -174,43 +174,43 @@ var DebugLog = React.createClass({
             <div className="docs-count">{this.state.searchAlert}</div>: [
             <div className="docs-count">{this.state.searchAlert}</div>,
             <LogTable
-                logs={this.state.logs}
-                caseInsensitive={this.state.caseInsensitive}
-                showLineBreaks={this.state.showLineBreaks}
-                highlightColor={this.state.highlightColor}
+            logs={this.state.logs}
+            caseInsensitive={this.state.caseInsensitive}
+            showLineBreaks={this.state.showLineBreaks}
+            highlightColor={this.state.highlightColor}
             />
         ];
 
         return (<div>
             <form onSubmit={this.handleSubmit}>
-              <Row>
-                <LongDatetimePicker placeHolder="start (14 days ago)" id="start-time" size="2" />
-                <LongDatetimePicker placeHolder="end (now)" id="end-time" size="2" />
-                <Col xs={3} sm={3} md={3} lg={3}>
-                  <input className="form-control" id="text-input" placeholder='Text e.g UART' />
-                </Col>
-                <Col xs={4} sm={4} md={4} lg={4}>
-                  <LongTagsInput id="devices-input" tagClass="label label-info" placeHolder="Devices/Emails (multiple)" />
-                </Col>
-                <Col xs={1} sm={1} md={1} lg={1}>
-                  <Button id="submit" bsStyle="success" type="submit"><Glyphicon glyph="search"/></Button>
-                </Col>
-              </Row>
+                <Row>
+                    <LongDatetimePicker placeHolder="start (14 days ago)" id="start-time" size="2" />
+                    <LongDatetimePicker placeHolder="end (now)" id="end-time" size="2" />
+                    <Col xs={3} sm={3} md={3} lg={3}>
+                        <input className="form-control" id="text-input" placeholder='Text e.g UART' />
+                    </Col>
+                    <Col xs={4} sm={4} md={4} lg={4}>
+                        <LongTagsInput id="devices-input" tagClass="label label-info" placeHolder="Devices/Emails (multiple)" />
+                    </Col>
+                    <Col xs={1} sm={1} md={1} lg={1}>
+                        <Button id="submit" bsStyle="success" type="submit"><Glyphicon glyph="search"/></Button>
+                    </Col>
+                </Row>
 
-              <Row>
-                <Col xs={4} sm={4} md={4} lg={4}>
-                  <input type="text" id="colorpick"/>
-                </Col>
-                <Col xs={2} sm={2} md={2} lg={2}>
-                    <input id="case-check" type="checkbox" onChange={this.handleCaseChange} /> Case Insensitive
-                </Col>
-                <Col xs={2} sm={2} md={2} lg={2}>
-                    <input id="whitespace-check" type="checkbox" onChange={this.handleWhiteSpaceChange} /> Show Linebreaks
-                </Col>
-                <Col xs={4} sm={4} md={4} lg={4}>
-                  Max docs: <span id="sliderValue">100</span>&nbsp;&nbsp;&nbsp;
-                  <input type="text" className="span2 slider" value="" data-slider-min="1" data-slider-max="150" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square" />
-                </Col>
+                <Row>
+                    <Col xs={4} sm={4} md={4} lg={4}>
+                        <input type="text" id="colorpick"/>
+                    </Col>
+                    <Col xs={2} sm={2} md={2} lg={2}>
+                        <input id="case-check" type="checkbox" onChange={this.handleCaseChange} /> Case Insensitive
+                    </Col>
+                    <Col xs={2} sm={2} md={2} lg={2}>
+                        <input id="whitespace-check" type="checkbox" onChange={this.handleWhiteSpaceChange} /> Show Linebreaks
+                    </Col>
+                    <Col xs={4} sm={4} md={4} lg={4}>
+                    Max docs: <span id="sliderValue">100</span>&nbsp;&nbsp;&nbsp;
+                        <input type="text" className="span2 slider" value="" data-slider-min="1" data-slider-max="150" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square" />
+                    </Col>
                 </Row>
 
             </form><br/>
@@ -270,21 +270,22 @@ function highlightByRegexForJSX(text, regexList, color) {
 }
 
 function logsFilter(data, start, end) {
-    var filtered_logs = data.filter(function(log){
-       if (start && end) {
-         return Number(log.timestamp) >= start && Number(log.timestamp) <= end;
-       }
-       else if(start) {
-         return Number(log.timestamp) >= start;
-       }
-       else if(end) {
-         return Number(log.timestamp) <= end;
-       }
-       else {
-         return log;
-       }
+    var filteredByTs = data.filter(function(log){
+        if (start && end) {
+            return Number(log.timestamp) >= start && Number(log.timestamp) <= end;
+        }
+        else if(start) {
+            return Number(log.timestamp) >= start;
+        }
+        else if(end) {
+            return Number(log.timestamp) <= end;
+        }
+        else {
+            return log;
+        }
     });
-    return filtered_logs.sort(compareTimestamp);
+
+    return filteredByTs.sort(compareTimestamp);
 }
 
 function compareTimestamp(log1, log2) {
