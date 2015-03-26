@@ -7,7 +7,6 @@
 
     <script type="text/javascript" src="/static/js/third-party/bootstrap.min.js"></script>
     <script type="text/javascript" src="/static/js/third-party/bootstrap-tagsinput.js"></script>
-
     <script type="text/jsx" src="/static/js/third-party/long-tagsinput.js"></script>
     <script type="text/jsx" src="/static/js/recent_users.js"></script>
     <script type="text/jsx" src="/static/js/user_search.js"></script>
@@ -24,15 +23,17 @@
     </div>
     <div class="col-sm-6 col-xs-6 col-md-6 col-lg-6">
         <div id="search-panel">
-            <h3>Search By Email</h3>
+            <h3>Search</h3>
             <hr class="fancy-line"/>
-            <div id="user-search"></div>
+            <ul class="nav nav-tabs" id="myTab">
+                <li class="active"><a href="#by-email" data-toggle="tab">By Email</a></li>
+                <li><a href="#by-devices" data-toggle="tab">By Devices</a></li>
+            </ul>
 
-            <br>
-
-            <h3>Search by Device</h3>
-            <hr class="fancy-line"/>
-            <div id="device-owner-search"></div>
+            <div class="tab-content">
+                <div class="tab-pane active" id="by-email"></div>
+                <div class="tab-pane" id="by-devices"></div>
+            </div>
         </div>
     </div>
 {% endblock %}

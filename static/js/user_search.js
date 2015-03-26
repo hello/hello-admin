@@ -225,4 +225,4 @@ var UserSearchCanvas = React.createClass({
     }
 });
 
-React.renderComponent(<UserSearchCanvas />, document.getElementById('user-search'));
+React.renderComponent(<UserSearchCanvas />, document.getElementById('by-email'));
