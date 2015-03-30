@@ -7,6 +7,7 @@ class AppInfo(ndb.Model):
     endpoint = ndb.StringProperty(required=True)
     access_token = ndb.StringProperty(required=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
+    env = ndb.StringProperty(default="new_api")
 
 
 class AdminUser(ndb.Model):
