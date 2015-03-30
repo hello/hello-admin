@@ -1,4 +1,5 @@
 from collections import defaultdict
+import settings
 import json
 from handlers.helpers import ProtectedRequestHandler, ResponseOutput
 
@@ -7,22 +8,15 @@ __author__ = 'zet'
 
 class PillStatusAPI(ProtectedRequestHandler):
     def get(self):
-        email = self.request.get('email', '')
-        pill_id = self.request.get('pill_id', '')
-        battery_data = ResponseOutput()
-
-        if email:
-            battery_data = self.hello_request(
-                api_url="devices/pill/{}/status".format(email),
-                type="GET",
-                test_mode=True
-            )
-        elif pill_id:
-            battery_data = self.hello_request(
-                api_url="devices/pill/id/{}/status".format(pill_id),
-                type="GET",
-                test_mode=True
-            )
+        search_input = self.request.get("search_input")
+        url_params = {"email": search_input} if '@' in search_input else {"pill_id_partial": search_input}
+        battery_data = self.hello_request(
+            api_url="devices/pill_status",
+            type="GET",
+            test_mode=True,
+            override_app_info=settings.ADMIN_APP_INFO,
+            url_params=url_params
+        )
 
         battery_by_pill_id = defaultdict(list)
         for d in battery_data.data:
