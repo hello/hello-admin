@@ -1,5 +1,6 @@
 import logging as log
 import json
+import settings
 
 from handlers.helpers import ProtectedRequestHandler
 
@@ -54,11 +55,11 @@ class DeviceOwnersAPI(ProtectedRequestHandler):
     def get(self):
         device_id = self.request.get('device_id', default_value="")
         log.info("Getting accounts associated with device {}".format(device_id))
-
         self.hello_request(
             api_url="devices/{}/accounts".format(device_id),
             type="GET",
-            filter_fields=['email']
+            filter_fields=['email'],
+            override_app_info=settings.ADMIN_APP_INFO
         )
 
 class DeviceInactiveAPI(ProtectedRequestHandler):

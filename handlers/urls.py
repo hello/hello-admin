@@ -75,6 +75,7 @@ from views import WorkerLogsView
 from handlers.memcache import RefreshMemcache
 from handlers.orders import OrdersAPI
 from handlers.users import RecentUsersAPI
+from handlers.setup import AppendAppInfo
 
 cron_routes = [
     ('/cron/sense_logs_purge', SenseLogsPurge),
@@ -122,6 +123,7 @@ api_routes = [
     ('/api/password_reset/?$', PasswordResetAPI),
     ('/api/worker_logs/?$', WorkerLogsAPI),
     ('/api/orders/?$', OrdersAPI),
+    ('/api/append_app_info/?$', AppendAppInfo),
 ]
 
 page_routes = [

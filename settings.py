@@ -24,6 +24,8 @@ if SERVER == "localhost" :
 ## Grab settings saved in GAE memcache and only query from Datastore if they are not available
 
 APP_INFO = memcache.get("app_info"+ENVIRONMENT) or AppInfo.get_by_id(ENVIRONMENT)
+ADMIN_APP_INFO = AppInfo.get_by_id("admin")
+
 ADMIN_USER = memcache.get("admin_user"+ENVIRONMENT) or AdminUser.get_by_id(ENVIRONMENT)
 SEARCHIFY = memcache.get("searchify_credentials") or SearchifyCredentials.query().get()
 ZENDESK = memcache.get("zendesk_credentials") or ZendeskCredentials.query().get()

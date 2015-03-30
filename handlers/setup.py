@@ -269,7 +269,8 @@ class SetupAPI(SuperEngineerRequestHandler):
             id=settings.ENVIRONMENT,
             client_id=settings.DEFAULT_LOCAL_DEV_CLIENT_ID,
             endpoint=settings.DEFAULT_LOCAL_API_URL,
-            access_token='will be created by /update'
+            access_token='will be created by /update',
+            env=settings.ENVIRONMENT
         )
         app_info.put()
         self.update_or_create_memcache(key="app_info", value=app_info, environment= settings.ENVIRONMENT)
@@ -289,6 +290,21 @@ class SetupAPI(SuperEngineerRequestHandler):
         self.update_or_create_memcache(key="searchify_credentials", value=searchify_credentials)
 
         self.response.write("Essential credentials initialized!")
+
+
+class AppendAppInfo(SuperEngineerRequestHandler):
+    def get(self):
+        app_source = self.request.get("app_source", "new_api")
+        app_info = AppInfo(
+            id=app_source,
+            client_id="application client ID",
+            endpoint="https://",
+            access_token='to be filled',
+            env=app_source
+        )
+        app_info.put()
+        self.update_or_create_memcache(key="app_info", value=app_info, environment=app_source)
+
 
 class UpdateAdminAccessTokenAPI(SuperEngineerRequestHandler):
     """

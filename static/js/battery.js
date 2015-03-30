@@ -127,7 +127,7 @@ var BatteryChart = React.createClass({
     handleSubmit: function() {
         var that = this;
         var searchInput = $('#search-input').val();
-        var requestData = searchInput.indexOf('@') !== -1 ?  {email: searchInput} : {pill_id: searchInput};
+        var requestData = {search_input: searchInput};
         $.ajax({
             url: "/api/battery",
             type: "GET",
