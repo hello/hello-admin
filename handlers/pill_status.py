@@ -13,7 +13,7 @@ class PillStatusAPI(ProtectedRequestHandler):
         battery_data = self.hello_request(
             api_url="devices/pill_status",
             type="GET",
-            test_mode=True,
+            raw_output=True,
             override_app_info=settings.ADMIN_APP_INFO,
             url_params=url_params
         )

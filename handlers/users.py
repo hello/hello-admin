@@ -38,6 +38,7 @@ class RecentUsersAPI(ProtectedRequestHandler):
                 api_url="account/recent",
                 type="GET",
                 test_mode=True
+                raw_output=True
             ).get_serialized_output())['data']
 
             previously_cached_recent_users = json.loads(memcache.get("recent_users" + settings.ENVIRONMENT) or "[]")

@@ -74,7 +74,7 @@ class SearchifyLogsHandler(ProtectedRequestHandler):
                         api_url="devices/q",
                         type="GET",
                         url_params={'email': d},
-                        test_mode=True
+                        raw_output=True
                     ).data
                 else:
                     devices_list.append(d)
