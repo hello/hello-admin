@@ -32,6 +32,7 @@ from handlers.setup import RegisterPillAPI, SetupAPI
 from handlers.setup import UpdateAdminAccessTokenAPI
 from handlers.teams import TeamsAPI
 from handlers.users import UserAPI
+from handlers.users import OmniSearchAPI
 from handlers.views import BatteryView
 from handlers.keys import SenseKeyProvision
 from handlers.views import ChartHandler
@@ -124,6 +125,7 @@ api_routes = [
     ('/api/worker_logs/?$', WorkerLogsAPI),
     ('/api/orders/?$', OrdersAPI),
     ('/api/append_app_info/?$', AppendAppInfo),
+    ('/api/omni_search/?$', OmniSearchAPI),
 ]
 
 page_routes = [

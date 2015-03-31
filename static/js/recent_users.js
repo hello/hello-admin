@@ -3,8 +3,8 @@
 var LinkToUserDashboard = React.createClass({
     populateUserSearchEmail: function(){
         $('#search-modes a[href="#by-email"]').tab('show');
-        $('#email-search').focus().val(this.props.email);
-        $("#email-search-submit").click();
+        $('#omni-input').focus().val(this.props.email);
+        $("#omni-submit").click();
     },
     render: function() {
         return <span className="cursor-custom" onClick={this.populateUserSearchEmail}>{this.props.email}</span>
