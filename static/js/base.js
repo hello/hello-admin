@@ -20,6 +20,8 @@ var TabbedArea = ReactBootstrap.TabbedArea;
 var Table = ReactBootstrap.Table;
 var TabPane = ReactBootstrap.TabPane;
 var Panel = ReactBootstrap.Panel;
+var Well = ReactBootstrap.Well;
+var Badge = ReactBootstrap.Badge;
 
 function getParameterByName(name) {
   name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");

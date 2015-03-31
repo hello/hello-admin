@@ -3,8 +3,8 @@
 var OwnerEmail = React.createClass({
     populateUserSearchEmail: function(e) {
         $('#search-modes a[href="#by-email"]').tab('show');
-        $('#email-search').focus().val($(e.target).text());
-        $("#email-search-submit").click();
+        $('#omni-input').focus().val($(e.target).text());
+        $("#omni-submit").click();
     },
     render: function() {
         var that = this;

@@ -97,7 +97,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         return hello.get_session(token)
 
     def hello_request(self, api_url, body_data="", url_params={}, type="GET"
-                          , impersonatee_token=None, test_mode=False, filter_fields=[], override_app_info=None):
+                          , impersonatee_token=None, raw_output=False, filter_fields=[], override_app_info=None):
         """
         :param api_url: api URL
         :type api_url: str
@@ -109,8 +109,8 @@ class BaseRequestHandler(webapp2.RequestHandler):
         :type type: str
         :param impersonatee_token: optional token to represent a user
         :type impersonatee_token: str
-        :param test_mode: boolean value to control output, if test_mode is one, return an object rather than a response
-        :type test_mode: bool
+        :param raw_output: boolean value to control output, if raw_ouput is True, return an object rather than a response
+        :type raw_output: bool
         :param filter_fields: optional list of fields for filtering
         :type filter_fields: list
         :return a ResponseOutput object in test mode  or a string otherwise
@@ -142,7 +142,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         if not response.ok:
             output.set_error(response.content)
 
-        if test_mode is True:
+        if raw_output is True:
             return output
         else:
             return self.render_response(output)
