@@ -94,8 +94,9 @@ var DeviceListHeaders = React.createClass({
 var FirmwareListHeaders = React.createClass({
     render: function() {
         return (<thead><tr>
+            <th className='alert-info'>Last Seen</th>
             <th className='alert-info'>FW Version</th>
-            <th className='alert-info'>&#35; of Devices Seen</th>
+            <th className='alert-info'>&#35;</th>
         </tr></thead>)
     }
 });
@@ -115,9 +116,16 @@ var HistoryListHeaders = React.createClass({
 
 var FirmwareListRows = React.createClass({
     render: function() {
+        this.props.fwList.sort(function(a, b){
+         return b.timestamp-a.timestamp
+        })
         var firmwareListRows = this.props.fwList.map(function(fw){
+        var timestamp = new Date(Number(fw.timestamp));
             return(
                 <tr>
+                    <td>
+                        {timestamp.toLocaleString()}
+                    </td>
                     <td>
                     <LinkToFWSearch firmware_version={fw.version} />
                     {" (" + parseInt(fw.version, 10).toString(16) + ")"}
