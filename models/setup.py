@@ -43,6 +43,7 @@ class UserGroup(ndb.Model):
     firmware = ndb.StringProperty(required=True)
     hardware = ndb.StringProperty(required=True)
     software = ndb.StringProperty(required=True)
+    super_firmware = ndb.StringProperty(required=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
 
 
