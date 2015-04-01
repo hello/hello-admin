@@ -435,12 +435,12 @@ class CreateGroupsAPI(ProtectedRequestHandler):
         output = {'data': [], 'error': ''}
 
         groups_data = {
-            'super_engineer': 'long@sayhello.com, tim@sayhello.com, pang@sayhello.com, chris@sayhello.com, jchen@sayhello.com',
-            'customer_experience': 'marina@sayhello.com, chrisl@sayhello.com',
+            'super_engineer': 'long@sayhello.com, tim@sayhello.com, pang@sayhello.com, chris@sayhello.com, kingshy@sayhello.com, josef@sayhello.com' 'jimmy@sayhello.com',
+            'customer_experience': 'marina@sayhello.com, tim@sayhello.com',
             'software': 'pang@sayhello.com, benjo@sayhello.com',
             'hardware': 'scott@sayhello.com, ben@sayhello.com',
-            'firmware': 'chris@sayhello.com, kingshy@sayhello.com, benjo@sayhello.com, jchen@sayhello.com',
-            'elite_admin': 'long@sayhello.com, tim@sayhello.com'
+            'firmware': 'chris@sayhello.com, kingshy@sayhello.com, benjo@sayhello.com, jchen@sayhello.com, km@sayhello.com, kevin@sayhello.com',
+            'super_firmware': 'chris@sayhello.com, josef@sayhello.com, tim@sayhello.com',
         }
         groups_entity = UserGroup(**groups_data)
         groups_entity.put()
