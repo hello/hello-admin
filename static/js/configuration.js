@@ -53,7 +53,8 @@ var ConfigMaestro = React.createClass({
       ids: "",
       groups: [],
       data: [],
-      sliderValue: 0
+      sliderValue: 0,
+      alert: ""
     };
   },
 
@@ -146,6 +147,7 @@ var ConfigMaestro = React.createClass({
       groups: $('#groups-input').val(),
       percentage: this.state.sliderValue
     };
+    console.log(submitData);
     $.ajax({
       url: '/api/features',
       dataType: 'json',
@@ -153,6 +155,13 @@ var ConfigMaestro = React.createClass({
       data: JSON.stringify(submitData),
       type: 'PUT',
       success: function(response) {
+        console.log(response);
+        if (response.status === 204 && response.error === "") {
+            that.setState({alert: "Successfully updated"});
+        }
+        else {
+            that.setState({alert: response.error});
+        }
         this.getCurrentFeatures();
       }.bind(this),
       error: function(xhr, status, err) {
@@ -168,6 +177,7 @@ var ConfigMaestro = React.createClass({
     groupsNames.forEach(function(group){
       groupsOptions.push(<option value={group}>{"➢  " + group}</option>)
     });
+    var alert = this.state.alert === "" ? null:<Alert>{this.state.alert}</Alert>;
     return (<Grid>
       <Row className="show-grid">
         <Col xs={5} md={5}><code className="nonscript">
@@ -185,6 +195,8 @@ var ConfigMaestro = React.createClass({
           <span>&nbsp;100</span>
           <h4>Submit</h4>
           <Button bsStyle="danger" onClick={this.handleSubmit}><Glyphicon glyph="send"/> PUT</Button>
+          <br/>
+          {alert}
         </code></Col>
         <Col xs={7} md={7}><code className="nonscript">
           <h4>Current Configs</h4>

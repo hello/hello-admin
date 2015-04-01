@@ -248,6 +248,10 @@ class ProtectedRequestHandler(BaseRequestHandler):
     def hardware(self):
         return stripStringToList(self.groups_entity.hardware)
 
+    def super_firmware(self):
+        return stripStringToList(self.groups_entity.super_firmware)
+
+
 class CustomerExperienceRequestHandler(ProtectedRequestHandler):
     """
     Grant access to only customer experience team members
