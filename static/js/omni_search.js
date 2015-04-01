@@ -113,6 +113,12 @@ var OmniMaestro = React.createClass({
     handleSubmit: function() {
         var that = this, omniInput = $("#omni-input").val();
         history.pushState({}, '', '/users/?omni_input=' + omniInput);
+
+        if (isNaN(Number(omniInput)) && omniInput.trim().length < 3) {
+            that.setState({data: [], alert: "Search string should be at least 3 characters"});
+            return false;
+        }
+
         $.ajax({
             url: "/api/omni_search",
             dataType: 'json',
@@ -144,6 +150,7 @@ var OmniMaestro = React.createClass({
                         type="text"
                         placeholder="UserID || Email|Name partial || DeviceID"
                         />
+                        <label for="omni-input" className="glyphicon glyphicon-pencil"></label>
                     </div>
                     <span className="input-group-btn">
                         <button id="omni-submit" className="btn btn-default form-control" type="submit">
