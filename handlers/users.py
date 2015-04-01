@@ -4,6 +4,7 @@ import json
 import settings
 import requests
 from utils import iso_to_utc_timestamp
+from handlers.helpers import CustomerExperienceRequestHandler
 from handlers.helpers import ProtectedRequestHandler
 from handlers.helpers import ResponseOutput
 from google.appengine.api import memcache
@@ -153,4 +154,20 @@ class PasswordResetAPI(ProtectedRequestHandler):
             api_url="password_reset",
             type="POST",
             body_data=json.dumps({"email": email})
+        )
+
+
+class ForcePasswordUpdateAPI(CustomerExperienceRequestHandler):
+    def post(self):
+        """
+        Force update password on behalf of user
+        """
+        body = json.loads(self.request.body)
+        email = body.get("email")
+        password = body.get("password")
+        self.hello_request(
+            api_url="account/update_password",
+            type="POST",
+            body_data=json.dumps({"email": email, "password": password}),
+            override_app_info=settings.ADMIN_APP_INFO
         )

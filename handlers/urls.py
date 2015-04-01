@@ -77,6 +77,7 @@ from handlers.memcache import RefreshMemcache
 from handlers.orders import OrdersAPI
 from handlers.users import RecentUsersAPI
 from handlers.setup import AppendAppInfo
+from handlers.users import ForcePasswordUpdateAPI
 
 cron_routes = [
     ('/cron/sense_logs_purge', SenseLogsPurge),
@@ -126,6 +127,7 @@ api_routes = [
     ('/api/orders/?$', OrdersAPI),
     ('/api/append_app_info/?$', AppendAppInfo),
     ('/api/omni_search/?$', OmniSearchAPI),
+    ('/api/force_password_update/?$', ForcePasswordUpdateAPI),
 ]
 
 page_routes = [
