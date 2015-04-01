@@ -147,7 +147,6 @@ var ConfigMaestro = React.createClass({
       groups: $('#groups-input').val(),
       percentage: this.state.sliderValue
     };
-    console.log(submitData);
     $.ajax({
       url: '/api/features',
       dataType: 'json',
@@ -155,7 +154,6 @@ var ConfigMaestro = React.createClass({
       data: JSON.stringify(submitData),
       type: 'PUT',
       success: function(response) {
-        console.log(response);
         if (response.status === 204 && response.error === "") {
             that.setState({alert: "Successfully updated"});
         }
