@@ -97,15 +97,16 @@ class OmniSearchAPI(ProtectedRequestHandler):
     def get(self):
         accounts = self.query_by_exact_email_or_id()
         if accounts.status == 404:
-            accounts = self.query_by_email_or_name_partials()
-            if len(accounts.data) == 0:
-                accounts = self.query_by_device_id()
+            if not self.omni_input.isdigit():
+                accounts = self.query_by_email_or_name_partials()
+                if len(accounts.data) == 0:
+                    accounts = self.query_by_device_id()
         else:
             accounts.data = [accounts.data]
         if len(accounts.data) == 0 and not accounts.error:
             accounts.set_status(404)
             accounts.set_error("Account not found!!")
-
+        print accounts.data
         accounts.set_data([{
             # 'zendesk': self.get_zendesk_info_by_email(account['email']),
             'profile': account,
