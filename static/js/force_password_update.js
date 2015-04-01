@@ -1,18 +1,24 @@
 /** @jsx React.DOM */
 
-var PasswordResetMaestro = React.createClass({
+var ForcePasswordUpdateMaestro = React.createClass({
     getInitialState: function() {
         return {alert: ""}
     },
     handleSubmit: function() {
         var that = this;
+        var passwordInput = $("#force-password-input-1").val();
+        if (passwordInput !== $("#force-password-input-2").val()) {
+            that.setState({alert: "Mismatched password inputs"});
+            return false;
+        }
         var requestData = {
-            email: $("#email-input").val()
+            email: $("#force-email-input").val(),
+            password: passwordInput
         };
         console.log(requestData);
         if (isValidRequest(requestData)) {
             $.ajax({
-                url: "/api/password_reset",
+                url: "/api/force_password_update",
                 type: "POST",
                 dataType: 'json',
                 contentType: 'application/json',
@@ -23,7 +29,7 @@ var PasswordResetMaestro = React.createClass({
                         that.setState({alert: response.error});
                     }
                     else {
-                        that.setState({alert: "Password reset link sent to " + requestData.email});
+                        that.setState({alert: "Successfully updated"});
                     }
                 }.bind(that),
                 error: function (e) {
@@ -38,15 +44,23 @@ var PasswordResetMaestro = React.createClass({
             <Alert bsStyle="info">{this.state.alert}</Alert>;
 
         return (<Col xs={8} sm={8} md={8} xsOffset={2} smOffset={2} mdOffset={2}><form onSubmit={this.handleSubmit}>
-            <h3>Password Reset</h3>
+            <h3>Force Password Update</h3>
             <hr className="fancy-line" /><br/>
-            <Input id="email-input" type="text" placeholder="Enter receiver email"/>
+            <Input id="force-email-input" type="text" placeholder="Enter account email"/>
+            <Input id="force-password-input-1" type="password" placeholder="Enter new password"/>
+            <Input id="force-password-input-2" type="password" placeholder="Enter new password"/>
             <Button bsStyle="info" bsSize="large" className="btn-circle" type="submit"><Glyphicon glyph="send"/></Button>
             {alert}
         </form></Col>)
     }
 });
-React.renderComponent(<PasswordResetMaestro />, document.getElementById('password-reset'));
+$(function(){
+    var viewer = $('#viewer').val();
+    if (viewer == 'tim@sayhello.com' || viewer == 'marina@sayhello.com') {
+        React.renderComponent(<ForcePasswordUpdateMaestro />, document.getElementById('force-password-update'));
+    }
+});
+
 
 function isValidRequest(r) {
     return Object.keys(r).every(function(k){return r[k] && !r[k].isWhiteString()})
