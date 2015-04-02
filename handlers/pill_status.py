@@ -12,7 +12,6 @@ class PillStatusAPI(ProtectedRequestHandler):
         end_ts = int(self.request.get("end_ts", 0))
         url_params = {"end_ts": end_ts}
         url_params.update({"email": search_input} if '@' in search_input else {"pill_id_partial": search_input})
-        print url_params
         battery_data = self.hello_request(
             api_url="devices/pill_status",
             type="GET",

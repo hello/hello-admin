@@ -1,6 +1,7 @@
 import settings
+import json
 import logging as log
-from handlers.helpers import BaseRequestHandler
+from handlers.helpers import ProtectedRequestHandler
 from models.setup import AppInfo
 from models.setup import AdminUser
 from models.setup import UserGroup
@@ -8,7 +9,7 @@ from models.ext import SearchifyCredentials
 from models.ext import ZendeskCredentials
 
 
-class RefreshMemcache(BaseRequestHandler):
+class RefreshMemcache(ProtectedRequestHandler):
     def get(self):
         try:
             self.update_or_create_memcache(key="app_info", value=AppInfo.get_by_id(settings.ENVIRONMENT), environment=settings.ENVIRONMENT)
@@ -18,5 +19,4 @@ class RefreshMemcache(BaseRequestHandler):
             self.update_or_create_memcache(key="user_group", value=UserGroup.query().get())
             log.info("Successfully refreshed memcache!")
         except Exception as e:
-            self.error(e.message)
-        self.redirect("/")
+            self.response.write(json.dumps({"error": e.message}))

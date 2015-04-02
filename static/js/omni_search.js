@@ -148,7 +148,7 @@ var OmniMaestro = React.createClass({
                         id="omni-input"
                         className="form-control"
                         type="text"
-                        placeholder="UserID || Email|Name partial || DeviceID"
+                        placeholder="UserID || Email|Name partial || Pill|SenseID"
                         />
                         <label for="omni-input" className="glyphicon glyphicon-pencil"></label>
                     </div>
