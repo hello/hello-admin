@@ -7,6 +7,7 @@ from models.setup import AdminUser
 from models.setup import UserGroup
 from models.ext import SearchifyCredentials
 from models.ext import ZendeskCredentials
+from models.ext import GeckoboardCredentials
 
 
 class RefreshMemcache(ProtectedRequestHandler):
@@ -17,6 +18,7 @@ class RefreshMemcache(ProtectedRequestHandler):
             self.update_or_create_memcache(key="searchify_credentials", value=SearchifyCredentials.query().get())
             self.update_or_create_memcache(key="zendesk_credentials", value=ZendeskCredentials.query().get())
             self.update_or_create_memcache(key="user_group", value=UserGroup.query().get())
+            self.update_or_create_memcache(key="geckoboard_credentials", value=GeckoboardCredentials.query().get())
             log.info("Successfully refreshed memcache!")
         except Exception as e:
             self.response.write(json.dumps({"error": e.message}))
