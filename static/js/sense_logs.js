@@ -126,6 +126,10 @@ var DebugLog = React.createClass({
         this.setState({showLineBreaks: $('#whitespace-check').is(':checked')});
     },
     handleSubmit: function(){
+        this.setState({
+            logs: [],
+            searchAlert: "searching in progress"
+        });
         var textInput = $('#text-input').val().trim(),
             devicesInput = $('#devices-input').val().trim(),
             startInputHuman = $('#start-time').val().trim(),
