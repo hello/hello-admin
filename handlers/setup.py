@@ -4,7 +4,7 @@ import urllib
 import settings
 from models.setup import AppInfo, AdminUser, AccessToken, UserGroup
 from handlers.helpers import make_oauth2_service, ProtectedRequestHandler, SuperEngineerRequestHandler
-from models.ext import ZendeskCredentials, SearchifyCredentials, KeyStoreLocker
+from models.ext import ZendeskCredentials, SearchifyCredentials, KeyStoreLocker, GeckoboardCredentials
 from google.appengine.api import memcache
 
 
@@ -289,8 +289,13 @@ class SetupAPI(SuperEngineerRequestHandler):
         searchify_credentials.put()
         self.update_or_create_memcache(key="searchify_credentials", value=searchify_credentials)
 
-        self.response.write("Essential credentials initialized!")
+        geckoboard_credentials = GeckoboardCredentials(
+            api_key='ask_kevin_twohy'
+        )
+        geckoboard_credentials.put()
+        self.update_or_create_memcache(key="geckoboard_credentials", value=geckoboard_credentials)
 
+        self.response.write("Essential credentials initialized!")
 
 class AppendAppInfo(SuperEngineerRequestHandler):
     def get(self):
@@ -304,6 +309,16 @@ class AppendAppInfo(SuperEngineerRequestHandler):
         )
         app_info.put()
         self.update_or_create_memcache(key="app_info", value=app_info, environment=app_source)
+
+
+class UpdateGeckoBoardCredentials(SuperEngineerRequestHandler):
+    def get(self):
+        api_key = self.request.get("api_key", "")
+        geckoboard_credentials = GeckoboardCredentials(
+            api_key=api_key
+        )
+        geckoboard_credentials.put()
+        self.update_or_create_memcache(key="geckoboard_credentials", value=geckoboard_credentials)
 
 
 class UpdateAdminAccessTokenAPI(SuperEngineerRequestHandler):
@@ -435,7 +450,7 @@ class CreateGroupsAPI(ProtectedRequestHandler):
         output = {'data': [], 'error': ''}
 
         groups_data = {
-            'super_engineer': 'long@sayhello.com, tim@sayhello.com, pang@sayhello.com, chris@sayhello.com, kingshy@sayhello.com, josef@sayhello.com' 'jimmy@sayhello.com',
+            'super_engineer': 'long@sayhello.com, tim@sayhello.com, pang@sayhello.com, chris@sayhello.com, kingshy@sayhello.com, josef@sayhello.com, jimmy@sayhello.com',
             'customer_experience': 'marina@sayhello.com, tim@sayhello.com',
             'software': 'pang@sayhello.com, benjo@sayhello.com',
             'hardware': 'scott@sayhello.com, ben@sayhello.com',

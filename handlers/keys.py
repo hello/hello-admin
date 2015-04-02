@@ -169,7 +169,6 @@ class PillKeyDecryptAPI(webapp2.RequestHandler):
             output_binary = (c.decrypt(ciphertext))
             pill = display_info(output_binary)
             pills.append(pill)
-            print pills
         return pills[0]
 
     def handle_upload(self):

@@ -27,3 +27,6 @@ class ZendeskDailyStats(ndb.Model):
     @classmethod
     def query_stats(cls, limit=None):
         return cls.query().order(-cls.created_at).fetch(limit)
+
+class GeckoboardCredentials(ndb.Model):
+    api_key = ndb.StringProperty(required=True)

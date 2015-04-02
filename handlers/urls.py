@@ -9,6 +9,7 @@ from handlers.cron import ZendeskCronHandler
 from handlers.cron import SenseLogsPurge
 from handlers.cron import ApplicationLogsPurge
 from handlers.cron import SearchifyLogsPurgeQueue
+from handlers.cron import GeckoboardPush
 from handlers.zendesk import ZendeskAPI
 from handlers.zendesk import ZendeskStatsAPI
 from handlers.zendesk import ZendeskHistoryAPI
@@ -30,6 +31,7 @@ from handlers.setup import ProxyAPI
 from handlers.setup import TokenAPI
 from handlers.setup import RegisterPillAPI, SetupAPI
 from handlers.setup import UpdateAdminAccessTokenAPI
+from handlers.setup import UpdateGeckoBoardCredentials
 from handlers.teams import TeamsAPI
 from handlers.users import UserAPI
 from handlers.users import OmniSearchAPI
@@ -83,7 +85,8 @@ cron_routes = [
     ('/cron/sense_logs_purge', SenseLogsPurge),
     ('/cron/application_logs_purge/?$', ApplicationLogsPurge),
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
-    ('/cron/searchify_logs_purge_queue', SearchifyLogsPurgeQueue)
+    ('/cron/searchify_logs_purge_queue', SearchifyLogsPurgeQueue),
+    ('/cron/geckoboard_push', GeckoboardPush),
 ]
 
 api_routes = [
@@ -128,6 +131,7 @@ api_routes = [
     ('/api/append_app_info/?$', AppendAppInfo),
     ('/api/omni_search/?$', OmniSearchAPI),
     ('/api/force_password_update/?$', ForcePasswordUpdateAPI),
+    ('/api/update_geckoboard_credentials', UpdateGeckoBoardCredentials)
 ]
 
 page_routes = [

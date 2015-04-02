@@ -83,7 +83,7 @@ class SearchifyHandler(BaseRequestHandler):
                     delete_docid_list.append(s['docid'])
             else:
                 if datetime.datetime.fromtimestamp(int(s['timestamp'])) < time_threshold \
-                    and not any([exception_keyword in s["text"] for exception_keyword in exception_keywords]):
+                        and not any([exception_keyword in s["text"] for exception_keyword in exception_keywords]):
                     delete_docid_list.append(s['docid'])
 
         return delete_docid_list
@@ -178,3 +178,29 @@ class SearchifyLogsPurgeQueue(SearchifyHandler):
         self.response.write(json.dumps({'queue': 'active'}))
 
 
+class GeckoboardPush(BaseRequestHandler):
+    def get(self):
+        senses_status_breakdown = self.hello_request(
+            type="GET",
+            api_url="devices/status_breakdown",
+            override_app_info=settings.ADMIN_APP_INFO,
+        ).data
+
+        if settings.GECKOBOARD is None:
+            self.error("missing Geckoboard credentials!")
+
+        post_data = {
+            "api_key": settings.GECKOBOARD.api_key,
+            "data": {
+                "item": [
+                    {
+                        "value": senses_status_breakdown.get('normal_count', -1),
+                        "text": "# NORMAL"
+                    }
+                ]
+            }
+        }
+        widget_id = "125660-10a1bf83-847e-4e14-9a2c-68fe2b656054"
+        widget_url = "https://push.geckoboard.com/v1/send/" + widget_id
+        gecko_response = requests.post(widget_url, json.dumps(post_data))
+        self.response.write(json.dumps({"status": gecko_response.ok}))
