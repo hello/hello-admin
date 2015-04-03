@@ -127,6 +127,7 @@ var BatteryChart = React.createClass({
     },
 
     handleSubmit: function() {
+        $preloader.fadeIn('fast');
         var that = this;
         var searchInput = $('#search-input').val();
         var endTs = $('#end-ts').val();
@@ -145,6 +146,7 @@ var BatteryChart = React.createClass({
                 that.pushHistory(searchInput, endTs);
             }
         });
+        $preloader.fadeOut('fast');
         return false;
     },
 

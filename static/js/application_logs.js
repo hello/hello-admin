@@ -137,6 +137,7 @@ var DebugLog = React.createClass({
         this.setState({showLineBreaks: $('#whitespace-check').is(':checked')});
     },
     handleSubmit: function(){
+        $preloader.fadeIn('fast');
         var textInput = $('#text-input').val().trim(),
             levelsInput = $('#levels-input').val().trim(),
             originsInput = $('#origins-input').val().trim(),
@@ -182,6 +183,7 @@ var DebugLog = React.createClass({
             console.error(this.props.url, status, err);
           }.bind(this)
         });
+        $preloader.fadeOut('fast');
         return false;
     },
     render: function(){

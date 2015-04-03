@@ -25,6 +25,7 @@ var DeviceOwnerSearch = React.createClass({
     },
 
     handleSubmit: function(e) {
+      $preloader.fadeIn('fast');
       if (e) {
         e.preventDefault();
       }
@@ -52,6 +53,7 @@ var DeviceOwnerSearch = React.createClass({
             }.bind(this)
           });
       });
+      $preloader.fadeOut('fast');
       return false;
     },
 

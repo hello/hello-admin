@@ -96,6 +96,7 @@ var ConfigMaestro = React.createClass({
   },
 
   handleSend: function(e) {
+    $preloader.fadeIn('fast');
     var that = this;
     var action = $(e.target).attr('action') || $(e.target).parent('button').attr('action');
     var sendData = {
@@ -120,6 +121,7 @@ var ConfigMaestro = React.createClass({
         that.getTeams();
       }.bind(this)
     });
+    $preloader.fadeOut('fast');
   },
 
   render: function () {

@@ -106,4 +106,6 @@ if (typeof String.prototype.startsWith != 'function') {
     return this.indexOf(str) === 0;
   };
 }
+var $preloader = $('.preloader');
+
 
