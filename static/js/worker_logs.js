@@ -160,6 +160,7 @@ var DebugLog = React.createClass({
               end_time: endInput
           },
           success: function(response) {
+            $preloader.fadeOut('slow');
             history.pushState({}, '', '/worker_logs/?text=' + textInput + '&levels=' + levelsInput + '&origins=' + originsInput + '&versions=' + versionsInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + startInputHuman + '&end=' + endInputHuman);
             if (response.error) {
                 this.setState({
@@ -176,6 +177,7 @@ var DebugLog = React.createClass({
             }
           }.bind(this),
           error: function(xhr, status, err) {
+            $preloader.fadeOut('fast');
             this.setState({
                 logs: [],
                 searchAlert: "☹ Query failed"
@@ -183,7 +185,6 @@ var DebugLog = React.createClass({
             console.error(this.props.url, status, err);
           }.bind(this)
         });
-        $preloader.fadeOut('fast');
         return false;
     },
     render: function(){
