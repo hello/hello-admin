@@ -126,6 +126,7 @@ var DebugLog = React.createClass({
         this.setState({showLineBreaks: $('#whitespace-check').is(':checked')});
     },
     handleSubmit: function(){
+        $preloader.fadeIn('fast');
         this.setState({
             logs: [],
             searchAlert: "searching in progress"
@@ -171,6 +172,7 @@ var DebugLog = React.createClass({
                 console.error(this.props.url, status, err);
             }.bind(this)
         });
+        $preloader.fadeOut('fast');
         return false;
     },
     render: function(){
