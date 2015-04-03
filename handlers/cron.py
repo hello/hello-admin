@@ -1,4 +1,5 @@
 import datetime
+import time
 import json
 import logging as log
 import requests
@@ -180,10 +181,12 @@ class SearchifyLogsPurgeQueue(SearchifyHandler):
 
 class GeckoboardPush(BaseRequestHandler):
     def get(self):
-        senses_status_breakdown = self.hello_request(
+        devices_status_breakdown = self.hello_request(
             type="GET",
             api_url="devices/status_breakdown",
+            raw_output=True,
             override_app_info=settings.ADMIN_APP_INFO,
+            url_params={'start_ts': int(time.time()*1000) - 24*3600*1000, 'end_ts': int(time.time()*1000)}
         ).data
 
         if settings.GECKOBOARD is None:
@@ -194,13 +197,18 @@ class GeckoboardPush(BaseRequestHandler):
             "data": {
                 "item": [
                     {
-                        "value": senses_status_breakdown.get('normal_count', -1),
-                        "text": "# NORMAL"
+                        "value": devices_status_breakdown.get('senses_count', -1),
+                        "text": "Senses"
+                    },
+                     {
+                        "value": devices_status_breakdown.get('pills_count', -1),
+                        "text": "Pills"
                     }
                 ]
             }
         }
-        widget_id = "125660-10a1bf83-847e-4e14-9a2c-68fe2b656054"
+
+        widget_id = "125660-18c5a1c1-88fe-4240-b35c-2704ba55e1a3"
         widget_url = "https://push.geckoboard.com/v1/send/" + widget_id
         gecko_response = requests.post(widget_url, json.dumps(post_data))
         self.response.write(json.dumps({"status": gecko_response.ok}))
