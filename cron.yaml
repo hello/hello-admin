@@ -4,7 +4,7 @@ cron:
   schedule: every day 08:05
 - description: geckoboard push
   url: /cron/geckoboard_push
-  schedule: every 5 mins
+  schedule: every 2 mins
 #- description: sense logs purge
 #  url: /cron/sense_logs_purge
 #  schedule: every 1 mins
