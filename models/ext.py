@@ -30,3 +30,5 @@ class ZendeskDailyStats(ndb.Model):
 
 class GeckoboardCredentials(ndb.Model):
     api_key = ndb.StringProperty(required=True)
+    senses_widget_id = ndb.StringProperty(required=True)
+    pills_widget_id = ndb.StringProperty(required=True)

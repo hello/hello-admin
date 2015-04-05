@@ -313,9 +313,10 @@ class AppendAppInfo(SuperEngineerRequestHandler):
 
 class UpdateGeckoBoardCredentials(SuperEngineerRequestHandler):
     def get(self):
-        api_key = self.request.get("api_key", "")
         geckoboard_credentials = GeckoboardCredentials(
-            api_key=api_key
+            api_key=self.request.get("api_key", ""),
+            senses_widget_id=self.request.get("senses_widget_id", ""),
+            pills_widget_id=self.request.get("pills_widget_id", "")
         )
         geckoboard_credentials.put()
         self.update_or_create_memcache(key="geckoboard_credentials", value=geckoboard_credentials)
