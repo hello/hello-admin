@@ -191,17 +191,16 @@ class GeckoboardPush(BaseRequestHandler):
 
         if settings.GECKOBOARD is None:
             self.error("missing Geckoboard credentials!")
-
         senses_count = devices_status_breakdown.get('senses_count', -1)
         pills_count = devices_status_breakdown.get('pills_count', -1)
 
         self.response.write(json.dumps({
-            "sense": self.push_to_gecko(senses_count, "senses", "125660-4507e07d-66c6-483c-8b01-7999f2233aa3"),
-            "pill": self.push_to_gecko(pills_count, "pills", "125660-2078c76d-65da-4d78-9375-129e757b18ad")
+            "sense": self.push_to_gecko(senses_count, "senses", settings.GECKOBOARD.senses_widget_id),
+            "pill": self.push_to_gecko(pills_count, "pills", settings.GECKOBOARD.pills_widget_id)
         }))
 
-
-    def push_to_gecko(self, count, device_type, widget_id):
+    @staticmethod
+    def push_to_gecko(count, device_type, widget_id):
         post_data = {
             "api_key": settings.GECKOBOARD.api_key,
             "data": {
