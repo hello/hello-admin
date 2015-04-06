@@ -23,7 +23,7 @@ var LineChart = React.createClass({
             lineChart.xAxis
                 .axisLabel(that.props.xlabel)
 //                .tickFormat(function(d) { return d3.time.format('%b %d %H:%M')(new Date(d)); });
-                .tickFormat(function(d) { return d3.time.format('%b %d %H:%M')(new Date(d).toUTCString().split("GMT")[0]); });
+                .tickFormat(function(d) { return d3.time.format('%b %d %H:%M')(new Date(new Date(d).toUTCString().split("GMT")[0])); });
 
             lineChart.yAxis
                 .axisLabel(that.props.ylabel)
@@ -144,6 +144,7 @@ var MotionMaestro = React.createClass({
                 </Col>
             </form>
             <p> All times are displayed using user local timezone </p>
+            <br />
             {alert}
             {stepwiseChart}
             {stairChart}
