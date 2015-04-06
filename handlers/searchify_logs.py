@@ -114,15 +114,7 @@ class SenseLogsAPI(SearchifyLogsHandler):
     Retrieve sense logs
     """
     def get(self):
-
-        new_sense_logs_output = self.get_logs_filtered_by_devices("sense-logs-2015-03")
-        old_sense_logs_output = self.get_logs_filtered_by_devices("sense-logs")
-
-        aggregate_output = {
-            'data': new_sense_logs_output['data'] + old_sense_logs_output['data'],
-            'error': new_sense_logs_output['error'] + old_sense_logs_output['error'],
-            }
-        self.response.write(json.dumps(aggregate_output))
+        self.response.write(json.dumps(self.get_logs_filtered_by_devices("sense-logs-2015-03")))
 
 
 class WorkerLogsAPI(SearchifyLogsHandler):
