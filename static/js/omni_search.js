@@ -4,6 +4,9 @@ var OmniTableContent = React.createClass({
     render: function() {
         var thisContent = this.props.content;
         var combine = Object.keys(thisContent.profile).map(function(k){
+            if (k === "last_modified") {
+                return <tr><td>{k}</td><td>{thisContent.profile[k] ? new Date(thisContent.profile[k]).toString() : "unknown last modified"}</td></tr>;
+            }
             return <tr><td>{k}</td><td>{thisContent.profile[k]}</td></tr>;
         });
 
