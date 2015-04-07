@@ -79,25 +79,24 @@ class BaseRequestHandler(webapp2.RequestHandler):
         s = self.render(template_file, template_values=context)
         self.response.write(s)
 
-    def authorize_session(self, app_info, token=None):
+    def authorize_session(self, app_info, token):
         """
         :param token: token issued to user to use an specific app
         :type token: str
         """
-        if app_info is not None:
-            hello = make_oauth2_service(app_info)
-        else:
-            if settings.APP_INFO is None:
-                self.error(500)
-                self.response.write("Missing AppInfo!")
-            hello = make_oauth2_service(settings.APP_INFO)
+        if app_info is None:
+            self.error(500)
+            self.response.write("Missing AppInfo!")
+        hello = make_oauth2_service(app_info)
 
-        if token is None:  # token could be set to impersonate an user otherwise
-            token = settings.APP_INFO.access_token
+        if token is None:
+            self.error(500)
+            self.response.write("Missing AccessToken!")
+
         return hello.get_session(token)
 
-    def hello_request(self, api_url, body_data="", url_params={}, type="GET"
-                          , impersonatee_token=None, raw_output=False, filter_fields=[], override_app_info=None):
+    def hello_request(self, api_url, body_data="", url_params={}, type="GET", raw_output=False, filter_fields=[]
+                          , access_token=settings.APP_INFO.access_token, app_info=settings.APP_INFO):
         """
         :param api_url: api URL
         :type api_url: str
@@ -107,8 +106,8 @@ class BaseRequestHandler(webapp2.RequestHandler):
         :type url_params: dict
         :param type: http request type, one of ["GET", "POST", "PUT", "PATCH", "DELETE"]
         :type type: str
-        :param impersonatee_token: optional token to represent a user
-        :type impersonatee_token: str
+        :param access_token: optional token to represent a user
+        :type access_token: str
         :param raw_output: boolean value to control output, if raw_ouput is True, return an object rather than a response
         :type raw_output: bool
         :param filter_fields: optional list of fields for filtering
@@ -118,7 +117,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
 
         output = ResponseOutput()
         output.set_viewer(self.current_user.email())
-        session = self.authorize_session(app_info=override_app_info, token=impersonatee_token)
+        session = self.authorize_session(app_info, access_token)
         request_detail = {
             "headers": {'Content-Type': 'application/json'},
         }
