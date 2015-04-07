@@ -51,14 +51,12 @@ class TestUtils(unittest.TestCase):
         draft.delete_by_search(query="all:{}".format(TEST_ID), start=DOCS_KEEP_SIZE, scoring_function=4)
         self.assertEqual(draft.search("all:{}".format(TEST_ID))['matches'], DOCS_KEEP_SIZE)
 
-    def test_documents_conservation(self):
+    def test_documents_conserved(self):
         is_conserved = [draft.search("docid:doc{}".format(i))['matches'] == 1 for i in range(DRAFT_INDEX_SIZE - DOCS_KEEP_SIZE, DRAFT_INDEX_SIZE)]
-        print is_conserved
         self.assertEqual(all(is_conserved), True)
 
     def test_documents_removed(self):
         is_removed = [draft.search("docid:doc{}".format(i))['matches'] == 0 for i in range(DRAFT_INDEX_SIZE - DOCS_KEEP_SIZE)]
-        print is_removed
         self.assertEqual(all(is_removed), True)
 
 if __name__ == '__main__':
