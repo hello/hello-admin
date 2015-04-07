@@ -33,7 +33,6 @@ from handlers.setup import RegisterPillAPI, SetupAPI
 from handlers.setup import UpdateAdminAccessTokenAPI
 from handlers.setup import UpdateGeckoBoardCredentials
 from handlers.teams import TeamsAPI
-from handlers.users import UserAPI
 from handlers.users import OmniSearchAPI
 from handlers.views import BatteryView
 from handlers.keys import SenseKeyProvision
@@ -110,8 +109,7 @@ api_routes = [
     ('/api/teams/?$', TeamsAPI),
     ('/api/troubleshoot/?$', InactiveDevicesAPI),
     ('/api/searchify_stats/?$', SearchifyStatsAPI),
-    ('/api/user/?$', UserAPI),
-    ('/api/users/recent/?$', RecentUsersAPI),
+    ('/api/recent_users/?$', RecentUsersAPI),
     ('/api/zendesk/?$', ZendeskAPI),
     ('/api/zendesk_stats/?$', ZendeskStatsAPI),
     ('/api/zendesk_history/?$', ZendeskHistoryAPI),
