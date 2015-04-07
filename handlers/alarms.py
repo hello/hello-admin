@@ -9,7 +9,7 @@ class AlarmsAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="alarms",
             type="GET",
-            impersonatee_token=impersonatee_token
+            access_token=impersonatee_token
         )
     def post(self):
         ''' Set an alarm '''
@@ -17,6 +17,6 @@ class AlarmsAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="alarms/{}".format(body['client_time_utc']),
             type="POST",
-            impersonatee_token=body['impersonatee_token'],
+            access_token=body['impersonatee_token'],
             body_data=json.dumps(body['data'])
         )

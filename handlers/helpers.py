@@ -117,7 +117,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
 
         output = ResponseOutput()
         output.set_viewer(self.current_user.email() if self.current_user is not None else "cron-bot")
-        
+
         session = self.authorize_session(app_info, access_token)
         request_detail = {
             "headers": {'Content-Type': 'application/json'},
