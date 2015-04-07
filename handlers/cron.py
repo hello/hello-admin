@@ -183,7 +183,7 @@ class GeckoboardPush(BaseRequestHandler):
         senses_status_breakdown = self.hello_request(
             type="GET",
             api_url="devices/status_breakdown",
-            override_app_info=settings.ADMIN_APP_INFO,
+            app_info=settings.ADMIN_APP_INFO,
         ).data
 
         if settings.GECKOBOARD is None:
