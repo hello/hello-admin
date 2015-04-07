@@ -10,6 +10,7 @@ var LinkToUserDashboard = React.createClass({
         return <span className="cursor-custom" onClick={this.populateUserSearchEmail}>{this.props.email}</span>
     }
 });
+
 var UserRow = React.createClass({
     componentDidMount: function() {
         $('.tablesorter').tablesorter({
@@ -40,7 +41,6 @@ var UserRow = React.createClass({
         );
     }
 });
-
 
 var UserTable = React.createClass({
     getInitialState: function() {
@@ -161,7 +161,7 @@ var RecentUsersBox = React.createClass({
     },
     loadRecentUsersFromServer: function(){
         $.ajax({
-          url: '/api/user',
+          url: '/api/recent_users',
           dataType: 'json',
           type: 'GET',
           success: function(response) {

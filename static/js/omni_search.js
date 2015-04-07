@@ -8,23 +8,30 @@ var OmniTableContent = React.createClass({
         });
 
         thisContent.devices.forEach(function(device){
+            console.log(device.deviceId);
             var debugLogLink = device.type === "PILL" ?
-                <a href={"/battery/?search=" + device.device_id} target="_blank" title="See pill status">
-                    <Label bsStyle= {device.state === "NORMAL" ? "success": "danger"}>{device.device_id}</Label>
+                <a href={"/battery/?search=" + device.deviceId} target="_blank" title="See pill status">
+                    <Label bsStyle= {device.state === "NORMAL" ? "success" : (device.state === "UNPAIRED" ? "danger" : "warning")}>{device.deviceId}</Label>
                 </a>
                 :
-                <a href={"/sense_logs/?devices=" + device.device_id} target="_blank" title="Go to sense log">
-                    <Label bsStyle= {device.state === "NORMAL" ? "success": "danger"}>{device.device_id}</Label>
+                <a href={"/sense_logs/?devices=" + device.deviceId} target="_blank" title="Go to sense log">
+                    <Label bsStyle= {device.state === "NORMAL" ? "success" : (device.state === "UNPAIRED" ? "danger" : "warning")}>{device.deviceId}</Label>
                 </a>;
             var deviceLabel = [
                 <span>{device.type}</span>, <br/>,
                 debugLogLink, <br/>,
-                <a href={"/key_store/?device=" + device.device_id + "&type=" + device.type.toLowerCase()} target="_blank">view KeyStore</a>
+                <a href={"/key_store/?device=" + device.deviceId + "&type=" + device.type.toLowerCase()} target="_blank">view KeyStore</a>
             ];
             var deviceDetail = [
-                <span>last seen: {new Date(device.last_updated).toLocaleString()}</span>, <br/>,
+                device.lastSeen > new Date().getTime() - 14*24*3600 ?
+                <span>last seen: {device.lastSeen ? new Date(device.lastSeen).toString() : "unknown last seen"}</span> :
+                <span>last seen: <span className="inactive-devices">{device.lastSeen ? new Date(device.lastSeen).toString() : "unknown last seen"}</span></span>
+                , <br/>,
                 <span>state: {device.state}</span>, <br/>,
-                <span>firmware version: {device.firmware_version}</span>, <br/>
+                debugLogLink = device.type === "SENSE" ?
+                <span>firmware version: {device.firmwareVersion || "unknown firmware"}</span>:
+                <span>battery level: {device.batteryLevel || "unknown battery level"}</span>,
+                <br/>
             ];
 
             combine.unshift(
@@ -63,7 +70,7 @@ var OmniResultsTable = React.createClass({
         var preview = this.props.data.map(function(d){
             var devices = d.devices.map(function(device){
                 return <div>
-                    <span className="cursor-custom" onClick={that.populateSearch}>{device.device_id}</span>
+                    <span className="cursor-custom" onClick={that.populateSearch}>{device.deviceId}</span>
                 </div>;
             });
             return <Alert><Table>
