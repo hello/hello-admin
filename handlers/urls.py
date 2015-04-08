@@ -6,9 +6,10 @@ from handlers.timeline import TimelineAPI
 import settings
 from handlers.configuration import FeaturesAPI
 from handlers.cron import ZendeskCronHandler
-from handlers.cron import SenseLogsPurge
-from handlers.cron import ApplicationLogsPurge
-from handlers.cron import SearchifyLogsPurgeQueue
+from handlers.cron import SensePurge
+from handlers.cron import ApplicationPurge
+from handlers.cron import WorkersPurge
+from handlers.cron import SearchifyPurgeQueue
 from handlers.cron import GeckoboardPush
 from handlers.zendesk import ZendeskAPI
 from handlers.zendesk import ZendeskStatsAPI
@@ -82,10 +83,11 @@ from handlers.setup import AppendAppInfo
 from handlers.users import ForcePasswordUpdateAPI
 
 cron_routes = [
-    ('/cron/sense_logs_purge', SenseLogsPurge),
-    ('/cron/application_logs_purge/?$', ApplicationLogsPurge),
+    ('/cron/sense_purge/?$', SensePurge),
+    ('/cron/application_purge/?$', ApplicationPurge),
+    ('/cron/workers_purge/?$', WorkersPurge),
+    ('/cron/searchify_purge_queue/?$', SearchifyPurgeQueue),
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
-    ('/cron/searchify_logs_purge_queue', SearchifyLogsPurgeQueue),
     ('/cron/geckoboard_push', GeckoboardPush),
 ]
 

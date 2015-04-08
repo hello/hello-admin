@@ -6,6 +6,7 @@ import requests
 import settings
 from handlers.analysis import get_zendesk_stats
 from handlers.helpers import BaseRequestHandler
+from handlers.helpers import ResponseOutput
 from handlers.utils import display_error
 from handlers.utils import get_current_pacific_datetime
 from models.ext import ZendeskDailyStats
@@ -64,119 +65,79 @@ class ZendeskCronHandler(BaseRequestHandler):
             log.error('ERROR: {}'.format(display_error(e)))
 
 
-class SearchifyHandler(BaseRequestHandler):
-    def get_searchify_index(self, index):
+class SearchifyPurgeHandler(BaseRequestHandler):
+    @staticmethod
+    def get_searchify_index(index):
         searchify_entity = settings.SEARCHIFY
         if not searchify_entity:
             raise RuntimeError("Missing AppInfo. Bailing.")
         return ApiClient(searchify_entity.api_client).get_index(index)
 
-    def identify_old_docs(self, index, query, time_threshold, start, limit, exception_keywords=[]):
-        delete_docid_list = []
-        if "1" not in index.list_functions():
-            # Customize scoring to present oldest documents first regardless of relevance to query
-            index.add_function(1, "age + 0*relevance")
-        search_uploading = index.search(query=query, fetch_fields=['timestamp', 'text'], start=start, length=limit, scoring_function=1)['results']
+    def mass_purge(self, index, level=None, keep=700000):
+        output = ResponseOutput()
+        query = "text:{}".format(level.upper()) if level else "all:1"
 
-        for s in search_uploading:
-            if not exception_keywords:
-                if datetime.datetime.fromtimestamp(int(s['timestamp'])) < time_threshold:
-                    delete_docid_list.append(s['docid'])
-            else:
-                if datetime.datetime.fromtimestamp(int(s['timestamp'])) < time_threshold \
-                        and not any([exception_keyword in s["text"] for exception_keyword in exception_keywords]):
-                    delete_docid_list.append(s['docid'])
+        try:
+            index.add_function(4, "doc.var[0]")
+            index.delete_by_search(query=query, start=keep, scoring_function=4)
+            output.set_status(204)
+        except Exception as e:
+            output.set_error(e.message)
+            output.set_status(500)
 
-        return delete_docid_list
-
-    def gather_purge_ids(self, index, query_keywords, time_threshold, maxdocs=50, exception_keywords=[]):
-        old_docs_list = []
-        for q in query_keywords:
-            old_docs_list += self.identify_old_docs(index=index, query=q, time_threshold=time_threshold, start=0, limit=50)
-        return list(set(old_docs_list))[:maxdocs]
-
-    def delete_old_docs(self, index, docid_list):
-        return index.delete_documents(docid_list)
+        self.response.write(json.dumps(output))
 
 
-class SenseLogsPurge(SearchifyHandler):
+class SensePurge(SearchifyPurgeHandler):
     def get(self):
-        sense_logs_index = self.get_searchify_index('sense-logs')
+        self.mass_purge(index=self.get_searchify_index(settings.SENSE_LOGS_INDEX),
+                        keep=self.request.get("keep", 900000))
 
-        old_docs_to_be_deleted_list = self.gather_purge_ids(
-            index=sense_logs_index,
-            query_keywords=['text:uart', 'text:uploading', 'text:sending', 'text:complete', 'text:success', 'text:dev', 'text:hello', 'text:morpheus'],
-            time_threshold=datetime.datetime.now() + datetime.timedelta(days=-7)
+
+class ApplicationPurge(SearchifyPurgeHandler):
+    def get(self):
+        self.mass_purge(index=self.get_searchify_index(settings.APPLICATION_LOGS_INDEX),
+                        level=self.request.get("level", "INFO"),
+                        keep=self.request.get("keep", 900000))
+
+
+class WorkersPurge(SearchifyPurgeHandler):
+    def get(self):
+        self.mass_purge(index=self.get_searchify_index(settings.WORKERS_LOGS_INDEX),
+                        level=self.request.get("level", "INFO"),
+                        keep=self.request.get("keep", 900000))
+
+
+class SearchifyPurgeQueue(SearchifyPurgeHandler):
+    def get(self):
+        taskqueue.add(
+            url='/cron/sense_purge',
+            params={
+                'keep': settings.SENSE_LOGS_KEEP
+            },
+            method="GET",
+            queue_name="sense_purge"
         )
 
-        output = {
-            'old_docs_to_be_deleted': old_docs_to_be_deleted_list,
-            'count': len(old_docs_to_be_deleted_list),
-            }
-        try:
-            output['searchify_response'] = self.delete_old_docs(sense_logs_index, old_docs_to_be_deleted_list)
-        except Exception as e:
-            output['error'] = e.message
-        self.response.write(json.dumps(output))
-
-
-class ApplicationLogsPurge(SearchifyHandler):
-    def get(self):
-        application_logs_index = self.get_searchify_index('application-logs')
-        level = self.request.get('level')
-        tolerance_in_days = int(self.request.get('tolerance_in_days', 7))
-
-        output = {'level': level}
-
-        try:
-            old_docs_to_be_deleted_list = self.gather_purge_ids(
-                index=application_logs_index,
-                query_keywords=['text:{}'.format(level)],
-                time_threshold=datetime.datetime.now() - datetime.timedelta(days=tolerance_in_days),
-                maxdocs=50
-            )
-
-            output.update({
-                'old_docs_to_be_deleted': old_docs_to_be_deleted_list,
-                'count': len(old_docs_to_be_deleted_list),
-                'searchify_response': self.delete_old_docs(application_logs_index, old_docs_to_be_deleted_list) if old_docs_to_be_deleted_list else "No docs to be deleted"
-            })
-
-        except Exception as e:
-            output['error'] = e.message
-            if 'HTTP 400' in e.message:
-                log.info('No Docs ID to be deleted for level {} - tolerance = {} days'.format(level, tolerance_in_days))
-        self.response.write(json.dumps(output))
-
-
-class SearchifyLogsPurgeQueue(SearchifyHandler):
-    def get(self):
-        queue_sizes = {
-            'DEBUG': 1,
-            'INFO': 3,
-            'WARN': 2,
-            'ERROR': 1,
-        }
-
-        tolerance_in_days = {
-            'DEBUG': 3,
-            'INFO': 2,
-            'WARN': 3,
-            'ERROR': 7,
-        }
-
         for level in ['DEBUG', 'INFO', 'WARN', 'ERROR']:
-            for j in range(queue_sizes[level]):
-                taskqueue.add(
-                    url='/cron/application_logs_purge',
-                    params={
-                        'level': '{}'.format(level),
-                        'tolerance_in_days': tolerance_in_days[level]
-                    },
-                    method="GET"
-                )
-
-        self.response.write(json.dumps({'queue': 'active'}))
+            taskqueue.add(
+                url='/cron/application_purge',
+                params={
+                    'level': '{}'.format(level),
+                    'keep': settings.APPLICATION_LOGS_KEEP[level]
+                },
+                method="GET",
+                queue_name="application_purge"
+            )
+            taskqueue.add(
+                url='/cron/workers_purge',
+                params={
+                    'level': '{}'.format(level),
+                    'keep': settings.WORKERS_LOGS_KEEP[level]
+                },
+                method="GET",
+                queue_name="workers_purge"
+            )
 
 
 class GeckoboardPush(BaseRequestHandler):
