@@ -1,6 +1,6 @@
 import unittest
 import datetime
-from utils import iso_to_utc_timestamp, iso_to_pacific_datetime_obj, iso_to_human_timestring
+from handlers.utils import iso_to_utc_timestamp, iso_to_pacific_datetime_obj, iso_to_human_timestring
 import pytz
 
 utc_timezone = pytz.timezone("UTC")
