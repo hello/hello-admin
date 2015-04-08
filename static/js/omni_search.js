@@ -27,13 +27,13 @@ var OmniTableContent = React.createClass({
             ];
             var deviceDetail = [
                 device.lastSeen > new Date().getTime() - 14*24*3600 ?
-                <span>last seen: {device.lastSeen ? new Date(device.lastSeen).toString() : "unknown last seen"}</span> :
-                <span>last seen: <span className="inactive-devices">{device.lastSeen ? new Date(device.lastSeen).toString() : "unknown last seen"}</span></span>
+                <span>last seen: {device.lastSeen ?  d3.time.format('%a %b %d %H:%M %Z')(new Date(device.lastSeen)) : "unknown last seen"}</span> :
+                <span>last seen: <span className="inactive-devices">{device.lastSeen ? d3.time.format('%a %b %d %H:%M %Z')(new Date(device.lastSeen)) : "unknown last seen"}</span></span>
                 , <br/>,
                 <span>state: {device.state}</span>, <br/>,
                 debugLogLink = device.type === "SENSE" ?
                 <span>firmware version: {device.firmwareVersion || "unknown firmware"}</span>:
-                <span>battery level: {device.batteryLevel || "unknown battery level"}</span>,
+                <span>battery level: click on pill badge to see</span>,
                 <br/>
             ];
 

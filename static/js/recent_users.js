@@ -24,7 +24,7 @@ var UserRow = React.createClass({
     render: function() {
         var chosenUserAttr = this.props.userAttr, attrVal;
         if (chosenUserAttr === 'last_modified')
-            attrVal = new Date(this.props.user[chosenUserAttr]).toLocaleString();
+            attrVal =  d3.time.format('%a %b %d %H:%M %Z')(new Date(this.props.user[chosenUserAttr]));
         else
             attrVal = this.props.user[chosenUserAttr];
         var rowValClasses = React.addons.classSet({
