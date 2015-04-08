@@ -90,7 +90,7 @@ class SearchifyPurgeHandler(BaseRequestHandler):
             output.set_error("No need to purge since current size is {} while keep size is {}".format(current_size, keep_size))
             output.set_status(400)
 
-        self.response.write(json.dumps(output))
+        self.response.write(output.get_serialized_output())
 
 
 class SensePurge(SearchifyPurgeHandler):
