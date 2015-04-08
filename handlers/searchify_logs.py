@@ -1,19 +1,17 @@
 import json
+import settings
 import logging as log
 from handlers.helpers import ProtectedRequestHandler
 from handlers.utils import stripStringToList, display_error
 from handlers.utils import get_pacific_time_from_epoch_seconds
 from indextank import ApiClient
-import settings
 
-__author__ = 'zet'
 
 
 class SearchifyLogsHandler(ProtectedRequestHandler):
     """
     Retrieve debug logs
     """
-
     def normalize_epoch(self, ts, index_name):
         if "sense" in index_name:
             return ts
@@ -106,7 +104,7 @@ class ApplicationLogsAPI(SearchifyLogsHandler):
     Retrieve application logs
     """
     def get(self):
-        self.response.write(json.dumps(self.get_logs_filtered_by_levels_orgins_versions("application-logs-2015-03")))
+        self.response.write(json.dumps(self.get_logs_filtered_by_levels_orgins_versions(settings.APPLICATION_LOGS_INDEX)))
 
 
 class SenseLogsAPI(SearchifyLogsHandler):
@@ -114,7 +112,7 @@ class SenseLogsAPI(SearchifyLogsHandler):
     Retrieve sense logs
     """
     def get(self):
-        self.response.write(json.dumps(self.get_logs_filtered_by_devices("sense-logs-2015-03")))
+        self.response.write(json.dumps(self.get_logs_filtered_by_devices(settings.SENSE_LOGS_INDEX)))
 
 
 class WorkerLogsAPI(SearchifyLogsHandler):
@@ -122,7 +120,7 @@ class WorkerLogsAPI(SearchifyLogsHandler):
     Retrieve worker logs
     """
     def get(self):
-        self.response.write(json.dumps(self.get_logs_filtered_by_levels_orgins_versions("workers-logs-2015-03")))
+        self.response.write(json.dumps(self.get_logs_filtered_by_levels_orgins_versions(settings.WORKERS_LOGS_INDEX)))
 
 
 class SearchifyStatsAPI(ProtectedRequestHandler):

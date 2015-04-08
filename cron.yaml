@@ -5,12 +5,6 @@ cron:
 - description: geckoboard push
   url: /cron/geckoboard_push
   schedule: every 2 mins
-#- description: sense logs purge
-#  url: /cron/sense_logs_purge
-#  schedule: every 1 mins
-#- description: searchify logs purge queue
-#  url: /cron/searchify_logs_purge_queue
-#  schedule: every 1 mins
-#- description: sense logs purge
-#  url: /cron/
-#  schedule: every 1 mins
+- description: searchify purge queue
+  url: /cron/searchify_purge_queue
+  schedule: every 60 mins

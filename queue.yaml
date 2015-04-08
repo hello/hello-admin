@@ -1,6 +1,21 @@
 queue:
 - name: default
-  rate: 20/m
+  rate: 1/m
   retry_parameters:
     task_retry_limit: 2
     task_age_limit: 10m
+- name: sense-purge
+  rate: 1/m
+  retry_parameters:
+    task_retry_limit: 1
+    task_age_limit: 5m
+- name: application-purge
+  rate: 1/m
+  retry_parameters:
+    task_retry_limit: 1
+    task_age_limit: 5m
+- name: workers-purge
+  rate: 1/m
+  retry_parameters:
+    task_retry_limit: 1
+    task_age_limit: 5m
