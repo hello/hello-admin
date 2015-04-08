@@ -5,7 +5,6 @@ var ForcePasswordUpdateMaestro = React.createClass({
         return {alert: ""}
     },
     handleSubmit: function() {
-        $preloader.fadeIn('fast');
         var that = this;
         var passwordInput = $("#force-password-input-1").val();
         if (passwordInput !== $("#force-password-input-2").val()) {
@@ -37,7 +36,6 @@ var ForcePasswordUpdateMaestro = React.createClass({
                     that.setState({alert: e.toString});
                 }.bind(that)
             });
-            $preloader.fadeOut('fast');
             return false;
         }
     },

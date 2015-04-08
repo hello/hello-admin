@@ -140,7 +140,6 @@ var ConfigMaestro = React.createClass({
   },
 
   handleSubmit: function() {
-    $preloader.fadeIn('fast');
     var that = this;
     var submitData = {
       feature: $('#feature-input').val(),
@@ -167,7 +166,6 @@ var ConfigMaestro = React.createClass({
         console.error(status, err);
       }.bind(this)
     });
-    $preloader.fadeOut('fast');
   },
 
   render: function () {
