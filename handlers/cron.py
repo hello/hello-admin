@@ -67,23 +67,28 @@ class ZendeskCronHandler(BaseRequestHandler):
 
 class SearchifyPurgeHandler(BaseRequestHandler):
     @staticmethod
-    def get_searchify_index(index):
+    def get_searchify_index(index_name):
         searchify_entity = settings.SEARCHIFY
         if not searchify_entity:
             raise RuntimeError("Missing AppInfo. Bailing.")
-        return ApiClient(searchify_entity.api_client).get_index(index)
+        return ApiClient(searchify_entity.api_client).get_index(index_name)
 
-    def mass_purge(self, index, level=None, keep=700000):
+    def mass_purge(self, index, level=None, keep_size=700000):
         output = ResponseOutput()
         query = "text:{}".format(level.upper()) if level else "all:1"
+        current_size = index.search(query=query)['matches']
 
-        try:
-            index.add_function(4, "doc.var[0]")
-            index.delete_by_search(query=query, start=int(keep), scoring_function=4)
-            output.set_status(204)
-        except Exception as e:
-            output.set_error(e.message)
-            output.set_status(500)
+        if current_size > int(keep_size):
+            try:
+                index.add_function(4, "doc.var[0]")
+                index.delete_by_search(query=query, start=int(keep_size), scoring_function=4)
+                output.set_status(204)
+            except Exception as e:
+                output.set_error(e.message)
+                output.set_status(500)
+        else:
+            output.set_error("No need to purge since current size is {} while keep size is {}".format(current_size, keep_size))
+            output.set_status(400)
 
         self.response.write(json.dumps(output))
 
@@ -91,21 +96,21 @@ class SearchifyPurgeHandler(BaseRequestHandler):
 class SensePurge(SearchifyPurgeHandler):
     def get(self):
         self.mass_purge(index=self.get_searchify_index(settings.SENSE_LOGS_INDEX),
-                        keep=self.request.get("keep", 900000))
+                        keep_size=self.request.get("keep_size", 900000))
 
 
 class ApplicationPurge(SearchifyPurgeHandler):
     def get(self):
         self.mass_purge(index=self.get_searchify_index(settings.APPLICATION_LOGS_INDEX),
                         level=self.request.get("level", "INFO"),
-                        keep=self.request.get("keep", 900000))
+                        keep_size=self.request.get("keep_size", 900000))
 
 
 class WorkersPurge(SearchifyPurgeHandler):
     def get(self):
         self.mass_purge(index=self.get_searchify_index(settings.WORKERS_LOGS_INDEX),
                         level=self.request.get("level", "INFO"),
-                        keep=self.request.get("keep", 900000))
+                        keep_size=self.request.get("keep_size", 900000))
 
 
 class SearchifyPurgeQueue(SearchifyPurgeHandler):
@@ -113,7 +118,7 @@ class SearchifyPurgeQueue(SearchifyPurgeHandler):
         taskqueue.add(
             url='/cron/sense_purge',
             params={
-                'keep': settings.SENSE_LOGS_KEEP
+                'keep_size': settings.SENSE_LOGS_KEEP_SIZE
             },
             method="GET",
             queue_name="sense_purge"
@@ -124,7 +129,7 @@ class SearchifyPurgeQueue(SearchifyPurgeHandler):
                 url='/cron/application_purge',
                 params={
                     'level': '{}'.format(level),
-                    'keep': settings.APPLICATION_LOGS_KEEP[level]
+                    'keep_size': settings.APPLICATION_LOGS_KEEP_SIZE[level]
                 },
                 method="GET",
                 queue_name="application_purge"
@@ -133,7 +138,7 @@ class SearchifyPurgeQueue(SearchifyPurgeHandler):
                 url='/cron/workers_purge',
                 params={
                     'level': '{}'.format(level),
-                    'keep': settings.WORKERS_LOGS_KEEP[level]
+                    'keep_size': settings.WORKERS_LOGS_KEEP_SIZE[level]
                 },
                 method="GET",
                 queue_name="workers_purge"
