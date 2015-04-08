@@ -37,6 +37,34 @@ APPLICATION_LOGS_INDEX = "application-logs-2015-03"
 WORKERS_LOGS_INDEX = "workers-logs-2015-03"
 
 ## Keep N newest docs from being purged
-SENSE_LOGS_KEEP_SIZE = 500000
-APPLICATION_LOGS_KEEP_SIZE = {'DEBUG': 100000, 'INFO': 300000, 'WARN': 100000, 'ERROR': 400000}
-WORKERS_LOGS_KEEP_SIZE = {'DEBUG': 100000, 'INFO': 300000, 'WARN': 100000, 'ERROR': 400000}
+SENSE_LOGS_KEEP_SIZE = 558000  # * 3 days * 465 active-senses * 400 sense-docs/active-sense day
+APPLICATION_LOGS_KEEP_SIZE = {
+    'DEBUG': 41850, # 3 days * 465 active-senses * 30 app-debug-docs/active-sense day
+    'INFO': 348750,  # 3 days * 465 active-senses * 250 app-info-docs/active-sense day
+    'WARN': 104625, # 3 days * 465 active-senses * 75 app-warn-docs/active-sense day
+    'ERROR': 97650 # at least 7 days * 465 active-senses * 30 app-error-docs/active-sense day
+}
+WORKERS_LOGS_KEEP_SIZE = {
+    'DEBUG': 5000, # No history so far
+    'INFO': 41850,  # 3 days * 465 active-senses * 55 app-info-docs/active-sense day
+    'WARN': 104625, # 3 days * 465 active-senses * 30 app-warn-docs/active-sense day
+    'ERROR': 97650 # 7 days * 465 active-senses * 30 app-error-docs/active-sense day
+}
+
+
+## Keep N lastest days of docs from being purge
+SEARCHIFY_LOGS_KEEP_DAYS = {
+    SENSE_LOGS_INDEX: 3,
+    APPLICATION_LOGS_INDEX: {
+        "DEBUG": 3,
+        "INFO": 3,
+        "WARN": 3,
+        "ERROR": 7
+    },
+    WORKERS_LOGS_INDEX: {
+        "DEBUG": 5,
+        "INFO": 3,
+        "WARN": 3,
+        "ERROR": 7
+    }
+}

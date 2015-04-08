@@ -9,6 +9,7 @@ from handlers.helpers import BaseRequestHandler
 from handlers.helpers import ResponseOutput
 from handlers.utils import display_error
 from handlers.utils import get_current_pacific_datetime
+from handlers.utils import epoch_to_human
 from models.ext import ZendeskDailyStats
 from indextank import ApiClient
 
@@ -66,6 +67,13 @@ class ZendeskCronHandler(BaseRequestHandler):
 
 
 class SearchifyPurgeHandler(BaseRequestHandler):
+
+    @staticmethod
+    def normalize_epoch(ts, index_name):
+        if "sense" in index_name:
+            return ts
+        return 1000*int(ts)
+
     @staticmethod
     def get_searchify_index(index_name):
         searchify_entity = settings.SEARCHIFY
@@ -73,7 +81,7 @@ class SearchifyPurgeHandler(BaseRequestHandler):
             raise RuntimeError("Missing AppInfo. Bailing.")
         return ApiClient(searchify_entity.api_client).get_index(index_name)
 
-    def mass_purge(self, index, level=None, keep_size=700000):
+    def mass_purge_by_keep_size(self, index, level=None, keep_size=700000):
         output = ResponseOutput()
         query = "text:{}".format(level.upper()) if level else "all:1"
         current_size = index.search(query=query)['matches']
@@ -92,25 +100,54 @@ class SearchifyPurgeHandler(BaseRequestHandler):
 
         self.response.write(output.get_serialized_output())
 
+    def mass_purge_by_keep_days(self, index_name, keep_days=30, level=None):
+        output = ResponseOutput()
+        query = "text:{}".format(level.upper()) if level else "all:1"
+        index = self.get_searchify_index(index_name)
+        now = time.time()
+        try:
+            start_ts = None
+            end_ts = self.normalize_epoch(now - int(keep_days) * 24 * 3600, index_name)
+
+            delete_query_params = {'query': query, 'docvar_filters': {0: [[start_ts, end_ts]]}}
+            purge_size = index.search(**delete_query_params)['matches']
+
+            if purge_size > 0:
+                log.info("About to purge {} documents from index {} over {} days, "
+                         "i.e. before {}".format(purge_size, index_name, keep_days, epoch_to_human(end_ts)))
+                index.delete_by_search(**delete_query_params)
+            else:
+                log.info("No need to purge because there is no document older than {} days".format(keep_days))
+            output.set_data({
+                "purge_size": purge_size,
+                "index_name": index_name,
+                "level": level,
+                "keep_days": int(keep_days),
+                "end_ts": epoch_to_human(end_ts)
+            })
+            output.set_status(204)
+        except Exception as e:
+            output.set_error(e.message)
+            output.set_status(500)
+        self.response.write(output.get_serialized_output())
 
 class SensePurge(SearchifyPurgeHandler):
     def get(self):
-        self.mass_purge(index=self.get_searchify_index(settings.SENSE_LOGS_INDEX),
-                        keep_size=self.request.get("keep_size", 900000))
+        self.mass_purge_by_keep_days(index_name=settings.SENSE_LOGS_INDEX,
+                                     keep_days=self.request.get("keep_days", 30))
 
 
 class ApplicationPurge(SearchifyPurgeHandler):
     def get(self):
-        self.mass_purge(index=self.get_searchify_index(settings.APPLICATION_LOGS_INDEX),
-                        level=self.request.get("level", "INFO"),
-                        keep_size=self.request.get("keep_size", 900000))
-
+        self.mass_purge_by_keep_days(index_name=settings.APPLICATION_LOGS_INDEX,
+                                     keep_days=self.request.get("keep_days", 30),
+                                     level=self.request.get("level", "INFO"))
 
 class WorkersPurge(SearchifyPurgeHandler):
     def get(self):
-        self.mass_purge(index=self.get_searchify_index(settings.WORKERS_LOGS_INDEX),
-                        level=self.request.get("level", "INFO"),
-                        keep_size=self.request.get("keep_size", 900000))
+        self.mass_purge_by_keep_days(index_name=settings.WORKERS_LOGS_INDEX,
+                                     keep_days=self.request.get("keep_days", 30),
+                                     level=self.request.get("level", "INFO"))
 
 
 class SearchifyPurgeQueue(SearchifyPurgeHandler):
@@ -118,10 +155,10 @@ class SearchifyPurgeQueue(SearchifyPurgeHandler):
         taskqueue.add(
             url='/cron/sense_purge',
             params={
-                'keep_size': settings.SENSE_LOGS_KEEP_SIZE
+                'keep_days': settings.SEARCHIFY_LOGS_KEEP_DAYS[settings.SENSE_LOGS_INDEX]
             },
             method="GET",
-            queue_name="sense_purge"
+            queue_name="sense-purge"
         )
 
         for level in ['DEBUG', 'INFO', 'WARN', 'ERROR']:
@@ -129,19 +166,19 @@ class SearchifyPurgeQueue(SearchifyPurgeHandler):
                 url='/cron/application_purge',
                 params={
                     'level': '{}'.format(level),
-                    'keep_size': settings.APPLICATION_LOGS_KEEP_SIZE[level]
+                    'keep_days': settings.SEARCHIFY_LOGS_KEEP_DAYS[settings.APPLICATION_LOGS_INDEX][level.upper()]
                 },
                 method="GET",
-                queue_name="application_purge"
+                queue_name="application-purge"
             )
             taskqueue.add(
                 url='/cron/workers_purge',
                 params={
                     'level': '{}'.format(level),
-                    'keep_size': settings.WORKERS_LOGS_KEEP_SIZE[level]
+                    'keep_days': settings.SEARCHIFY_LOGS_KEEP_DAYS[settings.WORKERS_LOGS_INDEX][level.upper()]
                 },
                 method="GET",
-                queue_name="workers_purge"
+                queue_name="workers-purge"
             )
 
 

@@ -4,6 +4,7 @@ import logging as log
 from datetime import datetime
 import calendar
 import pytz
+import time
 from google.appengine.api import memcache
 
 
@@ -76,3 +77,10 @@ def extract_dicts_by_fields(dicts, fields):
         raise TypeError("Expecting input as lists")
     return [{field: d.get(field, None) for field in fields} for d in dicts]
 
+def epoch_to_human(ts):
+    """
+    :param ts: epoch timestamp
+    :type ts: int
+    :return humdan datetime string
+    """
+    return time.strftime("%Y/%m/%d %H:%M:%S %Z", time.localtime(ts/1000 if ts > 10**10 else ts))
