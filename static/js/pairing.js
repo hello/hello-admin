@@ -2,7 +2,7 @@
 
 var PairingMaestro = React.createClass({
     getInitialState: function () {
-        return {unlinkToken: "", linkToken: "", devices: [], linkAlert: "", unlinkAlert: ""}
+        return {unlinkToken: "", linkToken: "", devices: {senses: [], pills: []}, linkAlert: "", unlinkAlert: ""}
     },
 
     listDevices: function() {
@@ -14,10 +14,10 @@ var PairingMaestro = React.createClass({
             data: {email: $('#username-input-unlink').val()},
             success: function(response) {
                 console.log(response);
-                that.setState({devices: response.data});
+                that.setState({devices: response});
             }.bind(that),
             error: function(e) {
-                that.setState({devices: []});
+                that.setState({devices: {senses: [], pills: []}});
             }.bind(that)
         })
     },
@@ -137,9 +137,14 @@ var PairingMaestro = React.createClass({
         var selectNarration = (!currentUserInput || currentUserInput.isWhiteString()) ?
             "Loading devices list ...": "Select a device of ".concat(currentUserInput);
         var options = [<option value="">{selectNarration}</option>];
-        this.state.devices.forEach(function(device){
-            var deviceInfo = [device.type, device.device_id].join(' - ');
-            options.push(<option value={deviceInfo}>{deviceInfo}</option>)
+        console.log(this.state);
+        this.state.devices.senses.forEach(function(device){
+            var senseInfo = ["SENSE", device.device_account_pair.externalDeviceId].join(' - ');
+            options.push(<option value={senseInfo}>{senseInfo}</option>)
+        });
+        this.state.devices.pills.forEach(function(device){
+            var pillInfo = ["PILL", device.device_account_pair.externalDeviceId].join(' - ');
+            options.push(<option value={pillInfo}>{pillInfo}</option>)
         });
         var linkAlert = (this.state.linkAlert.isWhiteString()) ? null:
             <Row>

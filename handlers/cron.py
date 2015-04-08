@@ -188,7 +188,7 @@ class GeckoboardPush(BaseRequestHandler):
             type="GET",
             api_url="devices/status_breakdown",
             raw_output=True,
-            override_app_info=settings.ADMIN_APP_INFO,
+            app_info=settings.ADMIN_APP_INFO,
             url_params={'start_ts': int(time.time()*1000) - 24*3600*1000, 'end_ts': int(time.time()*1000)}
         ).data
 

@@ -46,6 +46,3 @@ class UserGroup(ndb.Model):
     super_firmware = ndb.StringProperty(required=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
 
-
-class RecentUsers(ndb.Model):
-    recent_users = ndb.StringProperty(required=True)

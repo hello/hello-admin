@@ -3,6 +3,7 @@ import os
 import json
 import settings
 import requests
+import time
 from utils import iso_to_utc_timestamp
 from handlers.helpers import CustomerExperienceRequestHandler
 from handlers.helpers import ProtectedRequestHandler
@@ -16,19 +17,6 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 )
 
 
-class UserAPI(ProtectedRequestHandler):
-    def get(self):
-        """
-        Grab users by email / list of recent users
-        """
-        email = self.request.get('email', default_value="")
-        self.hello_request(
-            api_url="account/q" if email != "" else "account/recent",
-            type="GET",
-            url_params={'email': email},
-        )
-
-
 class OmniSearchAPI(ProtectedRequestHandler):
 
     @property
@@ -40,7 +28,7 @@ class OmniSearchAPI(ProtectedRequestHandler):
             api_url="account",
             type="GET",
             url_params={'id': int(self.omni_input)} if self.omni_input.isdigit() else {'email': self.omni_input},
-            override_app_info=settings.ADMIN_APP_INFO,
+            app_info=settings.ADMIN_APP_INFO,
             raw_output=True
         )
 
@@ -49,7 +37,7 @@ class OmniSearchAPI(ProtectedRequestHandler):
             api_url="account/partial",
             type="GET",
             url_params={'email': self.omni_input}  if 'a' in self.omni_input else {'name': self.omni_input},
-            override_app_info=settings.ADMIN_APP_INFO,
+            app_info=settings.ADMIN_APP_INFO,
             raw_output=True
         )
 
@@ -57,17 +45,60 @@ class OmniSearchAPI(ProtectedRequestHandler):
         return self.hello_request(
             api_url="devices/{}/accounts".format(self.omni_input),
             type="GET",
-            override_app_info=settings.ADMIN_APP_INFO,
+            app_info=settings.ADMIN_APP_INFO,
             raw_output=True
         )
 
     def get_devices_info_by_email(self, email):
-        return self.hello_request(
-            api_url="devices/specs",
-            type="GET",
-            url_params={'email': email},
-            raw_output=True
-        ).data
+        senses = self.hello_request(
+                api_url="devices/sense",
+                type="GET",
+                url_params={'email': email},
+                app_info=settings.ADMIN_APP_INFO,
+                raw_output=True
+            ).data
+        pills = self.hello_request(
+                api_url="devices/pill",
+                type="GET",
+                url_params={'email': email},
+                app_info=settings.ADMIN_APP_INFO,
+                raw_output=True
+            ).data
+
+        senses_info = []
+        pills_info = []
+        for s in senses:
+            pair = s.get('device_account_pair', {}) or {}
+            status = s.get('device_status', {}) or {}
+            print status
+            if pair:
+                state = "NORMAL"
+                status['deviceId'] = pair.get("externalDeviceId", status.get('deviceId', ""))
+            elif status and status.get('lastSeen', 0) > time.time()*1000 - 3*3600:
+                state = "WAITING"
+            else:
+                state = "UNPAIRED"
+            status['state'] = state
+            status['type'] = "SENSE"
+
+            senses_info.append(status)
+
+        for s in pills:
+            pair = s.get('device_account_pair', {}) or {}
+            status = s.get('device_status', {}) or {}
+            if pair:
+                state = "NORMAL"
+                status['deviceId'] = pair.get("externalDeviceId", status.get('deviceId', ''))
+            elif status and status.get('lastSeen', 0) > time.time()*1000 - 3*3600:
+                state = "WAITING"
+            else:
+                state = "UNPAIRED"
+
+            status['state'] = state
+            status['type'] = "PILL"
+            senses_info.append(status)
+
+        return senses_info + pills_info
 
     def get_zendesk_info_by_email(self, email):
         tickets = []
@@ -117,6 +148,13 @@ class OmniSearchAPI(ProtectedRequestHandler):
 
 class RecentUsersAPI(ProtectedRequestHandler):
     def get(self):
+        self.hello_request(
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO,
+            api_url="account/recent"
+        )
+
+    def get_from_cache(self):
         """Update cached recently users"""
         MAX_RECENT_USERS_LENGTH = 60
         output = ResponseOutput()
@@ -170,5 +208,5 @@ class ForcePasswordUpdateAPI(CustomerExperienceRequestHandler):
             api_url="account/update_password",
             type="POST",
             body_data=json.dumps({"email": email, "password": password}),
-            override_app_info=settings.ADMIN_APP_INFO
+            app_info=settings.ADMIN_APP_INFO
         )
