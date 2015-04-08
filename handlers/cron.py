@@ -79,7 +79,7 @@ class SearchifyPurgeHandler(BaseRequestHandler):
 
         try:
             index.add_function(4, "doc.var[0]")
-            index.delete_by_search(query=query, start=keep, scoring_function=4)
+            index.delete_by_search(query=query, start=int(keep), scoring_function=4)
             output.set_status(204)
         except Exception as e:
             output.set_error(e.message)
