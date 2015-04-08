@@ -5,7 +5,6 @@ var PasswordResetMaestro = React.createClass({
         return {alert: ""}
     },
     handleSubmit: function() {
-        $preloader.fadeIn('fast');
         var that = this;
         var requestData = {
             email: $("#email-input").val()
@@ -31,7 +30,6 @@ var PasswordResetMaestro = React.createClass({
                     that.setState({alert: e.toString});
                 }.bind(that)
             });
-            $preloader.fadeOut('fast');
             return false;
         }
     },

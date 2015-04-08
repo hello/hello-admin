@@ -23,7 +23,6 @@ var OrdersMaestro = React.createClass({
     },
 
     handleSubmit: function() {
-        $preloader.fadeIn('fast');
         var that = this;
         var orderId = $("#order-id-input").val();
         var requestData = {
@@ -50,7 +49,6 @@ var OrdersMaestro = React.createClass({
                     that.setState({alert: e.toString});
                 }.bind(that)
             });
-            $preloader.fadeOut('fast');
             return false;
         }
     },
