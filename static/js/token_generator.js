@@ -40,8 +40,7 @@ var TokenGenMaestro = React.createClass({
           this.setState({generatedToken: response.data.token});
         }.bind(this),
         error: function(e) {
-          console.error(e);
-          this.setState({generatedToken: ""});
+          alert("Failed to generate token");
         }.bind(this)
       });
       return false;
