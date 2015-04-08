@@ -23,12 +23,20 @@ if SERVER == "localhost" :
     ENVIRONMENT = "local-dev"
 
 ## Grab settings saved in GAE memcache and only query from Datastore if they are not available
-
 APP_INFO = memcache.get("app_info"+ENVIRONMENT) or AppInfo.get_by_id(ENVIRONMENT)
 ADMIN_APP_INFO = AppInfo.get_by_id("admin")
-
 ADMIN_USER = memcache.get("admin_user"+ENVIRONMENT) or AdminUser.get_by_id(ENVIRONMENT)
 SEARCHIFY = memcache.get("searchify_credentials") or SearchifyCredentials.query().get()
 ZENDESK = memcache.get("zendesk_credentials") or ZendeskCredentials.query().get()
 USER_GROUP = memcache.get("user_group") or UserGroup.query().get()
 GECKOBOARD = memcache.get("geckoboard_credentials") or GeckoboardCredentials.query().get()
+
+## Seachify Index
+SENSE_LOGS_INDEX = "sense-logs-2015-03"
+APPLICATION_LOGS_INDEX = "application-logs-2015-03"
+WORKERS_LOGS_INDEX = "workers-logs-2015-03"
+
+## Keep N newest docs from being purged
+SENSE_LOGS_KEEP = 500000
+APPLICATION_LOGS_KEEP = {'DEBUG': 100000, 'INFO': 300000, 'WARN': 100000, 'ERROR': 400000}
+WORKERS_LOGS_KEEP = {'DEBUG': 100000, 'INFO': 300000, 'WARN': 100000, 'ERROR': 400000}
