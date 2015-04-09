@@ -6,14 +6,15 @@ var ActiveDevicesHistory = React.createClass({
             data: [],
             filteredData: [],
             stackable: true,
-            zoomable: false,
-            chartType: "step"
+            zoomable: true,
+            chartType: "bar"
         }
     },
 
     filterTicketsByDate: function() {
         var startDate = $("#start-date").val();
         var endDate = $("#end-date").val();
+        history.pushState({}, '', '/active_devices_history/?start_date=' + startDate + '&end_date=' + endDate);
         this.setState({
             filteredData: this.state.data.filter(function(d) {
                 if (startDate && endDate && !startDate.isWhiteString() && !endDate.isWhiteString()) {
@@ -31,19 +32,32 @@ var ActiveDevicesHistory = React.createClass({
         return false;
     },
 
+    filterByURLInputs: function() {
+        var startDateFromURL = getParameterByName('start_date');
+        var endDateFromURL = getParameterByName('end_date');
+        if (startDateFromURL.isWhiteString() && endDateFromURL.isWhiteString()) {
+            return false;
+        }
+        $("#start-date").val(startDateFromURL);
+        $("#end-date").val(endDateFromURL);
+        $('#filter-by-date').click();
+        return false;
+    },
+
     componentDidMount: function() {
         $("#stack-check").attr("checked", true);
-        $("#zoom-check").attr("checked", false);
+        $("#zoom-check").attr("checked", true);
         var that = this;
         $.ajax({
             url: "/api/active_devices_history",
             type: "GET",
             dataType: "json",
             success: function(response) {
-                that.setState({data: response.data, filteredData: response.data});
                 console.log(response);
+                that.setState({data: response.data, filteredData: response.data.slice(0, 120)});
+                that.filterByURLInputs();
             }
-        })
+        });
     },
 
     handleStack: function() {
@@ -65,7 +79,7 @@ var ActiveDevicesHistory = React.createClass({
     },
 
     render: function() {
-        var chartOptions = ["step", "line", "area-spline", "area-step",  "spline", "area", "bar"].map(function(c){
+        var chartOptions = ["bar"].map(function(c){
             return <option value={c}>{c.capitalize() + " Chart"}</option>;
         });
 
@@ -74,7 +88,7 @@ var ActiveDevicesHistory = React.createClass({
                 <LongDatetimePicker size="2" placeHolder="start date" id="start-date" pickTime={false} format="MM-DD-YYYY"/>
                 <LongDatetimePicker size="2" placeHolder="end date" id="end-date" pickTime={false} format="MM-DD-YYYY"/>
                 <Col xs={1} sm={1} md={1}>
-                    <Button bsSize="large" bsStyle="info" title="Query !" className="btn-circle" type="submit">{<Glyphicon glyph="filter"/>}</Button>
+                    <Button id="filter-by-date" bsSize="large" bsStyle="info" title="Query !" className="btn-circle" type="submit">{<Glyphicon glyph="filter"/>}</Button>
                 </Col>
                 <Col xs={2} sm={2} md={2}>
                     <Button bsSize="large" bsStyle="info" tilte="Clear Filter" className="btn-circle" onClick={this.handleClearFilter}>{<Glyphicon glyph="remove"/>}</Button>
@@ -95,9 +109,10 @@ var ActiveDevicesHistory = React.createClass({
                 </Col>
             </Row>
             <p className="chart-remark">Notes: <br/>
+                &nbsp;&nbsp;- Scroll to zoom, drag to pan<br/>
                 &nbsp;&nbsp;- Legends are clickable to toggle visiblity by group<br/>
-                &nbsp;&nbsp;- Cap plot: 720 data points (~12 hours)<br/>
                 &nbsp;&nbsp;- Zooming/Dragging may be laggy in certain browsers
+                &nbsp;&nbsp;- There is no cap plot but if you query returns more than 1440 data points (~24 hours), performance might be very poor<br/>
             </p>
 
         </div>)
