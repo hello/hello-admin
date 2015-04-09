@@ -109,7 +109,7 @@ class ActiveDevicesHistoryAPI(ProtectedRequestHandler):
     def get(self):
         output = {'data': [], 'error': ''}
         try:
-            for daily_stats in RecentlyActiveDevicesStats.query_stats()[:720]:
+            for daily_stats in RecentlyActiveDevicesStats.query_stats()[:10080]:
                 output['data'].append({
                     'senses_zcount': daily_stats.senses_zcount,
                     'pills_zcount': daily_stats.pills_zcount,
