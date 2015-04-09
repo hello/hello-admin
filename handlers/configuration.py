@@ -43,4 +43,4 @@ class FeaturesAPI(ProtectedRequestHandler):
                     ','.join(body_data['ids']),
                     ','.join(body_data['groups']),
                     body_data['percentage'])
-            self.send_to_slack(message_text)
+            self.send_to_slack_deploys_channel(message_text)
