@@ -135,12 +135,14 @@ class SearchifyStatsAPI(ProtectedRequestHandler):
 
             output['data'] = []
             for index in sorted(searchify_client.list_indexes()):
-                oldest_ts = get_pacific_time_from_epoch_seconds(int(index.search("all:1", scoring_function=1)
-                    ['results'][0]['docid'].split('-')[-1])/1000)
-
-                newest_ts = get_pacific_time_from_epoch_seconds(int(index.search("all:1", scoring_function=0)
-                    ['results'][0]['docid'].split('-')[-1])/1000)
-
+                try:
+                    oldest_ts = get_pacific_time_from_epoch_seconds(int(index.search("all:1", scoring_function=1)
+                        ['results'][0]['docid'].split('-')[-1])/1000)
+                    newest_ts = get_pacific_time_from_epoch_seconds(int(index.search("all:1", scoring_function=0)
+                        ['results'][0]['docid'].split('-')[-1])/1000)
+                except Exception as e:
+                    oldest_ts = 'n/a'
+                    newest_ts = 'n/a'
                 output['data'].append({
                     "summary": index.__dict__,
                     "oldest_ts": oldest_ts,
