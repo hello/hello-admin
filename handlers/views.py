@@ -183,3 +183,8 @@ class OrdersView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/orders.html',
                                 context={'title': 'Orders'})
+
+class ActiveDevicesHistoryView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/active_devices_history.html',
+                                context={'title': 'Active Devices History'})

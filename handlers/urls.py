@@ -80,6 +80,9 @@ from handlers.orders import OrdersAPI
 from handlers.users import RecentUsersAPI
 from handlers.setup import AppendAppInfo
 from handlers.users import ForcePasswordUpdateAPI
+from handlers.cron import StoreRecentlyActiveDevicesStats
+from handlers.devices import ActiveDevicesHistoryAPI
+from handlers.views import ActiveDevicesHistoryView
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -88,6 +91,7 @@ cron_routes = [
     ('/cron/searchify_purge_queue/?$', SearchifyPurgeQueue),
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
     ('/cron/geckoboard_push', GeckoboardPush),
+    ('/cron/store_recently_active_devices_stats', StoreRecentlyActiveDevicesStats),
 ]
 
 api_routes = [
@@ -131,7 +135,8 @@ api_routes = [
     ('/api/append_app_info/?$', AppendAppInfo),
     ('/api/omni_search/?$', OmniSearchAPI),
     ('/api/force_password_update/?$', ForcePasswordUpdateAPI),
-    ('/api/update_geckoboard_credentials', UpdateGeckoBoardCredentials)
+    ('/api/update_geckoboard_credentials', UpdateGeckoBoardCredentials),
+    ('/api/active_devices_history', ActiveDevicesHistoryAPI),
 ]
 
 page_routes = [
@@ -171,6 +176,7 @@ page_routes = [
     ('/worker_logs/?$', WorkerLogsView),
     ('/refresh_memcache/?$', RefreshMemcache),
     ('/orders/?$', OrdersView),
+    ('/active_devices_history/?$', ActiveDevicesHistoryView),
 ]
 
 file_upload_routes = [

@@ -11,6 +11,7 @@ from handlers.utils import display_error
 from handlers.utils import get_current_pacific_datetime
 from handlers.utils import epoch_to_human
 from models.ext import ZendeskDailyStats
+from models.ext import RecentlyActiveDevicesStats
 from indextank import ApiClient
 
 from google.appengine.api import taskqueue
@@ -219,3 +220,25 @@ class GeckoboardPush(BaseRequestHandler):
         widget_url = "https://push.geckoboard.com/v1/send/" + widget_id
         gecko_response = requests.post(widget_url, json.dumps(post_data))
         return {"success": gecko_response.ok}
+
+
+class StoreRecentlyActiveDevicesStats(BaseRequestHandler):
+    def get(self):
+        zstats = self.hello_request(
+            type="GET",
+            api_url="devices/status_breakdown",
+            raw_output=True,
+            app_info=settings.ADMIN_APP_INFO,
+            url_params={'start_ts': int(time.time()*1000) - 60*1000, 'end_ts': int(time.time()*1000)}
+        ).data
+
+        recently_active_devices_stats = RecentlyActiveDevicesStats(
+            senses_zcount=zstats["senses_count"],
+            pills_zcount=zstats["pills_count"]
+        )
+
+        recently_active_devices_stats.put()
+
+
+
+

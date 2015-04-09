@@ -3,6 +3,7 @@ import json
 import settings
 
 from handlers.helpers import ProtectedRequestHandler
+from models.ext import RecentlyActiveDevicesStats
 
 
 class DeviceAPI(ProtectedRequestHandler):
@@ -103,4 +104,19 @@ class DeviceKeyStoreHint(ProtectedRequestHandler):
             app_info=settings.ADMIN_APP_INFO
         )
 
+class ActiveDevicesHistoryAPI(ProtectedRequestHandler):
+    """Retrieve recently active devices zcount from redis"""
+    def get(self):
+        output = {'data': [], 'error': ''}
+        try:
+            for daily_stats in RecentlyActiveDevicesStats.query_stats()[:720]:
+                output['data'].append({
+                    'senses_zcount': daily_stats.senses_zcount,
+                    'pills_zcount': daily_stats.pills_zcount,
+                    'created_at': int(daily_stats.created_at.strftime("%s"))
+                })
+        except Exception as e:
+            log.error(e.message)
+
+        self.response.write(json.dumps(output))
 

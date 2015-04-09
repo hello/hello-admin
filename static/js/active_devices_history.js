@@ -1,13 +1,13 @@
 /** @jsx React.DOM */
 
-var ZendeskHistory = React.createClass({
+var ActiveDevicesHistory = React.createClass({
     getInitialState: function() {
         return {
             data: [],
             filteredData: [],
             stackable: true,
             zoomable: false,
-            chartType: "line"
+            chartType: "step"
         }
     },
 
@@ -36,7 +36,7 @@ var ZendeskHistory = React.createClass({
         $("#zoom-check").attr("checked", false);
         var that = this;
         $.ajax({
-            url: "/api/zendesk_history",
+            url: "/api/active_devices_history",
             type: "GET",
             dataType: "json",
             success: function(response) {
@@ -65,7 +65,7 @@ var ZendeskHistory = React.createClass({
     },
 
     render: function() {
-        var chartOptions = [ "line", "area-spline", "area-step",  "spline", "step", "area", "bar"].map(function(c){
+        var chartOptions = ["step", "line", "area-spline", "area-step",  "spline", "area", "bar"].map(function(c){
             return <option value={c}>{c.capitalize() + " Chart"}</option>;
         });
 
@@ -91,16 +91,16 @@ var ZendeskHistory = React.createClass({
             </form>
             <Row>
                 <Col xs={12} sm={12} md={12}>
-                    <c3HistoryChart data={this.state.filteredData} stackable={this.state.stackable} zoomable={this.state.zoomable} chartType={this.state.chartType}/>
+                    <c3HistoryChart data={this.state.filteredData} stackable={this.state.stackable} zoomable={this.state.zoomable} chartType={this.state.chartType} xTickFormat="short"/>
                 </Col>
             </Row>
             <p className="chart-remark">Notes: <br/>
                 &nbsp;&nbsp;- Legends are clickable to toggle visiblity by group<br/>
-                &nbsp;&nbsp;- Filtering is prefered to zooming for finer granularity<br/>
+                &nbsp;&nbsp;- Cap plot: 720 data points (~12 hours)<br/>
                 &nbsp;&nbsp;- Zooming/Dragging may be laggy in certain browsers
             </p>
 
         </div>)
     }
 });
-React.renderComponent(<ZendeskHistory />, document.getElementById('zendesk-history'));
+React.renderComponent(<ActiveDevicesHistory />, document.getElementById('active-devices-history'));
