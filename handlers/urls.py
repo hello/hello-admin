@@ -80,6 +80,7 @@ from handlers.orders import OrdersAPI
 from handlers.users import RecentUsersAPI
 from handlers.setup import AppendAppInfo
 from handlers.users import ForcePasswordUpdateAPI
+from handlers.cron import StoreRecentlyActiveDevicesStats
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -88,6 +89,7 @@ cron_routes = [
     ('/cron/searchify_purge_queue/?$', SearchifyPurgeQueue),
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
     ('/cron/geckoboard_push', GeckoboardPush),
+    ('/cron/store_recently_active_devices_stats', StoreRecentlyActiveDevicesStats),
 ]
 
 api_routes = [
