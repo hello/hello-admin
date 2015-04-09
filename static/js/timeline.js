@@ -32,7 +32,7 @@ var TimelineContent = React.createClass({
                     null:
                     <p>Sound: <span>{segment.sound}</span></p>;
 
-                var svgIcon = "/static/css/svg/" + timelineSVG(segment.event_type);
+                var svgIcon = "/static/svg/" + timelineSVG(segment.event_type);
                 var currentEmailInput = $('#email-input').val();
                 var currentDateInput = $('#date-input').val().replace(/\-/g, '/');
                 var start = currentDateInput + " 12:00:01 AM";
