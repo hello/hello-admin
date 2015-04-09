@@ -55,4 +55,4 @@ class TeamsAPI(ProtectedRequestHandler):
                 body_data['name'],
                 ','.join(body_data['ids'])
         )
-        self.send_to_slack(message_text)
+        self.send_to_slack_deploys_channel(message_text)

@@ -7,7 +7,7 @@ cron:
   schedule: every 2 mins
 - description: searchify purge queue
   url: /cron/searchify_purge_queue
-  schedule: every 60 mins
+  schedule: every 10 mins
 - description: store recently active devices stats
   url: /cron/store_recently_active_devices_stats
   schedule: every 1 mins
