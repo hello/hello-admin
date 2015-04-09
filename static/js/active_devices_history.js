@@ -7,7 +7,7 @@ var ActiveDevicesHistory = React.createClass({
             filteredData: [],
             stackable: true,
             zoomable: false,
-            chartType: "line"
+            chartType: "step"
         }
     },
 
@@ -65,7 +65,7 @@ var ActiveDevicesHistory = React.createClass({
     },
 
     render: function() {
-        var chartOptions = ["line", "area-spline", "area-step",  "spline", "step", "area", "bar"].map(function(c){
+        var chartOptions = ["step", "line", "area-spline", "area-step",  "spline", "area", "bar"].map(function(c){
             return <option value={c}>{c.capitalize() + " Chart"}</option>;
         });
 
