@@ -1,5 +1,5 @@
 application: 'hello-admin'
-version: 31c
+version: 31m
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -8,8 +8,8 @@ handlers:
 - url: /static
   static_dir: static
 - url: /favicon\.ico
-  static_files: favicon.ico
-  upload: favicon\.ico
+  static_files: static/icon/favicon.ico
+  upload: static/icon/favicon\.ico
 - url: /cron/.*
   script: handlers.urls.hello_admin_app
   login: admin
