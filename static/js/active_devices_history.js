@@ -69,9 +69,7 @@ var ActiveDevicesHistory = React.createClass({
     },
 
     handleClearFilter: function() {
-        $("#start-date").val("");
-        $("#end-date").val("");
-        this.filterTicketsByDate();
+        window.location.replace("/active_devices_history");
     },
 
     handleChartType: function() {
