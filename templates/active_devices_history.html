@@ -1,7 +1,7 @@
 {% extends "templates/base.html" %}
 {% block title %}{{ title }}{% endblock %}
 {% block extrastatic %}
-    <link rel="stylesheet" href="/static/css/zendesk_history.css">
+    <link rel="stylesheet" href="/static/css/active_devices_history.css">
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-datetimepicker.min.css" />
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/c3.min.css" />
 
@@ -13,11 +13,11 @@
 
     <script type="text/jsx" src="/static/js/third-party/long-datetimepicker.js"></script>
     <script type="text/jsx" src="/static/js/custom/c3HistoryChart.js"></script>
-    <script type="text/jsx" src="/static/js/zendesk_history.js"></script>
+    <script type="text/jsx" src="/static/js/active_devices_history.js"></script>
 {% endblock %}
 
 {% block content %}
     <div class="row" id="container">
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="zendesk-history"></div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="active-devices-history"></div>
     </div>
 {% endblock %}
