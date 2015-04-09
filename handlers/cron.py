@@ -101,24 +101,42 @@ class SearchifyPurgeHandler(BaseRequestHandler):
 
         self.response.write(output.get_serialized_output())
 
-    def mass_purge_by_keep_days(self, index_name, keep_days=30, level=None):
+    def mass_purge_by_keep_days(self, index_name, keep_days=30, level=''):
         output = ResponseOutput()
         query = "text:{}".format(level.upper()) if level else "all:1"
         index = self.get_searchify_index(index_name)
         now = time.time()
         try:
+            delete_query_params = {}
             start_ts = None
-            end_ts = self.normalize_epoch(now - int(keep_days) * 24 * 3600, index_name)
+            end_ts = 0
+            keep_days = int(keep_days)
+            purge_size = settings.SEARCHIFY_PURGE_CAP_SIZE
 
-            delete_query_params = {'query': query, 'docvar_filters': {0: [[start_ts, end_ts]]}}
-            purge_size = index.search(**delete_query_params)['matches']
+            while purge_size >= settings.SEARCHIFY_PURGE_CAP_SIZE:  # increase keep_days to lower delete size
+                end_ts = self.normalize_epoch(now - keep_days * 24 * 3600, index_name)
+                delete_query_params = {'query': query, 'docvar_filters': {0: [[start_ts, end_ts]]}}
+                purge_size = index.search(**delete_query_params)['matches']
+                keep_days += 0.25
 
-            if purge_size > 0:
+            if purge_size > 0 and end_ts > 0 and delete_query_params != {}:
                 log.info("About to purge {} documents from index {} over {} days, "
                          "i.e. before {}".format(purge_size, index_name, keep_days, epoch_to_human(end_ts)))
+
                 index.delete_by_search(**delete_query_params)
+
+                message_text = "`{}-{}`: purged `{}` documents over {} days, " \
+                               "i.e. before {}".format(index_name, level, purge_size, keep_days-0.25, epoch_to_human(end_ts))
+
             else:
-                log.info("No need to purge because there is no document older than {} days".format(keep_days))
+                message_text = "`{}-{}`: No need to purge - no document older " \
+                               "than {} days".format(index_name, level, keep_days-0.25)
+                log.info(message_text)
+
+            self.send_to_slack_searchify_channel(message_text)
+
+
+
             output.set_data({
                 "purge_size": purge_size,
                 "index_name": index_name,
