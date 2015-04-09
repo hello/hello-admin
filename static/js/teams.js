@@ -15,7 +15,7 @@ var FeaturesTableBody = React.createClass({
         });
         idsSpans.push(<span className="ids-all cursor-hand">
             <span className="ids-val">{d.ids.join(", ")}</span>
-            <img src="/static/css/image/copy.png"/><span className="superscript">all</span>
+            <img src="/static/image/copy.png"/><span className="superscript">all</span>
         </span>);
         rows.push(<tr>
             <td><span className="group-td cursor-custom">{d.name}</span></td>
