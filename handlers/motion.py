@@ -1,3 +1,4 @@
+import settings
 from handlers.helpers import ProtectedRequestHandler
 
 class MotionAPI(ProtectedRequestHandler):
@@ -6,7 +7,8 @@ class MotionAPI(ProtectedRequestHandler):
         date = self.request.get('date')
 
         self.hello_request(
-            api_url="datascience/pill/{}/{}".format(email, date),
+            api_url="data/pill/{}/{}".format(email, date),
             type="GET",
+            app_info=settings.ADMIN_APP_INFO
         )
 

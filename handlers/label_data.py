@@ -8,7 +8,7 @@ class LabelDataAPI(ProtectedRequestHandler):
         email = self.request.get("email")
         night = self.request.get("night")
         self.hello_request(
-            api_url="datascience/label/{}/{}".format(email, night),
+            api_url="data/label/{}/{}".format(email, night),
             type="GET",
             app_info=settings.ADMIN_APP_INFO
         )
@@ -16,7 +16,7 @@ class LabelDataAPI(ProtectedRequestHandler):
         ''' single label '''
         body = json.loads(self.request.body)
         self.hello_request(
-            api_url="datascience/label",
+            api_url="data/label",
             type="POST",
             body_data=json.dumps(body),
             app_info=settings.ADMIN_APP_INFO
@@ -27,7 +27,7 @@ class LabelDataAPI(ProtectedRequestHandler):
         for b in body:
             b['note'] += "- created by {} at {}".format(self.current_user.email(), get_current_pacific_datetime())
         self.hello_request(
-            api_url="datascience/batch_label",
+            api_url="data/batch_label",
             type="POST",
             body_data=json.dumps(body),
             app_info=settings.ADMIN_APP_INFO
