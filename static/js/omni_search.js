@@ -4,36 +4,40 @@ var OmniTableContent = React.createClass({
     render: function() {
         var thisContent = this.props.content;
         var combine = Object.keys(thisContent.profile).map(function(k){
-            if (k === "last_modified") {
-                return <tr><td>{k}</td><td>{thisContent.profile[k] ? new Date(thisContent.profile[k]).toString() : "unknown last modified"}</td></tr>;
+            switch (k) {
+                case "last_modified":
+                    return <tr><td>Last Modified</td><td>{thisContent.profile[k] ? new Date(thisContent.profile[k]).toString() : "unknown"}</td></tr>;
+                case "email_verified":
+                    return null;
+                default:
+                    return <tr><td>{k.capitalize()}</td><td>{thisContent.profile[k]}</td></tr>;
             }
-            return <tr><td>{k}</td><td>{thisContent.profile[k]}</td></tr>;
         });
 
         thisContent.devices.forEach(function(device){
-            console.log(device.deviceId);
-            var debugLogLink = device.type === "PILL" ?
-                <a href={"/battery/?search=" + device.deviceId} target="_blank" title="See pill status">
-                    <Label bsStyle= {device.state === "NORMAL" ? "success" : (device.state === "UNPAIRED" ? "danger" : "warning")}>{device.deviceId}</Label>
-                </a>
-                :
-                <a href={"/sense_logs/?devices=" + device.deviceId} target="_blank" title="Go to sense log">
+
+            var debugLogLink = <a href={(device.type === "SENSE" ? "/sense_logs/?devices=" : "/battery/?search=")+ device.deviceId} target="_blank" title="View sense logs">
                     <Label bsStyle= {device.state === "NORMAL" ? "success" : (device.state === "UNPAIRED" ? "danger" : "warning")}>{device.deviceId}</Label>
                 </a>;
+
             var deviceLabel = [
-                <span>{device.type}</span>, <br/>,
-                debugLogLink, <br/>,
-                <a href={"/key_store/?device=" + device.deviceId + "&type=" + device.type.toLowerCase()} target="_blank">view KeyStore</a>
+                <a href={"/key_store/?device=" + device.deviceId + "&type=" + device.type.toLowerCase()} title="View key hint" target="_blank">
+                   <Glyphicon glyph="barcode" />
+                </a>,
+                <span>&nbsp;{device.type}</span>, <br/>,
+                debugLogLink, <br/>
             ];
+            console.log(Number(device.lastSeen));
+            var deviceLastSeen = <span>Last Seen: <span className=
+                { isNaN(device.lastSeen) || (device.type === "SENSE" && device.lastSeen < new Date().getTime() - 3600*1000) || (device.type === "PILL" && device.lastSeen < new Date().getTime() - 3*3600*1000) ? "inactive-devices" : "active-devices"}>
+                { isNaN(device.lastSeen) ? "unknown" : d3.time.format('%a %d %b %H:%M %Z')(new Date(device.lastSeen))}
+                </span></span>;
+
             var deviceDetail = [
-                device.lastSeen > new Date().getTime() - 14*24*3600 ?
-                <span>last seen: {device.lastSeen ?  d3.time.format('%a %d %b %H:%M %Z')(new Date(device.lastSeen)) : "unknown last seen"}</span> :
-                <span>last seen: <span className="inactive-devices">{device.lastSeen ? d3.time.format('%a %d %b %H:%M %Z')(new Date(device.lastSeen)) : "unknown last seen"}</span></span>
-                , <br/>,
-                <span>state: {device.state}</span>, <br/>,
-                debugLogLink = device.type === "SENSE" ?
-                <span>firmware version: {device.firmwareVersion || "unknown firmware"}</span>:
-                <span>battery level: click on pill badge to see</span>,
+                deviceLastSeen, <br/>,
+                device.type === "SENSE" ?
+                <span>Firmware Version: {device.firmwareVersion || <span className="inactive-devices">unknown</span>}</span>:
+                <span>Battery Level: <em>soon available</em></span>,
                 <br/>
             ];
 
