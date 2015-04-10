@@ -1,12 +1,15 @@
 import json
-from handlers.helpers import ProtectedRequestHandler
 import logging as log
+import settings
+from handlers.helpers import ProtectedRequestHandler
+
 
 class FeaturesAPI(ProtectedRequestHandler):
     def get(self):
         self.hello_request(
             api_url="features",
-            type="GET"
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO
         )
 
     def put(self):
@@ -19,10 +22,10 @@ class FeaturesAPI(ProtectedRequestHandler):
         percentage = req.get('percentage', 0)
 
         body_data = {
-                'name': feature,
-                'ids': [j.strip() for j in ids.split(",")] if ids != "" else [],
-                'groups': groups,
-                'percentage': percentage
+            'name': feature,
+            'ids': [j.strip() for j in ids.split(",")] if ids != "" else [],
+            'groups': groups,
+            'percentage': percentage
         }
 
         people_who_can_release = self.super_firmware()
@@ -33,7 +36,8 @@ class FeaturesAPI(ProtectedRequestHandler):
             self.hello_request(
                 api_url="features",
                 type="PUT",
-                body_data=json.dumps(body_data)
+                body_data=json.dumps(body_data),
+                app_info=settings.ADMIN_APP_INFO
             )
 
             request_context = self._extra_context({})
