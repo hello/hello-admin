@@ -12,3 +12,5 @@ tbody {display: block; overflow-y: scroll; overflow-x: hidden;}
 tbody.omni-search-table-body {height: 60vh !important; overflow-y: scroll !important ; overflow-x: hidden !important ;}
 div.omni-search-table-body {height: 68vh !important; overflow-y: scroll !important ; overflow-x: hidden !important ;}
 .narration {font-style: italic; font-size: 70%; margin-left: 70%;}
+.inactive-devices {color: red;}
+.active-devices {color: black;}

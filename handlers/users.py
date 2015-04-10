@@ -36,7 +36,7 @@ class OmniSearchAPI(ProtectedRequestHandler):
         return self.hello_request(
             api_url="account/partial",
             type="GET",
-            url_params={'email': self.omni_input}  if 'a' in self.omni_input else {'name': self.omni_input},
+            url_params={'email': self.omni_input} if '@' in self.omni_input else {'name': self.omni_input},
             app_info=settings.ADMIN_APP_INFO,
             raw_output=True
         )
@@ -70,7 +70,6 @@ class OmniSearchAPI(ProtectedRequestHandler):
         for s in senses:
             pair = s.get('device_account_pair', {}) or {}
             status = s.get('device_status', {}) or {}
-            print status
             if pair:
                 state = "NORMAL"
                 status['deviceId'] = pair.get("externalDeviceId", status.get('deviceId', ""))
@@ -86,9 +85,20 @@ class OmniSearchAPI(ProtectedRequestHandler):
         for s in pills:
             pair = s.get('device_account_pair', {}) or {}
             status = s.get('device_status', {}) or {}
+
             if pair:
                 state = "NORMAL"
                 status['deviceId'] = pair.get("externalDeviceId", status.get('deviceId', ''))
+                 # override last seen with data from pill status table
+                pill_status_data = self.hello_request(
+                    api_url="devices/pill_status",
+                    type="GET",
+                    raw_output=True,
+                    app_info=settings.ADMIN_APP_INFO,
+                    url_params={'end_ts': time.time() * 1000, 'pill_id_partial': status['deviceId']}
+                ).data
+                if pill_status_data:
+                    status['deviceId'] = pill_status_data[0]['lastSeen']
             elif status and status.get('lastSeen', 0) > time.time()*1000 - 3*3600:
                 state = "WAITING"
             else:
