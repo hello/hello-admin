@@ -6,7 +6,7 @@ class MotionAPI(ProtectedRequestHandler):
         date = self.request.get('date')
 
         self.hello_request(
-            api_url="datascience/admin/pill/{}/{}".format(email, date),
+            api_url="datascience/pill/{}/{}".format(email, date),
             type="GET",
         )
 

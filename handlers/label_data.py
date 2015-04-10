@@ -1,4 +1,5 @@
 import json
+import settings
 from helpers import ProtectedRequestHandler
 from handlers.utils import get_current_pacific_datetime
 
@@ -8,7 +9,8 @@ class LabelDataAPI(ProtectedRequestHandler):
         night = self.request.get("night")
         self.hello_request(
             api_url="datascience/label/{}/{}".format(email, night),
-            type="GET"
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO
         )
     def put(self):
         ''' single label '''
@@ -16,7 +18,8 @@ class LabelDataAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="datascience/label",
             type="POST",
-            body_data=json.dumps(body)
+            body_data=json.dumps(body),
+            app_info=settings.ADMIN_APP_INFO
         )
     def post(self):
         ''' batch label '''
@@ -26,5 +29,6 @@ class LabelDataAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="datascience/batch_label",
             type="POST",
-            body_data=json.dumps(body)
+            body_data=json.dumps(body),
+            app_info=settings.ADMIN_APP_INFO
         )
