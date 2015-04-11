@@ -95,10 +95,11 @@ class OmniSearchAPI(ProtectedRequestHandler):
                     type="GET",
                     raw_output=True,
                     app_info=settings.ADMIN_APP_INFO,
-                    url_params={'end_ts': time.time() * 1000, 'pill_id_partial': status['deviceId']}
+                    url_params={'end_ts': int(time.time() * 1000), 'pill_id_partial': status['deviceId']}
                 ).data
                 if pill_status_data:
-                    status['deviceId'] = pill_status_data[0]['lastSeen']
+                    status['lastSeen'] = pill_status_data[0]['lastSeen']
+                    status['batteryLevel'] = pill_status_data[0]['batteryLevel']
             elif status and status.get('lastSeen', 0) > time.time()*1000 - 3*3600:
                 state = "WAITING"
             else:

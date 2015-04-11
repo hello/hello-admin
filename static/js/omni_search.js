@@ -37,7 +37,7 @@ var OmniTableContent = React.createClass({
                 deviceLastSeen, <br/>,
                 device.type === "SENSE" ?
                 <span>Firmware Version: {device.firmwareVersion || <span className="inactive-devices">unknown</span>}</span>:
-                <span>Battery Level: <em>soon available</em></span>,
+                <span>Battery Level: {device.batteryLevel}</span>,
                 <br/>
             ];
 
