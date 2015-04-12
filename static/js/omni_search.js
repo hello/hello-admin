@@ -1,12 +1,13 @@
 /** @jsx React.DOM */
-
+var omniTimeFormat = d3.time.format('%a %d %b %H:%M %Z');
 var OmniTableContent = React.createClass({
     render: function() {
         var thisContent = this.props.content;
         var combine = Object.keys(thisContent.profile).map(function(k){
             switch (k) {
                 case "last_modified":
-                    return <tr><td>Last Modified</td><td>{thisContent.profile[k] ? new Date(thisContent.profile[k]).toString() : "unknown"}</td></tr>;
+                    return <tr><td>Last Modified</td><td>{thisContent.profile[k] ? 
+                        omniTimeFormat(new Date(thisContent.profile[k])) : "unknown"}</td></tr>;
                 case "email_verified":
                     return null;
                 default:
@@ -29,15 +30,19 @@ var OmniTableContent = React.createClass({
             ];
             console.log(Number(device.lastSeen));
             var deviceLastSeen = <span>Last Seen: <span className=
-                { isNaN(device.lastSeen) || (device.type === "SENSE" && device.lastSeen < new Date().getTime() - 3600*1000) || (device.type === "PILL" && device.lastSeen < new Date().getTime() - 3*3600*1000) ? "inactive-devices" : "active-devices"}>
-                { isNaN(device.lastSeen) ? "unknown" : d3.time.format('%a %d %b %H:%M %Z')(new Date(device.lastSeen))}
+                { isNaN(device.lastSeen) || (device.type === "SENSE" && device.lastSeen < new Date().getTime() - 3600*1000) || (device.type === "PILL" && device.lastSeen < new Date().getTime() - 4*3600*1000) ? "inactive-devices" : "active-devices"}>
+                { isNaN(device.lastSeen) ? "unknown" : omniTimeFormat(new Date(device.lastSeen))}
                 </span></span>;
 
             var deviceDetail = [
                 deviceLastSeen, <br/>,
                 device.type === "SENSE" ?
-                <span>Firmware Version: {device.firmwareVersion || <span className="inactive-devices">unknown</span>}</span>:
-                <span>Battery Level: {device.batteryLevel}</span>,
+                <span>Firmware Version: <a href={"/firmware/?device_id=" +  device.deviceId} target="_blank">
+                    {device.firmwareVersion || <span className="inactive-devices">unknown</span>}
+                </a></span>:
+                <span>Battery Level: <a href={"/battery/?search=" + device.deviceId} target="_blank">
+                    {device.batteryLevel}
+                </a></span>,
                 <br/>
             ];
 
