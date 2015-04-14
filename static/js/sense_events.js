@@ -1,10 +1,11 @@
 /** @jsx React.DOM */
 
-var PAGE_LIMIT = 10;
+var PAGE_LIMIT = 25;
+var QUERY_THROTTLE = 200; //ms
 
 var SenseEventsMaestro = React.createClass({
     getInitialState: function() {
-        return {data: [], error: "", cursor: 0}
+        return {data: [], error: "", cursor: 0, scrollY: 0, haltQuery: false, timer: null}
     },
 
     componentDidMount: function() {
@@ -14,10 +15,14 @@ var SenseEventsMaestro = React.createClass({
 
     submitWheneverScrollToBottom : function() {
         var that = this;
-        $(window).scroll(function() {
-            if (document.documentElement.clientHeight + $(document).scrollTop() >= document.body.offsetHeight){
-                that.handleSubmit();
+        $(window).on("scroll", function() {
+            if (frames.top.scrollY > that.state.scrollY && $(window).scrollTop() + $(window).height() == getDocHeight()) {
+                clearTimeout(that.state.timer);
+                that.setState({timer: setTimeout(function(){
+                    that.handleSubmit();
+                }, QUERY_THROTTLE)});
             }
+            that.setState({scrollY: frames.top.scrollY});
         });
     },
 
@@ -30,11 +35,25 @@ var SenseEventsMaestro = React.createClass({
         this.handleSubmit();
     },
 
+    emptyDataStoredInState: function() {
+        this.setState({data: []});
+    },
+
     handleSubmit: function() {
         var that = this, deviceId = $('#device-id-input').val();
+        if (that.state.currentDeviceId !== deviceId) {
+            that.emptyDataStoredInState();
+        }
+        that.setState({currentDeviceId: deviceId});
+
         var startTs = that.state.cursor === 0 ? new Date().getTime() : that.state.cursor;
-        console.log("Submitting with start ts", startTs);
         history.pushState({}, '', '/sense_events/?device_id=' + deviceId + '&start_ts=' + startTs);
+
+        if (that.state.haltQuery === true) {
+            alert("No more sense events for this device!");
+            return false;
+        }
+
         $.ajax({
             url: '/api/sense_events',
             dataType: 'json',
@@ -47,9 +66,21 @@ var SenseEventsMaestro = React.createClass({
             success: function(response) {
                 console.log(response);
                 if (response.error.isWhiteString()) {
-                    that.setState({data: response.data, error: ""});
+                    that.setState({error: ""});
+
                     if (response.data.length > 0){
                         that.setState({cursor: response.data.last().createdAt});
+                    }
+
+                    if (response.data.length < PAGE_LIMIT){
+                        that.setState({haltQuery: true});
+                    }
+
+                    if (that.state.data.length > 0) {
+                        that.setState({data: that.state.data.concat(response.data.slice(1))});
+                    }
+                    else {
+                        that.setState({data: response.data})
                     }
                 }
                 else {
@@ -75,7 +106,7 @@ var SenseEventsMaestro = React.createClass({
         });
 
         var results = !this.state.error.isWhiteString() ? null :
-            <Table striped>
+            <Table id="events-table" striped>
                 <thead>
                     <tr>
                         <th>Device ID</th>
@@ -99,3 +130,12 @@ var SenseEventsMaestro = React.createClass({
 });
 
 React.renderComponent(<SenseEventsMaestro />, document.getElementById('sense-events'));
+
+function getDocHeight() {
+    var D = document;
+    return Math.max(
+        D.body.scrollHeight, D.documentElement.scrollHeight,
+        D.body.offsetHeight, D.documentElement.offsetHeight,
+        D.body.clientHeight, D.documentElement.clientHeight
+    );
+}
