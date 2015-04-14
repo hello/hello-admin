@@ -188,3 +188,8 @@ class ActiveDevicesHistoryView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/active_devices_history.html',
                                 context={'title': 'Active Devices History'})
+
+class SenseEventsView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/sense_events.html',
+                                context={'title': 'Sense Events'})
