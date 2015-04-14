@@ -8,13 +8,14 @@ var SenseEventsMaestro = React.createClass({
     },
 
     componentDidMount: function() {
+        this.submitWithInputsFromURL();
+        this.submitWheneverScrollToBottom();
+    },
+
+    submitWheneverScrollToBottom : function() {
         var that = this;
-        that.submitWithInputsFromURL();
         $(window).scroll(function() {
-            if (  document.documentElement.clientHeight +
-                $(document).scrollTop() >= document.body.offsetHeight )
-            {
-                console.log("current cursor is", that.state.cursor);
+            if (document.documentElement.clientHeight + $(document).scrollTop() >= document.body.offsetHeight){
                 that.handleSubmit();
             }
         });
@@ -46,7 +47,7 @@ var SenseEventsMaestro = React.createClass({
             success: function(response) {
                 console.log(response);
                 if (response.error.isWhiteString()) {
-                    that.setState({data: response.data.reverse(), error: ""});
+                    that.setState({data: response.data, error: ""});
                     if (response.data.length > 0){
                         that.setState({cursor: response.data.last().createdAt});
                     }
@@ -59,6 +60,20 @@ var SenseEventsMaestro = React.createClass({
         return false;
     },
     render: function() {
+        var senseEventsData = this.state.data.map(function(senseEvent){
+            return <tr>
+                <td>{senseEvent.deviceId}</td>
+                <td>{d3.time.format('%a %d %b %H:%M:%S %Z')(new Date(senseEvent.createdAt))}</td>
+                <td>{senseEvent.events.map(function(event){
+                    if (event.indexOf("color") > -1){
+                        var ballStyle = {color: '#' + event.split(": ")[1]};
+                        return <p style={ballStyle}>{event}</p>
+                    }
+                    return <p>{event}</p>
+                })}</td>
+            </tr>
+        });
+
         var results = !this.state.error.isWhiteString() ? null :
             <Table striped>
                 <thead>
@@ -69,15 +84,10 @@ var SenseEventsMaestro = React.createClass({
                     </tr>
                 </thead>
                 <tbody>
-                    {this.state.data.map(function(senseEvent){
-                        return <tr>
-                            <td>{senseEvent.deviceId}</td>
-                            <td>{new Date(senseEvent.createdAt).toString()}</td>
-                            <td>{senseEvent.events}</td>
-                        </tr>
-                    })}
+                    {senseEventsData}
                 </tbody>
             </Table>;
+
         return (<div>
             <form className="row" onSubmit={this.handleSubmit}>
                 <Col xs={4} xsOffset={3}><Input type="text" id="device-id-input" placeholder="Enter device ID"/></Col>

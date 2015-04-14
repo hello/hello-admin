@@ -10,8 +10,6 @@ class SenseEventsAPI(ProtectedRequestHandler):
         start_ts = int(self.request.get("start_ts", 0))
         limit = int(self.request.get("limit", 0))
 
-        print device_id, start_ts, limit
-
         self.hello_request(
             api_url="events/{}".format(device_id),
             type="GET",
