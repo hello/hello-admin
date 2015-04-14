@@ -41,7 +41,7 @@ var TroubleshootTableBody = React.createClass({
                 cell = millisecondsToHumanReadableString(that.props.parent.state.end - device[k]);
               }
               else if (k == "device_id") {
-                cell = <a target="_blank" href={"/users/?device_id=" + device[k]}>{device[k]}</a>;
+                cell = <a target="_blank" href={"/users/?omni_input=" + device[k]}>{device[k]}</a>;
               }
               cells.push(<td>{cell}</td>);
             });
