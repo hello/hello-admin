@@ -30,7 +30,7 @@ var LogTable = React.createClass({
                 rCount = highlightedRegex.rCount, // number of \r
                 deviceId = log.docid.split('-')[0];
             var ts = [
-                <a href={"/users/?device_id=" + deviceId}><span className="label label-success">{deviceId}</span></a>, <br/>, <br/>,
+                <a href={"/users/?omni_input=" + deviceId}><span className="label label-success">{deviceId}</span></a>, <br/>, <br/>,
                 <a className="cursor-hand" onClick={that.searchAroundByTs}>{getFullDateTimeStringFromUTC(Number(log.timestamp))}</a>, <br/>, <br/>,
                 <span>Keyword Count: {matchCount}</span>, <br/>
             ];
