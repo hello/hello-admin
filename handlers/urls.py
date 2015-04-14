@@ -83,6 +83,8 @@ from handlers.users import ForcePasswordUpdateAPI
 from handlers.cron import StoreRecentlyActiveDevicesStats
 from handlers.devices import ActiveDevicesHistoryAPI
 from handlers.views import ActiveDevicesHistoryView
+from handlers.events import SenseEventsAPI
+from handlers.views import SenseEventsView
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -137,6 +139,7 @@ api_routes = [
     ('/api/force_password_update/?$', ForcePasswordUpdateAPI),
     ('/api/update_geckoboard_credentials', UpdateGeckoBoardCredentials),
     ('/api/active_devices_history', ActiveDevicesHistoryAPI),
+    ('/api/sense_events', SenseEventsAPI),
 ]
 
 page_routes = [
@@ -177,6 +180,7 @@ page_routes = [
     ('/refresh_memcache/?$', RefreshMemcache),
     ('/orders/?$', OrdersView),
     ('/active_devices_history/?$', ActiveDevicesHistoryView),
+    ('/sense_events/?$', SenseEventsView),
 ]
 
 file_upload_routes = [

@@ -2,7 +2,7 @@
 
 var OrdersMaestro = React.createClass({
     getInitialState: function() {
-        return {alert: ""}
+        return {alert: "", confirmCancelOrder: false}
     },
 
     submitWithInputsfromURL: function() {
@@ -52,15 +52,40 @@ var OrdersMaestro = React.createClass({
             return false;
         }
     },
+
+    cancelOrder: function() {
+        this.setState({confirmCancelOrder: true});
+    },
+
+    neverMind: function() {
+        this.setState({confirmCancelOrder: false});
+    },
+
     render: function() {
+        var cancelBlock = this.state.confirmCancelOrder === false ?
+            <div><p>Click the button to see next step</p><br/>
+            <p><Button onClick={this.cancelOrder}>Proceed to Reveal <Glyphicon glyph="arrow-right"/></Button></p></div>
+            :
+            <div>
+                <p>Be careful, there is no going back after you hit the following link</p><br/>
+                <p>
+                  <a href={"https://order.hello.is/cancel/" + this.state.alert} target="_blank">
+                    {"https://order.hello.is/cancel/" + this.state.alert}
+                  </a>
+                </p><br/>
+                <p><Button onClick={this.neverMind}>Never mind <Glyphicon glyph="arrow-left"/></Button></p>
+            </div>;
         var alert = (this.state.alert === "") ? null:
-            <Alert bsStyle="info">
-                <p>Order Link:</p>
+            <div><Alert bsStyle="info">
+                <p>Order Details:</p><br/>
                 <p><a href={"https://order.hello.is/details/" + this.state.alert} target="_blank">
                     {"https://order.hello.is/details/" + this.state.alert}
                 </a></p>
-            </Alert>;
-
+            </Alert>
+            <Alert bsStyle="info">
+                <p>Cancel Order:</p><br/>
+                {cancelBlock}
+            </Alert></div>;
         return (<Col xs={6} sm={6} md={6} xsOffset={3} smOffset={3} mdOffset={3}><form onSubmit={this.handleSubmit}>
             <h3>Order Info</h3>
             <hr className="fancy-line" /><br/>
