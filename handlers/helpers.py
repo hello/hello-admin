@@ -20,7 +20,8 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     autoescape=True
 )
 
-SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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'
+SLACK_DEPLOYS_WEBHOOK_URL = 'https://hooks.slack.com/services/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'
+SLACK_SEARCHIFY_WEBHOOK_URL = 'https://hooks.slack.com/services/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'
 
 class BaseRequestHandler(webapp2.RequestHandler):
     def log_and_redirect(self, redirect_path, redirect_message):
@@ -50,7 +51,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         """
         extras = {
             "logout_url": users.create_logout_url('/'),
-            "user": self.current_user.email().split('@')[0].title(),
+            "user": self.current_user.email(),
             "version": os.environ['CURRENT_VERSION_ID'],
             "env": settings.ENVIRONMENT
         }
@@ -79,25 +80,24 @@ class BaseRequestHandler(webapp2.RequestHandler):
         s = self.render(template_file, template_values=context)
         self.response.write(s)
 
-    def authorize_session(self, app_info, token=None):
+    def authorize_session(self, app_info, token):
         """
         :param token: token issued to user to use an specific app
         :type token: str
         """
-        if app_info is not None:
-            hello = make_oauth2_service(app_info)
-        else:
-            if settings.APP_INFO is None:
-                self.error(500)
-                self.response.write("Missing AppInfo!")
-            hello = make_oauth2_service(settings.APP_INFO)
+        if app_info is None:
+            self.error(500)
+            self.response.write("Missing AppInfo!")
+        hello = make_oauth2_service(app_info)
 
-        if token is None:  # token could be set to impersonate an user otherwise
-            token = settings.APP_INFO.access_token
+        if token is None:
+            self.error(500)
+            self.response.write("Missing AccessToken!")
+
         return hello.get_session(token)
 
-    def hello_request(self, api_url, body_data="", url_params={}, type="GET"
-                          , impersonatee_token=None, test_mode=False, filter_fields=[], override_app_info=None):
+    def hello_request(self, api_url, body_data="", url_params={}, type="GET", raw_output=False, filter_fields=[]
+                          , access_token=settings.APP_INFO.access_token, app_info=settings.APP_INFO):
         """
         :param api_url: api URL
         :type api_url: str
@@ -107,18 +107,19 @@ class BaseRequestHandler(webapp2.RequestHandler):
         :type url_params: dict
         :param type: http request type, one of ["GET", "POST", "PUT", "PATCH", "DELETE"]
         :type type: str
-        :param impersonatee_token: optional token to represent a user
-        :type impersonatee_token: str
-        :param test_mode: boolean value to control output, if test_mode is one, return an object rather than a response
-        :type test_mode: bool
+        :param access_token: optional token to represent a user
+        :type access_token: str
+        :param raw_output: boolean value to control output, if raw_ouput is True, return an object rather than a response
+        :type raw_output: bool
         :param filter_fields: optional list of fields for filtering
         :type filter_fields: list
         :return a ResponseOutput object in test mode  or a string otherwise
         """
 
         output = ResponseOutput()
-        output.set_viewer(self.current_user.email())
-        session = self.authorize_session(app_info=override_app_info, token=impersonatee_token)
+        output.set_viewer(self.current_user.email() if self.current_user is not None else "cron-bot")
+
+        session = self.authorize_session(app_info, access_token)
         request_detail = {
             "headers": {'Content-Type': 'application/json'},
         }
@@ -142,7 +143,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         if not response.ok:
             output.set_error(response.content)
 
-        if test_mode is True:
+        if raw_output is True:
             return output
         else:
             return self.render_response(output)
@@ -164,12 +165,20 @@ class BaseRequestHandler(webapp2.RequestHandler):
     def error_log(self):
         return
 
-    def send_to_slack(self, message_text=''):
+    @staticmethod
+    def send_to_slack(webhook, payload):
         try:
-            slack_payload = {'text' : message_text, "icon_emoji": ":ghost:", "username": "deploy-bot"}
-            requests.post(SLACK_WEBHOOK_URL, data=json.dumps(slack_payload), headers={"Content-Type": "application/json"})
+            requests.post(webhook, data=json.dumps(payload), headers={"Content-Type": "application/json"})
         except Exception, e:
             log.error("Slack notification failed: %s", e)
+
+    def send_to_slack_deploys_channel(self, message_text=''):
+        self.send_to_slack(webhook=SLACK_DEPLOYS_WEBHOOK_URL,
+                           payload ={'text': message_text, "icon_emoji": ":ghost:", "username": "deploy-bot"})
+
+    def send_to_slack_searchify_channel(self, message_text=''):
+        self.send_to_slack(webhook=SLACK_SEARCHIFY_WEBHOOK_URL,
+                           payload ={'text': message_text, "icon_emoji": ":hammer:", "username": "stats-bot"})
 
 def make_oauth2_service(app_info_model):
     """
@@ -247,6 +256,10 @@ class ProtectedRequestHandler(BaseRequestHandler):
 
     def hardware(self):
         return stripStringToList(self.groups_entity.hardware)
+
+    def super_firmware(self):
+        return stripStringToList(self.groups_entity.super_firmware)
+
 
 class CustomerExperienceRequestHandler(ProtectedRequestHandler):
     """

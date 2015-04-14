@@ -3,6 +3,7 @@ import json
 import settings
 
 from handlers.helpers import ProtectedRequestHandler
+from models.ext import RecentlyActiveDevicesStats
 
 
 class DeviceAPI(ProtectedRequestHandler):
@@ -10,13 +11,22 @@ class DeviceAPI(ProtectedRequestHandler):
 
     def get(self):
         email = self.request.get('email', default_value="")
-        log.info("Getting devices specs for {}".format(email))
-
-        self.hello_request(
-            api_url="devices/specs",
-            type="GET",
-            url_params={'email': email},
-        )
+        self.response.write(json.dumps({
+            "senses": self.hello_request(
+                api_url="devices/sense",
+                type="GET",
+                url_params={'email': email},
+                app_info=settings.ADMIN_APP_INFO,
+                raw_output=True
+            ).data,
+            "pills": self.hello_request(
+                api_url="devices/pill",
+                type="GET",
+                url_params={'email': email},
+                app_info=settings.ADMIN_APP_INFO,
+                raw_output=True
+            ).data
+        }))
 
     def post(self):
         device_id = self.request.get('device_id', default_value="")
@@ -25,10 +35,11 @@ class DeviceAPI(ProtectedRequestHandler):
         log.debug("attempting to register {} {}".format(device_type, device_id))
 
         self.hello_request(
-            api_url="devices/{}".format(device_type),
+            api_url="devices/register/{}".format(device_type),
             type="POST",
             body_data=json.dumps({'{}_id'.format(device_type): device_id}),
-            impersonatee_token=impersonatee_token
+            access_token=impersonatee_token,
+            app_info=settings.ADMIN_APP_INFO
         )
 
     def put(self):
@@ -45,7 +56,7 @@ class DeviceAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url=api_url,
             type="DELETE",
-            impersonatee_token=impersonatee_token,
+            access_token=impersonatee_token,
         )
 
 
@@ -59,7 +70,7 @@ class DeviceOwnersAPI(ProtectedRequestHandler):
             api_url="devices/{}/accounts".format(device_id),
             type="GET",
             filter_fields=['email'],
-            override_app_info=settings.ADMIN_APP_INFO
+            app_info=settings.ADMIN_APP_INFO
         )
 
 class DeviceInactiveAPI(ProtectedRequestHandler):
@@ -76,7 +87,8 @@ class DeviceInactiveAPI(ProtectedRequestHandler):
             url_params={
                 'after': after,
                 'before': before,
-            }
+            },
+            app_info=settings.ADMIN_APP_INFO
         )
 
 class DeviceKeyStoreHint(ProtectedRequestHandler):
@@ -88,7 +100,23 @@ class DeviceKeyStoreHint(ProtectedRequestHandler):
         device_type = self.request.get('device_type', default_value="")
         self.hello_request(
             api_url="devices/key_store_hints/{}/{}".format(device_type, device_id),
-            type="GET"
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO
         )
 
+class ActiveDevicesHistoryAPI(ProtectedRequestHandler):
+    """Retrieve recently active devices zcount from redis"""
+    def get(self):
+        output = {'data': [], 'error': ''}
+        try:
+            for daily_stats in RecentlyActiveDevicesStats.query_stats()[:10080]:
+                output['data'].append({
+                    'senses_zcount': daily_stats.senses_zcount,
+                    'pills_zcount': daily_stats.pills_zcount,
+                    'created_at': int(daily_stats.created_at.strftime("%s"))
+                })
+        except Exception as e:
+            log.error(e.message)
+
+        self.response.write(json.dumps(output))
 

@@ -113,21 +113,27 @@ var BatteryChart = React.createClass({
 
     submitWithInputsfromURL: function() {
         var searchInputFromURL = getParameterByName('search');
+        var endTsInputFromURL = getParameterByName('end_ts');
         if (searchInputFromURL.isWhiteString()) {
             return false;
         }
         $('#search-input').val(searchInputFromURL);
+        $('#end-ts').val(endTsInputFromURL);
         this.handleSubmit();
     },
 
-    pushHistory: function(search) {
-        history.pushState({}, '', '/battery/?search=' + search);
+    pushHistory: function(search, endTs) {
+        history.pushState({}, '', '/battery/?search=' + search + '&end_ts=' + endTs);
     },
 
     handleSubmit: function() {
         var that = this;
         var searchInput = $('#search-input').val();
-        var requestData = {search_input: searchInput};
+        var endTs = $('#end-ts').val();
+        var requestData = {
+            search_input: searchInput,
+            end_ts: endTs.isWhiteString() ? new Date().getTime() : getUTCEpochFromLocalTime(endTs)*1000
+        };
         $.ajax({
             url: "/api/battery",
             type: "GET",
@@ -136,7 +142,7 @@ var BatteryChart = React.createClass({
             success: function(response) {
                 console.log(response.data);
                 that.setState({data: filterData(response.data)});
-                that.pushHistory(searchInput);
+                that.pushHistory(searchInput, endTs);
             }
         });
         return false;
@@ -153,6 +159,7 @@ var BatteryChart = React.createClass({
                 <Col xs={3} sm={3} md={3}>
                     <Input id="search-input" type="text" placeholder="email / pill ID partial"/>
                 </Col>
+                <LongDatetimePicker placeHolder="end timestamp (now)" id="end-ts" size="3" />
                 <Col xs={1} sm={1} md={1}>
                     <Button bsStyle="info" bsSize="large" className="btn-circle" type="submit"><Glyphicon glyph="search"/></Button>
                 </Col>
@@ -169,8 +176,8 @@ var BatteryChart = React.createClass({
                 </Col>
             </Row>
             <p className="chart-remark">Notes: <br/>
+            &nbsp;&nbsp;- By default, data is shown for the last 7 days<br/>
             &nbsp;&nbsp;- Legends are clickable to toggle visiblity by group<br/>
-            &nbsp;&nbsp;- Filtering is prefered to zooming for finer granularity<br/>
             &nbsp;&nbsp;- Zooming/Dragging may be laggy in certain browsers
             </p>
 

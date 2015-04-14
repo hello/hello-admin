@@ -32,7 +32,7 @@ var TimelineContent = React.createClass({
                     null:
                     <p>Sound: <span>{segment.sound}</span></p>;
 
-                var svgIcon = "/static/css/svg/" + timelineSVG(segment.event_type);
+                var svgIcon = "/static/svg/" + timelineSVG(segment.event_type);
                 var currentEmailInput = $('#email-input').val();
                 var currentDateInput = $('#date-input').val().replace(/\-/g, '/');
                 var start = currentDateInput + " 12:00:01 AM";
@@ -76,7 +76,8 @@ var TimelineMaestro = React.createClass({
                 date: "",
                 segments: []
             }],
-            filterStatus: "key_events"
+            filterStatus: "key_events",
+            alert: ""
         };
     },
 
@@ -200,9 +201,24 @@ var TimelineMaestro = React.createClass({
             dataType: 'json',
             success: function(response) {
                 console.log(response);
-                that.setState({data: response.data});
-                $('.dial').val(response.data[0].score).trigger('change');
-                that.pushHistory(emailInput, dateInput);
+                if (response.error.isWhiteString()) {
+                    that.setState({data: response.data, alert: ""});
+                    $('.dial').val(response.data[0].score).trigger('change');
+                    that.pushHistory(emailInput, dateInput);
+                }
+                else {
+                    that.setState({
+                        alert: response.error,
+                        data: [{
+                            message: "",
+                            score: 0,
+                            insights: [],
+                            statistics: {},
+                            date: "",
+                            segments: []
+                        }]
+                    });
+                }
             }.bind(that),
             error: function(e) {
                 console.log(e);
@@ -218,16 +234,19 @@ var TimelineMaestro = React.createClass({
     render: function() {
         var that = this;
         var timelineContent =
-            (this.state.data[0] && this.state.data[0].segments && this.state.data[0].segments.length === 0) ? <span>No segments found !</span>:
+            (this.state.data[0] && this.state.data[0].segments && this.state.data[0].segments.length === 0) ? null:
             <TimelineContent data={this.state.data} filterStatus={this.state.filterStatus}/>;
 
         var insights = this.state.data[0].insights.map(function(i){return i.message}).join("<br/>");
-        var insightsPanel = insights.length === 0 ? <Alert bsStyle="danger">No insights found &#9785;</Alert> :
+        var insightsPanel = insights.length === 0 ? null :
             <Alert bsStyle="warning"><span className="insights" dangerouslySetInnerHTML={{__html: insights}}/></Alert>;
         var stats = this.state.data[0].statistics && this.state.data[0].statistics !== {} ? Object.keys(this.state.data[0].statistics).map(function(k){return k + " : " + that.state.data[0].statistics[k]}).join("<br/>"): that.state.data[0].message;
-        var statsPanel = stats.length === 0 ? <Alert bsStyle="danger">No stats found &#9785;</Alert> :
+        var statsPanel = stats.length === 0 ? null :
             <Alert bsStyle="success"><span className="insights" dangerouslySetInnerHTML={{__html: stats}}/></Alert>;
-
+        var alertPanel = that.state.alert === "" ? null : <Alert byStyle="danger">{that.state.alert}</Alert>;
+        var scoreBar = that.state.data[0].score !== 0 ? <Col id="score-bar" xs={2} sm={2} md={2} lg={2} xl={2}>
+                    <LongCircularBar score={this.state.data[0].score} />
+                </Col>: null;
         return(<code className="nonscript">
             <form onSubmit={this.handleSubmit} className="row">
                 <LongDatetimePicker size="2" placeHolder="date" id="date-input" pickTime={false} format="MM-DD-YYYY" defaultDate={yesterday} />
@@ -252,11 +271,10 @@ var TimelineMaestro = React.createClass({
                     <Button bsStyle="default" onClick={this.invalidateCache}><Glyphicon glyph="remove"/> Cache</Button>
                 </Col>
             </form>
+            {alertPanel}
             <Row id="insights-info">
                 <Col xs={3} sm={3} md={3} lg={3} xl={3} xsOffset={2} mdOffset={2} smOffset={2} lgOffset={2} xlOffset={2}>{statsPanel}</Col>
-                <Col id="score-bar" xs={2} sm={2} md={2} lg={2} xl={2}>
-                    <LongCircularBar score={this.state.data[0].score} />
-                </Col>
+                {scoreBar}
                 <Col xs={4} md={4} sm={4} lg={4} xl={4}>{insightsPanel}</Col>
             </Row>
             {timelineContent}

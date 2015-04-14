@@ -2,12 +2,13 @@ cron:
 - description: zendesk daily stats
   url: /cron/zendesk_daily_stats
   schedule: every day 08:05
-#- description: sense logs purge
-#  url: /cron/sense_logs_purge
-#  schedule: every 1 mins
-#- description: searchify logs purge queue
-#  url: /cron/searchify_logs_purge_queue
-#  schedule: every 1 mins
-#- description: sense logs purge
-#  url: /cron/
-#  schedule: every 1 mins
+- description: geckoboard push
+  url: /cron/geckoboard_push
+  schedule: every 2 mins
+- description: searchify purge queue
+  url: /cron/searchify_purge_queue
+  schedule: every 10 mins
+- description: store recently active devices stats
+  url: /cron/store_recently_active_devices_stats
+  schedule: every 1 mins
+

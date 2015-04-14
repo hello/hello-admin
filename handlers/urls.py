@@ -6,9 +6,11 @@ from handlers.timeline import TimelineAPI
 import settings
 from handlers.configuration import FeaturesAPI
 from handlers.cron import ZendeskCronHandler
-from handlers.cron import SenseLogsPurge
-from handlers.cron import ApplicationLogsPurge
-from handlers.cron import SearchifyLogsPurgeQueue
+from handlers.cron import SensePurge
+from handlers.cron import ApplicationPurge
+from handlers.cron import WorkersPurge
+from handlers.cron import SearchifyPurgeQueue
+from handlers.cron import GeckoboardPush
 from handlers.zendesk import ZendeskAPI
 from handlers.zendesk import ZendeskStatsAPI
 from handlers.zendesk import ZendeskHistoryAPI
@@ -30,8 +32,9 @@ from handlers.setup import ProxyAPI
 from handlers.setup import TokenAPI
 from handlers.setup import RegisterPillAPI, SetupAPI
 from handlers.setup import UpdateAdminAccessTokenAPI
+from handlers.setup import UpdateGeckoBoardCredentials
 from handlers.teams import TeamsAPI
-from handlers.users import UserAPI
+from handlers.users import OmniSearchAPI
 from handlers.views import BatteryView
 from handlers.keys import SenseKeyProvision
 from handlers.views import ChartHandler
@@ -76,12 +79,21 @@ from handlers.memcache import RefreshMemcache
 from handlers.orders import OrdersAPI
 from handlers.users import RecentUsersAPI
 from handlers.setup import AppendAppInfo
+from handlers.users import ForcePasswordUpdateAPI
+from handlers.cron import StoreRecentlyActiveDevicesStats
+from handlers.devices import ActiveDevicesHistoryAPI
+from handlers.views import ActiveDevicesHistoryView
+from handlers.events import SenseEventsAPI
+from handlers.views import SenseEventsView
 
 cron_routes = [
-    ('/cron/sense_logs_purge', SenseLogsPurge),
-    ('/cron/application_logs_purge/?$', ApplicationLogsPurge),
+    ('/cron/sense_purge/?$', SensePurge),
+    ('/cron/application_purge/?$', ApplicationPurge),
+    ('/cron/workers_purge/?$', WorkersPurge),
+    ('/cron/searchify_purge_queue/?$', SearchifyPurgeQueue),
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
-    ('/cron/searchify_logs_purge_queue', SearchifyLogsPurgeQueue)
+    ('/cron/geckoboard_push', GeckoboardPush),
+    ('/cron/store_recently_active_devices_stats', StoreRecentlyActiveDevicesStats),
 ]
 
 api_routes = [
@@ -105,8 +117,7 @@ api_routes = [
     ('/api/teams/?$', TeamsAPI),
     ('/api/troubleshoot/?$', InactiveDevicesAPI),
     ('/api/searchify_stats/?$', SearchifyStatsAPI),
-    ('/api/user/?$', UserAPI),
-    ('/api/users/recent/?$', RecentUsersAPI),
+    ('/api/recent_users/?$', RecentUsersAPI),
     ('/api/zendesk/?$', ZendeskAPI),
     ('/api/zendesk_stats/?$', ZendeskStatsAPI),
     ('/api/zendesk_history/?$', ZendeskHistoryAPI),
@@ -124,6 +135,11 @@ api_routes = [
     ('/api/worker_logs/?$', WorkerLogsAPI),
     ('/api/orders/?$', OrdersAPI),
     ('/api/append_app_info/?$', AppendAppInfo),
+    ('/api/omni_search/?$', OmniSearchAPI),
+    ('/api/force_password_update/?$', ForcePasswordUpdateAPI),
+    ('/api/update_geckoboard_credentials', UpdateGeckoBoardCredentials),
+    ('/api/active_devices_history', ActiveDevicesHistoryAPI),
+    ('/api/sense_events', SenseEventsAPI),
 ]
 
 page_routes = [
@@ -163,6 +179,8 @@ page_routes = [
     ('/worker_logs/?$', WorkerLogsView),
     ('/refresh_memcache/?$', RefreshMemcache),
     ('/orders/?$', OrdersView),
+    ('/active_devices_history/?$', ActiveDevicesHistoryView),
+    ('/sense_events/?$', SenseEventsView),
 ]
 
 file_upload_routes = [

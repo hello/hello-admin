@@ -4,7 +4,7 @@ import urllib
 import settings
 from models.setup import AppInfo, AdminUser, AccessToken, UserGroup
 from handlers.helpers import make_oauth2_service, ProtectedRequestHandler, SuperEngineerRequestHandler
-from models.ext import ZendeskCredentials, SearchifyCredentials, KeyStoreLocker
+from models.ext import ZendeskCredentials, SearchifyCredentials, KeyStoreLocker, GeckoboardCredentials
 from google.appengine.api import memcache
 
 
@@ -16,13 +16,15 @@ class AppAPI(ProtectedRequestHandler):
         id = self.request.get('id')
         self.hello_request(
             api_url="applications/{}".format(id) if id else "applications",
-            type="GET"
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO
         )
     def post(self):
         self.hello_request(
             api_url="applications",
             type="POST",
-            body_data=json.dumps(json.loads(self.request.body))
+            body_data=json.dumps(json.loads(self.request.body)),
+            app_info=settings.ADMIN_APP_INFO
         )
 
 class AppScopeAPI(ProtectedRequestHandler):
@@ -33,7 +35,8 @@ class AppScopeAPI(ProtectedRequestHandler):
         app_id = self.request.get('app_id', "")
         self.hello_request(
             api_url="applications/{}/scopes".format(app_id) if app_id else "applications/scopes",
-            type="GET"
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO
         )
 
     def put(self):
@@ -45,7 +48,8 @@ class AppScopeAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url='applications/{}/scopes'.format(app_id),
             type="PUT",
-            body_data=json.dumps(scopes)
+            body_data=json.dumps(scopes),
+            app_info=settings.ADMIN_APP_INFO
         )
 
 
@@ -62,48 +66,19 @@ class CreateAccountAPI(ProtectedRequestHandler):
         weight = self.request.get("weight")
         tz = self.request.get("tz")
 
-        data = {
-            "name": name,
-            "email": email,
-            "password": password,
-            "gender": gender,
-            "height": height,
-            "weight": weight,
-            "tz": tz
-        }
-
-        if not all([name, email, password, gender, height, weight, tz]):
-            self.error(400)
-            self.response.write("All fields not specified")
-            self.response.write(json.dumps(data))
-            return
-
-        headers = {
-            'Content-type': 'application/json',
-            'Accept': 'application/json'
-        }
-
-        session = self.authorize_session(settings.APP_INFO)
-
-        log.info("Submitting data")
-        log.info(data)
-        resp = session.post('account', data=json.dumps(data), headers=headers)
-
-        log.info(resp.url)
-        log.info(resp.status_code)
-        log.info(resp.content)
-
-        template_values = {}
-        if resp.status_code == 409:
-            template_values['error'] = '[HTTP %s] Account already exists.\
-             Response: %s ' % (resp.status_code, resp.content)
-        elif resp.status_code == 200:
-            template_values['message'] = "User %s created successfully" % email
-        else:
-            template_values['error'] = '[HTTP %s] Response: %s' \
-                % (resp.status_code, resp.content)
-        self.error(resp.status_code)
-        self.response.write(json.dumps(template_values))
+        self.hello_request(
+            api_url="account",
+            type="POST",
+            body_data=json.dumps({
+                "name": name,
+                "email": email,
+                "password": password,
+                "gender": gender,
+                "height": height,
+                "weight": weight,
+                "tz": tz
+            })
+        )
 
 
 class ProxyAPI(ProtectedRequestHandler):
@@ -289,8 +264,13 @@ class SetupAPI(SuperEngineerRequestHandler):
         searchify_credentials.put()
         self.update_or_create_memcache(key="searchify_credentials", value=searchify_credentials)
 
-        self.response.write("Essential credentials initialized!")
+        geckoboard_credentials = GeckoboardCredentials(
+            api_key='ask_kevin_twohy'
+        )
+        geckoboard_credentials.put()
+        self.update_or_create_memcache(key="geckoboard_credentials", value=geckoboard_credentials)
 
+        self.response.write("Essential credentials initialized!")
 
 class AppendAppInfo(SuperEngineerRequestHandler):
     def get(self):
@@ -306,13 +286,24 @@ class AppendAppInfo(SuperEngineerRequestHandler):
         self.update_or_create_memcache(key="app_info", value=app_info, environment=app_source)
 
 
+class UpdateGeckoBoardCredentials(SuperEngineerRequestHandler):
+    def get(self):
+        geckoboard_credentials = GeckoboardCredentials(
+            api_key=self.request.get("api_key", ""),
+            senses_widget_id=self.request.get("senses_widget_id", ""),
+            pills_widget_id=self.request.get("pills_widget_id", "")
+        )
+        geckoboard_credentials.put()
+        self.update_or_create_memcache(key="geckoboard_credentials", value=geckoboard_credentials)
+
+
 class UpdateAdminAccessTokenAPI(SuperEngineerRequestHandler):
     """
     Update access token after admin user and app info entities are updated and memcache is flushed
     """
     def get(self):
         admin_user = settings.ADMIN_USER
-        app_info_model = settings.APP_INFO
+        app_info_model = settings.ADMIN_APP_INFO
 
         if admin_user is None:
 
@@ -435,12 +426,12 @@ class CreateGroupsAPI(ProtectedRequestHandler):
         output = {'data': [], 'error': ''}
 
         groups_data = {
-            'super_engineer': 'long@sayhello.com, tim@sayhello.com, pang@sayhello.com, chris@sayhello.com, jchen@sayhello.com',
-            'customer_experience': 'marina@sayhello.com, chrisl@sayhello.com',
+            'super_engineer': 'long@sayhello.com, tim@sayhello.com, pang@sayhello.com, chris@sayhello.com, kingshy@sayhello.com, josef@sayhello.com, jimmy@sayhello.com',
+            'customer_experience': 'marina@sayhello.com, tim@sayhello.com',
             'software': 'pang@sayhello.com, benjo@sayhello.com',
             'hardware': 'scott@sayhello.com, ben@sayhello.com',
-            'firmware': 'chris@sayhello.com, kingshy@sayhello.com, benjo@sayhello.com, jchen@sayhello.com',
-            'elite_admin': 'long@sayhello.com, tim@sayhello.com'
+            'firmware': 'chris@sayhello.com, kingshy@sayhello.com, benjo@sayhello.com, jchen@sayhello.com, km@sayhello.com, kevin@sayhello.com',
+            'super_firmware': 'chris@sayhello.com, josef@sayhello.com, tim@sayhello.com',
         }
         groups_entity = UserGroup(**groups_data)
         groups_entity.put()

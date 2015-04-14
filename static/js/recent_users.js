@@ -3,13 +3,14 @@
 var LinkToUserDashboard = React.createClass({
     populateUserSearchEmail: function(){
         $('#search-modes a[href="#by-email"]').tab('show');
-        $('#email-search').focus().val(this.props.email);
-        $("#email-search-submit").click();
+        $('#omni-input').focus().val(this.props.email);
+        $("#omni-submit").click();
     },
     render: function() {
         return <span className="cursor-custom" onClick={this.populateUserSearchEmail}>{this.props.email}</span>
     }
 });
+
 var UserRow = React.createClass({
     componentDidMount: function() {
         $('.tablesorter').tablesorter({
@@ -23,7 +24,7 @@ var UserRow = React.createClass({
     render: function() {
         var chosenUserAttr = this.props.userAttr, attrVal;
         if (chosenUserAttr === 'last_modified')
-            attrVal = new Date(this.props.user[chosenUserAttr]).toLocaleString();
+            attrVal =  d3.time.format('%a %d %b %H:%M %Z')(new Date(this.props.user[chosenUserAttr]));
         else
             attrVal = this.props.user[chosenUserAttr];
         var rowValClasses = React.addons.classSet({
@@ -40,7 +41,6 @@ var UserRow = React.createClass({
         );
     }
 });
-
 
 var UserTable = React.createClass({
     getInitialState: function() {
@@ -161,7 +161,7 @@ var RecentUsersBox = React.createClass({
     },
     loadRecentUsersFromServer: function(){
         $.ajax({
-          url: '/api/user',
+          url: '/api/recent_users',
           dataType: 'json',
           type: 'GET',
           success: function(response) {

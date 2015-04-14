@@ -32,7 +32,7 @@ var KeyStoreMaestro = React.createClass({
         var deviceInput = $("#device-input").val();
         var typeInput = $("#type-input").val();
         var requestData = {
-            device_id: deviceInput,
+            device_id: deviceInput.toUpperCase(),
             device_type: typeInput
         };
         console.log(requestData);

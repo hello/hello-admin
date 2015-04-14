@@ -1,0 +1,15 @@
+{% extends "templates/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block extrastatic %}
+    <script type="text/javascript" src="/static/js/third-party/d3.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/sense_events.css" />
+    <script type="text/jsx" src="/static/js/sense_events.js"></script>
+{% endblock %}
+
+{% block content %}
+   <div class="row" id="container">
+        <h3 id="page-name"> {{ title }}</h3>
+        <hr class="fancy-line"/>
+        <div class="col-xs-12" id="sense-events"></div>
+    </div>
+{% endblock %}

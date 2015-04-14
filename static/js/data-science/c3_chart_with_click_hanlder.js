@@ -24,6 +24,7 @@ var LabelDataForm =  React.createClass({
     },
 
     handleLabel: function() {
+        $preloader.fadeIn('fast');
         var that = this;
         var dataSet = that.props.parent.props.data;
         console.log(dataSet);
@@ -63,6 +64,7 @@ var LabelDataForm =  React.createClass({
                 }
             }
         });
+        $preloader.fadeOut('fast');
     },
     render: function() {
         return this.transferPropsTo(

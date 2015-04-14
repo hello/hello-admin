@@ -4,7 +4,7 @@
 
 var AccountForm = React.createClass({
   getInitialState : function() {
-    return {'success' : false, 'failure' : false}
+    return {'success' : false, 'failure' : false, createdUser: ""}
   },
   
   fade : function() {
@@ -20,8 +20,7 @@ var AccountForm = React.createClass({
     var height = this.refs.height.getDOMNode().value.trim();
     var weight = this.refs.weight.getDOMNode().value.trim();
     var tz = this.refs.tz.getDOMNode().value.trim();
-    
-    
+
     if (!name || !email || !password) {
       alert("Missing info");
       return;
@@ -32,12 +31,20 @@ var AccountForm = React.createClass({
       dataType: 'json',
       type: 'POST',
       data: {name:name,email:email,password:password,gender:gender,height:height,weight:weight,tz:tz},
-      success: function(data) {
-        this.refs.name.getDOMNode().value = '';
-        this.refs.email.getDOMNode().value = '';
-        this.refs.password.getDOMNode().value = '';
-        this.setState({'success' : true})
-        setTimeout(this.fade, 2000);
+      success: function(response) {
+        console.log(response);
+        if (response.error.isWhiteString()) {
+          this.setState({createdUser: response.data.email});
+          this.refs.name.getDOMNode().value = '';
+          this.refs.email.getDOMNode().value = '';
+          this.refs.password.getDOMNode().value = '';
+          this.setState({'success' : true});
+          setTimeout(this.fade, 2000);
+        }
+        else {
+          this.setState({createdUser: ""});
+          alert(response.error);
+        }
 
       }.bind(this),
       error: function(xhr, status, err) {
@@ -46,8 +53,7 @@ var AccountForm = React.createClass({
         setTimeout(this.fade, 2000);
       }.bind(this)
     });
-
-    return;
+    return false;
   },
 
 
@@ -60,7 +66,9 @@ var AccountForm = React.createClass({
       'failure' : this.state.failure,
       'normal' : !this.state.success && !this.state.failure
     });
-  
+
+    var createdUser = this.state.createdUser === "" ? null:
+        <div>User "{this.state.createdUser}" created!</div>;
     return (
 
       <form className={classes} onSubmit={this.handleSubmit}>
@@ -99,7 +107,7 @@ var AccountForm = React.createClass({
           <div><button type="submit" className="btn btn-info btn-circle"><span className="glyphicon glyphicon-plus"></span></button></div>
           <div>{this.state.success}</div>
         </p>
-        
+        <p>{createdUser}</p>
       </form>
     );
   }

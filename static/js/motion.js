@@ -22,7 +22,8 @@ var LineChart = React.createClass({
 
             lineChart.xAxis
                 .axisLabel(that.props.xlabel)
-                .tickFormat(function(d) { return d3.time.format('%b %d %H:%M')(new Date(d)); });
+//                .tickFormat(function(d) { return d3.time.format('%b %d %H:%M')(new Date(d)); });
+                .tickFormat(function(d) { return d3.time.format('%b %d %H:%M')(new Date(new Date(d).toUTCString().split("GMT")[0])); });
 
             lineChart.yAxis
                 .axisLabel(that.props.ylabel)
@@ -142,6 +143,8 @@ var MotionMaestro = React.createClass({
                     <Button bsSize="large" bsStyle="info" tilte="Clear Filter" className="btn-circle" onClick={this.handleClear}>{<Glyphicon glyph="remove"/>}</Button>
                 </Col>
             </form>
+            <p> All times are displayed using user local timezone </p>
+            <br />
             {alert}
             {stepwiseChart}
             {stairChart}
@@ -164,12 +167,12 @@ function manipulateStepwiseData(rawData, stepwise) {
     rawData.forEach(function(point, index) {
         var y = point.value !== -1 ? Math.abs(point.value) : point.value * 1000;
         points.push({
-            x: point.timestamp,
+            x: point.timestamp + point.timezone_offset,
             y: y
         });
         if (stepwise === true && index < rawData.length - 1) {
             points.push({
-                x: rawData[index + 1].timestamp,
+                x: rawData[index + 1].timestamp + point.timezone_offset,
                 y: y
             });
         }
@@ -186,19 +189,19 @@ function manipulateStairData(rawData) {
     rawData.forEach(function(point) {
         var y = point.value !== -1 ? Math.abs(point.value) : point.value * 1000;
         points.push({
-            x: point.timestamp,
+            x: point.timestamp + point.timezone_offset,
             y: 0
         });
         points.push({
-            x: point.timestamp,
+            x: point.timestamp + point.timezone_offset,
             y: y
         });
         points.push({
-            x: point.timestamp + 30000,
+            x: point.timestamp + 30000 + point.timezone_offset,
             y: y
         });
         points.push({
-            x: point.timestamp + 30000,
+            x: point.timestamp + 30000 + point.timezone_offset,
             y: 0
         });
     });

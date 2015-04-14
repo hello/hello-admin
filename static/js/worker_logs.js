@@ -137,6 +137,7 @@ var DebugLog = React.createClass({
         this.setState({showLineBreaks: $('#whitespace-check').is(':checked')});
     },
     handleSubmit: function(){
+        $preloader.fadeIn('fast');
         var textInput = $('#text-input').val().trim(),
             levelsInput = $('#levels-input').val().trim(),
             originsInput = $('#origins-input').val().trim(),
@@ -159,6 +160,7 @@ var DebugLog = React.createClass({
               end_time: endInput
           },
           success: function(response) {
+            $preloader.fadeOut('slow');
             history.pushState({}, '', '/worker_logs/?text=' + textInput + '&levels=' + levelsInput + '&origins=' + originsInput + '&versions=' + versionsInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + startInputHuman + '&end=' + endInputHuman);
             if (response.error) {
                 this.setState({
@@ -175,6 +177,7 @@ var DebugLog = React.createClass({
             }
           }.bind(this),
           error: function(xhr, status, err) {
+            $preloader.fadeOut('fast');
             this.setState({
                 logs: [],
                 searchAlert: "☹ Query failed"

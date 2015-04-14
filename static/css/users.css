@@ -9,5 +9,8 @@ table.table>thead>tr>th {text-align: left;}
 thead {display: block}
 tbody {display: block; overflow-y: scroll; overflow-x: hidden;}
 #recent-users-table>tbody {height: 62vh;}
-#user-search-table>tbody {height: 60vh;}
+tbody.omni-search-table-body {height: 60vh !important; overflow-y: scroll !important ; overflow-x: hidden !important ;}
+div.omni-search-table-body {height: 68vh !important; overflow-y: scroll !important ; overflow-x: hidden !important ;}
 .narration {font-style: italic; font-size: 70%; margin-left: 70%;}
+.inactive-devices {color: red;}
+.active-devices {color: black;}

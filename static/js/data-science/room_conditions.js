@@ -257,6 +257,7 @@ var vizForm = React.createClass({
 
 
     handleSubmit: function() {
+        $preloader.fadeIn('fast');
         var that = this;
         var email = $('#email-input').val().trim();
         var until = $('#end-time').val().trim();
@@ -291,6 +292,7 @@ var vizForm = React.createClass({
             });
           });
         });
+        $preloader.fadeOut('fast');
         return false;
     },
     

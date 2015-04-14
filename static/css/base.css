@@ -11,9 +11,9 @@ html * {
 
 body {font-size: 100%; color: rgb(32, 32, 32);;}
 
-#header {background: #475F78 url(image/menu-pattern.png); padding: 10px 0; margin: 0 auto; color: #F2F7FB; width: 100%; position: fixed; top: 0; z-index: 999; -moz-box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); -webkit-box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); font-family: "Century Gothic",CenturyGothic,AppleGothic,sans-serif;}
+#header {background: #475F78 url(/static/image/menu-pattern.png); padding: 10px 0; margin: 0 auto; color: #F2F7FB; width: 100%; position: fixed; top: 0; z-index: 999; -moz-box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); -webkit-box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); font-family: "Century Gothic",CenturyGothic,AppleGothic,sans-serif;}
 #header>div{text-align: center;}
-#header.dev {background: #475F78 url(image/menu-pattern.png);}
+#header.dev {background: #475F78 url(/static/image/menu-pattern.png);}
 #menu {color: rgba(0, 0, 139, 0.18);}
 #menu>a, #sub-menu>a {color: deepskyblue;margin-right: 10px;}
 #sub-menu>a {font-size: 90%;}
@@ -27,7 +27,7 @@ a.activeEnv {color: #B0FC23; text-decoration: none; -webkit-stroke-width: 7px;-w
 .list-group-item {background: #F9FAFD; -moz-box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); -webkit-box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); font-family: "Century Gothic",CenturyGothic,AppleGothic,sans-serif;}
 #content {margin: 40px 0 30px 0; font-family: Menlo,Monaco,Consolas,"Courier New",monospace; font-size: 85%;}
 
-#footer {background: #F2F7FB url(image/menu-pattern.png); padding: 6px; color: gray; text-align: center; opacity: 0.5; width: 100%; position: fixed; bottom: 0;}
+#footer {background: #F2F7FB url(/static/image/menu-pattern.png); padding: 6px; color: gray; text-align: center; opacity: 0.5; width: 100%; position: fixed; bottom: 0;}
 
 
 .normal {border: 1px solid #90ADE6; transition: all 2s;}
@@ -55,7 +55,7 @@ div.slider-track {background: antiquewhite;}
 div.slider div.tooltip {display: none;}
 
 .cursor-hand {cursor: pointer;}
-.cursor-custom {cursor: url("/static/css/image/copy.png"), auto;}
+.cursor-custom {cursor: url("/static/image/copy.png"), auto;}
 .cursor-custom:hover {-webkit-stroke-width: 7px;-webkit-stroke-color: yellow; -webkit-fill-color: yellow; text-shadow: 1px 0 20px yellow;}
 
 div.bootstrap-tagsinput>input {height: 25px;}
@@ -66,3 +66,7 @@ a.menu-transparent, .menu-transparent>a {display: none;}
 a.menu-inactive {opacity: 0.5;}
 em {font-style: italic;}
 ::-webkit-scrollbar {display: none;}
+
+/*.no-js #loader { display: none;  }*/
+/*.js #loader { display: block; position: absolute; left: 100px; top: 0; }*/
+.preloader {position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: 9999; background: url("/static/image/preloader.gif") center no-repeat #fff;}

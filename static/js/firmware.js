@@ -214,14 +214,29 @@ var DeviceList = React.createClass({
 });
 
 var HistoryList = React.createClass({
-   render: function() {
+    scrollToDeviceFirmwareHistory: function() {
+        window.requestAnimationFrame(function() {
+            var $historyTable = $("#history-table");
+            if (!getParameterByName('device_id').isWhiteString() && $historyTable !== undefined) {
+                $('html, body').animate({
+                    scrollTop: $historyTable.offset().top
+                }, 800);
+            }
+        });
+    },
+
+    componentDidUpdate: function() {
+        this.scrollToDeviceFirmwareHistory();
+    },
+
+    render: function() {
         return (
-            <Table responsive condensed bordered>
-              <HistoryListHeaders device_id={this.props.device_id}/>
-              <HistoryListRows firmwareHistory={this.props.fwHistory}/>
+            <Table id="history-table" responsive condensed bordered>
+                <HistoryListHeaders device_id={this.props.device_id}/>
+                <HistoryListRows firmwareHistory={this.props.fwHistory}/>
             </Table>
-        )
-   }
+            )
+    }
 });
 
 var FirmwareMaestro = React.createClass({

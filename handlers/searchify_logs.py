@@ -1,19 +1,17 @@
 import json
+import settings
 import logging as log
 from handlers.helpers import ProtectedRequestHandler
 from handlers.utils import stripStringToList, display_error
 from handlers.utils import get_pacific_time_from_epoch_seconds
 from indextank import ApiClient
-import settings
 
-__author__ = 'zet'
 
 
 class SearchifyLogsHandler(ProtectedRequestHandler):
     """
     Retrieve debug logs
     """
-
     def normalize_epoch(self, ts, index_name):
         if "sense" in index_name:
             return ts
@@ -74,7 +72,7 @@ class SearchifyLogsHandler(ProtectedRequestHandler):
                         api_url="devices/q",
                         type="GET",
                         url_params={'email': d},
-                        test_mode=True
+                        raw_output=True
                     ).data
                 else:
                     devices_list.append(d)
@@ -106,7 +104,7 @@ class ApplicationLogsAPI(SearchifyLogsHandler):
     Retrieve application logs
     """
     def get(self):
-        self.response.write(json.dumps(self.get_logs_filtered_by_levels_orgins_versions("application-logs-2015-03")))
+        self.response.write(json.dumps(self.get_logs_filtered_by_levels_orgins_versions(settings.APPLICATION_LOGS_INDEX)))
 
 
 class SenseLogsAPI(SearchifyLogsHandler):
@@ -114,15 +112,7 @@ class SenseLogsAPI(SearchifyLogsHandler):
     Retrieve sense logs
     """
     def get(self):
-
-        new_sense_logs_output = self.get_logs_filtered_by_devices("sense-logs-2015-03")
-        old_sense_logs_output = self.get_logs_filtered_by_devices("sense-logs")
-
-        aggregate_output = {
-            'data': new_sense_logs_output['data'] + old_sense_logs_output['data'],
-            'error': new_sense_logs_output['error'] + old_sense_logs_output['error'],
-            }
-        self.response.write(json.dumps(aggregate_output))
+        self.response.write(json.dumps(self.get_logs_filtered_by_devices(settings.SENSE_LOGS_INDEX)))
 
 
 class WorkerLogsAPI(SearchifyLogsHandler):
@@ -130,7 +120,7 @@ class WorkerLogsAPI(SearchifyLogsHandler):
     Retrieve worker logs
     """
     def get(self):
-        self.response.write(json.dumps(self.get_logs_filtered_by_levels_orgins_versions("workers-logs-2015-03")))
+        self.response.write(json.dumps(self.get_logs_filtered_by_levels_orgins_versions(settings.WORKERS_LOGS_INDEX)))
 
 
 class SearchifyStatsAPI(ProtectedRequestHandler):
@@ -145,12 +135,14 @@ class SearchifyStatsAPI(ProtectedRequestHandler):
 
             output['data'] = []
             for index in sorted(searchify_client.list_indexes()):
-                oldest_ts = get_pacific_time_from_epoch_seconds(int(index.search("all:1", scoring_function=1)
-                    ['results'][0]['docid'].split('-')[-1])/1000)
-
-                newest_ts = get_pacific_time_from_epoch_seconds(int(index.search("all:1", scoring_function=0)
-                    ['results'][0]['docid'].split('-')[-1])/1000)
-
+                try:
+                    oldest_ts = get_pacific_time_from_epoch_seconds(int(index.search("all:1", scoring_function=1)
+                        ['results'][0]['docid'].split('-')[-1])/1000)
+                    newest_ts = get_pacific_time_from_epoch_seconds(int(index.search("all:1", scoring_function=0)
+                        ['results'][0]['docid'].split('-')[-1])/1000)
+                except Exception as e:
+                    oldest_ts = 'n/a'
+                    newest_ts = 'n/a'
                 output['data'].append({
                     "summary": index.__dict__,
                     "oldest_ts": oldest_ts,

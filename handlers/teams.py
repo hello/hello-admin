@@ -1,4 +1,5 @@
 import json
+import settings
 import logging as log
 from handlers.helpers import ProtectedRequestHandler
 
@@ -8,7 +9,8 @@ class TeamsAPI(ProtectedRequestHandler):
         mode = self.request.get('mode', default_value="")
         self.hello_request(
             api_url="teams/{}".format(mode),
-            type="GET"
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO
         )
 
     def put(self):
@@ -20,7 +22,6 @@ class TeamsAPI(ProtectedRequestHandler):
 
         mode = req.get('mode', "")
         action = req.get('action', "")
-
         try:
             if mode == "users" and action != "delete-group":
                 ids = map(int, ids)
@@ -39,7 +40,8 @@ class TeamsAPI(ProtectedRequestHandler):
         request_specs = {
             "api_url": "teams/{}/{}".format(mode, group) if action == "delete-group" else "teams/{}".format(mode),
             "type": request_type_map[action],
-            "body_data": json.dumps(body_data)
+            "body_data": json.dumps(body_data),
+            "app_info": settings.ADMIN_APP_INFO
         }
 
         if action == "remove":
@@ -55,4 +57,4 @@ class TeamsAPI(ProtectedRequestHandler):
                 body_data['name'],
                 ','.join(body_data['ids'])
         )
-        self.send_to_slack(message_text)
+        self.send_to_slack_deploys_channel(message_text)
