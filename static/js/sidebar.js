@@ -14,6 +14,7 @@ var SideBar = React.createClass({
            <ListGroupItem bsStyle="default" href="/room_conditions">&#x029D0; Room Conditions</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/battery">&#x029D0; Pill Status</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/motion">&#x029D0; Motion</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/sense_events">&#x029D0; Sense Events</ListGroupItem>
 
            <ListGroupItem bsStyle="info" className="sidebar-group">Logs</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/sense_logs">&#x029D0; Sense</ListGroupItem>
