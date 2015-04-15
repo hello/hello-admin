@@ -226,7 +226,8 @@ var vizForm = React.createClass({
             humidity: [],
             particulates: [],
             light: [],
-            sound: []
+            sound: [],
+            alert: ""
         }
     },
 
@@ -250,10 +251,10 @@ var vizForm = React.createClass({
     },
 
     handleSubmit: function() {
-        $preloader.fadeIn('fast');
         var that = this;
         var email = $('#email-input').val().trim();
         var until = $('#end-time').val().trim();
+        that.setState({alert: "Thinking ...", temperature: [], humidity: [], particulates: [], light: [], sound: []});
         sensorList.forEach(function(sensor){
             resolutionList.forEach(function(resolution){
                 var request_params = {
@@ -271,13 +272,20 @@ var vizForm = React.createClass({
                     type: 'GET',
                     success: function(response) {
                         console.log(response);
-                        var d = {};
-                        d[sensor] = this.state[sensor];
-                        if (d[sensor].length === resolutionList.length) {
-                            d[sensor] = [];
+                        if (response.error.isWhiteString()) {
+                            var d = {};
+                            d[sensor] = this.state[sensor];
+                            if (d[sensor].length === resolutionList.length) {
+                                d[sensor] = [];
+                            }
+                            d[sensor].push(manipulateData(response.data, sensor, resolution));
+                            d["alert"] = "";
+                            this.setState(d);
                         }
-                        d[sensor].push(manipulateData(response.data, sensor, resolution));
-                        this.setState(d);
+                        else {
+                            this.setState({alert: response.error});
+                        }
+
                     }.bind(that),
                     error: function(xhr, status, err) {
                         console.error(that.props.url, status, err);
@@ -285,11 +293,11 @@ var vizForm = React.createClass({
                 });
             });
         });
-        $preloader.fadeOut('fast');
         return false;
     },
 
     render: function() {
+        var alert = this.state.alert === "" ? null : <div><br/><Alert>{this.state.alert}</Alert></div>;
         return (<div>
             <form onSubmit={this.handleSubmit} className="row">
                 <div className="col-xs-3 col-sm-3 col-md-3 col-lg-3">
@@ -301,6 +309,7 @@ var vizForm = React.createClass({
                 <LongDatetimePicker placeHolder="end time" id="end-time" defaultDate={todayInDatepickerFormat} glyphicon="time" />
                 <Button type="submit" bsStyle="success"><Glyphicon glyph="share-alt"/></Button>
             </form>
+            {alert}
             <vizCanvas
             temperature={this.state.temperature}
             humidity={this.state.humidity}
