@@ -73,7 +73,7 @@ var TimelineMaestro = React.createClass({
         return {
             data: [{
                 message: "",
-                score: 0,
+                score: -1,
                 insights: [],
                 statistics: {},
                 date: "",
@@ -247,7 +247,7 @@ var TimelineMaestro = React.createClass({
         var statsPanel = stats.length === 0 ? null :
             <Alert bsStyle="success"><span className="insights" dangerouslySetInnerHTML={{__html: stats}}/></Alert>;
         var alertPanel = that.state.alert === "" ? null : <Alert byStyle="danger">{that.state.alert}</Alert>;
-        var scoreBar = that.state.data[0].score !== 0 ? <Col id="score-bar" xs={2} sm={2} md={2} lg={2} xl={2}>
+        var scoreBar = that.state.data[0].score !== -1 ? <Col id="score-bar" xs={2} sm={2} md={2} lg={2} xl={2}>
                     <LongCircularBar score={this.state.data[0].score} />
                 </Col>: null;
         return(<code className="nonscript">
