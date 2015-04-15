@@ -1,13 +1,41 @@
 /** @jsx React.DOM */
-var omniTimeFormat = d3.time.format('%a %d %b %H:%M %Z');
+
 var OmniTableContent = React.createClass({
+    getInitialState: function() {
+        return {useUserLocalTimezone: false}
+    },
+
+    changeTimezoneSettings: function() {
+        this.setState({useUserLocalTimezone: $('#user-local-tz').is(':checked')});
+    },
+
+    unhashFirmware: function(version) {
+        $.ajax({
+            url: "/api/firmware_unhash",
+            dataType: 'json',
+            type: 'GET',
+            async: false,
+            data: {version: version},
+            success: function(response) {
+                if (response.error.isWhiteString()) {
+                    version = (version || "unknown hashed")
+                        + " (" + (response.data.join(", ") || "unknown unhashed") + ")";
+                }
+            }
+        });
+        return version;
+    },
+
     render: function() {
+        var that = this;
         var thisContent = this.props.content;
         var combine = Object.keys(thisContent.profile).map(function(k){
             switch (k) {
                 case "last_modified":
-                    return <tr><td>Last Modified</td><td>{thisContent.profile[k] ? 
-                        omniTimeFormat(new Date(thisContent.profile[k])) : "unknown"}</td></tr>;
+                    var lastSeenDateTimeString = that.state.useUserLocalTimezone === false ?
+                        displayDateTime(thisContent.profile.last_modified) : displayDateTime(thisContent.profile.last_modified, thisContent.profile.tz);
+                    return <tr><td>Last Modified</td><td>{thisContent.profile[k] ?
+                        lastSeenDateTimeString : "unknown"}</td></tr>;
                 case "email_verified":
                     return null;
                 default:
@@ -16,33 +44,34 @@ var OmniTableContent = React.createClass({
         });
 
         thisContent.devices.forEach(function(device){
-
             var debugLogLink = <a href={(device.type === "SENSE" ? "/sense_logs/?devices=" : "/battery/?search=")+ device.deviceId} target="_blank" title="View sense logs">
-                    <Label bsStyle= {device.state === "NORMAL" ? "success" : (device.state === "UNPAIRED" ? "danger" : "warning")}>{device.deviceId}</Label>
-                </a>;
+                <Label bsStyle= {device.state === "NORMAL" ? "success" : (device.state === "UNPAIRED" ? "danger" : "warning")}>{device.deviceId}</Label>
+            </a>;
 
             var deviceLabel = [
                 <a href={"/key_store/?device=" + device.deviceId + "&type=" + device.type.toLowerCase()} title="View key hint" target="_blank">
-                   <Glyphicon glyph="barcode" />
+                    <Glyphicon glyph="barcode" />
                 </a>,
                 <span>&nbsp;{device.type}</span>, <br/>,
                 debugLogLink, <br/>
             ];
-            console.log(Number(device.lastSeen));
+            var lastSeenDateTimeString = that.state.useUserLocalTimezone === false ? displayDateTime(device.lastSeen) : displayDateTime(device.lastSeen, thisContent.profile.tz);
             var deviceLastSeen = <span>Last Seen: <span className=
                 { isNaN(device.lastSeen) || (device.type === "SENSE" && device.lastSeen < new Date().getTime() - 3600*1000) || (device.type === "PILL" && device.lastSeen < new Date().getTime() - 4*3600*1000) ? "inactive-devices" : "active-devices"}>
-                { isNaN(device.lastSeen) ? "unknown" : omniTimeFormat(new Date(device.lastSeen))}
-                </span></span>;
-
+                { isNaN(device.lastSeen) ? "unknown" : lastSeenDateTimeString}
+            </span></span>;
+            if (device.type === "SENSE") {
+                var unhashedFwVersion = that.unhashFirmware(device.firmwareVersion);
+            }
             var deviceDetail = [
                 deviceLastSeen, <br/>,
-                device.type === "SENSE" ?
-                <span>Firmware Version: <a href={"/firmware/?device_id=" +  device.deviceId} target="_blank">
-                    {device.firmwareVersion || <span className="inactive-devices">unknown</span>}
-                </a></span>:
-                <span>Battery Level: <a href={"/battery/?search=" + device.deviceId} target="_blank">
+                    device.type === "SENSE" ?
+                    <span>Firmware: <a href={"/firmware/?device_id=" +  device.deviceId} target="_blank">
+                    <span className={unhashedFwVersion.indexOf("unknown") > -1 ? "unknown-firmware" : "known-firmware"}>{unhashedFwVersion}</span>
+                    </a></span>:
+                    <span>Battery Level: <a href={"/battery/?search=" + device.deviceId} target="_blank">
                     {device.batteryLevel}
-                </a></span>,
+                    </a></span>,
                 <br/>
             ];
 
@@ -65,7 +94,7 @@ var OmniTableContent = React.createClass({
 
 
         return <Table responsive>
-            <thead><tr><th className="col-xs-1">Attribute</th><th className="col-xs-3">Value</th></tr></thead>
+            <thead><tr><th className="col-xs-1">Attribute</th><th className="col-xs-3">Value &nbsp; &nbsp;&nbsp; &nbsp;<input id="user-local-tz" type='checkbox' onChange={this.changeTimezoneSettings}/>&nbsp;<Glyphicon glyph="globe"/> User Local</th></tr></thead>
             <tbody className="omni-search-table-body">{combine}</tbody>
         </Table>;
     }
@@ -132,7 +161,7 @@ var OmniMaestro = React.createClass({
     handleSubmit: function() {
         var that = this, omniInput = $("#omni-input").val();
         history.pushState({}, '', '/users/?omni_input=' + omniInput);
-        that.setState({alert: "Thinking ...", data: []});
+        that.setState({alert: "Loading ...", data: []});
 
         if (isNaN(Number(omniInput)) && omniInput.trim().length < 3) {
             that.setState({data: [], alert: "Search string should be at least 3 characters"});
@@ -186,3 +215,24 @@ var OmniMaestro = React.createClass({
 });
 
 React.renderComponent(<OmniMaestro />, document.getElementById('by-email'));
+
+function displayDateTime(ts, tzOffsetMillis) {
+    var omniTimeFormat = d3.time.format('%a %d %b %H:%M %Z');
+    var omniTimeFormatWithoutTz = d3.time.format('%a %d %b %H:%M');
+    if (tzOffsetMillis) {
+        var adjustedDateTimeString = new Date(ts + tzOffsetMillis).toUTCString().split("GMT")[0];
+        var tzOffsetHours =  tzOffsetMillis / 3600000, adjustTimezoneString;
+        if (tzOffsetHours >= 0 && tzOffsetHours < 10 ) {
+            adjustTimezoneString = "0" + tzOffsetHours.toString() + "00";
+        }
+        else if (tzOffsetHours < 0 && tzOffsetHours > -10) {
+            adjustTimezoneString = "-0" + Math.abs(tzOffsetHours).toString() + "00";
+        }
+        else {
+            adjustTimezoneString = tzOffsetHours.toString() + "00";
+        }
+        return omniTimeFormatWithoutTz(new Date(adjustedDateTimeString)) +  " " + adjustTimezoneString;
+    }
+
+    return omniTimeFormat(new Date(ts));
+}

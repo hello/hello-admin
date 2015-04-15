@@ -254,7 +254,7 @@ var vizForm = React.createClass({
         var that = this;
         var email = $('#email-input').val().trim();
         var until = $('#end-time').val().trim();
-        that.setState({alert: "Thinking ...", temperature: [], humidity: [], particulates: [], light: [], sound: []});
+        that.setState({alert: "Loading ...", temperature: [], humidity: [], particulates: [], light: [], sound: []});
         sensorList.forEach(function(sensor){
             resolutionList.forEach(function(resolution){
                 var request_params = {
