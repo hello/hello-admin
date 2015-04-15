@@ -9,6 +9,23 @@ var OmniTableContent = React.createClass({
         this.setState({useUserLocalTimezone: $('#user-local-tz').is(':checked')});
     },
 
+    unhashFirmware: function(version) {
+        $.ajax({
+            url: "/api/firmware_unhash",
+            dataType: 'json',
+            type: 'GET',
+            async: false,
+            data: {version: version},
+            success: function(response) {
+                if (response.error.isWhiteString()) {
+                    version = (version || "unknown hashed")
+                        + " (" + (response.data.join(", ") || "unknown unhashed") + ")";
+                }
+            }
+        });
+        return version;
+    },
+
     render: function() {
         var that = this;
         var thisContent = this.props.content;
@@ -43,12 +60,14 @@ var OmniTableContent = React.createClass({
                 { isNaN(device.lastSeen) || (device.type === "SENSE" && device.lastSeen < new Date().getTime() - 3600*1000) || (device.type === "PILL" && device.lastSeen < new Date().getTime() - 4*3600*1000) ? "inactive-devices" : "active-devices"}>
                 { isNaN(device.lastSeen) ? "unknown" : lastSeenDateTimeString}
             </span></span>;
-
+            if (device.type === "SENSE") {
+                var unhashedFwVersion = that.unhashFirmware(device.firmwareVersion);
+            }
             var deviceDetail = [
                 deviceLastSeen, <br/>,
                     device.type === "SENSE" ?
-                    <span>Firmware Version: <a href={"/firmware/?device_id=" +  device.deviceId} target="_blank">
-                    {device.firmwareVersion || <span className="inactive-devices">unknown</span>}
+                    <span>Firmware: <a href={"/firmware/?device_id=" +  device.deviceId} target="_blank">
+                    <span className={unhashedFwVersion.indexOf("unknown") > -1 ? "unknown-firmware" : "known-firmware"}>{unhashedFwVersion}</span>
                     </a></span>:
                     <span>Battery Level: <a href={"/battery/?search=" + device.deviceId} target="_blank">
                     {device.batteryLevel}
