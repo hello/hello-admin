@@ -1,8 +1,7 @@
 /** @jsx React.DOM */
 
 var today = new Date();
-
-var datepickerFormat = d3.time.format("%m/%d/%Y %I:%M:%S %p");
+var datepickerFormat = d3.time.format("%m/%d/%Y %H:%M:%S");
 var todayInDatepickerFormat = datepickerFormat(today);
 
 var sensorList = ['temperature', 'humidity', 'particulates', 'light', 'sound'];
@@ -99,7 +98,6 @@ var vizCanvas = React.createClass({
                         return d.toFixed(2);
                     });
 
-
                 d3.select('#humidity')
                     .datum(that.props.humidity)
                     .call(humidityChart);
@@ -132,7 +130,6 @@ var vizCanvas = React.createClass({
                     .tickFormat(function (d) {
                         return d.toFixed(2);
                     });
-
 
                 d3.select('#particulates')
                     .datum(that.props.particulates)
@@ -167,7 +164,6 @@ var vizCanvas = React.createClass({
                         return d.toFixed(2);
                     });
 
-
                 d3.select('#light')
                     .datum(that.props.light)
                     .call(lightChart);
@@ -201,7 +197,6 @@ var vizCanvas = React.createClass({
                         return d.toFixed(2);
                     });
 
-
                 d3.select('#sound')
                     .datum(that.props.sound)
                     .call(soundChart);
@@ -214,13 +209,12 @@ var vizCanvas = React.createClass({
 
         var graphs = [];
 
-
-          sensorList.forEach(function (s) {
+        sensorList.forEach(function (s) {
             if (that.props[s].length > 0 && ((that.props[s][0] && that.props[s][0].values.length) || (that.props[s][1] && that.props[s][1].values.length > 0))) {
                 graphs.push(<h4 className="chart-title">{s.capitalize()}</h4>);
                 graphs.push(<svg id={s} />);
             }
-          });
+        });
         return (<div>{graphs}</div>)
     }
 });
@@ -232,11 +226,12 @@ var vizForm = React.createClass({
             humidity: [],
             particulates: [],
             light: [],
-            sound: []
+            sound: [],
+            alert: ""
         }
     },
-    
-     componentDidMount: function() {
+
+    componentDidMount: function() {
         this.submitWithInputsfromURL();
     },
 
@@ -255,67 +250,72 @@ var vizForm = React.createClass({
         history.pushState({}, '', '/room_conditions/?email=' + email + '&until=' + until);
     },
 
-
     handleSubmit: function() {
-        $preloader.fadeIn('fast');
         var that = this;
         var email = $('#email-input').val().trim();
         var until = $('#end-time').val().trim();
+        that.setState({alert: "Thinking ...", temperature: [], humidity: [], particulates: [], light: [], sound: []});
         sensorList.forEach(function(sensor){
-          resolutionList.forEach(function(resolution){
-            var request_params = {
-              email: email,
-              sensor: sensor,
-              resolution: resolution,
-              ts: new Date(until).getTime()
-            };
-            console.log('sending', request_params);
-            that.pushHistory(email, until);
-            $.ajax({
-              url: '/api/room_conditions',
-              dataType: 'json',
-              data: request_params,
-              type: 'GET',
-              success: function(response) {
-                  console.log(response);
-                  var d = {};
-                  d[sensor] = this.state[sensor];
-                  if (d[sensor].length === resolutionList.length) {
-                      d[sensor] = [];
-                  }
-                  d[sensor].push(manipulateData(response.data, sensor, resolution));
-                  this.setState(d);
-              }.bind(that),
-              error: function(xhr, status, err) {
-                console.error(that.props.url, status, err);
-              }.bind(that)
+            resolutionList.forEach(function(resolution){
+                var request_params = {
+                    email: email,
+                    sensor: sensor,
+                    resolution: resolution,
+                    ts: new Date(until).getTime()
+                };
+                console.log('sending', request_params);
+                that.pushHistory(email, until);
+                $.ajax({
+                    url: '/api/room_conditions',
+                    dataType: 'json',
+                    data: request_params,
+                    type: 'GET',
+                    success: function(response) {
+                        console.log(response);
+                        if (response.error.isWhiteString()) {
+                            var d = {};
+                            d[sensor] = this.state[sensor];
+                            if (d[sensor].length === resolutionList.length) {
+                                d[sensor] = [];
+                            }
+                            d[sensor].push(manipulateData(response.data, sensor, resolution));
+                            d["alert"] = "";
+                            this.setState(d);
+                        }
+                        else {
+                            this.setState({alert: response.error});
+                        }
+
+                    }.bind(that),
+                    error: function(xhr, status, err) {
+                        console.error(that.props.url, status, err);
+                    }.bind(that)
+                });
             });
-          });
         });
-        $preloader.fadeOut('fast');
         return false;
     },
-    
-    
 
     render: function() {
+        var alert = this.state.alert === "" ? null : <div><br/><Alert>{this.state.alert}</Alert></div>;
         return (<div>
             <form onSubmit={this.handleSubmit} className="row">
                 <div className="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-                  <p className="icon-addon addon-xs">
-                    <input id="email-input" className="form-control" placeholder="email"/>
-                    <label className="glyphicon glyphicon-user"></label>
-                  </p>
+                    <p className="icon-addon addon-xs">
+                        <input id="email-input" className="form-control" placeholder="email"/>
+                        <label className="glyphicon glyphicon-user"></label>
+                    </p>
                 </div>
                 <LongDatetimePicker placeHolder="end time" id="end-time" defaultDate={todayInDatepickerFormat} glyphicon="time" />
                 <Button type="submit" bsStyle="success"><Glyphicon glyph="share-alt"/></Button>
             </form>
+            {alert}
             <vizCanvas
-               temperature={this.state.temperature}
-               humidity={this.state.humidity}
-               particulates={this.state.particulates}
-               sound={this.state.sound}
-               light={this.state.light}
+            temperature={this.state.temperature}
+            humidity={this.state.humidity}
+            particulates={this.state.particulates}
+            sound={this.state.sound}
+            light={this.state.light}
             />
         </div>)
     }
@@ -329,7 +329,6 @@ var vizBox = React.createClass({
 });
 
 React.renderComponent(<vizBox />, document.getElementById('room-conditions'));
-
 
 function manipulateData(rawData, sensor, resolution) {
     return {

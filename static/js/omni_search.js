@@ -132,6 +132,7 @@ var OmniMaestro = React.createClass({
     handleSubmit: function() {
         var that = this, omniInput = $("#omni-input").val();
         history.pushState({}, '', '/users/?omni_input=' + omniInput);
+        that.setState({alert: "Thinking ...", data: []});
 
         if (isNaN(Number(omniInput)) && omniInput.trim().length < 3) {
             that.setState({data: [], alert: "Search string should be at least 3 characters"});
@@ -157,7 +158,7 @@ var OmniMaestro = React.createClass({
     },
 
     render: function() {
-        var alert = this.state.alert.isWhiteString() ? null:<p>{this.state.alert}</p>;
+        var alert = this.state.alert.isWhiteString() ? null: <div><br/><p>{this.state.alert}</p></div>;
         var results = this.state.data.length === 0 ? null:<OmniResultsTable data={this.state.data}/>;
         return (<div className="fancy-box">
             <form onSubmit={this.handleSubmit}>
