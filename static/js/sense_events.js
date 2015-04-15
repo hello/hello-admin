@@ -36,23 +36,20 @@ var SenseEventsMaestro = React.createClass({
     },
 
     emptyDataStoredInState: function() {
-        this.setState({data: []});
+        this.setState({data: [], error: "", cursor: 0, scrollY: 0, haltQuery: false, timer: null});
     },
 
     handleSubmit: function() {
         var that = this, deviceId = $('#device-id-input').val();
+        var startTs = that.state.cursor === 0 ? new Date().getTime() : that.state.cursor;
+
         if (that.state.currentDeviceId !== deviceId) {
             that.emptyDataStoredInState();
+            startTs = new Date().getTime();
         }
         that.setState({currentDeviceId: deviceId});
 
-        var startTs = that.state.cursor === 0 ? new Date().getTime() : that.state.cursor;
         history.pushState({}, '', '/sense_events/?device_id=' + deviceId + '&start_ts=' + startTs);
-
-        if (that.state.haltQuery === true) {
-            alert("No more sense events for this device!");
-            return false;
-        }
 
         $.ajax({
             url: '/api/sense_events',
@@ -110,6 +107,8 @@ var SenseEventsMaestro = React.createClass({
             </tr>
         });
 
+        var alert = this.state.haltQuery === false ? null : <Alert> No more older events found! </Alert>;
+
         var results = !this.state.error.isWhiteString() ? null :
             <Table id="events-table" striped>
                 <thead>
@@ -130,6 +129,7 @@ var SenseEventsMaestro = React.createClass({
                 <Col xs={1}><Button type="submit"><Glyphicon glyph="search"></Glyphicon></Button></Col>
             </form>
             <Row>{results}</Row>
+            {alert}
         </div>)
     }
 });

@@ -132,7 +132,7 @@ var OmniMaestro = React.createClass({
     handleSubmit: function() {
         var that = this, omniInput = $("#omni-input").val();
         history.pushState({}, '', '/users/?omni_input=' + omniInput);
-        that.setState({alert: "Thinking ...", data: []});
+        that.setState({alert: "Loading` ...", data: []});
 
         if (isNaN(Number(omniInput)) && omniInput.trim().length < 3) {
             that.setState({data: [], alert: "Search string should be at least 3 characters"});
