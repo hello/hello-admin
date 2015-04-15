@@ -1,5 +1,5 @@
 import time
-
+import settings
 from handlers.helpers import ProtectedRequestHandler
 
 
@@ -13,9 +13,10 @@ class RoomConditionsAPI(ProtectedRequestHandler):
         resolution = self.request.get('resolution', default_value='')
         ts = int(self.request.get('ts', int(time.time() * 1000)))
         self.hello_request(
-            api_url="datascience/admin/{}/{}/{}".format(email, sensor, resolution),
+            api_url="data/{}/{}/{}".format(email, sensor, resolution),
             url_params={'from': ts},
-            type="GET"
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO
         )
 
 
