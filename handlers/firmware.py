@@ -1,6 +1,7 @@
 import json
 import settings
 from handlers.helpers import FirmwareRequestHandler
+from handlers.helpers import ProtectedRequestHandler
 
 
 class FirmwareAPI(FirmwareRequestHandler):
@@ -56,7 +57,6 @@ class FirmwareInfoAPI(FirmwareRequestHandler):
 
 class FirmwareHistoryAPI(FirmwareRequestHandler):
 
-
     def get(self):
         device_id = self.request.get('device_id', default_value="")
 
@@ -65,3 +65,15 @@ class FirmwareHistoryAPI(FirmwareRequestHandler):
             type="GET",
             app_info=settings.ADMIN_APP_INFO
         )
+
+class FirmwareUnhashAPI(ProtectedRequestHandler):
+
+    def get(self):
+        hashed_firmware = self.request.get('version', default_value="")
+
+        self.hello_request(
+            api_url="firmware/names/{}".format(hashed_firmware),
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO
+        )
+

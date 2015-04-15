@@ -85,6 +85,7 @@ from handlers.devices import ActiveDevicesHistoryAPI
 from handlers.views import ActiveDevicesHistoryView
 from handlers.events import SenseEventsAPI
 from handlers.views import SenseEventsView
+from handlers.firmware import FirmwareUnhashAPI
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -137,9 +138,10 @@ api_routes = [
     ('/api/append_app_info/?$', AppendAppInfo),
     ('/api/omni_search/?$', OmniSearchAPI),
     ('/api/force_password_update/?$', ForcePasswordUpdateAPI),
-    ('/api/update_geckoboard_credentials', UpdateGeckoBoardCredentials),
-    ('/api/active_devices_history', ActiveDevicesHistoryAPI),
-    ('/api/sense_events', SenseEventsAPI),
+    ('/api/update_geckoboard_credentials/?$', UpdateGeckoBoardCredentials),
+    ('/api/active_devices_history/?$', ActiveDevicesHistoryAPI),
+    ('/api/sense_events/?$', SenseEventsAPI),
+    ('/api/firmware_unhash/?$', FirmwareUnhashAPI),
 ]
 
 page_routes = [
