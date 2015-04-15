@@ -22,11 +22,13 @@ var TimelineContent = React.createClass({
 
                 var duration = <p>Duration: <span>{segment.duration}</span></p>;
 
+                var eventType = <p>Event Type: <em>{segment.event_type}</em></p>;
+
                 var sensors = (!segment.sensors || segment.sensors.length === 0) ?
                     null:
                     <p>Sensors: <span>{segment.sensors}</span></p>;
 
-                var sleepDepth = <p>Sleep depth: <span>{segment.sleep_depth}</span></p>;
+                var sleepDepth = <p>Sleep Depth: <span>{segment.sleep_depth}</span></p>;
 
                 var sound = (!segment.sound || segment.sound === null) ?
                     null:
@@ -45,6 +47,7 @@ var TimelineContent = React.createClass({
 
                         <div className="cd-timeline-content">
                             {date}
+                            {eventType}
                             {duration}
                             {sensors}
                             {sleepDepth}
