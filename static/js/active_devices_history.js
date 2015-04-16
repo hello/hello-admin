@@ -7,7 +7,8 @@ var ActiveDevicesHistory = React.createClass({
             filteredData: [],
             stackable: true,
             zoomable: true,
-            chartType: "bar"
+            chartType: "bar",
+            alert: "Loading ..."
         }
     },
 
@@ -54,7 +55,12 @@ var ActiveDevicesHistory = React.createClass({
             dataType: "json",
             success: function(response) {
                 console.log(response);
-                that.setState({data: response.data, filteredData: response.data.slice(0, 480)});
+                if (response.error.isWhiteString()){
+                    that.setState({data: response.data, filteredData: response.data.slice(0, 480), alert: ""});
+                }
+                else {
+                    that.setState({data: [], filteredData: [], alert: response.error});
+                }
             }
         });
     },
@@ -80,6 +86,8 @@ var ActiveDevicesHistory = React.createClass({
             return <option value={c}>{c.capitalize() + " Chart"}</option>;
         });
 
+        var alert = this.state.alert === "" ? null:<Alert>{this.state.alert}</Alert>;
+
         return (<div>
             <form className="row">
                 <LongDatetimePicker size="2" placeHolder="start date" id="start-date" pickTime={false} format="MM-DD-YYYY"/>
@@ -100,6 +108,7 @@ var ActiveDevicesHistory = React.createClass({
                     <Input type="checkbox" id="stack-check" label="Stacked" onChange={this.handleStack}/>
                 </Col>
             </form>
+            {alert}
             <Row>
                 <Col xs={12} sm={12} md={12}>
                     <c3HistoryChart data={this.state.filteredData} stackable={this.state.stackable} zoomable={this.state.zoomable} chartType={this.state.chartType} xTickFormat="short"/>
