@@ -181,11 +181,11 @@ class DustStatsAPI(ProtectedRequestHandler):
             matches = [re.findall(regex_pattern, r['text']) for r in results]
 
             output['data'] = [{
-                'timestamp': item[0],
-                'average': item[1],
-                'max': item[2],
-                'min': item[3],
-                'variance': item[4]
+                'timestamp': int(item[0])*1000,
+                'average': int(item[1]),
+                'max': int(item[2]),
+                'min': int(item[3]),
+                'variance': int(item[4])
             } for sublist in matches for item in sublist if all([i.isdigit() for i in item])]
 
         except Exception as e:
