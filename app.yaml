@@ -1,5 +1,5 @@
 application: 'hello-admin'
-version: 33
+version: 33a
 runtime: python27
 api_version: 1
 threadsafe: yes

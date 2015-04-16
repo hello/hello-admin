@@ -7,7 +7,8 @@ var ActiveDevicesHistory = React.createClass({
             filteredData: [],
             stackable: true,
             zoomable: true,
-            chartType: "bar"
+            chartType: "bar",
+            alert: "Loading ..."
         }
     },
 
@@ -54,8 +55,12 @@ var ActiveDevicesHistory = React.createClass({
             dataType: "json",
             success: function(response) {
                 console.log(response);
-                that.setState({data: response.data, filteredData: response.data.slice(0, 120)});
-                that.filterByURLInputs();
+                if (response.error.isWhiteString()){
+                    that.setState({data: response.data, filteredData: response.data.slice(0, 480), alert: ""});
+                }
+                else {
+                    that.setState({data: [], filteredData: [], alert: response.error});
+                }
             }
         });
     },
@@ -81,15 +86,17 @@ var ActiveDevicesHistory = React.createClass({
             return <option value={c}>{c.capitalize() + " Chart"}</option>;
         });
 
+        var alert = this.state.alert === "" ? null:<Alert>{this.state.alert}</Alert>;
+
         return (<div>
-            <form className="row" onSubmit={this.filterTicketsByDate}>
+            <form className="row">
                 <LongDatetimePicker size="2" placeHolder="start date" id="start-date" pickTime={false} format="MM-DD-YYYY"/>
                 <LongDatetimePicker size="2" placeHolder="end date" id="end-date" pickTime={false} format="MM-DD-YYYY"/>
                 <Col xs={1} sm={1} md={1}>
                     <Button id="filter-by-date" bsSize="large" bsStyle="info" title="Query !" className="btn-circle" type="submit">{<Glyphicon glyph="filter"/>}</Button>
                 </Col>
                 <Col xs={2} sm={2} md={2}>
-                    <Button bsSize="large" bsStyle="info" tilte="Clear Filter" className="btn-circle" onClick={this.handleClearFilter}>{<Glyphicon glyph="remove"/>}</Button>
+                    <Button id="submit" bsSize="large" bsStyle="info" tilte="Clear Filter" className="btn-circle" onClick={this.handleClearFilter}>{<Glyphicon glyph="remove"/>}</Button>
                 </Col>
                 <Col xs={2} sm={2} md={2}>
                     <Input type="select" id="chart-type" onChange={this.handleChartType}>{chartOptions}</Input>
@@ -101,6 +108,7 @@ var ActiveDevicesHistory = React.createClass({
                     <Input type="checkbox" id="stack-check" label="Stacked" onChange={this.handleStack}/>
                 </Col>
             </form>
+            {alert}
             <Row>
                 <Col xs={12} sm={12} md={12}>
                     <c3HistoryChart data={this.state.filteredData} stackable={this.state.stackable} zoomable={this.state.zoomable} chartType={this.state.chartType} xTickFormat="short"/>
@@ -109,10 +117,9 @@ var ActiveDevicesHistory = React.createClass({
             <p className="chart-remark">Notes: <br/>
                 &nbsp;&nbsp;- Scroll to zoom, drag to pan<br/>
                 &nbsp;&nbsp;- Legends are clickable to toggle visiblity by group<br/>
-                &nbsp;&nbsp;- Zooming/Dragging may be laggy in certain browsers
-                &nbsp;&nbsp;- There is no cap plot but if you query returns more than 1440 data points (~24 hours), performance might be very poor<br/>
+                &nbsp;&nbsp;- Zooming/Dragging may be laggy in certain browsers<br/>
+                &nbsp;&nbsp;- Showing latest 720 data points<br/>
             </p>
-
         </div>)
     }
 });
