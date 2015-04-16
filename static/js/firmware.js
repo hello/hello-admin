@@ -94,8 +94,9 @@ var DeviceListHeaders = React.createClass({
 var FirmwareListHeaders = React.createClass({
     render: function() {
         return (<thead><tr>
+            <th className='alert-info'>Last Seen</th>
             <th className='alert-info'>FW Version</th>
-            <th className='alert-info'>&#35; of Devices Seen</th>
+            <th className='alert-info'>&#35;</th>
         </tr></thead>)
     }
 });
@@ -115,9 +116,13 @@ var HistoryListHeaders = React.createClass({
 
 var FirmwareListRows = React.createClass({
     render: function() {
-        var firmwareListRows = this.props.fwList.map(function(fw){
+        var firmwareListRows = this.props.fwList.sort(timestampSort).map(function(fw){
+        var timestamp = new Date(Number(fw.timestamp));
             return(
                 <tr>
+                    <td>
+                        {timestamp.toLocaleString()}
+                    </td>
                     <td>
                     <LinkToFWSearch firmware_version={fw.version} />
                     {" (" + parseInt(fw.version, 10).toString(16) + ")"}
@@ -528,32 +533,26 @@ var FirmwareMaestro = React.createClass({
         return (<div>
             <TabbedArea defaultActiveKey={1}>
               <TabPane key={1} tab="Firmware History">
-                <p/><p/>
-
-                <div className="col">
-                  <div className="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-                    <Button bsStyle="primary" onClick={this.fwList}><Glyphicon glyph="list"/> List All FW Seen</Button>
-                  </div>
-                </div>
-                <div className="col">
-                  <div className="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-                    <Input id="device_id" type="text" bsStyle={inputStyle} placeholder="<Enter Device ID>" hasFeedback />
-                  </div>
-                  <div className="col-xs-1 col-sm-1 col-md-1 col-lg-1">
-                    <Button id="device_history_search" bsStyle="success" onClick={this.fwHistoryList} type='submit'><Glyphicon glyph="search"/></Button>
-                  </div>
-                </div>
-                <div className="col">
-                  <div className="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-                    <Input id="firmware_version" type="text" bsStyle={inputStyle} placeholder="<Enter FW Version>" hasFeedback />
-                  </div>
-                  <div className="col-xs-1 col-sm-1 col-md-1 col-lg-1">
-                    <Button id="firmware_version_search" bsStyle="warning" onClick={this.deviceList} type='submit'><Glyphicon glyph="search"/></Button>
-                  </div>
-                  {remove}
-                </div>
-
-               <Col xs={5} md={5}>
+                <Row>
+                    &nbsp;
+                </Row>
+                    <Col xs={2} md={2}>
+                        <Button bsStyle="primary" onClick={this.fwList}><Glyphicon glyph="list"/> List All FW Seen</Button>
+                    </Col>
+                    <Col xs={3} md={3}>
+                        <Input id="device_id" type="text" bsStyle={inputStyle} placeholder="<Enter Device ID>" hasFeedback />
+                    </Col>
+                    <Col xs={1} md={1}>
+                        <Button id="device_history_search" bsStyle="success" onClick={this.fwHistoryList} type='submit'><Glyphicon glyph="search"/></Button>
+                    </Col>
+                    <Col xs={3} md={3}>
+                        <Input id="firmware_version" type="text" bsStyle={inputStyle} placeholder="<Enter FW Version>" hasFeedback />
+                    </Col>
+                    <Col xs={3} md={3}>
+                        <Button id="firmware_version_search" bsStyle="warning" onClick={this.deviceList} type='submit'><Glyphicon glyph="search"/></Button>
+                    </Col>
+                    {remove}
+               <Col xs={6} md={6}>
                 <Panel header="Firmware Seen">
                     <div id="fw_seen">
                     {countResult}
@@ -563,7 +562,7 @@ var FirmwareMaestro = React.createClass({
                     {historyResult}
                 </Panel>
                 </Col>
-                <Col xs={7} md={7}>
+                <Col xs={6} md={6}>
                     <Panel header="Device List">
                     <Input type="select" id="device-count" onChange={this.changeRange} addonBefore="Device Count:">
                       <option selected value="9">10</option>
@@ -608,4 +607,8 @@ function prettify_json(json_obj, title_field) {
     </div>);
   });
   return divs
+}
+
+function timestampSort(a, b) {
+ return b.timestamp-a.timestamp
 }
