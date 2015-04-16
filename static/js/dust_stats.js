@@ -83,6 +83,7 @@ var c3Chart = React.createClass({
                 .text("Sense " + deviceId);
             });
         return(<div>
+            <Button bsSize="small"><FileExporter fileContent={this.props.data} fileName="dust-statistic"/></Button>
             {graphs}
         </div>)
     }
@@ -105,7 +106,7 @@ var DustStatsChart = React.createClass({
         var deviceIdFromURL = getParameterByName('device_id');
         var startTsFromURL = getParameterByName('start_ts');
         var endTsFromURL = getParameterByName('end_ts');
-        var lengthFromURL = getParameterByName('length');
+        var lengthFromURL = getParameterByName('length') || 100;
         if (deviceIdFromURL.isWhiteString()) {
             return false;
         }
@@ -171,10 +172,12 @@ var DustStatsChart = React.createClass({
             </form>
             <p className="chart-remark">Notes: <br/>
                 &nbsp;&nbsp;- This chart relies on logging consistency, {'regex_pattern = "collecting time (\d+)\\t.*?dust (\d+) (\d+) (\d+) (\d+)\\t"'}<br/>
+                &nbsp;&nbsp;- Leaving the start_ts and end_ts blank assumes querying for recent logs<br/>
                 &nbsp;&nbsp;- Max data size is 700, however for good performance, less than 200 points is reccommended<br/>
                 &nbsp;&nbsp;- Latest logs show up first, so you want to adjust end timestamp in case you want backtrack in further<br/>
                 &nbsp;&nbsp;- Can display data for up to 3 senses at once.
             </p><br/>
+
             <Row>
                 <Col xs={12} sm={12} md={12}>
                     <c3Chart id="dust-stats-chart" data={this.state.data} zoomable={this.state.zoomable} chartType={this.state.chartType}/>
