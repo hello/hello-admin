@@ -67,7 +67,7 @@ var OmniTableContent = React.createClass({
                 deviceLastSeen, <br/>,
                     device.type === "SENSE" ?
                     <span>Firmware: <a href={"/firmware/?device_id=" +  device.deviceId} target="_blank">
-                    <span className={unhashedFwVersion.indexOf("unknown") > -1 ? "unknown-firmware" : "known-firmware"}>{unhashedFwVersion}</span>
+                    <span className={unhashedFwVersion && unhashedFwVersion.indexOf("unknown") === -1 ? "known-firmware" : "unknown-firmware"}>{unhashedFwVersion}</span>
                     </a></span>:
                     <span>Battery Level: <a href={"/battery/?search=" + device.deviceId} target="_blank">
                     {device.batteryLevel}

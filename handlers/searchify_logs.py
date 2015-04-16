@@ -168,7 +168,7 @@ class DustStatsAPI(ProtectedRequestHandler):
         try:
             query.set_query("text:dust")
             query.set_category_filters({"device_id": self.request.get("device_id", "")})
-            query.set_length(int(self.request.get("length", 100)))
+            query.set_length(min(700, int(self.request.get("length", 100))))
 
             start_ts = self.request.get("start_ts", None)
             if start_ts:
