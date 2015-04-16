@@ -7,11 +7,12 @@ var FileExporter = React.createClass({
             icon: "cloud-download",
             buttonName: "JSON",
             fileName: "export.json"
+            dataType: "data:application/json;charset=utf-8,"
         }
     },
     render: function(){
         return <a className="export" download={this.props.fileName} target="_blank"
-                href={"data:application/json;charset=utf-8," + encodeURI(JSON.stringify(this.props.fileContent))}>
+                href={this.props.dataType + encodeURI(JSON.stringify(this.props.fileContent))}>
                 <Glyphicon glyph={this.props.icon}/> {this.props.buttonName}
             </a>;
     }
