@@ -176,7 +176,7 @@ class DustStatsAPI(ProtectedRequestHandler):
 
             results = index.search(**query.mapping())['results']
 
-            regex_pattern = "collecting time (\d+)\\t.*?dust (\d+) (\d+) (\d+) (\d+)"
+            regex_pattern = "collecting time (\d+)\\t.*?dust (\d+) (\d+) (\d+) (\d+)\\t"
 
             matches = [re.findall(regex_pattern, r['text']) for r in results]
 
