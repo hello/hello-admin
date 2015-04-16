@@ -16,6 +16,7 @@ class FirmwareAPI(FirmwareRequestHandler):
             api_url="firmware/devices/",
             type="GET",
             url_params={'firmware_version': firmware_version, 'range_start': range_start, 'range_end': range_end},
+            access_token=settings.ADMIN_APP_INFO.access_token,
             app_info=settings.ADMIN_APP_INFO
         )
 
@@ -31,6 +32,7 @@ class FirmwareAPI(FirmwareRequestHandler):
             api_url="firmware/{}/{}".format(device_id, firmware_version),
             type="PUT",
             body_data=json.dumps(update_data),
+            access_token=settings.ADMIN_APP_INFO.access_token,
             app_info=settings.ADMIN_APP_INFO
         )
 
@@ -43,6 +45,7 @@ class FirmwareAPI(FirmwareRequestHandler):
         self.hello_request(
             api_url="firmware/{}".format(device_id),
             type="DELETE",
+            access_token=settings.ADMIN_APP_INFO.access_token,
             app_info=settings.ADMIN_APP_INFO
         )
 
@@ -52,6 +55,7 @@ class FirmwareInfoAPI(FirmwareRequestHandler):
         self.hello_request(
             api_url="firmware/list/",
             type="GET",
+            access_token=settings.ADMIN_APP_INFO.access_token,
             app_info=settings.ADMIN_APP_INFO
         )
 
@@ -63,6 +67,7 @@ class FirmwareHistoryAPI(FirmwareRequestHandler):
         self.hello_request(
             api_url="firmware/{}/history".format(device_id),
             type="GET",
+            access_token=settings.ADMIN_APP_INFO.access_token,
             app_info=settings.ADMIN_APP_INFO
         )
 
@@ -74,6 +79,7 @@ class FirmwareUnhashAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="firmware/names/{}".format(hashed_firmware),
             type="GET",
+            access_token=settings.ADMIN_APP_INFO.access_token,
             app_info=settings.ADMIN_APP_INFO
         )
 
