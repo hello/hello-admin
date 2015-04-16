@@ -86,6 +86,7 @@ from handlers.views import ActiveDevicesHistoryView
 from handlers.events import SenseEventsAPI
 from handlers.views import SenseEventsView
 from handlers.firmware import FirmwareUnhashAPI
+from handlers.searchify_logs import DustStatsAPI
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -142,6 +143,7 @@ api_routes = [
     ('/api/active_devices_history/?$', ActiveDevicesHistoryAPI),
     ('/api/sense_events/?$', SenseEventsAPI),
     ('/api/firmware_unhash/?$', FirmwareUnhashAPI),
+    ('/api/dust_stats/?$', DustStatsAPI),
 ]
 
 page_routes = [

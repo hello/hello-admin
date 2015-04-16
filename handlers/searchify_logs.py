@@ -1,4 +1,5 @@
 import json
+import re
 import settings
 import logging as log
 from handlers.helpers import ProtectedRequestHandler
@@ -150,6 +151,47 @@ class SearchifyStatsAPI(ProtectedRequestHandler):
                 })
         except Exception as e:
             output['error'] = display_error(e)
+
+        self.response.write(json.dumps(output))
+
+
+class DustStatsAPI(ProtectedRequestHandler):
+    def get(self):
+        output = {"data": [], "error": ""}
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX)
+        query = SearchifyQuery()
+
+        try:
+            query.set_query("text:dust")
+            query.set_category_filters({"device_id": self.request.get("device_id", "")})
+            query.set_length(int(self.request.get("length", 100)))
+
+            start_ts = self.request.get("start_ts", None)
+            if start_ts:
+                start_ts = int(start_ts)/1000
+            end_ts = self.request.get("end_ts", None)
+            if end_ts:
+                end_ts = int(end_ts)/1000
+            query.set_docvar_filters({0: [[start_ts, end_ts]]})
+
+            results = index.search(**query.mapping())['results']
+
+            regex_pattern = "collecting time (\d+)\\t.*?dust (\d+) (\d+) (\d+) (\d+)"
+
+            matches = [re.findall(regex_pattern, r['text']) for r in results]
+
+            output['data'] = [{
+                'timestamp': item[0],
+                'average': item[1],
+                'max': item[2],
+                'min': item[3],
+                'variance': item[4]
+            } for sublist in matches for item in sublist if all([i.isdigit() for i in item])]
+
+        except Exception as e:
+            output['error'] = display_error(e)
+            log.error('ERROR: {}'.format(display_error(e)))
+
         self.response.write(json.dumps(output))
 
 class SearchifyQuery():
@@ -159,6 +201,7 @@ class SearchifyQuery():
         self.category_filters = {}  # by default no filter
         self.scoring_function = 0  # by default looks for latest documents
         self.length = 100  # by default return at most 100 documents per search
+        self.docvar_filters = {}
 
     def set_query(self, query):
         if not isinstance(query, str):
@@ -177,13 +220,18 @@ class SearchifyQuery():
 
     def set_scoring_function(self, scoring_function):
         if not isinstance(scoring_function, int):
-            raise TypeError("Scoring function ID must an integer")
+            raise TypeError("Scoring function ID must be an integer")
         self.scoring_function = scoring_function
 
     def set_length(self, length):
         if not isinstance(length, int):
-            raise TypeError("Results length must an integer")
+            raise TypeError("Results length must be an integer")
         self.length = length
+
+    def set_docvar_filters(self, docvar_filters):
+        if not isinstance(docvar_filters, dict):
+            raise TypeError("Results length must be a dict")
+        self.docvar_filters = docvar_filters
 
     def mapping(self):
         return {
