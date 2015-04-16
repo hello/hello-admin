@@ -256,7 +256,7 @@ var TimelineMaestro = React.createClass({
                 <Col xs={3} md={3}>
                     <Input id="email-input" type="text" addonBefore={<Glyphicon glyph="user"/>} placeholder="user email" />
                 </Col>
-                <Col xs={2} md={2}>
+                <Col xs={1} md={1}>
                     <Button bsStyle="info" type="submit">{<Glyphicon glyph="search"/>}</Button>
                 </Col>
                 <Col xs={3} md={3}>
@@ -270,7 +270,10 @@ var TimelineMaestro = React.createClass({
                         <option value="all">All raw data</option>
                     </Input>
                 </Col>
-                <Col xs={1} sm={1} md={1} lg={1} xl={1}>
+                <Col xs={1}>
+                    <Button><FileExporter fileContent={this.state.data} fileName="timeline"/></Button>
+                </Col>
+                <Col xs={1}>
                     <Button bsStyle="default" onClick={this.invalidateCache}><Glyphicon glyph="remove"/> Cache</Button>
                 </Col>
             </form>
