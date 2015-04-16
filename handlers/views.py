@@ -193,3 +193,8 @@ class SenseEventsView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/sense_events.html',
                                 context={'title': 'Sense Events'})
+
+class DustStatsView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/dust_stats.html',
+                                context={'title': 'Dust Statistics'})
