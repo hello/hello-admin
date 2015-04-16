@@ -81,7 +81,7 @@ var SenseEventsMaestro = React.createClass({
                     }
                 }
                 else {
-                    that.setState({data: [], error: response.error});
+                    that.setState({data: [], error: response.status});
                 }
             }
         });
@@ -109,7 +109,11 @@ var SenseEventsMaestro = React.createClass({
 
         var alert = this.state.haltQuery === false ? null : <Alert> No more older events found! </Alert>;
 
-        var results = !this.state.error.isWhiteString() ? null :
+        if (this.state.error !== "") {
+            alert = <Alert> {this.state.error} </Alert>
+        }
+
+        var results = this.state.error !== "" ? null :
             <Table id="events-table" striped>
                 <thead>
                     <tr>
