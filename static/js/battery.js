@@ -167,7 +167,10 @@ var BatteryChart = React.createClass({
                     <Input type="select" id="chart-type" onChange={this.handleChartType}>{chartOptions}</Input>
                 </Col>
                 <Col xs={1} sm={1} md={1}>
-                    <Input type="checkbox" id="zoom-check" label="Zoomable" onChange={this.handleZoom}/>
+                    <Input type="checkbox" id="zoom-check" label="Zoomable&nbsp;" onChange={this.handleZoom}/>
+                </Col>
+                <Col xs={1} sm={1} md={1}>
+                    <Button><FileExporter fileContent={that.state.data} fileName="battery"/></Button>
                 </Col>
             </form>
             <Row>
