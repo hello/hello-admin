@@ -69,14 +69,18 @@ class SearchifyLogsHandler(ProtectedRequestHandler):
             input_list = stripStringToList(devices_input)
             for d in input_list:
                 if '@' in d and '.' in d:
-                    devices_list += self.hello_request(
-                        api_url="devices/q",
+                    device_info = self.hello_request(
+                        api_url="devices/sense",
                         type="GET",
                         url_params={'email': d},
+                        app_info=settings.ADMIN_APP_INFO,
                         raw_output=True
                     ).data
+                    if device_info:
+                        devices_list.append(device_info[0]['device_account_pair']['externalDeviceId'])
                 else:
                     devices_list.append(d)
+
         if devices_list:  # Only filter if list of devices is not empty
             return self.get_logs_by_index(index_name, {'device_id': devices_list})
 
