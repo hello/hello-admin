@@ -297,17 +297,28 @@ var vizForm = React.createClass({
     },
 
     render: function() {
+        var that = this;
         var alert = this.state.alert === "" ? null : <div><br/><Alert>{this.state.alert}</Alert></div>;
+        var fileExporters = sensorList.map(function(sensor, i){
+            return <MenuItem eventKey={i.toString()}>
+                <FileExporter fileContent={that.state[sensor]} fileName={sensor} buttonName={sensor.capitalize()}/>
+            </MenuItem>;
+        });
         return (<div>
             <form onSubmit={this.handleSubmit} className="row">
-                <div className="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                <Col xs={3}>
                     <p className="icon-addon addon-xs">
                         <input id="email-input" className="form-control" placeholder="email"/>
                         <label className="glyphicon glyphicon-user"></label>
                     </p>
-                </div>
+                </Col>
                 <LongDatetimePicker placeHolder="end time" id="end-time" defaultDate={todayInDatepickerFormat} glyphicon="time" />
-                <Button type="submit" bsStyle="success"><Glyphicon glyph="share-alt"/></Button>
+                <Col xs={1}>
+                    <Button type="submit" bsStyle="success"><Glyphicon glyph="search"/></Button>
+                </Col>
+                <Col xs={1}>
+                    <DropdownButton bsStyle="info" title="&darr; JSON">{fileExporters}</DropdownButton>
+                </Col>
             </form>
             {alert}
             <vizCanvas
