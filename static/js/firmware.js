@@ -116,10 +116,7 @@ var HistoryListHeaders = React.createClass({
 
 var FirmwareListRows = React.createClass({
     render: function() {
-        this.props.fwList.sort(function(a, b){
-         return b.timestamp-a.timestamp
-        })
-        var firmwareListRows = this.props.fwList.map(function(fw){
+        var firmwareListRows = this.props.fwList.sort(timestampSort).map(function(fw){
         var timestamp = new Date(Number(fw.timestamp));
             return(
                 <tr>
@@ -539,28 +536,22 @@ var FirmwareMaestro = React.createClass({
                 <Row>
                     &nbsp;
                 </Row>
-                    <div className="col">
-                      <div className="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                    <Col xs={2} md={2}>
                         <Button bsStyle="primary" onClick={this.fwList}><Glyphicon glyph="list"/> List All FW Seen</Button>
-                      </div>
-                    </div>
-                    <div className="col">
-                      <div className="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                    </Col>
+                    <Col xs={3} md={3}>
                         <Input id="device_id" type="text" bsStyle={inputStyle} placeholder="<Enter Device ID>" hasFeedback />
-                      </div>
-                      <div className="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+                    </Col>
+                    <Col xs={1} md={1}>
                         <Button id="device_history_search" bsStyle="success" onClick={this.fwHistoryList} type='submit'><Glyphicon glyph="search"/></Button>
-                      </div>
-                    </div>
-                    <div className="col">
-                      <div className="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                    </Col>
+                    <Col xs={3} md={3}>
                         <Input id="firmware_version" type="text" bsStyle={inputStyle} placeholder="<Enter FW Version>" hasFeedback />
-                      </div>
-                      <div className="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                    </Col>
+                    <Col xs={3} md={3}>
                         <Button id="firmware_version_search" bsStyle="warning" onClick={this.deviceList} type='submit'><Glyphicon glyph="search"/></Button>
-                      </div>
-                      {remove}
-                    </div>
+                    </Col>
+                    {remove}
                <Col xs={6} md={6}>
                 <Panel header="Firmware Seen">
                     <div id="fw_seen">
@@ -616,4 +607,8 @@ function prettify_json(json_obj, title_field) {
     </div>);
   });
   return divs
+}
+
+function timestampSort(a, b) {
+ return b.timestamp-a.timestamp
 }
