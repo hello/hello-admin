@@ -6,7 +6,7 @@ var FileExporter = React.createClass({
             fileContent: "",
             icon: "cloud-download",
             buttonName: "JSON",
-            fileName: "export.json"
+            fileName: "export.json",
             dataType: "data:application/json;charset=utf-8,"
         }
     },
