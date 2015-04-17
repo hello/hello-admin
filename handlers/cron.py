@@ -13,9 +13,9 @@ from handlers.utils import epoch_to_human
 from models.ext import ZendeskDailyStats
 from models.ext import RecentlyActiveDevicesStats
 from indextank import ApiClient
-from handlers.searchify_logs import SearchifyQuery
-
 from google.appengine.api import taskqueue
+
+
 class ZendeskCronHandler(BaseRequestHandler):
     def get(self):
         output = {'data': []}
@@ -213,7 +213,7 @@ class GeckoboardPush(BaseRequestHandler):
                         "value": count,
                         "text": device_type
                     },
-                ]
+                    ]
             }
         }
 
@@ -245,25 +245,70 @@ class DevicesCountPushAPI(GeckoboardPush):
 
 class AlarmsCountPushAPI(GeckoboardPush):
     def get(self):
-        if settings.GECKOBOARD is None or settings.GECKOBOARD.alarms_widget_id:
-            self.error("missing Geckoboard credentials!")
+        # if settings.GECKOBOARD is None or settings.GECKOBOARD.alarms_widget_id:
+        #     self.error("missing Geckoboard credentials!")
 
+        alarm_pattern = "ALARM RINGING"
         alarms_count = -1
 
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX)
+
+        try:
+            alarms_count = index.search(query=alarm_pattern, docvar_filters={0:[[time.time() - 24*3600, None]]})['matches']
+
+        except Exception as e:
+            self.error(e.message)
+
         self.response.write(json.dumps({
-            "alarms": self.push_to_gecko(alarms_count, "alarms", settings.GECKOBOARD.alarms_widget_id),
-        }))
+            # "alarms": self.push_to_gecko(alarms_count, "alarms", settings.GECKOBOARD.alarms_widget_id),
+            "alarms": self.push_to_gecko(alarms_count, "alarms", "125660-3c3cfc26-67e6-4fbf-8ccd-0039c641fda3"),
+            }))
+
 
 class WavesCountPushAPI(GeckoboardPush):
     def get(self):
-        if settings.GECKOBOARD is None or settings.GECKOBOARD.waves_widget_id:
-            self.error("missing Geckoboard credentials!")
+        # if settings.GECKOBOARD is None or settings.GECKOBOARD.waves_widget_id:
+        #     self.error("missing Geckoboard credentials!")
 
+        wave_pattern = "Gesture: WAVE"
         waves_count = -1
 
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX)
+
+        try:
+            results = index.search(query=wave_pattern, docvar_filters={0:[[time.time() - 24*3600, None]]}, length=5000, fetch_fields=['text'])['results']
+            waves_count =  sum([i['text'].count(wave_pattern) for i in results])
+
+        except Exception as e:
+            self.error(e.message)
+
         self.response.write(json.dumps({
-            "alarms": self.push_to_gecko(waves_count, "waves", settings.GECKOBOARD.waves_widget_id),
-        }))
+            # "waves": self.push_to_gecko(waves_count, "waves", settings.GECKOBOARD.waves_widget_id),
+            "waves": self.push_to_gecko(waves_count, "waves on old firmware", "125660-e8d0841b-6655-40f9-9b88-4cdef30590b6"),
+            }))
+
+
+class HoldsCountPushAPI(GeckoboardPush):
+    def get(self):
+        # if settings.GECKOBOARD is None or settings.GECKOBOARD.holds_widget_id:
+        #     self.error("missing Geckoboard credentials!")
+
+        hold_pattern = "Gesture: HOLD"
+        holds_count = -1
+
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX)
+
+        try:
+            results = index.search(query=hold_pattern, docvar_filters={0:[[time.time() - 24*3600, None]]}, length=5000, fetch_fields=['text'])['results']
+            holds_count =  sum([i['text'].count(hold_pattern) for i in results])
+
+        except Exception as e:
+            self.error(e.message)
+
+        self.response.write(json.dumps({
+            # "holds": self.push_to_gecko(holds_count, "holds", settings.GECKOBOARD.holds_widget_id),
+            "holds": self.push_to_gecko(holds_count, "holds on old firmware", "125660-2442ccde-be68-4c8a-b3d5-0315bba368db"),
+            }))
 
 
 class StoreRecentlyActiveDevicesStats(BaseRequestHandler):

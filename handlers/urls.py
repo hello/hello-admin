@@ -90,6 +90,7 @@ from handlers.searchify_logs import DustStatsAPI
 from handlers.views import DustStatsView
 from handlers.cron import AlarmsCountPushAPI
 from handlers.cron import WavesCountPushAPI
+from handlers.cron import HoldsCountPushAPI
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -100,6 +101,7 @@ cron_routes = [
     ('/cron/devices_count_push', DevicesCountPushAPI),
     ('/cron/alarms_count_push', AlarmsCountPushAPI),
     ('/cron/waves_count_push', WavesCountPushAPI),
+    ('/cron/holds_count_push', HoldsCountPushAPI),
     ('/cron/store_recently_active_devices_stats', StoreRecentlyActiveDevicesStats),
 ]
 
