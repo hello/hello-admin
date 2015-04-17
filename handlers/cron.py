@@ -13,6 +13,7 @@ from handlers.utils import epoch_to_human
 from models.ext import ZendeskDailyStats
 from models.ext import RecentlyActiveDevicesStats
 from indextank import ApiClient
+from handlers.searchify_logs import SearchifyQuery
 
 from google.appengine.api import taskqueue
 class ZendeskCronHandler(BaseRequestHandler):
@@ -202,6 +203,26 @@ class SearchifyPurgeQueue(SearchifyPurgeHandler):
 
 
 class GeckoboardPush(BaseRequestHandler):
+    @staticmethod
+    def push_to_gecko(count, device_type, widget_id):
+        post_data = {
+            "api_key": settings.GECKOBOARD.api_key,
+            "data": {
+                "item": [
+                    {
+                        "value": count,
+                        "text": device_type
+                    },
+                ]
+            }
+        }
+
+        widget_url = "https://push.geckoboard.com/v1/send/" + widget_id
+        gecko_response = requests.post(widget_url, json.dumps(post_data))
+        return {"success": gecko_response.ok}
+
+
+class DevicesCountPushAPI(GeckoboardPush):
     def get(self):
         devices_status_breakdown = self.hello_request(
             type="GET",
@@ -221,23 +242,28 @@ class GeckoboardPush(BaseRequestHandler):
             "pill": self.push_to_gecko(pills_count, "pills", settings.GECKOBOARD.pills_widget_id)
         }))
 
-    @staticmethod
-    def push_to_gecko(count, device_type, widget_id):
-        post_data = {
-            "api_key": settings.GECKOBOARD.api_key,
-            "data": {
-                "item": [
-                    {
-                        "value": count,
-                        "text": device_type
-                    },
-                ]
-            }
-        }
 
-        widget_url = "https://push.geckoboard.com/v1/send/" + widget_id
-        gecko_response = requests.post(widget_url, json.dumps(post_data))
-        return {"success": gecko_response.ok}
+class AlarmsCountPushAPI(GeckoboardPush):
+    def get(self):
+        if settings.GECKOBOARD is None or settings.GECKOBOARD.alarms_widget_id:
+            self.error("missing Geckoboard credentials!")
+
+        alarms_count = -1
+
+        self.response.write(json.dumps({
+            "alarms": self.push_to_gecko(alarms_count, "alarms", settings.GECKOBOARD.alarms_widget_id),
+        }))
+
+class WavesCountPushAPI(GeckoboardPush):
+    def get(self):
+        if settings.GECKOBOARD is None or settings.GECKOBOARD.waves_widget_id:
+            self.error("missing Geckoboard credentials!")
+
+        waves_count = -1
+
+        self.response.write(json.dumps({
+            "alarms": self.push_to_gecko(waves_count, "waves", settings.GECKOBOARD.waves_widget_id),
+        }))
 
 
 class StoreRecentlyActiveDevicesStats(BaseRequestHandler):
