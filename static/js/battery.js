@@ -196,7 +196,7 @@ function filterData(data) {
                 d.lastSeen *= 1000;
             }
             return d;
-        }).sort(compareTimestamp).slice(-169, -1);
+        }).sort(compareTimestamp);
     });
 }
 
