@@ -10,7 +10,7 @@ from handlers.cron import SensePurge
 from handlers.cron import ApplicationPurge
 from handlers.cron import WorkersPurge
 from handlers.cron import SearchifyPurgeQueue
-from handlers.cron import GeckoboardPush
+from handlers.cron import DevicesCountPushAPI
 from handlers.zendesk import ZendeskAPI
 from handlers.zendesk import ZendeskStatsAPI
 from handlers.zendesk import ZendeskHistoryAPI
@@ -88,6 +88,9 @@ from handlers.views import SenseEventsView
 from handlers.firmware import FirmwareUnhashAPI
 from handlers.searchify_logs import DustStatsAPI
 from handlers.views import DustStatsView
+from handlers.cron import AlarmsCountPushAPI
+from handlers.cron import WavesCountPushAPI
+from handlers.cron import HoldsCountPushAPI
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -95,7 +98,10 @@ cron_routes = [
     ('/cron/workers_purge/?$', WorkersPurge),
     ('/cron/searchify_purge_queue/?$', SearchifyPurgeQueue),
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
-    ('/cron/geckoboard_push', GeckoboardPush),
+    ('/cron/devices_count_push', DevicesCountPushAPI),
+    ('/cron/alarms_count_push', AlarmsCountPushAPI),
+    ('/cron/waves_count_push', WavesCountPushAPI),
+    ('/cron/holds_count_push', HoldsCountPushAPI),
     ('/cron/store_recently_active_devices_stats', StoreRecentlyActiveDevicesStats),
 ]
 
