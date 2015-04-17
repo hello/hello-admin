@@ -143,7 +143,12 @@ var MotionMaestro = React.createClass({
                     <Button bsSize="large" bsStyle="info" tilte="Clear Filter" className="btn-circle" onClick={this.handleClear}>{<Glyphicon glyph="remove"/>}</Button>
                 </Col>
             </form>
-            <p> All times are displayed using user local timezone </p>
+            <Row>
+                <Button bsSize="xsmall">
+                    <FileExporter fileContent={this.state.filteredData} fileName="motion"/>
+                </Button>
+                &nbsp;All times are displayed using user local timezone
+            </Row>
             <br />
             {alert}
             {stepwiseChart}
