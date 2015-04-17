@@ -37,7 +37,6 @@ var KeyStoreMaestro = React.createClass({
         };
         console.log(requestData);
         if (isValidRequest(requestData) === true) {
-            console.log(" good request");
             $.ajax({
                 url: "/api/devices/key_store",
                 type: "GET",

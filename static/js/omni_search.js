@@ -26,6 +26,23 @@ var OmniTableContent = React.createClass({
         return version;
     },
 
+    isDeviceProvisioned: function(deviceId, deviceType) {
+        var isProvisioned = true;
+        $.ajax({
+            url: "/api/devices/key_store",
+            dataType: 'json',
+            type: "GET",
+            async: false,
+            data: {device_id: deviceId.toUpperCase(), device_type: deviceType.toLowerCase()},
+            success: function (response) {
+                if (!response.error.isWhiteString()) {
+                    isProvisioned = false;
+                }
+            }
+        });
+        return isProvisioned;
+    },
+
     render: function() {
         var that = this;
         var thisContent = this.props.content;
@@ -50,7 +67,7 @@ var OmniTableContent = React.createClass({
 
             var deviceLabel = [
                 <a href={"/key_store/?device=" + device.deviceId + "&type=" + device.type.toLowerCase()} title="View key hint" target="_blank">
-                    <Glyphicon glyph="barcode" />
+                    <Glyphicon glyph="barcode" className={that.isDeviceProvisioned(device.deviceId, device.type) ? "provisioned" : "unprovisioned"} />
                 </a>,
                 <span>&nbsp;{device.type}</span>, <br/>,
                 debugLogLink, <br/>
@@ -67,7 +84,7 @@ var OmniTableContent = React.createClass({
                 deviceLastSeen, <br/>,
                     device.type === "SENSE" ?
                     <span>Firmware: <a href={"/firmware/?device_id=" +  device.deviceId} target="_blank">
-                    <span className={unhashedFwVersion && unhashedFwVersion.indexOf("unknown") === -1 ? "known-firmware" : "unknown-firmware"}>{unhashedFwVersion}</span>
+                        <span className={unhashedFwVersion && unhashedFwVersion.indexOf("unknown") === -1 ? "known-firmware" : "unknown-firmware"}>{unhashedFwVersion}</span>
                     </a></span>:
                     <span>Battery Level: <a href={"/battery/?search=" + device.deviceId} target="_blank">
                     {device.batteryLevel}
