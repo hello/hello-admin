@@ -92,8 +92,8 @@ var BatteryChart = React.createClass({
         return {
             data: [[], [], [], [], [], [], [], [], [], []],
             zoomable: false,
-            chartType: "area"
-//            pill904: []
+            chartType: "area",
+            alert: ""
         }
     },
 
@@ -128,6 +128,10 @@ var BatteryChart = React.createClass({
 
     handleSubmit: function() {
         var that = this;
+        that.setState({
+            alert: "Loading ...",
+            data: [[], [], [], [], [], [], [], [], [], []]
+        });
         var searchInput = $('#search-input').val();
         var endTs = $('#end-ts').val();
         var requestData = {
@@ -141,8 +145,13 @@ var BatteryChart = React.createClass({
             data: requestData,
             success: function(response) {
                 console.log(response.data);
-                that.setState({data: filterData(response.data)});
                 that.pushHistory(searchInput, endTs);
+                if (response.error.isWhiteString()) {
+                    that.setState({data: filterData(response.data), alert: ""});
+                }
+                else {
+                    that.setState({data: [], alert: response.error})
+                }
             }
         });
         return false;
@@ -152,8 +161,12 @@ var BatteryChart = React.createClass({
         var chartOptions = ["area", "area-spline", "area-step", "spline", "step", "line", "bar"].map(function (c) {
             return <option value={c}>{c.capitalize() + " Chart"}</option>;
         });
-        var that = this;
-
+        var alert = this.state.alert === "" ? null : <Alert>{this.state.alert}</Alert>;
+        var notes = this.state.alert === "" ? <p className="chart-remark">Notes: <br/>
+                &nbsp;&nbsp;- By default, data is shown for the last 14 days<br/>
+                &nbsp;&nbsp;- Legends are clickable to toggle visiblity by group<br/>
+                &nbsp;&nbsp;- Zooming/Dragging may be laggy in certain browsers
+            </p>: null;
         return (<div>
             <form className="row" onSubmit={this.handleSubmit}>
                 <Col xs={3} sm={3} md={3}>
@@ -170,19 +183,16 @@ var BatteryChart = React.createClass({
                     <Input type="checkbox" id="zoom-check" label="Zoomable&nbsp;" onChange={this.handleZoom}/>
                 </Col>
                 <Col xs={1} sm={1} md={1}>
-                    <Button><FileExporter fileContent={that.state.data} fileName="battery"/></Button>
+                    <Button><FileExporter fileContent={this.state.data} fileName="battery"/></Button>
                 </Col>
             </form>
+            {alert}
             <Row>
                 <Col xs={12} sm={12} md={12}>
-                    <c3Chart id="battery-graph" data={that.state.data} zoomable={that.state.zoomable} chartType={that.state.chartType}/>
+                    <c3Chart id="battery-graph" data={this.state.data} zoomable={this.state.zoomable} chartType={this.state.chartType}/>
                 </Col>
             </Row>
-            <p className="chart-remark">Notes: <br/>
-            &nbsp;&nbsp;- By default, data is shown for the last 7 days<br/>
-            &nbsp;&nbsp;- Legends are clickable to toggle visiblity by group<br/>
-            &nbsp;&nbsp;- Zooming/Dragging may be laggy in certain browsers
-            </p>
+            {notes}
 
         </div>)
     }
@@ -196,7 +206,7 @@ function filterData(data) {
                 d.lastSeen *= 1000;
             }
             return d;
-        }).sort(compareTimestamp).slice(-169, -1);
+        }).sort(compareTimestamp);
     });
 }
 
