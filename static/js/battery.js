@@ -93,7 +93,7 @@ var BatteryChart = React.createClass({
             data: [[], [], [], [], [], [], [], [], [], []],
             zoomable: false,
             chartType: "area",
-            alert: "Loading ..."
+            alert: ""
         }
     },
 
@@ -128,6 +128,10 @@ var BatteryChart = React.createClass({
 
     handleSubmit: function() {
         var that = this;
+        that.setState({
+            alert: "Loading ...",
+            data: [[], [], [], [], [], [], [], [], [], []]
+        });
         var searchInput = $('#search-input').val();
         var endTs = $('#end-ts').val();
         var requestData = {
@@ -146,7 +150,7 @@ var BatteryChart = React.createClass({
                     that.setState({data: filterData(response.data), alert: ""});
                 }
                 else {
-                    that.setState({data: [[], [], [], [], [], [], [], [], [], []], alert: response.error})
+                    that.setState({data: [], alert: response.error})
                 }
             }
         });
@@ -158,7 +162,11 @@ var BatteryChart = React.createClass({
             return <option value={c}>{c.capitalize() + " Chart"}</option>;
         });
         var alert = this.state.alert === "" ? null : <Alert>{this.state.alert}</Alert>;
-
+        var notes = this.state.alert === "" ? <p className="chart-remark">Notes: <br/>
+                &nbsp;&nbsp;- By default, data is shown for the last 14 days<br/>
+                &nbsp;&nbsp;- Legends are clickable to toggle visiblity by group<br/>
+                &nbsp;&nbsp;- Zooming/Dragging may be laggy in certain browsers
+            </p>: null;
         return (<div>
             <form className="row" onSubmit={this.handleSubmit}>
                 <Col xs={3} sm={3} md={3}>
@@ -184,11 +192,7 @@ var BatteryChart = React.createClass({
                     <c3Chart id="battery-graph" data={this.state.data} zoomable={this.state.zoomable} chartType={this.state.chartType}/>
                 </Col>
             </Row>
-            <p className="chart-remark">Notes: <br/>
-            &nbsp;&nbsp;- By default, data is shown for the last 7 days<br/>
-            &nbsp;&nbsp;- Legends are clickable to toggle visiblity by group<br/>
-            &nbsp;&nbsp;- Zooming/Dragging may be laggy in certain browsers
-            </p>
+            {notes}
 
         </div>)
     }

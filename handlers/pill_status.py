@@ -38,7 +38,10 @@ class PillStatusAPI(ProtectedRequestHandler):
         try:
             aggregate_data = last_week_data + previous_last_week_data
             battery_by_pill_id = defaultdict(list)
-            print len(aggregate_data)
+
+            if not aggregate_data:
+                output['error'] = "No data found!"
+
             for d in aggregate_data:
                 battery_by_pill_id['pill{}'.format(d['deviceId'])].append(d)
 
