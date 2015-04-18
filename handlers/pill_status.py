@@ -33,9 +33,18 @@ class PillStatusAPI(ProtectedRequestHandler):
                 url_params=url_params,
             ).data
 
-        aggregate_data = last_week_data + previous_last_week_data
-        battery_by_pill_id = defaultdict(list)
-        print len(aggregate_data)
-        for d in aggregate_data:
-            battery_by_pill_id['pill{}'.format(d['deviceId'])].append(d)
-        self.response.write(json.dumps({'data': dict(battery_by_pill_id).values()}))
+        output = {'error': '', 'data': []}
+
+        try:
+            aggregate_data = last_week_data + previous_last_week_data
+            battery_by_pill_id = defaultdict(list)
+            print len(aggregate_data)
+            for d in aggregate_data:
+                battery_by_pill_id['pill{}'.format(d['deviceId'])].append(d)
+
+            output['data'] = dict(battery_by_pill_id).values()
+
+        except Exception as e:
+            output['error'] = e.message
+
+        self.response.write(json.dumps(output))

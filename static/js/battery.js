@@ -92,8 +92,8 @@ var BatteryChart = React.createClass({
         return {
             data: [[], [], [], [], [], [], [], [], [], []],
             zoomable: false,
-            chartType: "area"
-//            pill904: []
+            chartType: "area",
+            alert: "Loading ..."
         }
     },
 
@@ -141,8 +141,13 @@ var BatteryChart = React.createClass({
             data: requestData,
             success: function(response) {
                 console.log(response.data);
-                that.setState({data: filterData(response.data)});
                 that.pushHistory(searchInput, endTs);
+                if (response.error.isWhiteString()) {
+                    that.setState({data: filterData(response.data), alert: ""});
+                }
+                else {
+                    that.setState({data: [[], [], [], [], [], [], [], [], [], []], alert: response.error})
+                }
             }
         });
         return false;
@@ -152,7 +157,7 @@ var BatteryChart = React.createClass({
         var chartOptions = ["area", "area-spline", "area-step", "spline", "step", "line", "bar"].map(function (c) {
             return <option value={c}>{c.capitalize() + " Chart"}</option>;
         });
-        var that = this;
+        var alert = this.state.alert === "" ? null : <Alert>{this.state.alert}</Alert>;
 
         return (<div>
             <form className="row" onSubmit={this.handleSubmit}>
@@ -170,12 +175,13 @@ var BatteryChart = React.createClass({
                     <Input type="checkbox" id="zoom-check" label="Zoomable&nbsp;" onChange={this.handleZoom}/>
                 </Col>
                 <Col xs={1} sm={1} md={1}>
-                    <Button><FileExporter fileContent={that.state.data} fileName="battery"/></Button>
+                    <Button><FileExporter fileContent={this.state.data} fileName="battery"/></Button>
                 </Col>
             </form>
+            {alert}
             <Row>
                 <Col xs={12} sm={12} md={12}>
-                    <c3Chart id="battery-graph" data={that.state.data} zoomable={that.state.zoomable} chartType={that.state.chartType}/>
+                    <c3Chart id="battery-graph" data={this.state.data} zoomable={this.state.zoomable} chartType={this.state.chartType}/>
                 </Col>
             </Row>
             <p className="chart-remark">Notes: <br/>
