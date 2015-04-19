@@ -14,9 +14,12 @@ cron:
 #- description: holds count push
 #  url: /cron/holds_count_push
 #  schedule: every 2 mins
+- description: purge active devices history
+  url: /cron/active_devices_history_purge
+  schedule: every 10 mins
 - description: searchify purge queue
   url: /cron/searchify_purge_queue
-  schedule: every 10 mins
+  schedule: every 1 mins
 - description: store recently active devices stats
   url: /cron/store_recently_active_devices_stats
   schedule: every 1 mins
