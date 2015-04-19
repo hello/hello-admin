@@ -33,7 +33,7 @@ var PairingMaestro = React.createClass({
             url: '/api/tokens',
             dataType: 'json',
             contentType: 'application/json',
-            type: 'POST',
+            type: 'PUT',
             data: JSON.stringify(requestData),
             success: function(response) {
                 console.log(response);
@@ -58,7 +58,7 @@ var PairingMaestro = React.createClass({
             url: '/api/tokens',
             dataType: 'json',
             contentType: 'application/json',
-            type: 'POST',
+            type: 'PUT',
             data: JSON.stringify(requestData),
             success: function(response) {
                 console.log(response);
