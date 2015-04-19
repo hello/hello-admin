@@ -107,6 +107,9 @@ var DustStatsChart = React.createClass({
         var startTsFromURL = getParameterByName('start_ts');
         var endTsFromURL = getParameterByName('end_ts');
         var lengthFromURL = getParameterByName('length') || 100;
+
+        $('#length').val(lengthFromURL);
+
         if (deviceIdFromURL.isWhiteString()) {
             return false;
         }
@@ -114,7 +117,6 @@ var DustStatsChart = React.createClass({
         $('#device-id-input').val(deviceIdFromURL);
         $('#start-ts').val(startTsFromURL);
         $('#end-ts').val(endTsFromURL);
-        $('#length').val(lengthFromURL);
 
         this.handleSubmit();
     },
