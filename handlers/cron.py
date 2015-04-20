@@ -12,6 +12,7 @@ from handlers.utils import get_current_pacific_datetime
 from handlers.utils import epoch_to_human
 from models.ext import ZendeskDailyStats
 from models.ext import RecentlyActiveDevicesStats
+from models.ext import SearchifyStats
 from indextank import ApiClient
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
@@ -350,3 +351,35 @@ class ActiveDevicesHistoryPurge(BaseRequestHandler):
         output['total'] = current_total
 
         self.response.write(json.dumps(output))
+
+
+class ConserveSearchifyStats(BaseRequestHandler):
+    def get(self):
+        searchify_client = ApiClient(settings.SEARCHIFY.api_client)
+        output = ResponseOutput()
+
+        try:
+            index_sizes =[{
+                'index_name': index.__dict__['_IndexClient__index_url'].split('/')[-1],
+                'index_size': index.get_size()
+            } for index in searchify_client.list_indexes()]
+
+            searchify_stats = SearchifyStats(index_sizes=json.dumps(index_sizes))
+            searchify_stats.put()
+
+            searchify_stats_count = SearchifyStats.query().count()
+            if searchify_stats_count > 2800:
+                ndb.delete_multi(SearchifyStats.get_oldest_items_key())
+
+            output.set_data({
+                'breakdown': index_sizes,
+                'stats_count': searchify_stats_count,
+                'total': sum([i.get("size", 0) for i in index_sizes])
+            })
+            output.set_status(200)
+
+        except Exception as e:
+            output.set_error(e.message)
+            output.set_status(500)
+
+        self.response.write(output.get_serialized_output())
