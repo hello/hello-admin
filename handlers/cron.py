@@ -374,7 +374,7 @@ class ConserveSearchifyStats(BaseRequestHandler):
             output.set_data({
                 'breakdown': index_sizes,
                 'stats_count': searchify_stats_count,
-                'total': sum([i.get("size", 0) for i in index_sizes])
+                'total': sum([i.get("index_size", 0) for i in index_sizes])
             })
             output.set_status(200)
 
