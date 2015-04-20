@@ -222,7 +222,7 @@ class GeckoboardPush(BaseRequestHandler):
         return {"success": gecko_response.ok}
 
 
-class DevicesCountPushAPI(GeckoboardPush):
+class DevicesCountPush(GeckoboardPush):
     def get(self):
         devices_status_breakdown = self.hello_request(
             type="GET",
@@ -243,7 +243,7 @@ class DevicesCountPushAPI(GeckoboardPush):
         }))
 
 
-class AlarmsCountPushAPI(GeckoboardPush):
+class AlarmsCountPush(GeckoboardPush):
     def get(self):
         # if settings.GECKOBOARD is None or settings.GECKOBOARD.alarms_widget_id:
         #     self.error("missing Geckoboard credentials!")
@@ -265,7 +265,7 @@ class AlarmsCountPushAPI(GeckoboardPush):
             }))
 
 
-class WavesCountPushAPI(GeckoboardPush):
+class WavesCountPush(GeckoboardPush):
     def get(self):
         # if settings.GECKOBOARD is None or settings.GECKOBOARD.waves_widget_id:
         #     self.error("missing Geckoboard credentials!")
@@ -288,7 +288,7 @@ class WavesCountPushAPI(GeckoboardPush):
             }))
 
 
-class HoldsCountPushAPI(GeckoboardPush):
+class HoldsCountPush(GeckoboardPush):
     def get(self):
         # if settings.GECKOBOARD is None or settings.GECKOBOARD.holds_widget_id:
         #     self.error("missing Geckoboard credentials!")
@@ -329,7 +329,7 @@ class StoreRecentlyActiveDevicesStats(BaseRequestHandler):
         recently_active_devices_stats.put()
 
 
-class ActiveDevicesHistoryPurgeAPI(BaseRequestHandler):
+class ActiveDevicesHistoryPurge(BaseRequestHandler):
     def get(self):
         end_ts = datetime.datetime.now() - datetime.timedelta(days=settings.ACTIVE_DEVICES_KEEP_DAYS)
         keys = RecentlyActiveDevicesStats.query_keys_by_created(end_ts)
