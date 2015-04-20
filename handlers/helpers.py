@@ -305,7 +305,7 @@ class ResponseOutput():
     def __init__(self):
         self.data = []
         self.error = ""
-        self.status = 401
+        self.status = 501
         self.viewer = ""
 
     def set_data(self, data):

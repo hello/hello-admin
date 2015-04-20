@@ -12,6 +12,7 @@ from handlers.utils import get_current_pacific_datetime
 from handlers.utils import epoch_to_human
 from models.ext import ZendeskDailyStats
 from models.ext import RecentlyActiveDevicesStats
+from models.ext import SearchifyStats
 from indextank import ApiClient
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
@@ -222,7 +223,7 @@ class GeckoboardPush(BaseRequestHandler):
         return {"success": gecko_response.ok}
 
 
-class DevicesCountPushAPI(GeckoboardPush):
+class DevicesCountPush(GeckoboardPush):
     def get(self):
         devices_status_breakdown = self.hello_request(
             type="GET",
@@ -243,7 +244,7 @@ class DevicesCountPushAPI(GeckoboardPush):
         }))
 
 
-class AlarmsCountPushAPI(GeckoboardPush):
+class AlarmsCountPush(GeckoboardPush):
     def get(self):
         # if settings.GECKOBOARD is None or settings.GECKOBOARD.alarms_widget_id:
         #     self.error("missing Geckoboard credentials!")
@@ -265,7 +266,7 @@ class AlarmsCountPushAPI(GeckoboardPush):
             }))
 
 
-class WavesCountPushAPI(GeckoboardPush):
+class WavesCountPush(GeckoboardPush):
     def get(self):
         # if settings.GECKOBOARD is None or settings.GECKOBOARD.waves_widget_id:
         #     self.error("missing Geckoboard credentials!")
@@ -288,7 +289,7 @@ class WavesCountPushAPI(GeckoboardPush):
             }))
 
 
-class HoldsCountPushAPI(GeckoboardPush):
+class HoldsCountPush(GeckoboardPush):
     def get(self):
         # if settings.GECKOBOARD is None or settings.GECKOBOARD.holds_widget_id:
         #     self.error("missing Geckoboard credentials!")
@@ -329,7 +330,7 @@ class StoreRecentlyActiveDevicesStats(BaseRequestHandler):
         recently_active_devices_stats.put()
 
 
-class ActiveDevicesHistoryPurgeAPI(BaseRequestHandler):
+class ActiveDevicesHistoryPurge(BaseRequestHandler):
     def get(self):
         end_ts = datetime.datetime.now() - datetime.timedelta(days=settings.ACTIVE_DEVICES_KEEP_DAYS)
         keys = RecentlyActiveDevicesStats.query_keys_by_created(end_ts)
@@ -350,3 +351,35 @@ class ActiveDevicesHistoryPurgeAPI(BaseRequestHandler):
         output['total'] = current_total
 
         self.response.write(json.dumps(output))
+
+
+class ConserveSearchifyStats(BaseRequestHandler):
+    def get(self):
+        searchify_client = ApiClient(settings.SEARCHIFY.api_client)
+        output = ResponseOutput()
+
+        try:
+            index_sizes =[{
+                'index_name': index.__dict__['_IndexClient__index_url'].split('/')[-1],
+                'index_size': index.get_size()
+            } for index in searchify_client.list_indexes()]
+
+            searchify_stats = SearchifyStats(index_sizes=json.dumps(index_sizes))
+            searchify_stats.put()
+
+            searchify_stats_count = SearchifyStats.query().count()
+            if searchify_stats_count > 2800:
+                ndb.delete_multi(SearchifyStats.get_oldest_items_key())
+
+            output.set_data({
+                'breakdown': index_sizes,
+                'stats_count': searchify_stats_count,
+                'total': sum([i.get("index_size", 0) for i in index_sizes])
+            })
+            output.set_status(200)
+
+        except Exception as e:
+            output.set_error(e.message)
+            output.set_status(500)
+
+        self.response.write(output.get_serialized_output())
