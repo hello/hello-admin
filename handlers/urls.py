@@ -93,6 +93,7 @@ from handlers.cron import WavesCountPush
 from handlers.cron import HoldsCountPush
 from handlers.cron import ActiveDevicesHistoryPurge
 from handlers.cron import ConserveSearchifyStats
+from handlers.cron import RemoveOldSearchifyPurgeStats
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -107,6 +108,7 @@ cron_routes = [
     ('/cron/store_recently_active_devices_stats', StoreRecentlyActiveDevicesStats),
     ('/cron/active_devices_history_purge', ActiveDevicesHistoryPurge),
     ('/cron/conserve_searchify_stats', ConserveSearchifyStats),
+    ('/cron/remove_old_searchify_purge_stats', RemoveOldSearchifyPurgeStats),
 ]
 
 api_routes = [
