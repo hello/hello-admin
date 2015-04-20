@@ -14,7 +14,7 @@ from models.ext import ZendeskDailyStats
 from models.ext import RecentlyActiveDevicesStats
 from indextank import ApiClient
 from google.appengine.api import taskqueue
-
+from google.appengine.ext import ndb
 
 class ZendeskCronHandler(BaseRequestHandler):
     def get(self):
@@ -329,5 +329,24 @@ class StoreRecentlyActiveDevicesStats(BaseRequestHandler):
         recently_active_devices_stats.put()
 
 
+class ActiveDevicesHistoryPurgeAPI(BaseRequestHandler):
+    def get(self):
+        end_ts = datetime.datetime.now() - datetime.timedelta(days=settings.ACTIVE_DEVICES_KEEP_DAYS)
+        keys = RecentlyActiveDevicesStats.query_keys_by_created(end_ts)
+        output = {}
 
+        try:
+            if keys:
+                ndb.delete_multi(keys=keys[:50])
+                output['success'] = True
+            else:
+                output['success'] = False
+                output['error'] = "No more to purge"
+        except Exception as e:
+            output['success'] = False
+            output['error'] = e.message
 
+        current_total = RecentlyActiveDevicesStats.query().count()
+        output['total'] = current_total
+
+        self.response.write(json.dumps(output))
