@@ -13,6 +13,7 @@ from handlers.utils import epoch_to_human
 from models.ext import ZendeskDailyStats
 from models.ext import RecentlyActiveDevicesStats
 from models.ext import SearchifyStats
+from models.ext import SearchifyPurgeStats
 from indextank import ApiClient
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
@@ -135,9 +136,14 @@ class SearchifyPurgeHandler(BaseRequestHandler):
                                "than {} days".format(index_name, level, keep_days-0.25)
                 log.info(message_text)
 
+            searchify_purge_stats = SearchifyPurgeStats(
+                purge_size=purge_size,
+                index_name=index_name,
+                level=level,
+            )
+            searchify_purge_stats.put()
+
             self.send_to_slack_searchify_channel(message_text)
-
-
 
             output.set_data({
                 "purge_size": purge_size,
@@ -383,3 +389,17 @@ class ConserveSearchifyStats(BaseRequestHandler):
             output.set_status(500)
 
         self.response.write(output.get_serialized_output())
+
+
+class RemoveOldSearchifyPurgeStats(BaseRequestHandler):
+    def get(self):
+        output = {'deleted_count': 0}
+        old_stats_keys = SearchifyPurgeStats.query_keys_by_created(
+            end_ts=datetime.datetime.now() - datetime.timedelta(days=settings.SEARCHIFY_PURGE_STATS_KEEP_DAYS)
+        )
+        if old_stats_keys:
+            ndb.delete_multi(old_stats_keys)
+            output['deleted_count'] = len(old_stats_keys)
+        output['current_count'] = SearchifyPurgeStats.query().count()
+
+        self.response.write(json.dumps(output))

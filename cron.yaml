@@ -23,6 +23,9 @@ cron:
 - description: conserve searchify stats
   url: /cron/conserve_searchify_stats
   schedule: every 60 mins
+- description: remove old searchify purge stats
+  url: /cron/remove_old_searchify_purge_stats
+  schedule: every 60 mins
 - description: searchify purge queue
   url: /cron/searchify_purge_queue
   schedule: every 1 mins
