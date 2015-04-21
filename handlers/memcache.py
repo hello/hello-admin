@@ -20,5 +20,6 @@ class RefreshMemcache(ProtectedRequestHandler):
             self.update_or_create_memcache(key="user_group", value=UserGroup.query().get())
             self.update_or_create_memcache(key="geckoboard_credentials", value=GeckoboardCredentials.query().get())
             log.info("Successfully refreshed memcache!")
+            self.redirect("/")
         except Exception as e:
             self.response.write(json.dumps({"error": e.message}))

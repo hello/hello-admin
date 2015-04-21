@@ -86,18 +86,16 @@ class BaseRequestHandler(webapp2.RequestHandler):
         :type token: str
         """
         if app_info is None:
-            self.error(500)
-            self.response.write("Missing AppInfo!")
+            log.error("Missing App Info")
         hello = make_oauth2_service(app_info)
 
         if token is None:
-            self.error(500)
-            self.response.write("Missing AccessToken!")
+            log.error("Missing Access Token")
 
         return hello.get_session(token)
 
     def hello_request(self, api_url, body_data="", url_params={}, type="GET", raw_output=False, filter_fields=[]
-                          , access_token=settings.APP_INFO.access_token, app_info=settings.APP_INFO):
+                          , access_token=settings.DEFAULT_ACCESS_TOKEN, app_info=settings.APP_INFO):
         """
         :param api_url: api URL
         :type api_url: str
@@ -120,6 +118,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         output.set_viewer(self.current_user.email() if self.current_user is not None else "cron-bot")
 
         session = self.authorize_session(app_info, access_token)
+
         request_detail = {
             "headers": {'Content-Type': 'application/json'},
         }
