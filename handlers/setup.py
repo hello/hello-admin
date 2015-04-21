@@ -3,10 +3,8 @@ import logging as log
 import urllib
 import settings
 from models.setup import AppInfo, AdminUser, AccessToken, UserGroup
-from handlers.helpers import make_oauth2_service, ProtectedRequestHandler, SuperEngineerRequestHandler
+from handlers.helpers import make_oauth2_service, ProtectedRequestHandler, SuperEngineerRequestHandler, BaseRequestHandler
 from models.ext import ZendeskCredentials, SearchifyCredentials, KeyStoreLocker, GeckoboardCredentials
-from google.appengine.api import memcache
-
 
 class AppAPI(ProtectedRequestHandler):
     def get(self):
@@ -238,17 +236,24 @@ class SetupAPI(SuperEngineerRequestHandler):
             password='with with correct pw'
         )
         admin_user.put()
-        self.update_or_create_memcache(key="admin_user", value=admin_user, environment=settings.ENVIRONMENT)
 
         app_info = AppInfo(
             id=settings.ENVIRONMENT,
             client_id=settings.DEFAULT_LOCAL_DEV_CLIENT_ID,
-            endpoint=settings.DEFAULT_LOCAL_API_URL,
+            endpoint=settings.DEFAULT_LOCAL_AGAINST_PROD_API_URL,
             access_token='will be created by /update',
             env=settings.ENVIRONMENT
         )
         app_info.put()
-        self.update_or_create_memcache(key="app_info", value=app_info, environment= settings.ENVIRONMENT)
+
+        admin_app_info = AppInfo(
+            id="admin",
+            client_id=settings.DEFAULT_LOCAL_DEV_CLIENT_ID,
+            endpoint=settings.DEFAULT_LOCAL_AGAINST_DEV_API_URL,
+            access_token='will be created by /update',
+            env=settings.ENVIRONMENT
+        )
+        admin_app_info.put()
 
         zendesk_credentials = ZendeskCredentials(
             domain='https://helloinc.zendesk.com',
@@ -256,19 +261,18 @@ class SetupAPI(SuperEngineerRequestHandler):
             api_token='ask_marina'
         )
         zendesk_credentials.put()
-        self.update_or_create_memcache(key="zendesk_credentials", value=zendesk_credentials)
 
         searchify_credentials = SearchifyCredentials(
             api_client='ask_tim'
         )
         searchify_credentials.put()
-        self.update_or_create_memcache(key="searchify_credentials", value=searchify_credentials)
 
         geckoboard_credentials = GeckoboardCredentials(
-            api_key='ask_kevin_twohy'
+            api_key='ask_kevin_twohy',
+            senses_widget_id = "sense widget id",
+            pills_widget_id = "pill widget id",
         )
         geckoboard_credentials.put()
-        self.update_or_create_memcache(key="geckoboard_credentials", value=geckoboard_credentials)
 
         self.response.write("Essential credentials initialized!")
 
@@ -283,8 +287,6 @@ class AppendAppInfo(SuperEngineerRequestHandler):
             env=app_source
         )
         app_info.put()
-        self.update_or_create_memcache(key="app_info", value=app_info, environment=app_source)
-
 
 class UpdateGeckoBoardCredentials(SuperEngineerRequestHandler):
     def get(self):
@@ -294,16 +296,14 @@ class UpdateGeckoBoardCredentials(SuperEngineerRequestHandler):
             pills_widget_id=self.request.get("pills_widget_id", "")
         )
         geckoboard_credentials.put()
-        self.update_or_create_memcache(key="geckoboard_credentials", value=geckoboard_credentials)
 
-
-class UpdateAdminAccessTokenAPI(SuperEngineerRequestHandler):
+class UpdateAdminAccessTokenAPI(BaseRequestHandler):
     """
     Update access token after admin user and app info entities are updated and memcache is flushed
     """
     def get(self):
         admin_user = settings.ADMIN_USER
-        app_info_model = settings.ADMIN_APP_INFO
+        app_info_model = settings.APP_INFO
 
         if admin_user is None:
 
@@ -375,13 +375,16 @@ class UpdateAdminAccessTokenAPI(SuperEngineerRequestHandler):
         access_token = json_data['access_token']
         app_info_model.access_token = access_token
         app_info_model.put()
-        self.update_or_create_memcache(key="app_info", value=app_info_model, environment=settings.ENVIRONMENT)
+
+        admin_app_info_model = settings.ADMIN_APP_INFO
+        admin_app_info_model.access_token = access_token
+        admin_app_info_model.put()
+
         msg = "updated app client_id = %s successfully." % \
             app_info_model.client_id
         log.info(msg)
 
-        self.redirect('/refresh_memcache')
-
+        self.redirect("/")
 
 class CreateKeyStoreLockerAPI(SuperEngineerRequestHandler):
     def get(self):
@@ -394,7 +397,6 @@ class CreateKeyStoreLockerAPI(SuperEngineerRequestHandler):
                 private_key="Fill in private key for provisioning {} sense".format(key_id)
             )
             key_store_entity.put()
-            self.update_or_create_memcache(key=key_id, value= key_store_entity)
 
         self.response.write("Empty RSA private keys for sense provision initialized !")
 
@@ -413,8 +415,6 @@ class CreateKeyStoreLockerAPI(SuperEngineerRequestHandler):
         priv.private_key = key
 
         priv.put()
-        self.update_or_create_memcache(key=key_id, value=priv)
-
         self.redirect('/')
 
 
@@ -426,7 +426,7 @@ class CreateGroupsAPI(ProtectedRequestHandler):
         output = {'data': [], 'error': ''}
 
         groups_data = {
-            'super_engineer': 'long@sayhello.com, tim@sayhello.com, pang@sayhello.com, chris@sayhello.com, kingshy@sayhello.com, josef@sayhello.com, jimmy@sayhello.com',
+            'super_engineer': 'long@sayhello.com, tim@sayhello.com, pang@sayhello.com, chris@sayhello.com, kingshy@sayhello.com, josef@sayhello.com, jimmy@sayhello.com, km@sayhello.com',
             'customer_experience': 'marina@sayhello.com, tim@sayhello.com',
             'software': 'pang@sayhello.com, benjo@sayhello.com',
             'hardware': 'scott@sayhello.com, ben@sayhello.com',
@@ -435,7 +435,6 @@ class CreateGroupsAPI(ProtectedRequestHandler):
         }
         groups_entity = UserGroup(**groups_data)
         groups_entity.put()
-        self.update_or_create_memcache(key="user_group", value=groups_entity)
         output['data'] = groups_data
 
         self.response.write(json.dumps(output))
