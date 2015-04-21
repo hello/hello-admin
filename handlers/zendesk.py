@@ -116,6 +116,7 @@ class ZendeskHistoryAPI(CustomerExperienceRequestHandler):
                     'open_tickets': daily_stats.open_tickets,
                     'solved_tickets': daily_stats.solved_tickets,
                     'closed_tickets': daily_stats.closed_tickets,
+                    'pending_tickets': daily_stats.pending_tickets,
                     'created_at': int(daily_stats.created_at.strftime("%s"))
                 })
         except Exception as e:

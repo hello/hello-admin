@@ -26,16 +26,13 @@ class ZendeskCronHandler(BaseRequestHandler):
 
         zen_api = "{}/api/v2/search.json?query=type:ticket%20".format(zendesk_cred.domain)
 
-        end_date = (get_current_pacific_datetime()).strftime('%Y-%m-%d')
-        start_date = (get_current_pacific_datetime() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        start_date = (get_current_pacific_datetime() - datetime.timedelta(days=2)).strftime('%Y-%m-%d')
         date_type = "created"
 
-        search_url = zen_api + "{}>{}+{}<{}".format(date_type, start_date, date_type, end_date)
-
+        search_url = zen_api + "{}>{}".format(date_type, start_date)
         zen_auth = (zendesk_cred.email_account + '/token', zendesk_cred.api_token)
         try:
             zen_response = requests.get(search_url, auth=zen_auth)
-
             if zen_response.ok:
                 tickets += zen_response.json().get('results', [])
             else:
@@ -46,11 +43,6 @@ class ZendeskCronHandler(BaseRequestHandler):
                 zen_response = requests.get(zen_response.json().get('next_page'), auth=zen_auth)
                 if zen_response.ok:
                     tickets += zen_response.json().get('results', [])
-
-            # tickets = sorted(tickets, key=lambda k: iso_to_utc_timestamp(k.get('created_at')))
-
-            if not tickets:
-                raise RuntimeError("There is no ticket for specified query")
 
             output['data'] = get_zendesk_stats(tickets)
             log.info(output)
