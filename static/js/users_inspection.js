@@ -287,7 +287,7 @@ var ProblemUsersMaestro = React.createClass({
             }
             return <tr>
                 <td className="col-xs-1"><Button bsSize="small" bsStyle={inspectStatusStyle} id={"fire"+i} onClick={that.getDevicesInfo.bind(that, user.email, i)}><Glyphicon glyph={inspectStatusIcon}/></Button></td>
-                <td className="col-xs-2 user-val">{user.email}</td>
+                <td className="col-xs-2 user-val"><a target="_blank" href={"/account_profile/?account_input=" + user.email}>{user.email}</a></td>
                 <td className="col-xs-1 user-val">{d3TimeFormat(new Date(user.last_modified))}</td>
                 <td className="col-xs-1 inspection-result">{booleanPresent(hasSense)}</td>
                 <td className="col-xs-1 inspection-result">{booleanPresent(isSenseActive)}</td>
