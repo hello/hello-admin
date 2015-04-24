@@ -95,6 +95,7 @@ from handlers.cron import ActiveDevicesHistoryPurge
 from handlers.cron import ConserveSearchifyStats
 from handlers.cron import RemoveOldSearchifyPurgeStats
 from handlers.users import UserSearchAPI
+from handlers.views import UsersInpsectionView
 from handlers.devices import DeviceByEmailAPI
 
 cron_routes = [
@@ -203,6 +204,7 @@ page_routes = [
     ('/active_devices_history/?$', ActiveDevicesHistoryView),
     ('/sense_events/?$', SenseEventsView),
     ('/dust_stats/?$', DustStatsView),
+    ('/users_inspection/?$', UsersInpsectionView),
 ]
 
 file_upload_routes = [

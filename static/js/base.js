@@ -2,6 +2,7 @@
 
 var Alert = ReactBootstrap.Alert;
 var Button = ReactBootstrap.Button;
+var ButtonGroup = ReactBootstrap.ButtonGroup;
 var Col = ReactBootstrap.Col;
 var DropdownButton = ReactBootstrap.DropdownButton;
 var Glyphicon = ReactBootstrap.Glyphicon;

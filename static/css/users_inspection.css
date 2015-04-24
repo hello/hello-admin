@@ -1,0 +1,4 @@
+th {text-align: left !important;}
+html, body {max-width: 100%; overflow-x: hidden;}
+th.metric {font-size: 60%}
+td.email {font-size: 80%}
