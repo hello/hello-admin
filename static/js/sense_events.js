@@ -27,11 +27,11 @@ var SenseEventsMaestro = React.createClass({
     },
 
     submitWithInputsFromURL: function() {
-        var deviceIdFromURL = getParameterByName("device_id");
-        if (deviceIdFromURL.isWhiteString()){
+        var accountInputFromURL = getParameterByName("account_input");
+        if (accountInputFromURL.isWhiteString()){
             return false;
         }
-        $('#device-id-input').val(deviceIdFromURL);
+        $('#account-input').val(accountInputFromURL);
         this.handleSubmit();
     },
 
@@ -40,26 +40,43 @@ var SenseEventsMaestro = React.createClass({
     },
 
     handleSubmit: function() {
-        var that = this, deviceId = $('#device-id-input').val();
+        var that = this, accountInput = $('#account-input').val();
         var startTs = that.state.cursor === 0 ? new Date().getTime() : that.state.cursor;
 
-        if (that.state.currentDeviceId !== deviceId) {
+        if (that.state.currentDeviceId !== accountInput) {
             that.emptyDataStoredInState();
             startTs = new Date().getTime();
         }
-        that.setState({currentDeviceId: deviceId});
+        that.setState({currentDeviceId: accountInput});
 
-        history.pushState({}, '', '/sense_events/?device_id=' + deviceId + '&start_ts=' + startTs);
+        history.pushState({}, '', '/sense_events/?account_input=' + accountInput + '&start_ts=' + startTs);
 
+        if (accountInput.indexOf('@') !== -1) {
+            console.log('hey');
+            $.ajax({
+                url: '/api/device_by_email',
+                dataType: 'json',
+                type: 'GET',
+                data: {email: accountInput, device_type: "sense"},
+                async: false,
+                success: function (response) {
+                    console.log(response);
+                    accountInput = response.data[0].device_account_pair.externalDeviceId
+                }
+            });
+
+        }
+        console.log(accountInput);
         $.ajax({
             url: '/api/sense_events',
             dataType: 'json',
             type: 'GET',
             data: {
                 start_ts: startTs,
-                device_id: deviceId,
+                device_id: accountInput,
                 limit: PAGE_LIMIT
             },
+            async: false,
             success: function(response) {
                 console.log(response);
                 if (response.error.isWhiteString()) {
@@ -129,7 +146,7 @@ var SenseEventsMaestro = React.createClass({
 
         return (<div>
             <form className="row" onSubmit={this.handleSubmit}>
-                <Col xs={4} xsOffset={3}><Input type="text" id="device-id-input" placeholder="Enter device ID"/></Col>
+                <Col xs={4} xsOffset={3}><Input type="text" id="account-input" placeholder="Enter device ID"/></Col>
                 <Col xs={1}><Button type="submit"><Glyphicon glyph="search"></Glyphicon></Button></Col>
             </form>
             <Row>{results}</Row>
