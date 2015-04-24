@@ -155,14 +155,15 @@ var AccountSearch = React.createClass({
             pillInfoResponse: {data: [], error: ""},
             pillStatusResponse: {data: [], error: ""},
             senseKeyStoreResponse: {data: {}, error: ""},
-            pillKeyStoreResponse: {data: {}, error: ""}
+            pillKeyStoreResponse: {data: {}, error: ""},
+            accountInput: ""
         }
     },
 
     componentDidMount: function() {
         var accountInputFromURL = getParameterByName("account_input"), that = this;
         if (accountInputFromURL){
-            $('#account-input').val(accountInputFromURL);
+            this.refs.accountInput.getDOMNode().value = accountInputFromURL;
             that.handleSubmit();
         }
     },
@@ -172,7 +173,7 @@ var AccountSearch = React.createClass({
             url: "/api/user_search",
             dataType: 'json',
             type: "GET",
-            data: {search_input: $("#account-input").val(), search_method: "email"},
+            data: {search_input: this.refs.accountInput.getDOMNode().value, search_method: "email"},
             success: function (response) {
                 that.setState({basicProfileResponse: response});
             }
@@ -185,7 +186,7 @@ var AccountSearch = React.createClass({
             url: '/api/device_by_email',
             dataType: 'json',
             type: 'GET',
-            data: {email: $("#account-input").val(), device_type: "sense"},
+            data: {email: this.refs.accountInput.getDOMNode().value, device_type: "sense"},
             success: function (response) {
                 that.setState({senseInfoResponse: response});
                 if (response.data.length > 0) {
@@ -206,7 +207,7 @@ var AccountSearch = React.createClass({
             url: '/api/device_by_email',
             dataType: 'json',
             type: 'GET',
-            data: {email: $("#account-input").val(), device_type: "pill"},
+            data: {email: this.refs.accountInput.getDOMNode().value, device_type: "pill"},
             success: function (response) {
                 that.setState({pillInfoResponse: response});
                 if (response.data.length > 0) {
@@ -265,36 +266,43 @@ var AccountSearch = React.createClass({
     },
 
     handleSubmit: function() {
-        history.pushState({}, '', '/account_profile/?account_input=' + $("#account-input").val());
+        history.pushState({}, '', '/account_profile/?account_input=' + this.refs.accountInput.getDOMNode().value);
         this.setState(this.getInitialState());
+        this.setState({accountInput: this.refs.accountInput.getDOMNode().value});
         this.loadSenseInfo();
         this.loadBasicProfile();
         this.loadPillInfo();
         setTimeout(function(){$('.not-ok').css("color", "red")}, 200);
-        alert(this.refs.accountInput.getDOMNode().value);
         return false;
     },
+
     render: function() {
-        var accountInput = $('#account-input').val();
         return (<div>
             <Row><Col xs={6} xsOffset={3}><form onSubmit={this.handleSubmit}>
-                <Input type='text' id="account-input" placeholder="email please" addonAfter={<Glyphicon onClick={this.handleSubmit} className="cursor-hand" glyph='search' />} />
+                <div className="form-group">
+                    <div className="input-group">
+                        <input className="form-control" type="text" id="account-input" ref="accountInput" placeholder="email please"/>
+                        <span className="input-group-addon cursor-hand">
+                            <Glyphicon glyph="search"/>
+                        </span>
+                    </div>
+                </div>
             </form></Col></Row>
             <br/><br/>
             <Row>
-                <Col xs={4}><Tile title="Basic Profile" content={<UserBasicProfileTile response={this.state.basicProfileResponse} accountInput={accountInput} />} /></Col>
-                <Col xs={4}><Tile title="Sense Summary" content={<SenseSummary senseInfoResponse={this.state.senseInfoResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} accountInput={accountInput} />} /></Col>
-                <Col xs={4}><Tile title="Pill Summary" content={<PillSummary pillInfoResponse={this.state.pillInfoResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} accountInput={accountInput} />} /></Col>
+                <Col xs={4}><Tile title="Basic Profile" content={<UserBasicProfileTile response={this.state.basicProfileResponse} accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile title="Sense Summary" content={<SenseSummary senseInfoResponse={this.state.senseInfoResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile title="Pill Summary" content={<PillSummary pillInfoResponse={this.state.pillInfoResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} accountInput={this.state.accountInput} />} /></Col>
             </Row>
             <Row>
-                <Col xs={4}><Tile title="Timeline" content={<TimelineTile accountInput={accountInput} />} /></Col>
-                <Col xs={4}><Tile title="Room Conditions" content={<RoomConditionsTile accountInput={accountInput} />} /></Col>
-                <Col xs={4}><Tile title="Motion "content={<MotionTile accountInput={accountInput}/>} /></Col>
+                <Col xs={4}><Tile title="Timeline" content={<TimelineTile accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile title="Room Conditions" content={<RoomConditionsTile accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile title="Motion "content={<MotionTile accountInput={this.state.accountInput}/>} /></Col>
             </Row>
             <Row>
-                <Col xs={4}><Tile title="Sense Logs" content={<SenseLogsTile accountInput={accountInput} />} /></Col>
-                <Col xs={4}><Tile title="Sense Events" content={<SenseEventsTile accountInput={accountInput} />} /></Col>
-                <Col xs={4}><Tile title="Pill Status" content={<PillStatusTile accountInput={accountInput} />} /></Col>
+                <Col xs={4}><Tile title="Sense Logs" content={<SenseLogsTile accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile title="Sense Events" content={<SenseEventsTile accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile title="Pill Status" content={<PillStatusTile accountInput={this.state.accountInput} />} /></Col>
             </Row>
         </div>)
     }
