@@ -2,6 +2,7 @@
 const d3TimeFormat = d3.time.format('%a %d %b %H:%M:%S %Z');
 
 const ACCEPTABLE_BATTERY_LEVEL = 1;
+const ACCEPTABLE_BATTERY_LEVEL = 10;
 const ACTIVE_SENSE_HOURS_THRESHOLD = 1;
 const ACTIVE_PILL_HOURS_THRESHOLD = 4;
 
