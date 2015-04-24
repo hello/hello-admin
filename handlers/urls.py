@@ -94,6 +94,7 @@ from handlers.cron import HoldsCountPush
 from handlers.cron import ActiveDevicesHistoryPurge
 from handlers.cron import ConserveSearchifyStats
 from handlers.cron import RemoveOldSearchifyPurgeStats
+from handlers.users import UserSearchAPI
 from handlers.devices import DeviceByEmailAPI
 
 cron_routes = [
@@ -158,6 +159,8 @@ api_routes = [
     ('/api/sense_events/?$', SenseEventsAPI),
     ('/api/firmware_unhash/?$', FirmwareUnhashAPI),
     ('/api/dust_stats/?$', DustStatsAPI),
+    ('/api/user_search/?$', UserSearchAPI),
+    ('/api/device_by_email/?$', DeviceByEmailAPI),
 ]
 
 page_routes = [
