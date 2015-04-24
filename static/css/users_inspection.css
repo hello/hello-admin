@@ -1,4 +1,7 @@
-th {text-align: left !important;}
 html, body {max-width: 100%; overflow-x: hidden;}
 th.metric {font-size: 60%}
-td.email {font-size: 80%}
+.inspection-not-ok {color: red; font-size: 125%;}
+.inspection-ok {color: limegreen; font-size: 145%;}
+.inspection-result {text-align: center;}
+.user-attr {text-align: left !important; font-size: 80%}
+.user-val {font-size: 80%}
