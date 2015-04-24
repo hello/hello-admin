@@ -96,6 +96,7 @@ from handlers.cron import ConserveSearchifyStats
 from handlers.cron import RemoveOldSearchifyPurgeStats
 from handlers.users import UserSearchAPI
 from handlers.views import UsersInpsectionView
+from handlers.views import AccountProfileView
 from handlers.devices import DeviceByEmailAPI
 
 cron_routes = [
@@ -205,6 +206,7 @@ page_routes = [
     ('/sense_events/?$', SenseEventsView),
     ('/dust_stats/?$', DustStatsView),
     ('/users_inspection/?$', UsersInpsectionView),
+    ('/account_profile/?$', AccountProfileView),
 ]
 
 file_upload_routes = [
