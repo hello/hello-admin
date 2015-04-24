@@ -59,6 +59,14 @@ class DeviceAPI(ProtectedRequestHandler):
             access_token=impersonatee_token,
         )
 
+class DeviceByEmailAPI(ProtectedRequestHandler):
+    def get(self):
+        self.hello_request(
+            api_url="devices/{}".format(self.request.get("device_type")),
+            type="GET",
+            url_params={'email': self.request.get("email")},
+            app_info=settings.ADMIN_APP_INFO,
+        )
 
 class DeviceOwnersAPI(ProtectedRequestHandler):
     """Retrieve owners of a device"""
