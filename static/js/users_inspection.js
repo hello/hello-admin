@@ -21,7 +21,7 @@ var RemarksModal =  React.createClass({
                     <p><Button bsSize="xsmall" bsStyle="primary"><Glyphicon glyph="hand-right"/></Button>&nbsp;&#10230; Skipped</p><br/>
                     <p><Button bsSize="xsmall" bsStyle="success"><Glyphicon glyph="thumbs-up"/></Button>&nbsp;&#10230; Flawless</p><br/><br/>
                     <p>Trouble signal</p>
-                    <Alert>!({"(hasSense === true && (isSenseActive !== true || isSenseProvisioned !== true))" +
+                    <Alert>!({"(hasSense === true && (isSenseActive !== true || isSenseProvisioned !== true || hasPill === false))" +
                         "|| (hasPill === true && (isPillActive !== true || isPillProvisioned !== true || isBatteryLevelOk !== true))"})</Alert>
                 </div>
             </Modal>
@@ -262,7 +262,7 @@ var ProblemUsersMaestro = React.createClass({
                     inspectStatusStyle = "default";
                     break;
                 case 0:                                 // inspection complete
-                    if ((hasSense === true && (isSenseActive !== true || isSenseProvisioned !== true))
+                    if ((hasSense === true && (isSenseActive !== true || isSenseProvisioned !== true || hasPill === false))
                         || (hasPill === true && (isPillActive !== true || isPillProvisioned !== true || isBatteryLevelOk !== true))) {
                         inspectStatusIcon = "thumbs-down";
                         inspectStatusStyle = "danger";
