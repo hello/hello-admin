@@ -51,19 +51,19 @@ class OmniSearchAPI(ProtectedRequestHandler):
 
     def get_devices_info_by_email(self, email):
         senses = self.hello_request(
-                api_url="devices/sense",
-                type="GET",
-                url_params={'email': email},
-                app_info=settings.ADMIN_APP_INFO,
-                raw_output=True
-            ).data
+            api_url="devices/sense",
+            type="GET",
+            url_params={'email': email},
+            app_info=settings.ADMIN_APP_INFO,
+            raw_output=True
+        ).data
         pills = self.hello_request(
-                api_url="devices/pill",
-                type="GET",
-                url_params={'email': email},
-                app_info=settings.ADMIN_APP_INFO,
-                raw_output=True
-            ).data
+            api_url="devices/pill",
+            type="GET",
+            url_params={'email': email},
+            app_info=settings.ADMIN_APP_INFO,
+            raw_output=True
+        ).data
 
         senses_info = []
         pills_info = []
@@ -89,7 +89,7 @@ class OmniSearchAPI(ProtectedRequestHandler):
             if pair:
                 state = "NORMAL"
                 status['deviceId'] = pair.get("externalDeviceId", status.get('deviceId', ''))
-                 # override last seen with data from pill status table
+                # override last seen with data from pill status table
                 pill_status_data = self.hello_request(
                     api_url="devices/pill_status",
                     type="GET",
@@ -150,10 +150,10 @@ class OmniSearchAPI(ProtectedRequestHandler):
             accounts.set_error("Account not found!!")
 
         accounts.set_data([{
-            # 'zendesk': self.get_zendesk_info_by_email(account['email']),
-            'profile': account,
-            'devices': self.get_devices_info_by_email(account['email'])
-        } for account in accounts.data])
+                               # 'zendesk': self.get_zendesk_info_by_email(account['email']),
+                               'profile': account,
+                               'devices': self.get_devices_info_by_email(account['email'])
+                           } for account in accounts.data])
         self.response.write(accounts.get_serialized_output())
 
 
@@ -191,6 +191,65 @@ class RecentUsersAPI(ProtectedRequestHandler):
             output.set_status(500)
 
         self.response.write(output.get_serialized_output())
+
+
+class UserSearchAPI(ProtectedRequestHandler):
+    @property
+    def search_input(self):
+        return self.request.get('search_input')
+
+    @property
+    def search_method(self):
+        search_methods_switch = {
+            "user_id": self.get_by_user_id,
+            "email": self.get_by_email,
+            "email_partial": self.get_by_email_partial,
+            "name_partial": self.get_by_name_partial,
+            "device_id": self.get_by_device_id
+        }
+        return search_methods_switch[self.request.get('search_method', default_value='email')]
+
+    def get_by_user_id(self):
+        self.hello_request(
+            api_url="account",
+            type="GET",
+            url_params={'id': int(self.search_input) if self.search_input.isdigit() else 1},
+            app_info=settings.ADMIN_APP_INFO,
+        )
+
+    def get_by_email(self):
+        self.hello_request(
+            api_url="account",
+            type="GET",
+            url_params={'email': self.search_input},
+            app_info=settings.ADMIN_APP_INFO,
+        )
+
+    def get_by_email_partial(self):
+        self.hello_request(
+            api_url="account/partial",
+            type="GET",
+            url_params={'email': self.search_input},
+            app_info=settings.ADMIN_APP_INFO,
+        )
+
+    def get_by_name_partial(self):
+        self.hello_request(
+            api_url="account/partial",
+            type="GET",
+            url_params={'name': self.search_input},
+            app_info=settings.ADMIN_APP_INFO,
+        )
+
+    def get_by_device_id(self):
+        self.hello_request(
+            api_url="devices/{}/accounts".format(self.search_input),
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO,
+        )
+
+    def get(self):
+        self.search_method()
 
 
 class PasswordResetAPI(ProtectedRequestHandler):
