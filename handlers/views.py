@@ -198,3 +198,8 @@ class DustStatsView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/dust_stats.html',
                                 context={'title': 'Dust Statistics'})
+
+class UsersInpsectionView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/users_inspection.html',
+                                context={'title': 'Inspect Recent Users To Detect Trouble'})
