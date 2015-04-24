@@ -94,6 +94,7 @@ from handlers.cron import HoldsCountPush
 from handlers.cron import ActiveDevicesHistoryPurge
 from handlers.cron import ConserveSearchifyStats
 from handlers.cron import RemoveOldSearchifyPurgeStats
+from handlers.devices import DeviceByEmailAPI
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),

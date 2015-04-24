@@ -51,19 +51,19 @@ class OmniSearchAPI(ProtectedRequestHandler):
 
     def get_devices_info_by_email(self, email):
         senses = self.hello_request(
-                api_url="devices/sense",
-                type="GET",
-                url_params={'email': email},
-                app_info=settings.ADMIN_APP_INFO,
-                raw_output=True
-            ).data
+            api_url="devices/sense",
+            type="GET",
+            url_params={'email': email},
+            app_info=settings.ADMIN_APP_INFO,
+            raw_output=True
+        ).data
         pills = self.hello_request(
-                api_url="devices/pill",
-                type="GET",
-                url_params={'email': email},
-                app_info=settings.ADMIN_APP_INFO,
-                raw_output=True
-            ).data
+            api_url="devices/pill",
+            type="GET",
+            url_params={'email': email},
+            app_info=settings.ADMIN_APP_INFO,
+            raw_output=True
+        ).data
 
         senses_info = []
         pills_info = []
