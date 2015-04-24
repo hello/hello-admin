@@ -203,3 +203,8 @@ class UsersInpsectionView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/users_inspection.html',
                                 context={'title': 'Inspect Recent Users To Detect Trouble'})
+
+class AccountProfileView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/account_profile.html',
+                                context={'title': "Account Profile"})
