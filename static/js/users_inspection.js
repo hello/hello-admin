@@ -1,7 +1,6 @@
 /** @jsx React.DOM */
-const d3TimeFormat = d3.time.format('%a %d %b %H:%M:%S %Z');
+const d3TimeFormat = d3.time.format('%b %d %H:%M');
 
-const ACCEPTABLE_BATTERY_LEVEL = 1;
 const ACCEPTABLE_BATTERY_LEVEL = 10;
 const ACTIVE_SENSE_HOURS_THRESHOLD = 1;
 const ACTIVE_PILL_HOURS_THRESHOLD = 4;
@@ -14,8 +13,8 @@ var RemarksModal =  React.createClass({
                     <p>Acceptable battery level = {ACCEPTABLE_BATTERY_LEVEL + " (%)"}</p>
                     <p>Active sense threshold = {ACTIVE_SENSE_HOURS_THRESHOLD + " (hours)"}</p>
                     <p>Active pill threshold = {ACTIVE_PILL_HOURS_THRESHOLD + " (hours)"}</p><br/><br/>
-                    <p>&#10004; &nbsp; means <em> positive</em></p><br/>
-                    <p>&#10008; &nbsp; means <em> negative</em></p><br/>
+                    <p><span className="inspection-ok">&#10004;</span> &nbsp; means <em> positive</em></p><br/>
+                    <p><span className="inspection-not-ok">&#10008;</span> &nbsp; means <em> negative</em></p><br/>
                     <p>&#8211; &nbsp; means <em> not applicable</em></p><br/>
                     <p>&#63; &nbsp; means <em> uninspected</em></p><br/><br/>
                     <p><Button bsSize="xsmall" bsStyle="danger"><Glyphicon glyph="thumbs-down"/></Button>&nbsp;&#10230; Trouble Detected</p><br/>
@@ -288,15 +287,15 @@ var ProblemUsersMaestro = React.createClass({
             }
             return <tr>
                 <td className="col-xs-1"><Button bsSize="small" bsStyle={inspectStatusStyle} id={"fire"+i} onClick={that.getDevicesInfo.bind(that, user.email, i)}><Glyphicon glyph={inspectStatusIcon}/></Button></td>
-                <td className="col-xs-1">{user.id}</td>
-                <td className="col-xs-2 email">{user.email}</td>
-                <td className="col-xs-1">{booleanPresent(hasSense)}</td>
-                <td className="col-xs-1">{booleanPresent(isSenseActive)}</td>
-                <td className="col-xs-1">{booleanPresent(isSenseProvisioned)}</td>
-                <td className="col-xs-1">{booleanPresent(hasPill)}</td>
-                <td className="col-xs-1">{booleanPresent(isPillActive)}</td>
-                <td className="col-xs-1">{booleanPresent(isPillProvisioned)}</td>
-                <td className="col-xs-1">{booleanPresent(isBatteryLevelOk)}</td>
+                <td className="col-xs-2 user-val">{user.email}</td>
+                <td className="col-xs-1 user-val">{d3TimeFormat(new Date(user.last_modified))}</td>
+                <td className="col-xs-1 inspection-result">{booleanPresent(hasSense)}</td>
+                <td className="col-xs-1 inspection-result">{booleanPresent(isSenseActive)}</td>
+                <td className="col-xs-1 inspection-result">{booleanPresent(isSenseProvisioned)}</td>
+                <td className="col-xs-1 inspection-result">{booleanPresent(hasPill)}</td>
+                <td className="col-xs-1 inspection-result">{booleanPresent(isPillActive)}</td>
+                <td className="col-xs-1 inspection-result">{booleanPresent(isPillProvisioned)}</td>
+                <td className="col-xs-1 inspection-result">{booleanPresent(isBatteryLevelOk)}</td>
             </tr>
         });
 
@@ -305,8 +304,8 @@ var ProblemUsersMaestro = React.createClass({
             <Table id="events-table" striped>
                 <thead><tr>
                         <th className="col-xs-1"></th>
-                        <th className="col-xs-1"><em>ID</em></th>
-                        <th className="col-xs-2"><em>Email</em></th>
+                        <th className="col-xs-2 user-attr"><em>Account Email</em></th>
+                        <th className="col-xs-1 user-attr"><em>Last Modified</em></th>
                         <th className="col-xs-1 metric"><em>hasSense</em></th>
                         <th className="col-xs-1 metric"><em>isSenseActive</em></th>
                         <th className="col-xs-1 metric"><em>isSenseProvisioned</em></th>
@@ -352,8 +351,8 @@ React.renderComponent(<ProblemUsersMaestro />, document.getElementById('problem-
 
 function booleanPresent(b) {
     switch (b) {
-        case true: return <span>&#10004;</span>;
-        case false: return <span>&#10008;</span>;
+        case true: return <span className="inspection-ok">&#10004;</span>;
+        case false: return <span className="inspection-not-ok">&#10008;</span>;
         case null: return <span>&#8211;</span>;
         default: return <span>&#63;</span>;
     }
