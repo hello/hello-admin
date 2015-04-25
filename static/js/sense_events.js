@@ -146,7 +146,7 @@ var SenseEventsMaestro = React.createClass({
 
         return (<div>
             <form className="row" onSubmit={this.handleSubmit}>
-                <Col xs={4} xsOffset={3}><Input type="text" id="account-input" placeholder="Enter device ID"/></Col>
+                <Col xs={4} xsOffset={3}><Input type="text" id="account-input" placeholder="Enter device ID / email"/></Col>
                 <Col xs={1}><Button type="submit"><Glyphicon glyph="search"></Glyphicon></Button></Col>
             </form>
             <Row>{results}</Row>
