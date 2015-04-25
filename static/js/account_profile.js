@@ -18,7 +18,7 @@ var UserBasicProfileTile = React.createClass({
     render: function() {
         var response = this.props.response;
         var alert = response.error.isWhiteString() ? null : <Well>{response.error}</Well>;
-        var basicProfileTable = (response.data === {} || response.data.length === 0) ? null:
+        var basicProfileTable = ($.isEmptyObject(response.data) || response.data.length === 0) ? null:
             <Table>
                 <thead></thead>
                 <tbody>
@@ -93,12 +93,19 @@ var SenseSummary = React.createClass({
             senseKeyStoreResponse = this.props.senseKeyStoreResponse,
             result = null, lastSeen, keyStore;
 
+        if (senseKeyStoreResponse.error.isWhiteString() && !$.isEmptyObject(senseKeyStoreResponse.data)) {
+            if(senseKeyStoreResponse.data.key) {
+                keyStore = senseKeyStoreResponse.data.key.slice(senseKeyStoreResponse.data.key.length-7, senseKeyStoreResponse.data.key.length);
+            }
+            else {
+                keyStore = <span className="not-ok">unprovisioned</span>;
+            }
+        }
+
         if (senseInfoResponse.data.length > 0) {
             var senseId = senseInfoResponse.data[0].device_account_pair ? senseInfoResponse.data[0].device_account_pair.externalDeviceId : undefined;
             var firmwareVersion = senseInfoResponse.data[0].device_status ? senseInfoResponse.data[0].device_status.firmwareVersion : undefined;
             lastSeen =  senseInfoResponse.data[0].device_status ? new Date(senseInfoResponse.data[0].device_status.lastSeen).toUTCString() : undefined;
-            keyStore = senseKeyStoreResponse.error.isWhiteString() && senseKeyStoreResponse.data.key  ?
-                senseKeyStoreResponse.data.key.slice(senseKeyStoreResponse.data.key.length-7, senseKeyStoreResponse.data.key.length) : <span className="not-ok">unprovisioned</span>;
             result = <Table>
                 <thead/>
                 <tbody>
@@ -126,8 +133,15 @@ var PillSummary = React.createClass({
             if(pillStatusResponse.data[0][0]) {
                 batteryLevel = pillStatusResponse.data[0][0].batteryLevel;
                 lastSeen = new Date(pillStatusResponse.data[0][0].lastSeen).toUTCString();
-                keyStore = pillKeyStoreResponse.error.isWhiteString() && pillKeyStoreResponse.data.key ?
-                    pillKeyStoreResponse.data.key.slice(pillKeyStoreResponse.data.key.length-7, pillKeyStoreResponse.data.key.length) : <span className="not-ok">unprovisioned</span>;
+            }
+        }
+
+        if (pillKeyStoreResponse.error.isWhiteString() && !$.isEmptyObject(pillKeyStoreResponse.data)) {
+            if(pillKeyStoreResponse.data.key) {
+                keyStore = pillKeyStoreResponse.data.key.slice(pillKeyStoreResponse.data.key.length-7, pillKeyStoreResponse.data.key.length);
+            }
+            else {
+                keyStore = <span className="not-ok">unprovisioned</span>;
             }
         }
 
@@ -276,7 +290,6 @@ var AccountProfile = React.createClass({
         this.loadBasicProfile();
         this.loadPillInfo();
         this.setState({submitted: true});
-        setTimeout(function(){$('.not-ok').css("color", "red")}, 200);
         return false;
     },
 
