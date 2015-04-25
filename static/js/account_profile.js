@@ -17,10 +17,8 @@ var Tile = React.createClass({
 var UserBasicProfileTile = React.createClass({
     render: function() {
         var response = this.props.response;
-        console.log(response);
-
-        return !response.error.isWhiteString() ?
-            <Well>{response.error}</Well>:
+        var alert = response.error.isWhiteString() ? null : <Well>{response.error}</Well>;
+        var basicProfileTable = (response.data === {} || response.data.length === 0) ? null:
             <Table>
                 <thead></thead>
                 <tbody>
@@ -30,6 +28,11 @@ var UserBasicProfileTile = React.createClass({
                     <tr><td>Last Modified</td><td>{new Date(response.data.last_modified).toUTCString()}</td></tr>
                 </tbody>
             </Table>;
+        return (<div>
+            {alert}
+            {basicProfileTable}
+        </div>)
+
     }
 });
 
@@ -96,7 +99,6 @@ var SenseSummary = React.createClass({
             lastSeen =  senseInfoResponse.data[0].device_status ? new Date(senseInfoResponse.data[0].device_status.lastSeen).toUTCString() : undefined;
             keyStore = senseKeyStoreResponse.error.isWhiteString() && senseKeyStoreResponse.data.key  ?
                 senseKeyStoreResponse.data.key.slice(senseKeyStoreResponse.data.key.length-7, senseKeyStoreResponse.data.key.length) : <span className="not-ok">unprovisioned</span>;
-            console.log(senseKeyStoreResponse, keyStore);
             result = <Table>
                 <thead/>
                 <tbody>
@@ -147,7 +149,7 @@ var PillSummary = React.createClass({
     }
 });
 
-var AccountSearch = React.createClass({
+var AccountProfile = React.createClass({
     getInitialState: function() {
         return {
             basicProfileResponse: {data: {}, error: ""},
@@ -156,7 +158,8 @@ var AccountSearch = React.createClass({
             pillStatusResponse: {data: [], error: ""},
             senseKeyStoreResponse: {data: {}, error: ""},
             pillKeyStoreResponse: {data: {}, error: ""},
-            accountInput: ""
+            accountInput: "",
+            submitted: false
         }
     },
 
@@ -272,24 +275,14 @@ var AccountSearch = React.createClass({
         this.loadSenseInfo();
         this.loadBasicProfile();
         this.loadPillInfo();
+        this.setState({submitted: true});
         setTimeout(function(){$('.not-ok').css("color", "red")}, 200);
         return false;
     },
 
     render: function() {
-        return (<div>
-            <Row><Col xs={6} xsOffset={3}><form onSubmit={this.handleSubmit}>
-                <div className="form-group">
-                    <div className="input-group">
-                        <input className="form-control" type="text" id="account-input" ref="accountInput" placeholder="email please"/>
-                        <span className="input-group-addon cursor-hand" onClick={this.handleSubmit}>
-                            <Glyphicon glyph="search"/>
-                        </span>
-                    </div>
-                </div>
-            </form></Col></Row>
-            <br/><br/>
-            <Row>
+        var results = this.state.submitted === false ? null :
+            <div><Row>
                 <Col xs={4}><Tile title="Basic Profile" content={<UserBasicProfileTile response={this.state.basicProfileResponse} accountInput={this.state.accountInput} />} /></Col>
                 <Col xs={4}><Tile title="Sense Summary" content={<SenseSummary senseInfoResponse={this.state.senseInfoResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} accountInput={this.state.accountInput} />} /></Col>
                 <Col xs={4}><Tile title="Pill Summary" content={<PillSummary pillInfoResponse={this.state.pillInfoResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} accountInput={this.state.accountInput} />} /></Col>
@@ -303,12 +296,25 @@ var AccountSearch = React.createClass({
                 <Col xs={4}><Tile title="Sense Logs" content={<SenseLogsTile accountInput={this.state.accountInput} />} /></Col>
                 <Col xs={4}><Tile title="Sense Events" content={<SenseEventsTile accountInput={this.state.accountInput} />} /></Col>
                 <Col xs={4}><Tile title="Pill Status" content={<PillStatusTile accountInput={this.state.accountInput} />} /></Col>
-            </Row>
-        </div>)
+            </Row></div>;
+        return <div>
+            <Row><Col xs={6} xsOffset={3}><form onSubmit={this.handleSubmit}>
+                <div className="form-group">
+                    <div className="input-group">
+                        <input className="form-control" type="text" id="account-input" ref="accountInput" placeholder="email please"/>
+                        <span className="input-group-addon cursor-hand" onClick={this.handleSubmit}>
+                            <Glyphicon glyph="search"/>
+                        </span>
+                    </div>
+                </div>
+            </form></Col></Row>
+            <br/><br/>
+            {results}
+        </div>;
     }
 });
 
-React.renderComponent(<AccountSearch />, document.getElementById('account-profile'));
+React.renderComponent(<AccountProfile />, document.getElementById('account-profile'));
 
 
 function displayDateTime(ts, tzOffsetMillis) {
