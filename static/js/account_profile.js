@@ -282,7 +282,7 @@ var AccountSearch = React.createClass({
                 <div className="form-group">
                     <div className="input-group">
                         <input className="form-control" type="text" id="account-input" ref="accountInput" placeholder="email please"/>
-                        <span className="input-group-addon cursor-hand">
+                        <span className="input-group-addon cursor-hand" onClick={this.handleSubmit}>
                             <Glyphicon glyph="search"/>
                         </span>
                     </div>
