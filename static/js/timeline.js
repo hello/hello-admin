@@ -197,6 +197,9 @@ var TimelineMaestro = React.createClass({
             return false;
         }
 
+        that.setState(that.getInitialState());
+        that.setState({alert: "Loading ..."});
+
         $.ajax({
             url: "/api/timeline",
             type: 'GET',
