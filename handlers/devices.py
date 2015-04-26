@@ -31,33 +31,37 @@ class DeviceAPI(ProtectedRequestHandler):
     def post(self):
         device_id = self.request.get('device_id', default_value="")
         device_type = self.request.get('device_type', default_value="")
-        impersonatee_token = self.request.get('impersonatee_token', default_value="")
-        log.debug("attempting to register {} {}".format(device_type, device_id))
+        email = self.request.get('email', default_value="")
+        timezone = self.request.get('timezone', default_value="")
+
+        post_data = {
+            '{}_id'.format(device_type): device_id,
+            'email': email
+        }
+
+        if device_type == "sense":
+            post_data['timezone'] = timezone
+
+        print post_data
 
         self.hello_request(
             api_url="devices/register/{}".format(device_type),
             type="POST",
-            body_data=json.dumps({'{}_id'.format(device_type): device_id}),
-            access_token=impersonatee_token,
+            body_data=json.dumps(post_data),
             app_info=settings.ADMIN_APP_INFO
         )
 
     def put(self):
         device_id = self.request.get('device_id', default_value="")
         device_type = self.request.get('device_type', default_value="")
-        impersonatee_token = self.request.get('impersonatee_token', default_value="")
-        log.debug("attempting to unregister {} {}".format(device_type, device_id))
-
-        if device_type == "sense":
-            api_url = "devices/sense/{}/all".format(device_id)
-        else:
-            api_url = "devices/pill/{}".format(device_id)
+        email = self.request.get('email', default_value="")
 
         self.hello_request(
-            api_url=api_url,
+            api_url="devices/{}/{}/{}".format(device_type, email, device_id),
             type="DELETE",
-            access_token=impersonatee_token,
+            app_info=settings.ADMIN_APP_INFO
         )
+
 
 class DeviceByEmailAPI(ProtectedRequestHandler):
     def get(self):
@@ -67,6 +71,7 @@ class DeviceByEmailAPI(ProtectedRequestHandler):
             url_params={'email': self.request.get("email")},
             app_info=settings.ADMIN_APP_INFO,
         )
+
 
 class DeviceOwnersAPI(ProtectedRequestHandler):
     """Retrieve owners of a device"""
