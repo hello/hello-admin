@@ -1,213 +1,199 @@
 /** @jsx React.DOM */
 
-var PairingMaestro = React.createClass({
-    getInitialState: function () {
-        return {unlinkToken: "", linkToken: "", devices: {senses: [], pills: []}, linkAlert: "", unlinkAlert: ""}
-    },
+var Tile = React.createClass({
+    render: function() {
+        return <div className="tile">
+            <div className="tile-title">
+                {this.props.title}
+            </div>
+            <br/>
+            <div className="tile-content">
+                {this.props.content}
+            </div>
+        </div>
+    }
+});
 
-    listDevices: function() {
+var PairSenseTile = React.createClass({
+    getInitialState: function() {
+        return {alert: null};
+    },
+    handleSubmit: function() {
         var that = this;
-        $.ajax({
-            url: '/api/devices',
-            dataType: 'json',
-            type: 'GET',
-            data: {email: $('#username-input-unlink').val()},
-            success: function(response) {
-                console.log(response);
-                that.setState({devices: response});
-            }.bind(that),
-            error: function(e) {
-                that.setState({devices: {senses: [], pills: []}});
-            }.bind(that)
-        })
-    },
-
-    handleUnlink: function() {
-        var that = this;
-        var requestData = {
-            username: $('#username-input-unlink').val(),
-            password: $('#password-input-unlink').val(),
-            app: "admin-data-viewer"
-        };
-        $.ajax({
-            url: '/api/tokens',
-            dataType: 'json',
-            contentType: 'application/json',
-            type: 'PUT',
-            data: JSON.stringify(requestData),
-            success: function(response) {
-                console.log(response);
-                that.setState({unlinkToken: response.data.token, error: ""});
-                that.unregisterDevice();
-            }.bind(that),
-            error: function(e) {
-                that.setState({unlinkToken: ""});
-            }.bind(that)
-        });
-        return false;
-    },
-
-    handleLink: function() {
-        var that = this;
-        var requestData = {
-            username: $('#username-input-link').val(),
-            password: $('#password-input-link').val(),
-            app: "admin-data-viewer"
-        };
-        $.ajax({
-            url: '/api/tokens',
-            dataType: 'json',
-            contentType: 'application/json',
-            type: 'PUT',
-            data: JSON.stringify(requestData),
-            success: function(response) {
-                console.log(response);
-                that.setState({linkToken: response.data.token, error: ""});
-                this.registerDevice();
-            }.bind(that),
-            error: function(e) {
-                that.setState({linkToken: ""});
-            }.bind(that)
-        });
-        return false;
-    },
-
-    registerDevice: function() {
-        var that = this, deviceInput = $('#device-input-link').val();
-        var requestData = {
-            device_type: $('#device-type-input-link').val(),
-            device_id: deviceInput,
-            impersonatee_token: that.state.linkToken
-        };
-        console.log('registering', JSON.stringify(requestData));
+        that.setState(that.getInitialState());
+        if (that.refs.emailInput.getDOMNode().value.isWhiteString() || that.refs.deviceIdInput.getDOMNode().value.isWhiteString()) {
+            that.setState({alert: <Alert bsStyle="warning">Invalid Input</Alert>});
+            return false;
+        }
         $.ajax({
             url: '/api/devices',
             dataType: 'json',
             type: 'POST',
-            data: requestData,
-            success: function(response) {
+            data: {
+                email: that.refs.emailInput.getDOMNode().value,
+                device_id: that.refs.deviceIdInput.getDOMNode().value,
+                timezone: that.refs.timezoneInput.getDOMNode().value,
+                device_type: "sense"
+            },
+            success: function (response) {
                 console.log(response);
-                if (response.status === 204) {
-                    this.setState({linkAlert: "Successfully registered device ".concat(deviceInput)});
-                }
-                else {
-                    this.setState({linkAlert: response.error});
-                }
-            }.bind(that),
-            error: function(e) {
-                console.log('js error!!');
-            }.bind(that)
+                that.setState({alert: response.error ?
+                    <Alert bsStyle="danger">{response.error}</Alert> : <Alert bsStyle="success">Success</Alert>});
+            }
         });
+        return false;
     },
+    render: function() {
+        return (<div>
+                <form onSubmit={this.handleSubmit}>
+                <div><input className="form-control" ref="emailInput" type="text" placeholder="Email" /></div><br/>
+                <div><input className="form-control" ref="deviceIdInput" type="text" placeholder="Sense ID" /></div><br/>
+                <div><select className="form-control" ref="timezoneInput" type="text" placeholder="Timezone">
+                    <option value="America/Los_Angeles">America/Los Angeles</option>
+                    <option value="UTC">UTC</option>
+                    <option value="Asia/Shanghai">Asia/Shanghai</option>
+                </select></div><br/>
+                <div><Button className="submit" type="submit">Submit</Button></div><br/>
+            </form>
+            {this.state.alert}
+        </div>)
+    }
+});
 
-    unregisterDevice: function() {
-        var that = this, deviceInput = $('#device-input-unlink').val();
-        var requestData = {
-            device_type: deviceInput.split(' - ')[0].toLocaleLowerCase(),
-            device_id: deviceInput.split(' - ')[1],
-            impersonatee_token: that.state.unlinkToken
-        };
-        console.log('unregistering', JSON.stringify(requestData));
+var PairPillTile = React.createClass({
+    getInitialState: function() {
+        return {alert: null};
+    },
+    handleSubmit: function() {
+        var that = this;
+        that.setState(that.getInitialState());
+        if (that.refs.emailInput.getDOMNode().value.isWhiteString() || that.refs.deviceIdInput.getDOMNode().value.isWhiteString()) {
+            that.setState({alert: <Alert bsStyle="warning">Invalid Input</Alert>});
+            return false;
+        }
+        $.ajax({
+            url: '/api/devices',
+            dataType: 'json',
+            type: 'POST',
+            data: {
+                email: that.refs.emailInput.getDOMNode().value,
+                device_id: that.refs.deviceIdInput.getDOMNode().value,
+                device_type: "pill"
+            },
+            success: function (response) {
+                console.log(response);
+                that.setState({alert: response.error ?
+                    <Alert bsStyle="danger">{response.error}</Alert> : <Alert bsStyle="success">Success</Alert>});
+            }
+        });
+        return false;
+    },
+    render: function() {
+        return (<div>
+            <form onSubmit={this.handleSubmit}>
+                <div><input className="form-control" ref="emailInput" type="text" placeholder="Email" /></div><br/>
+                <div><input className="form-control" ref="deviceIdInput" type="text" placeholder="Pill ID" /></div><br/>
+                <div><input className="form-control input-hidden"/></div><br/>
+                <div><Button className="submit" type="submit">Submit</Button></div><br/>
+            </form>
+            {this.state.alert}
+        </div>)
+    }
+});
+
+var UnpairSenseTile = React.createClass({
+    getInitialState: function() {
+        return {alert: null};
+    },
+    handleSubmit: function() {
+        var that = this;
+        that.setState(that.getInitialState());
+        if (that.refs.emailInput.getDOMNode().value.isWhiteString() || that.refs.deviceIdInput.getDOMNode().value.isWhiteString()) {
+            that.setState({alert: <Alert bsStyle="warning">Invalid Input</Alert>});
+            return false;
+        }
         $.ajax({
             url: '/api/devices',
             dataType: 'json',
             type: 'PUT',
-            data: requestData,
-            success: function(response) {
+            data: {
+                email: that.refs.emailInput.getDOMNode().value,
+                device_id: that.refs.deviceIdInput.getDOMNode().value,
+                device_type: "sense"
+            },
+            success: function (response) {
                 console.log(response);
-                if (response.status === 204) {
-                    this.setState({unlinkAlert: "Successfully unregistered device " + deviceInput + " for user " + $("#username-input-unlink").val()});
-                }
-                else if (response.status === 500) {
-                    this.setState({unlinkAlert: "Error 500: failed to unlink device, very likely that device has already been unlinked by this user or other users who share it. Basically you cannot unlink a device twice given the database schema at the moment. Tim probably can explain why"});
-                }
-                else {
-                    this.setState({unlinkAlert: response.error});
-                }
-            }.bind(that),
-            error: function(e) {
-                console.log('js error!!');
-            }.bind(that)
+                that.setState({alert: response.error ?
+                    <Alert bsStyle="danger">{response.error}</Alert> : <Alert bsStyle="success">Success</Alert>});
+            }
         });
+        return false;
     },
-
-
     render: function() {
-        var currentUserInput = $('#username-input-unlink').val();
-        var selectNarration = (!currentUserInput || currentUserInput.isWhiteString()) ?
-            "Loading devices list ...": "Select a device of ".concat(currentUserInput);
-        var options = [<option value="">{selectNarration}</option>];
-        console.log(this.state);
-        this.state.devices.senses.forEach(function(device){
-            var senseInfo = ["SENSE", device.device_account_pair.externalDeviceId].join(' - ');
-            options.push(<option value={senseInfo}>{senseInfo}</option>)
-        });
-        this.state.devices.pills.forEach(function(device){
-            var pillInfo = ["PILL", device.device_account_pair.externalDeviceId].join(' - ');
-            options.push(<option value={pillInfo}>{pillInfo}</option>)
-        });
-        var linkAlert = (this.state.linkAlert.isWhiteString()) ? null:
-            <Row>
-                <Alert>{this.state.linkAlert}</Alert>
-            </Row>;
-        var unlinkAlert = (this.state.unlinkAlert.isWhiteString()) ? null:
-             <Row>
-                <Alert>{this.state.unlinkAlert}</Alert>
-             </Row>;
-
-        return (<Row>
-            <Col xs={5} sm={5} md={5} lg={4} xl={3} xsOffset={1} smOffset={1} mdOffset={1} lgOffset={2} xlOffset={2}>
-                <form onSubmit={this.handleUnlink}>
-                    <h3>Unlink a sense/pill</h3><hr className="fancy-line"/>
-                    <Row onMouseLeave={this.listDevices}>
-                        <Input id="username-input-unlink" type="text" addonBefore={<Glyphicon glyph="user"/>} placeholder="email" />
-                    </Row>
-                    <Row>
-                        <Input id="password-input-unlink" type="password" addonBefore={<Glyphicon glyph="qrcode"/>} placeholder="password" />
-                    </Row>
-                    <Row xs={4} md={4}>
-                        <Input id="device-input-unlink" type="select" addonBefore={<Glyphicon glyph="star-empty"/>}>
-                        {options}
-                        </Input>
-                    </Row>
-                    <Row xs={2} md={2}>
-                        <Button bsStyle="info" type="submit">{<Glyphicon glyph="send"/>}</Button>
-                    </Row>
-                </form>
-                <br/>
-                {unlinkAlert}
-            </Col>
-            <Col xs={1} sm={1} md={1} lg={1} xl={1}/>
-            <Col xs={5} sm={5} md={5} lg={4} xl={3}>
-                <form onSubmit={this.handleLink}>
-                    <h3>Link a sense/pill</h3><hr className="fancy-line"/>
-                    <Row>
-                        <Input id="username-input-link" type="text" addonBefore={<Glyphicon glyph="user"/>} placeholder="email" />
-                    </Row>
-                    <Row>
-                        <Input id="password-input-link" type="password" addonBefore={<Glyphicon glyph="qrcode"/>} placeholder="password" />
-                    </Row>
-                    <Row xs={4} md={4}>
-                        <Input id="device-type-input-link" type="select" addonBefore={<Glyphicon glyph="heart-empty"/>}>
-                            <option value="sense">Sense</option>
-                            <option value="pill">Pill</option>
-                        </Input>
-                    </Row>
-                    <Row xs={4} md={4}>
-                        <Input id="device-input-link" type="text" addonBefore={<Glyphicon glyph="star-empty"/>} placeholder="Enter device ID" />
-                    </Row>
-                    <Row xs={2} md={2}>
-                        <Button bsStyle="info" type="submit">{<Glyphicon glyph="send"/>}</Button>
-                    </Row>
-                </form>
-                <br/>
-                {linkAlert}
-            </Col>
-
-        </Row>)
+        return (<div>
+            <form onSubmit={this.handleSubmit}>
+                <div><input className="form-control" ref="emailInput" type="text" placeholder="Email" /></div><br/>
+                <div><input className="form-control" ref="deviceIdInput" type="text" placeholder="Sense ID" /></div><br/>
+                <div><input className="form-control input-hidden"/></div><br/>
+                <div><Button className="submit" type="submit">Submit</Button></div><br/>
+            </form>
+        {this.state.alert}
+        </div>)
     }
 });
 
+var UnpairPillTile = React.createClass({
+    getInitialState: function() {
+        return {alert: null};
+    },
+    handleSubmit: function() {
+        var that = this;
+        that.setState(that.getInitialState());
+        if (that.refs.emailInput.getDOMNode().value.isWhiteString() || that.refs.deviceIdInput.getDOMNode().value.isWhiteString()) {
+            that.setState({alert: <Alert bsStyle="warning">Invalid Input</Alert>});
+            return false;
+        }
+        $.ajax({
+            url: '/api/devices',
+            dataType: 'json',
+            type: 'PUT',
+            data: {
+                email: that.refs.emailInput.getDOMNode().value,
+                device_id: that.refs.deviceIdInput.getDOMNode().value,
+                device_type: "pill"
+            },
+            success: function (response) {
+                console.log(response);
+                that.setState({alert: response.error ?
+                    <Alert bsStyle="danger">{response.error}</Alert> : <Alert bsStyle="success">Success</Alert>});
+            }
+        });
+        return false;
+    },
+    render: function() {
+        return (<div>
+            <form onSubmit={this.handleSubmit}>
+                <div><input className="form-control" ref="emailInput" type="text" placeholder="Email" /></div><br/>
+                <div><input className="form-control" ref="deviceIdInput" type="text" placeholder="Pill ID" /></div><br/>
+                <div><input className="form-control input-hidden"/></div><br/>
+                <div><Button className="submit" type="submit">Submit</Button></div><br/>
+            </form>
+            {this.state.alert}
+        </div>)
+    }
+});
 
+var PairingMaster = React.createClass({
+    render: function() {
+        return (<div><br/><br/>
+            <Row>
+                <Col xs={3}><Tile title="Pair Sense" content={<PairSenseTile parent={this} />} /></Col>
+                <Col xs={3}><Tile title="Pair Pill" content={<PairPillTile parent={this} />} /></Col>
+                <Col xs={3}><Tile title="Unpair Sense" content={<UnpairSenseTile parent={this} />} /></Col>
+                <Col xs={3}><Tile title="Unpair PIll" content={<UnpairPillTile parent={this} />} /></Col>
+            </Row>
+        </div>);
+    }
+});
 
-React.renderComponent(<PairingMaestro />, document.getElementById('pairing'));
+React.renderComponent(<PairingMaster />, document.getElementById('pairing'));
