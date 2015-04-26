@@ -6,6 +6,7 @@ import hashlib
 import binascii
 import datetime
 import logging as log
+import settings
 
 from helpers import ProtectedRequestHandler
 from Crypto.PublicKey import RSA
@@ -53,6 +54,7 @@ class SenseKeyProvision(ProtectedRequestHandler):
         output = ResponseOutput()
         output.set_status(self.response.status_int)
         output.set_viewer(self.current_user.email())
+
         try:
             priv = KeyStoreLocker.get_by_id(stage)
             if not priv or "Fill in" in priv.private_key:
@@ -79,13 +81,14 @@ class SenseKeyProvision(ProtectedRequestHandler):
         metadata = self.request.get("metadata", default_value="")
 
         self.hello_request(
-            api_url="provision/sense",
+            api_url="devices/provision/sense",
             type="POST",
             body_data=json.dumps({
                 "metadata": metadata,
                 "public_key": public_key,
                 "device_id": device_id
             }),
+            app_info=settings.ADMIN_APP_INFO
         )
 
 class PillKeyProvision(ProtectedRequestHandler):
@@ -95,7 +98,7 @@ class PillKeyProvision(ProtectedRequestHandler):
         remark = self.request.get("remark", default_value="")
 
         self.hello_request(
-            api_url="provision/pill",
+            api_url="devices/provision/pill",
             type="POST",
             body_data=json.dumps({
                 "metadata": json.dumps({
@@ -106,6 +109,7 @@ class PillKeyProvision(ProtectedRequestHandler):
                 "public_key": public_key,
                 "device_id": device_id
             }),
+            app_info=settings.ADMIN_APP_INFO
         )
 
 
