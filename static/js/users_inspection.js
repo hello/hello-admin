@@ -4,6 +4,7 @@ const d3TimeFormat = d3.time.format('%b %d %H:%M');
 const ACCEPTABLE_BATTERY_LEVEL = 10;
 const ACTIVE_SENSE_HOURS_THRESHOLD = 1;
 const ACTIVE_PILL_HOURS_THRESHOLD = 4;
+const INSPECT_POPULATION = 500;
 
 var RemarksModal =  React.createClass({
     render: function() {
@@ -31,7 +32,7 @@ var RemarksModal =  React.createClass({
 
 var ProblemUsersMaestro = React.createClass({
     getInitialState: function() {
-        return {recentUsers: [], error: "", senses: [], pills: [], pillStatuses: [], senseProvisionStatuses: [], pillProvisionStatuses: [], nonOkUsers: [], userStates: []}
+        return {recentUsers: [], error: "", senses: [], pills: [], pillStatuses: [], senseProvisionStatuses: [], pillProvisionStatuses: [], nonOkUsers: [], inspectedUsers: []}
     },
 
     getRecentUsers: function() {
@@ -39,7 +40,7 @@ var ProblemUsersMaestro = React.createClass({
         $.ajax({
             url: '/api/recent_users',
             dataType: 'json',
-            data: {limit: 500},
+            data: {limit: INSPECT_POPULATION},
             type: 'GET',
             success: function(response) {
                 if (response.error.isWhiteString()) {
@@ -281,6 +282,9 @@ var ProblemUsersMaestro = React.createClass({
                             inspectStatusStyle = "primary";
                         }
                     }
+                    if (that.state.inspectedUsers.indexOf(user.email) === -1) {
+                        that.state.inspectedUsers.push(user.email);
+                    }
                     break;
                 default:                                // inspection in progress
                     inspectStatusIcon = "time";
@@ -304,7 +308,7 @@ var ProblemUsersMaestro = React.createClass({
         var results = this.state.error !== "" ? null :
             <Table id="events-table" striped>
                 <thead><tr>
-                        <th className="col-xs-1"></th>
+                        <th className="col-xs-1 counter"> {that.state.inspectedUsers.length + "/" + INSPECT_POPULATION}</th>
                         <th className="col-xs-2 user-attr"><em>Account Email</em></th>
                         <th className="col-xs-1 user-attr"><em>Last Modified</em></th>
                         <th className="col-xs-1 metric"><em>hasSense</em></th>
