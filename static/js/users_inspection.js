@@ -39,6 +39,7 @@ var ProblemUsersMaestro = React.createClass({
         $.ajax({
             url: '/api/recent_users',
             dataType: 'json',
+            data: {limit: 500},
             type: 'GET',
             success: function(response) {
                 if (response.error.isWhiteString()) {
