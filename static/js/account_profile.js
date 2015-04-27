@@ -26,6 +26,7 @@ var UserBasicProfileTile = React.createClass({
                     <tr><td>Name</td><td>{response.data.name}</td></tr>
                     <tr><td>Email</td><td>{response.data.email}</td></tr>
                     <tr><td>Last Modified</td><td>{new Date(response.data.last_modified).toUTCString()}</td></tr>
+                    <tr><td/><td/></tr>
                 </tbody>
             </Table>;
         return (<div>
@@ -38,9 +39,33 @@ var UserBasicProfileTile = React.createClass({
 
 var TimelineTile = React.createClass({
     render: function() {
-        var lastNightDate =  d3.time.format("%m-%d-%Y")(new Date(new Date().getTime() - 24*3600*1000));
+        console.log('timeline', this.props.response);
+        var response = this.props.response;
+        var timelinePreview, lastNightDate =  d3.time.format("%m-%d-%Y")(new Date(new Date().getTime() - 24*3600*1000));
+        if (response.data.length > 0) {
+            console.log('yeah');
+            var lastNightScore = response.data[0].score && response.data[0].score > 0 ? response.data[0].score : <span className="not-ok">unavailable</span>;
+            var lastNightMessage = response.data[0].message ? response.data[0].message : <span className="not-ok">unavailable</span>;
+            var lastNightInsights = response.data[0].insights && response.data[0].insights.length > 0 ? response.data[0].insights.map(function(insight){
+                        console.log(debunkMarkdown(insight.message));
+                        return <tr><td>{insight.sensor.capitalize()}</td>
+                            <td>{debunkMarkdown(insight.message)}</td>
+                            </tr>;
+                    })
+                : <span className="not-ok">unavailable</span>;
+            timelinePreview = <Table>
+                <thead></thead>
+                <tbody>
+                    <tr><td>Score</td><td>{lastNightScore}</td></tr>
+                    <tr><td>Message</td><td>{debunkMarkdown(lastNightMessage)}</td></tr>
+                    {lastNightInsights}
+                    <tr><td/><td/></tr>
+                </tbody>
+            </Table>
+        }
         return <div>
-            <p><a target="_blank" href={"/timeline/?email=" + this.props.accountInput + "&date=" + lastNightDate}>Last Night</a></p>
+            {timelinePreview}
+            <p><a target="_blank" href={"/timeline/?email=" + this.props.accountInput + "&date=" + lastNightDate}>See more</a></p>
         </div>
     }
 });
@@ -113,6 +138,7 @@ var SenseSummary = React.createClass({
                     <tr><td>Firmware</td><td>{firmwareVersion}</td></tr>
                     <tr><td>Keystore</td><td>{keyStore}</td></tr>
                     <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
+                    <tr><td/><td/></tr>
                 </tbody>
             </Table>;
         }
@@ -154,6 +180,7 @@ var PillSummary = React.createClass({
                     <tr><td>Battery</td><td>{batteryLevel}</td></tr>
                     <tr><td>Keystore</td><td>{keyStore}</td></tr>
                     <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
+                    <tr><td/><td/></tr>
                 </tbody>
             </Table>;
         }
@@ -172,6 +199,7 @@ var AccountProfile = React.createClass({
             pillStatusResponse: {data: [], error: ""},
             senseKeyStoreResponse: {data: {}, error: ""},
             pillKeyStoreResponse: {data: {}, error: ""},
+            timelineResponse: {data: [], error: ""},
             accountInput: "",
             submitted: false
         }
@@ -226,6 +254,7 @@ var AccountProfile = React.createClass({
             type: 'GET',
             data: {email: this.refs.accountInput.getDOMNode().value, device_type: "pill"},
             success: function (response) {
+                console.log("pillInfo", response);
                 that.setState({pillInfoResponse: response});
                 if (response.data.length > 0) {
                     if (response.data[0].device_account_pair) {
@@ -282,13 +311,30 @@ var AccountProfile = React.createClass({
         });
     },
 
+    loadTimeline: function() {
+        var that = this;
+        $.ajax({
+            aysnc: false,
+            url: "/api/timeline",
+            dataType: "json",
+            type: 'GET',
+            data: {email: that.refs.accountInput.getDOMNode().value, date: d3.time.format("%Y-%m-%d")(new Date(new Date().getTime() - 24*3600*1000))},
+            success: function (response) {
+                that.setState({timelineResponse: response});
+            }
+        });
+    },
+
     handleSubmit: function() {
         history.pushState({}, '', '/account_profile/?account_input=' + this.refs.accountInput.getDOMNode().value);
         this.setState(this.getInitialState());
         this.setState({accountInput: this.refs.accountInput.getDOMNode().value});
+
         this.loadSenseInfo();
         this.loadBasicProfile();
         this.loadPillInfo();
+        this.loadTimeline();
+
         this.setState({submitted: true});
         return false;
     },
@@ -301,7 +347,7 @@ var AccountProfile = React.createClass({
                 <Col xs={4}><Tile title="Pill Summary" content={<PillSummary pillInfoResponse={this.state.pillInfoResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} accountInput={this.state.accountInput} />} /></Col>
             </Row>
             <Row>
-                <Col xs={4}><Tile title="Timeline" content={<TimelineTile accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile title="Timeline" content={<TimelineTile accountInput={this.state.accountInput} response={this.state.timelineResponse} />} /></Col>
                 <Col xs={4}><Tile title="Room Conditions" content={<RoomConditionsTile accountInput={this.state.accountInput} />} /></Col>
                 <Col xs={4}><Tile title="Motion "content={<MotionTile accountInput={this.state.accountInput}/>} /></Col>
             </Row>
@@ -329,24 +375,7 @@ var AccountProfile = React.createClass({
 
 React.renderComponent(<AccountProfile />, document.getElementById('account-profile'));
 
-
-function displayDateTime(ts, tzOffsetMillis) {
-    var omniTimeFormat = d3.time.format('%a %d %b %H:%M %Z');
-    var omniTimeFormatWithoutTz = d3.time.format('%a %d %b %H:%M');
-    if (tzOffsetMillis) {
-        var adjustedDateTimeString = new Date(ts + tzOffsetMillis).toUTCString().split("GMT")[0];
-        var tzOffsetHours =  tzOffsetMillis / 3600000, adjustTimezoneString;
-        if (tzOffsetHours >= 0 && tzOffsetHours < 10 ) {
-            adjustTimezoneString = "0" + tzOffsetHours.toString() + "00";
-        }
-        else if (tzOffsetHours < 0 && tzOffsetHours > -10) {
-            adjustTimezoneString = "-0" + Math.abs(tzOffsetHours).toString() + "00";
-        }
-        else {
-            adjustTimezoneString = tzOffsetHours.toString() + "00";
-        }
-        return omniTimeFormatWithoutTz(new Date(adjustedDateTimeString)) +  " " + adjustTimezoneString;
-    }
-
-    return omniTimeFormat(new Date(ts));
+function debunkMarkdown(md) {
+    var partials = md.match(/(.*?)(\*\*)(.*?)(\*\*)(.*?)/);
+    return <span>{partials[1]}<span className="stress">{partials[3]}</span>{partials[5]}</span>;
 }
