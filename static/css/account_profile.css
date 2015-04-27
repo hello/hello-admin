@@ -13,12 +13,14 @@
     transition: none;
     background-color: white;
     margin-bottom: 20px;
+    max-width: 400px;
 }
 
 body {
-    font-size: 90%;
     background-image: url(/static/image/grey.png);
 }
 
 .tile-title {text-align: center; text-transform: uppercase;}
 .not-ok {color: #ff0000;}
+.tile-content {font-size: 90%;}
+#submit{max-width: 700px;}

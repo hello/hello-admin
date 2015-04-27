@@ -311,7 +311,7 @@ var AccountProfile = React.createClass({
                 <Col xs={4}><Tile title="Pill Status" content={<PillStatusTile accountInput={this.state.accountInput} />} /></Col>
             </Row></div>;
         return <div>
-            <Row><Col xs={6} xsOffset={3}><form onSubmit={this.handleSubmit}>
+            <Row><Col id="submit" xs={6} xsOffset={3}><form onSubmit={this.handleSubmit}>
                 <div className="form-group">
                     <div className="input-group">
                         <input className="form-control" type="text" id="account-input" ref="accountInput" placeholder="email please"/>
