@@ -39,15 +39,13 @@ var UserBasicProfileTile = React.createClass({
 
 var TimelineTile = React.createClass({
     render: function() {
-        console.log('timeline', this.props.response);
         var response = this.props.response;
-        var timelinePreview, lastNightDate =  d3.time.format("%m-%d-%Y")(new Date(new Date().getTime() - 24*3600*1000));
+        var timelinePreview,
+            lastNightDate =  d3.time.format("%m-%d-%Y")(new Date(new Date().getTime() - 24*3600*1000));
         if (response.data.length > 0) {
-            console.log('yeah');
             var lastNightScore = response.data[0].score && response.data[0].score > 0 ? response.data[0].score : <span className="not-ok">unavailable</span>;
             var lastNightMessage = response.data[0].message ? response.data[0].message : <span className="not-ok">unavailable</span>;
             var lastNightInsights = response.data[0].insights && response.data[0].insights.length > 0 ? response.data[0].insights.map(function(insight){
-                        console.log(debunkMarkdown(insight.message));
                         return <tr><td>{insight.sensor.capitalize()}</td>
                             <td>{debunkMarkdown(insight.message)}</td>
                             </tr>;
@@ -63,7 +61,9 @@ var TimelineTile = React.createClass({
                 </tbody>
             </Table>
         }
+
         return <div>
+            {this.props.status}
             {timelinePreview}
             <p><a target="_blank" href={"/timeline/?email=" + this.props.accountInput + "&date=" + lastNightDate}>See more</a></p>
         </div>
@@ -201,7 +201,8 @@ var AccountProfile = React.createClass({
             pillKeyStoreResponse: {data: {}, error: ""},
             timelineResponse: {data: [], error: ""},
             accountInput: "",
-            submitted: false
+            submitted: false,
+            timelineStatus: null
         }
     },
 
@@ -313,6 +314,7 @@ var AccountProfile = React.createClass({
 
     loadTimeline: function() {
         var that = this;
+        that.setState({timelineStatus: <Alert>Loading ...</Alert>});
         $.ajax({
             aysnc: false,
             url: "/api/timeline",
@@ -320,7 +322,12 @@ var AccountProfile = React.createClass({
             type: 'GET',
             data: {email: that.refs.accountInput.getDOMNode().value, date: d3.time.format("%Y-%m-%d")(new Date(new Date().getTime() - 24*3600*1000))},
             success: function (response) {
-                that.setState({timelineResponse: response});
+                if (response.error.isWhiteString()) {
+                    that.setState({timelineResponse: response, timelineStatus: null});
+                }
+                else {
+                    that.setState({timelineResponse: response, timelineStatus: <Alert bsStyle="danger">response.error</Alert>});
+                }
             }
         });
     },
@@ -347,7 +354,7 @@ var AccountProfile = React.createClass({
                 <Col xs={4}><Tile title="Pill Summary" content={<PillSummary pillInfoResponse={this.state.pillInfoResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} accountInput={this.state.accountInput} />} /></Col>
             </Row>
             <Row>
-                <Col xs={4}><Tile title="Timeline" content={<TimelineTile accountInput={this.state.accountInput} response={this.state.timelineResponse} />} /></Col>
+                <Col xs={4}><Tile title="Timeline" content={<TimelineTile accountInput={this.state.accountInput} response={this.state.timelineResponse} status={this.state.timelineStatus} />} /></Col>
                 <Col xs={4}><Tile title="Room Conditions" content={<RoomConditionsTile accountInput={this.state.accountInput} />} /></Col>
                 <Col xs={4}><Tile title="Motion "content={<MotionTile accountInput={this.state.accountInput}/>} /></Col>
             </Row>
@@ -377,5 +384,8 @@ React.renderComponent(<AccountProfile />, document.getElementById('account-profi
 
 function debunkMarkdown(md) {
     var partials = md.match(/(.*?)(\*\*)(.*?)(\*\*)(.*?)/);
+    if (!partials) {
+        return <span/>
+    }
     return <span>{partials[1]}<span className="stress">{partials[3]}</span>{partials[5]}</span>;
 }
