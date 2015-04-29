@@ -70,3 +70,6 @@ em {font-style: italic;}
 /*.no-js #loader { display: none;  }*/
 /*.js #loader { display: block; position: absolute; left: 100px; top: 0; }*/
 .preloader {position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: 9999; background: url("/static/image/preloader.gif") center no-repeat #fff;}
+html {
+    -webkit-font-smoothing: antialiased;
+}

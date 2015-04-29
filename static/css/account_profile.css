@@ -20,8 +20,10 @@ body {
     background-image: url(/static/image/grey.png);
 }
 
-.tile-title {text-align: center; text-transform: uppercase;}
+.tile-title {text-transform: uppercase;}
 .not-ok {color: #ff0000;}
 .tile-content {font-size: 90%;}
 #submit{max-width: 700px;}
 .stress {font-weight: bold;}
+.tile-icon {height: 15px; margin: 0 0 -3px 8px; opacity: 0.6;}
+.tile-title {text-align: center;}
