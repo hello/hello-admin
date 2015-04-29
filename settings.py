@@ -58,7 +58,7 @@ WORKERS_LOGS_KEEP_SIZE = {
 
 ## Keep N lastest days of docs from being purge
 SEARCHIFY_LOGS_KEEP_DAYS = {
-    SENSE_LOGS_INDEX: 3,
+    SENSE_LOGS_INDEX: 7,
     APPLICATION_LOGS_INDEX: {
         "DEBUG": 3,
         "INFO": 3,
