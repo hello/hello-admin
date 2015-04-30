@@ -1,10 +1,13 @@
 /** @jsx React.DOM */
 
 var Tile = React.createClass({
+    getDefaultProps: function() {
+        return {img: "svg/motion.svg"}
+    },
     render: function() {
         return <div className="tile">
             <div className="tile-title">
-                {this.props.title}
+                <Row><Col xs={2}><img className="tile-icon" src={"/static/" + this.props.img}/></Col><Col xs={8}> {this.props.title}</Col></Row>
             </div>
             <br/>
             <div className="tile-content">
@@ -26,6 +29,7 @@ var UserBasicProfileTile = React.createClass({
                     <tr><td>Name</td><td>{response.data.name}</td></tr>
                     <tr><td>Email</td><td>{response.data.email}</td></tr>
                     <tr><td>Last Modified</td><td>{new Date(response.data.last_modified).toUTCString()}</td></tr>
+                    <tr><td/><td/></tr>
                 </tbody>
             </Table>;
         return (<div>
@@ -38,9 +42,33 @@ var UserBasicProfileTile = React.createClass({
 
 var TimelineTile = React.createClass({
     render: function() {
-        var lastNightDate =  d3.time.format("%m-%d-%Y")(new Date(new Date().getTime() - 24*3600*1000));
+        var response = this.props.response;
+        var timelinePreview,
+            lastNightDate =  d3.time.format("%m-%d-%Y")(new Date(new Date().getTime() - 24*3600*1000));
+        if (response.data.length > 0) {
+            var lastNightScore = response.data[0].score && response.data[0].score > 0 ? response.data[0].score : <span className="not-ok">unavailable</span>;
+            var lastNightMessage = response.data[0].message ? response.data[0].message : <span className="not-ok">unavailable</span>;
+            var lastNightInsights = response.data[0].insights && response.data[0].insights.length > 0 ? response.data[0].insights.map(function(insight){
+                        return <tr><td>{insight.sensor.capitalize()}</td>
+                            <td>{debunkMarkdown(insight.message)}</td>
+                            </tr>;
+                    })
+                : <span className="not-ok">unavailable</span>;
+            timelinePreview = <Table>
+                <thead></thead>
+                <tbody>
+                    <tr><td>Score</td><td>{lastNightScore}</td></tr>
+                    <tr><td>Message</td><td>{debunkMarkdown(lastNightMessage)}</td></tr>
+                    {lastNightInsights}
+                    <tr><td/><td/></tr>
+                </tbody>
+            </Table>
+        }
+
         return <div>
-            <p><a target="_blank" href={"/timeline/?email=" + this.props.accountInput + "&date=" + lastNightDate}>Last Night</a></p>
+            {this.props.status}
+            {timelinePreview}
+            <p><a target="_blank" href={"/timeline/?email=" + this.props.accountInput + "&date=" + lastNightDate}>See more</a></p>
         </div>
     }
 });
@@ -107,12 +135,12 @@ var SenseSummary = React.createClass({
             var firmwareVersion = senseInfoResponse.data[0].device_status ? senseInfoResponse.data[0].device_status.firmwareVersion : undefined;
             lastSeen =  senseInfoResponse.data[0].device_status ? new Date(senseInfoResponse.data[0].device_status.lastSeen).toUTCString() : undefined;
             result = <Table>
-                <thead/>
                 <tbody>
                     <tr><td>ID</td><td>{senseId}</td></tr>
                     <tr><td>Firmware</td><td>{firmwareVersion}</td></tr>
                     <tr><td>Keystore</td><td>{keyStore}</td></tr>
                     <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
+                    <tr><td/><td/></tr>
                 </tbody>
             </Table>;
         }
@@ -154,6 +182,7 @@ var PillSummary = React.createClass({
                     <tr><td>Battery</td><td>{batteryLevel}</td></tr>
                     <tr><td>Keystore</td><td>{keyStore}</td></tr>
                     <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
+                    <tr><td/><td/></tr>
                 </tbody>
             </Table>;
         }
@@ -172,8 +201,10 @@ var AccountProfile = React.createClass({
             pillStatusResponse: {data: [], error: ""},
             senseKeyStoreResponse: {data: {}, error: ""},
             pillKeyStoreResponse: {data: {}, error: ""},
+            timelineResponse: {data: [], error: ""},
             accountInput: "",
-            submitted: false
+            submitted: false,
+            timelineStatus: null
         }
     },
 
@@ -226,6 +257,7 @@ var AccountProfile = React.createClass({
             type: 'GET',
             data: {email: this.refs.accountInput.getDOMNode().value, device_type: "pill"},
             success: function (response) {
+                console.log("pillInfo", response);
                 that.setState({pillInfoResponse: response});
                 if (response.data.length > 0) {
                     if (response.data[0].device_account_pair) {
@@ -282,13 +314,36 @@ var AccountProfile = React.createClass({
         });
     },
 
+    loadTimeline: function() {
+        var that = this;
+        that.setState({timelineStatus: <div className="loader"><img src="/static/image/loading.gif" /></div>});
+        $.ajax({
+            aysnc: false,
+            url: "/api/timeline",
+            dataType: "json",
+            type: 'GET',
+            data: {email: that.refs.accountInput.getDOMNode().value, date: d3.time.format("%Y-%m-%d")(new Date(new Date().getTime() - 24*3600*1000))},
+            success: function (response) {
+                if (response.error.isWhiteString()) {
+                    that.setState({timelineResponse: response, timelineStatus: null});
+                }
+                else {
+                    that.setState({timelineResponse: response, timelineStatus: <Alert bsStyle="danger">response.error</Alert>});
+                }
+            }
+        });
+    },
+
     handleSubmit: function() {
         history.pushState({}, '', '/account_profile/?account_input=' + this.refs.accountInput.getDOMNode().value);
         this.setState(this.getInitialState());
         this.setState({accountInput: this.refs.accountInput.getDOMNode().value});
+
         this.loadSenseInfo();
         this.loadBasicProfile();
         this.loadPillInfo();
+        this.loadTimeline();
+
         this.setState({submitted: true});
         return false;
     },
@@ -296,22 +351,22 @@ var AccountProfile = React.createClass({
     render: function() {
         var results = this.state.submitted === false ? null :
             <div><Row>
-                <Col xs={4}><Tile title="Basic Profile" content={<UserBasicProfileTile response={this.state.basicProfileResponse} accountInput={this.state.accountInput} />} /></Col>
-                <Col xs={4}><Tile title="Sense Summary" content={<SenseSummary senseInfoResponse={this.state.senseInfoResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} accountInput={this.state.accountInput} />} /></Col>
-                <Col xs={4}><Tile title="Pill Summary" content={<PillSummary pillInfoResponse={this.state.pillInfoResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile img="svg/sleep.svg" title="Basic Info" img="svg/sleep.svg" content={<UserBasicProfileTile response={this.state.basicProfileResponse} accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseInfoResponse={this.state.senseInfoResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary pillInfoResponse={this.state.pillInfoResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} accountInput={this.state.accountInput} />} /></Col>
             </Row>
             <Row>
-                <Col xs={4}><Tile title="Timeline" content={<TimelineTile accountInput={this.state.accountInput} />} /></Col>
-                <Col xs={4}><Tile title="Room Conditions" content={<RoomConditionsTile accountInput={this.state.accountInput} />} /></Col>
-                <Col xs={4}><Tile title="Motion "content={<MotionTile accountInput={this.state.accountInput}/>} /></Col>
+                <Col xs={4}><Tile img="svg/timeline.svg" title="Timeline" content={<TimelineTile accountInput={this.state.accountInput} response={this.state.timelineResponse} status={this.state.timelineStatus} />} /></Col>
+                <Col xs={4}><Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile img="svg/motion.svg" title="Motion "content={<MotionTile accountInput={this.state.accountInput}/>} /></Col>
             </Row>
             <Row>
-                <Col xs={4}><Tile title="Sense Logs" content={<SenseLogsTile accountInput={this.state.accountInput} />} /></Col>
-                <Col xs={4}><Tile title="Sense Events" content={<SenseEventsTile accountInput={this.state.accountInput} />} /></Col>
-                <Col xs={4}><Tile title="Pill Status" content={<PillStatusTile accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile img="svg/sense_logs.svg" title="Sense Logs" content={<SenseLogsTile accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile img="svg/sense_events.svg" title="Sense Events" content={<SenseEventsTile accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile img="svg/pill_status.svg" title="Pill Status" content={<PillStatusTile accountInput={this.state.accountInput} />} /></Col>
             </Row></div>;
         return <div>
-            <Row><Col xs={6} xsOffset={3}><form onSubmit={this.handleSubmit}>
+            <Row><Col id="submit" xs={6} xsOffset={3}><form onSubmit={this.handleSubmit}>
                 <div className="form-group">
                     <div className="input-group">
                         <input className="form-control" type="text" id="account-input" ref="accountInput" placeholder="email please"/>
@@ -329,24 +384,10 @@ var AccountProfile = React.createClass({
 
 React.renderComponent(<AccountProfile />, document.getElementById('account-profile'));
 
-
-function displayDateTime(ts, tzOffsetMillis) {
-    var omniTimeFormat = d3.time.format('%a %d %b %H:%M %Z');
-    var omniTimeFormatWithoutTz = d3.time.format('%a %d %b %H:%M');
-    if (tzOffsetMillis) {
-        var adjustedDateTimeString = new Date(ts + tzOffsetMillis).toUTCString().split("GMT")[0];
-        var tzOffsetHours =  tzOffsetMillis / 3600000, adjustTimezoneString;
-        if (tzOffsetHours >= 0 && tzOffsetHours < 10 ) {
-            adjustTimezoneString = "0" + tzOffsetHours.toString() + "00";
-        }
-        else if (tzOffsetHours < 0 && tzOffsetHours > -10) {
-            adjustTimezoneString = "-0" + Math.abs(tzOffsetHours).toString() + "00";
-        }
-        else {
-            adjustTimezoneString = tzOffsetHours.toString() + "00";
-        }
-        return omniTimeFormatWithoutTz(new Date(adjustedDateTimeString)) +  " " + adjustTimezoneString;
+function debunkMarkdown(md) {
+    var partials = md.match(/(.*?)(\*\*)(.*?)(\*\*)(.*?)/);
+    if (!partials) {
+        return <span/>
     }
-
-    return omniTimeFormat(new Date(ts));
+    return <span>{partials[1]}<span className="stress">{partials[3]}</span>{partials[5]}</span>;
 }

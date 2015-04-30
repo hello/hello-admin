@@ -5,7 +5,7 @@ var QUERY_THROTTLE = 200; //ms
 
 var SenseEventsMaestro = React.createClass({
     getInitialState: function() {
-        return {data: [], error: "", cursor: 0, scrollY: 0, haltQuery: false, timer: null}
+        return {data: [], error: "", cursor: 0, scrollY: 0, haltQuery: false, timer: null, loading: ""}
     },
 
     componentDidMount: function() {
@@ -19,7 +19,9 @@ var SenseEventsMaestro = React.createClass({
             if (frames.top.scrollY > that.state.scrollY && $(window).scrollTop() + $(window).height() == getDocHeight()) {
                 clearTimeout(that.state.timer);
                 that.setState({timer: setTimeout(function(){
-                    that.handleSubmit();
+                    if(that.state.haltQuery === false) {
+                        that.handleSubmit(true);
+                    }
                 }, QUERY_THROTTLE)});
             }
             that.setState({scrollY: frames.top.scrollY});
@@ -32,27 +34,20 @@ var SenseEventsMaestro = React.createClass({
             return false;
         }
         $('#account-input').val(accountInputFromURL);
-        this.handleSubmit();
+        this.handleSubmit(false);
     },
 
-    emptyDataStoredInState: function() {
-        this.setState({data: [], error: "", cursor: 0, scrollY: 0, haltQuery: false, timer: null});
-    },
-
-    handleSubmit: function() {
+    handleSubmit: function(willRetainOldData) {
         var that = this, accountInput = $('#account-input').val();
-        var startTs = that.state.cursor === 0 ? new Date().getTime() : that.state.cursor;
-
-        if (that.state.currentDeviceId !== accountInput) {
-            that.emptyDataStoredInState();
-            startTs = new Date().getTime();
+        that.setState({loading: "Loading ...", haltQuery: false});
+        var startTs = new Date().getTime();
+        if (willRetainOldData){
+            startTs = that.state.cursor === 0 ? new Date().getTime() : that.state.cursor;
         }
-        that.setState({currentDeviceId: accountInput});
 
-        history.pushState({}, '', '/sense_events/?account_input=' + accountInput + '&start_ts=' + startTs);
+        history.pushState({}, '', '/sense_events/?account_input=' + accountInput);
 
         if (accountInput.indexOf('@') !== -1) {
-            console.log('hey');
             $.ajax({
                 url: '/api/device_by_email',
                 dataType: 'json',
@@ -64,9 +59,7 @@ var SenseEventsMaestro = React.createClass({
                     accountInput = response.data[0].device_account_pair.externalDeviceId
                 }
             });
-
         }
-        console.log(accountInput);
         $.ajax({
             url: '/api/sense_events',
             dataType: 'json',
@@ -76,9 +69,11 @@ var SenseEventsMaestro = React.createClass({
                 device_id: accountInput,
                 limit: PAGE_LIMIT
             },
-            async: false,
+//            async: false,
             success: function(response) {
                 console.log(response);
+                that.setState({loading: ""});
+
                 if (response.error.isWhiteString()) {
                     that.setState({error: ""});
 
@@ -91,7 +86,12 @@ var SenseEventsMaestro = React.createClass({
                     }
 
                     if (that.state.data.length > 0) {
-                        that.setState({data: that.state.data.concat(response.data.slice(1))});
+                        if(willRetainOldData) {
+                            that.setState({data: that.state.data.concat(response.data.slice(1))});
+                        }
+                        else {
+                            that.setState({data: response.data});
+                        }
                     }
                     else {
                         that.setState({data: response.data})
@@ -105,6 +105,7 @@ var SenseEventsMaestro = React.createClass({
         return false;
     },
     render: function() {
+        var loading = this.state.loading === "" ? null : <Alert>{this.state.loading}</Alert>;
         var senseEventsData = this.state.data.map(function(senseEvent){
             return <tr>
                 <td>{senseEvent.deviceId}</td>
@@ -145,10 +146,11 @@ var SenseEventsMaestro = React.createClass({
             </Table>;
 
         return (<div>
-            <form className="row" onSubmit={this.handleSubmit}>
+            <form className="row" onSubmit={this.handleSubmit.bind(this, false)}>
                 <Col xs={4} xsOffset={3}><Input type="text" id="account-input" placeholder="Enter device ID / email"/></Col>
                 <Col xs={1}><Button type="submit"><Glyphicon glyph="search"></Glyphicon></Button></Col>
             </form>
+            {loading}
             <Row>{results}</Row>
             {alert}
         </div>)

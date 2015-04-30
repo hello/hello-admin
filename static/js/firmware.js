@@ -223,7 +223,7 @@ var HistoryList = React.createClass({
     },
 
     componentDidUpdate: function() {
-        this.scrollToDeviceFirmwareHistory();
+//        this.scrollToDeviceFirmwareHistory();
     },
 
     render: function() {
@@ -554,9 +554,9 @@ var FirmwareMaestro = React.createClass({
                     {remove}
                <Col xs={6} md={6}>
                 <Panel header="Firmware Seen">
-                    <div id="fw_seen">
-                    {countResult}
-                    </div>
+                    {this.state.fwList.length === 0  ? null : <div id="fw_seen">
+                        {countResult}
+                    </div>}
                 </Panel>
                 <Panel header="Device Firmware History">
                     {historyResult}

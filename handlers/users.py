@@ -159,10 +159,12 @@ class OmniSearchAPI(ProtectedRequestHandler):
 
 class RecentUsersAPI(ProtectedRequestHandler):
     def get(self):
+        limit = self.request.get("limit", default_value="")
         self.hello_request(
             type="GET",
             app_info=settings.ADMIN_APP_INFO,
-            api_url="account/recent"
+            api_url="account/recent",
+            url_params={"limit": limit} if limit else {}
         )
 
     def get_from_cache(self):
