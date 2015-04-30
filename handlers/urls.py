@@ -98,6 +98,7 @@ from handlers.users import UserSearchAPI
 from handlers.views import UsersInpsectionView
 from handlers.views import AccountProfileView
 from handlers.devices import DeviceByEmailAPI
+from handlers.timezone import TimezoneAPI
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -163,6 +164,7 @@ api_routes = [
     ('/api/dust_stats/?$', DustStatsAPI),
     ('/api/user_search/?$', UserSearchAPI),
     ('/api/device_by_email/?$', DeviceByEmailAPI),
+    ('/api/timezone/?$', TimezoneAPI),
 ]
 
 page_routes = [
