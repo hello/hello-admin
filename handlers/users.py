@@ -207,7 +207,8 @@ class UserSearchAPI(ProtectedRequestHandler):
             "email": self.get_by_email,
             "email_partial": self.get_by_email_partial,
             "name_partial": self.get_by_name_partial,
-            "device_id": self.get_by_device_id
+            "device_id": self.get_by_device_id,
+            "partner": self.get_by_partner
         }
         return search_methods_switch[self.request.get('search_method', default_value='email')]
 
@@ -246,6 +247,13 @@ class UserSearchAPI(ProtectedRequestHandler):
     def get_by_device_id(self):
         self.hello_request(
             api_url="devices/{}/accounts".format(self.search_input),
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO,
+        )
+
+    def get_by_partner(self):
+        self.hello_request(
+            api_url="account/{}/partner".format(self.search_input),
             type="GET",
             app_info=settings.ADMIN_APP_INFO,
         )
