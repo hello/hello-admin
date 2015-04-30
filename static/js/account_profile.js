@@ -1,6 +1,9 @@
 /** @jsx React.DOM */
 
 var Tile = React.createClass({
+    getDefaultProps: function() {
+        return {img: "svg/motion.svg"}
+    },
     render: function() {
         return <div className="tile">
             <div className="tile-title">
@@ -313,7 +316,7 @@ var AccountProfile = React.createClass({
 
     loadTimeline: function() {
         var that = this;
-        that.setState({timelineStatus: <Alert>Loading ...</Alert>});
+        that.setState({timelineStatus: <div className="loader"><img src="/static/image/loading.gif" /></div>});
         $.ajax({
             aysnc: false,
             url: "/api/timeline",
@@ -353,14 +356,14 @@ var AccountProfile = React.createClass({
                 <Col xs={4}><Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary pillInfoResponse={this.state.pillInfoResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} accountInput={this.state.accountInput} />} /></Col>
             </Row>
             <Row>
-                <Col xs={4}><Tile img="image/timeline-bw.png" title="Timeline" content={<TimelineTile accountInput={this.state.accountInput} response={this.state.timelineResponse} status={this.state.timelineStatus} />} /></Col>
-                <Col xs={4}><Tile title="Room Conditions" content={<RoomConditionsTile accountInput={this.state.accountInput} />} /></Col>
-                <Col xs={4}><Tile title="Motion "content={<MotionTile accountInput={this.state.accountInput}/>} /></Col>
+                <Col xs={4}><Tile img="svg/timeline.svg" title="Timeline" content={<TimelineTile accountInput={this.state.accountInput} response={this.state.timelineResponse} status={this.state.timelineStatus} />} /></Col>
+                <Col xs={4}><Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile img="svg/motion.svg" title="Motion "content={<MotionTile accountInput={this.state.accountInput}/>} /></Col>
             </Row>
             <Row>
-                <Col xs={4}><Tile title="Sense Logs" content={<SenseLogsTile accountInput={this.state.accountInput} />} /></Col>
-                <Col xs={4}><Tile title="Sense Events" content={<SenseEventsTile accountInput={this.state.accountInput} />} /></Col>
-                <Col xs={4}><Tile title="Pill Status" content={<PillStatusTile accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile img="svg/sense_logs.svg" title="Sense Logs" content={<SenseLogsTile accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile img="svg/sense_events.svg" title="Sense Events" content={<SenseEventsTile accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile img="svg/pill_status.svg" title="Pill Status" content={<PillStatusTile accountInput={this.state.accountInput} />} /></Col>
             </Row></div>;
         return <div>
             <Row><Col id="submit" xs={6} xsOffset={3}><form onSubmit={this.handleSubmit}>
