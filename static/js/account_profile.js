@@ -20,7 +20,12 @@ var Tile = React.createClass({
 var UserBasicProfileTile = React.createClass({
     render: function() {
         var response = this.props.response;
+        var partnerResponse = this.props.partnerResponse;
         var alert = response.error.isWhiteString() ? null : <Well>{response.error}</Well>;
+        var partner = partnerResponse.error.isWhiteString() && !$.isEmptyObject(partnerResponse) ?
+            <a title={partnerResponse.data.name} href={"/account_profile/?account_input=" + partnerResponse.data.email} target="_blank">{partnerResponse.data.email}</a>
+            : <span> - </span>;
+
         var basicProfileTable = ($.isEmptyObject(response.data) || response.data.length === 0) ? null:
             <Table>
                 <thead></thead>
@@ -28,6 +33,7 @@ var UserBasicProfileTile = React.createClass({
                     <tr><td>ID</td><td>{response.data.id}</td></tr>
                     <tr><td>Name</td><td>{response.data.name}</td></tr>
                     <tr><td>Email</td><td>{response.data.email}</td></tr>
+                    <tr><td>Partner</td><td>{partner}</td></tr>
                     <tr><td>Last Modified</td><td>{new Date(response.data.last_modified).toUTCString()}</td></tr>
                     <tr><td/><td/></tr>
                 </tbody>
@@ -46,9 +52,12 @@ var TimelineTile = React.createClass({
         var timelinePreview,
             lastNightDate =  d3.time.format("%m-%d-%Y")(new Date(new Date().getTime() - 24*3600*1000));
         if (response.data.length > 0) {
-            var lastNightScore = response.data[0].score && response.data[0].score > 0 ? response.data[0].score : <span className="not-ok">unavailable</span>;
-            var lastNightMessage = response.data[0].message ? response.data[0].message : <span className="not-ok">unavailable</span>;
-            var lastNightInsights = response.data[0].insights && response.data[0].insights.length > 0 ? response.data[0].insights.map(function(insight){
+            var lastNightScore = response.data[0].score && response.data[0].score > 0 ?
+                <Badge className="score-badge">{response.data[0].score}</Badge> : <span className="not-ok">unavailable</span>;
+            var lastNightMessage = response.data[0].message ?
+                response.data[0].message : <span className="not-ok">unavailable</span>;
+            var lastNightInsights = response.data[0].insights && response.data[0].insights.length > 0 ?
+                response.data[0].insights.map(function(insight){
                         return <tr><td>{insight.sensor.capitalize()}</td>
                             <td>{debunkMarkdown(insight.message)}</td>
                             </tr>;
@@ -119,7 +128,11 @@ var SenseSummary = React.createClass({
     render: function() {
         var senseInfoResponse = this.props.senseInfoResponse,
             senseKeyStoreResponse = this.props.senseKeyStoreResponse,
+            timezoneResponse = this.props.timezoneResponse,
             result = null, lastSeen, keyStore;
+
+        var timezone = <span>{timezoneResponse.error.isWhiteString() && !$.isEmptyObject(timezoneResponse) ?
+            timezoneResponse.data.timezone_id : "-" }</span>;
 
         if (senseKeyStoreResponse.error.isWhiteString() && !$.isEmptyObject(senseKeyStoreResponse.data)) {
             if(senseKeyStoreResponse.data.key) {
@@ -137,8 +150,9 @@ var SenseSummary = React.createClass({
             result = <Table>
                 <tbody>
                     <tr><td>ID</td><td>{senseId}</td></tr>
-                    <tr><td>Firmware</td><td>{firmwareVersion}</td></tr>
                     <tr><td>Keystore</td><td>{keyStore}</td></tr>
+                    <tr><td>Firmware</td><td>{firmwareVersion}</td></tr>
+                    <tr><td>Timezone</td><td>{timezone}</td></tr>
                     <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
                     <tr><td/><td/></tr>
                 </tbody>
@@ -155,12 +169,19 @@ var PillSummary = React.createClass({
         var pillInfoResponse = this.props.pillInfoResponse,
             pillStatusResponse = this.props.pillStatusResponse,
             pillKeyStoreResponse = this.props.pillKeyStoreResponse,
-            result = null, batteryLevel, lastSeen, keyStore;
+            result = null, batteryLevel, lastSeen, keyStore, uptime;
 
         if (pillStatusResponse.data.length > 0) {
             if(pillStatusResponse.data[0][0]) {
                 batteryLevel = pillStatusResponse.data[0][0].batteryLevel;
                 lastSeen = new Date(pillStatusResponse.data[0][0].lastSeen).toUTCString();
+                uptime = millisecondsToHumanReadableString(pillStatusResponse.data[0][0].uptime * 1000);
+            }
+            else {
+                batteryLevel = <span className="not-ok">-</span>;
+                lastSeen = <span className="not-ok">-</span>;
+                uptime = <span className="not-ok">-</span>;
+
             }
         }
 
@@ -179,8 +200,9 @@ var PillSummary = React.createClass({
                 <thead/>
                 <tbody>
                     <tr><td>ID</td><td>{pillId}</td></tr>
-                    <tr><td>Battery</td><td>{batteryLevel}</td></tr>
                     <tr><td>Keystore</td><td>{keyStore}</td></tr>
+                    <tr><td>Battery</td><td>{batteryLevel}</td></tr>
+                    <tr><td>Uptime</td><td>{uptime}</td></tr>
                     <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
                     <tr><td/><td/></tr>
                 </tbody>
@@ -202,6 +224,8 @@ var AccountProfile = React.createClass({
             senseKeyStoreResponse: {data: {}, error: ""},
             pillKeyStoreResponse: {data: {}, error: ""},
             timelineResponse: {data: [], error: ""},
+            partnerResponse: {data: {}, error: ""},
+            timezoneResponse: {data: {}, error: ""},
             accountInput: "",
             submitted: false,
             timelineStatus: null
@@ -221,7 +245,7 @@ var AccountProfile = React.createClass({
             url: "/api/user_search",
             dataType: 'json',
             type: "GET",
-            data: {search_input: this.refs.accountInput.getDOMNode().value, search_method: "email"},
+            data: {search_input: that.refs.accountInput.getDOMNode().value, search_method: "email"},
             success: function (response) {
                 that.setState({basicProfileResponse: response});
             }
@@ -234,7 +258,7 @@ var AccountProfile = React.createClass({
             url: '/api/device_by_email',
             dataType: 'json',
             type: 'GET',
-            data: {email: this.refs.accountInput.getDOMNode().value, device_type: "sense"},
+            data: {email: that.refs.accountInput.getDOMNode().value, device_type: "sense"},
             success: function (response) {
                 that.setState({senseInfoResponse: response});
                 if (response.data.length > 0) {
@@ -255,9 +279,8 @@ var AccountProfile = React.createClass({
             url: '/api/device_by_email',
             dataType: 'json',
             type: 'GET',
-            data: {email: this.refs.accountInput.getDOMNode().value, device_type: "pill"},
+            data: {email: that.refs.accountInput.getDOMNode().value, device_type: "pill"},
             success: function (response) {
-                console.log("pillInfo", response);
                 that.setState({pillInfoResponse: response});
                 if (response.data.length > 0) {
                     if (response.data[0].device_account_pair) {
@@ -334,14 +357,44 @@ var AccountProfile = React.createClass({
         });
     },
 
+    loadPartner: function() {
+        var that = this;
+        $.ajax({
+            aysnc: false,
+            url: "/api/user_search",
+            dataType: "json",
+            type: 'GET',
+            data: {search_input: that.refs.accountInput.getDOMNode().value, search_method: "partner"},
+            success: function (response) {
+                that.setState({partnerResponse: response});
+            }
+        });
+    },
+
+    loadTimezone: function() {
+        var that = this;
+        $.ajax({
+            aysnc: false,
+            url: "/api/timezone",
+            dataType: "json",
+            type: 'GET',
+            data: {email: that.refs.accountInput.getDOMNode().value, event_ts: new Date().getTime()},
+            success: function (response) {
+                that.setState({timezoneResponse: response})
+            }
+        });
+    },
+
     handleSubmit: function() {
         history.pushState({}, '', '/account_profile/?account_input=' + this.refs.accountInput.getDOMNode().value);
         this.setState(this.getInitialState());
         this.setState({accountInput: this.refs.accountInput.getDOMNode().value});
 
         this.loadSenseInfo();
-        this.loadBasicProfile();
         this.loadPillInfo();
+        this.loadBasicProfile();
+        this.loadTimezone();
+        this.loadPartner();
         this.loadTimeline();
 
         this.setState({submitted: true});
@@ -351,8 +404,8 @@ var AccountProfile = React.createClass({
     render: function() {
         var results = this.state.submitted === false ? null :
             <div><Row>
-                <Col xs={4}><Tile img="svg/sleep.svg" title="Basic Info" img="svg/sleep.svg" content={<UserBasicProfileTile response={this.state.basicProfileResponse} accountInput={this.state.accountInput} />} /></Col>
-                <Col xs={4}><Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseInfoResponse={this.state.senseInfoResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile img="svg/sleep.svg" title="Basic Info" img="svg/sleep.svg" content={<UserBasicProfileTile response={this.state.basicProfileResponse} accountInput={this.state.accountInput} partnerResponse={this.state.partnerResponse} />} /></Col>
+                <Col xs={4}><Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseInfoResponse={this.state.senseInfoResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} timezoneResponse={this.state.timezoneResponse} accountInput={this.state.accountInput} />} /></Col>
                 <Col xs={4}><Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary pillInfoResponse={this.state.pillInfoResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} accountInput={this.state.accountInput} />} /></Col>
             </Row>
             <Row>
