@@ -420,13 +420,9 @@ var AccountProfile = React.createClass({
             </Row></div>;
         return <div>
             <Row><Col id="submit" xs={6} xsOffset={3}><form onSubmit={this.handleSubmit}>
-                <div className="form-group">
-                    <div className="input-group">
-                        <input className="form-control" type="text" id="account-input" ref="accountInput" placeholder="email please"/>
-                        <span className="input-group-addon cursor-hand" onClick={this.handleSubmit}>
-                            <Glyphicon glyph="search"/>
-                        </span>
-                    </div>
+                <div className="icon-addon addon-md">
+                    <input className="form-control" type="text" id="account-input" ref="accountInput" placeholder="email please"/>
+                    <Glyphicon className="cursor-hand" id="submit" glyph="search" onClick={this.handleSubmit}/>
                 </div>
             </form></Col></Row>
             <br/><br/>

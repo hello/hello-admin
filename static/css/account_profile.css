@@ -28,3 +28,23 @@ body {
 .tile-icon {height: 18px; margin: 0 0 -3px 8px; opacity: 0.6;}
 .tile-title {text-align: center;}
 .loader {text-align: center;}
+
+.score-badge {
+    display: block;
+    height: 22px;
+    padding: 4px 0;
+    color: black;
+    width: 23px;
+    border: 1px dotted #000000;
+    border-radius: 100%;
+    background-color: white;
+}
+
+#submit {
+    left: inherit;
+    top: 0;
+    right: 12px;
+}
+#account-input {
+    padding-left: 15px;
+}
