@@ -21,8 +21,8 @@ class PCHSerialNumberCheckSenseAPI(ProtectedRequestHandler):
         current_cache = memcache.get(PCH_SENSE_SN_MEMCACHE_KEY)
         if not current_cache:  # memcache has expired, i.e. can check sn sense now
             next_expiration_time = time.time() + THROTTLE_PERIOD
-            self.check_sn_sense()
             memcache.add(key=PCH_SENSE_SN_MEMCACHE_KEY, value=epoch_to_human(next_expiration_time), time=next_expiration_time)
+            self.check_sn_sense()
         else:
             response_output = ResponseOutput()
             response_output.set_status(400)
