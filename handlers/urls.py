@@ -99,6 +99,7 @@ from handlers.views import UsersInpsectionView
 from handlers.views import AccountProfileView
 from handlers.devices import DeviceByEmailAPI
 from handlers.timezone import TimezoneAPI
+from handlers.pch_serial import PCHSerialNumberCheckSenseAPI
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -165,6 +166,7 @@ api_routes = [
     ('/api/user_search/?$', UserSearchAPI),
     ('/api/device_by_email/?$', DeviceByEmailAPI),
     ('/api/timezone/?$', TimezoneAPI),
+    ('/api/pch_sn_check_sense/?$', PCHSerialNumberCheckSenseAPI),
 ]
 
 page_routes = [
