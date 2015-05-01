@@ -133,7 +133,7 @@ var ZendeskTile = React.createClass({
                 {zendeskResponse.data.tickets.map(function(ticket){
                     var ticketURL = "https://helloinc.zendesk.com/tickets/" + ticket.id;
                     var ticketFrom = Object.keys(ticket.via.source.from).map(function(k){return ticket.via.source.from[k]}).join(" | ") || ticket.via.channel;
-                    var ticketTags = ticket.tags.map(function(tag){return <span><Label bsStyle="info">{tag}</Label>&nbsp;</span>;});
+                    var ticketTags = <em>{ticket.tags.join(", ")}</em>;
                     return <ReactBootstrap.CarouselItem>
                         <div className="zendesk-well">
                             <Table>
