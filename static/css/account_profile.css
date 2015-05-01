@@ -64,6 +64,7 @@ body {
 }
 .carousel-control {
     background-image: none !important;
+    width: 40px;
 }
 .carousel-control>span.glyphicon {
     rgba(66, 139, 202, 0.2);
@@ -80,5 +81,5 @@ body {
 .zendesk-well {
     height: 220px;
     overflow-y: scroll;
-    margin: 0 80px 50px;
+    margin: 0 50px 50px;
 }
