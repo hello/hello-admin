@@ -141,11 +141,14 @@ var ConfigMaestro = React.createClass({
     var mySlider = $('input.slider').slider();
     mySlider.slider("setValue", 0).on('slide', function(slideEvt){
       that.setState({sliderValue: slideEvt.value});
+    }).on('slideStop', function(slideEvt){
+      that.setState({sliderValue: slideEvt.value});
     });
   },
 
   handleSubmit: function() {
     var that = this;
+    that.setState({alert: "Sending request ..."});
     var submitData = {
       feature: $('#feature-input').val(),
       ids: $('#ids-input').val(),
