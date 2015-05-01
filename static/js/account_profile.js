@@ -5,9 +5,9 @@ var Tile = React.createClass({
         return {img: "svg/motion.svg"}
     },
     render: function() {
-        return <div className="tile">
+        return <div className={"tile tile-" + this.props.title.toLowerCase().replace(/\s/g, "-")}>
             <div className="tile-title">
-                <Row><Col xs={2}><img className="tile-icon" src={"/static/" + this.props.img}/></Col><Col xs={8}> {this.props.title}</Col></Row>
+                <Row><Col xs={2} className="tile-icon-wrapper"><img className="tile-icon" src={"/static/" + this.props.img}/></Col><Col xs={8}> {this.props.title}</Col></Row>
             </div>
             <br/>
             <div className="tile-content">
@@ -124,6 +124,44 @@ var MotionTile = React.createClass({
     }
 });
 
+var ZendeskTile = React.createClass({
+    render: function() {
+        var zendeskResponse = this.props.zendeskResponse, ticketsCount = 0;
+        if (zendeskResponse.error.isWhiteString() && !$.isEmptyObject(zendeskResponse.data) && zendeskResponse.data.tickets.length > 0) {
+            ticketsCount = zendeskResponse.data.count;
+            var zendeskTickets = <ReactBootstrap.Carousel index={0} pause="true" interval={Math.pow(10, 10)}>
+                {zendeskResponse.data.tickets.map(function(ticket){
+                    var ticketURL = "https://helloinc.zendesk.com/tickets/" + ticket.id;
+                    var ticketFrom = Object.keys(ticket.via.source.from).map(function(k){return ticket.via.source.from[k]}).join(" | ") || ticket.via.channel;
+                    var ticketTags = <em>{ticket.tags.join(", ")}</em>;
+                    return <ReactBootstrap.CarouselItem>
+                        <div className="zendesk-well">
+                            <Table>
+                                <thead/>
+                                <tbody>
+                                    <tr><td>Created</td><td>{new Date(ticket.created_at).toString()}</td></tr>
+                                    <tr><td>From</td><td>{ticketFrom}</td></tr>
+                                    <tr><td>To</td><td>{ticket.recipient}</td></tr>
+                                    <tr><td>Subject</td><td>{ticket.subject}</td></tr>
+                                    <tr><td>Tags</td><td>{ticketTags}</td></tr>
+                                    <tr><td>Updated</td><td>{new Date(ticket.updated_at).toString()}</td></tr>
+                                    <tr><td>Status</td><td>{ticket.status}</td></tr>
+                                    <tr><td>URL</td><td><a target="_blank" href={ticketURL}>{ticketURL}</a></td></tr>
+                                    <tr><td/><td/></tr>
+                                </tbody>
+                            </Table>
+                        </div>
+                    </ReactBootstrap.CarouselItem>;
+                })}</ReactBootstrap.Carousel>;
+        }
+        return <div>
+            <div>&nbsp;&Sigma; = {ticketsCount}</div>
+            {this.props.status}
+            {zendeskTickets}
+        </div>
+    }
+});
+
 var SenseSummary = React.createClass({
     render: function() {
         var senseInfoResponse = this.props.senseInfoResponse,
@@ -226,9 +264,11 @@ var AccountProfile = React.createClass({
             timelineResponse: {data: [], error: ""},
             partnerResponse: {data: {}, error: ""},
             timezoneResponse: {data: {}, error: ""},
+            zendeskResponse: {data: {}, error: ""},
             accountInput: "",
             submitted: false,
-            timelineStatus: null
+            timelineStatus: null,
+            zendeskStatus: null
         }
     },
 
@@ -351,7 +391,7 @@ var AccountProfile = React.createClass({
                     that.setState({timelineResponse: response, timelineStatus: null});
                 }
                 else {
-                    that.setState({timelineResponse: response, timelineStatus: <Alert bsStyle="danger">response.error</Alert>});
+                    that.setState({timelineResponse: response, timelineStatus: <Well>{response.error}</Well>});
                 }
             }
         });
@@ -385,6 +425,26 @@ var AccountProfile = React.createClass({
         });
     },
 
+    loadZendeskTickets: function() {
+        var that = this;
+        that.setState({zendeskStatus: <div className="loader"><img src="/static/image/loading.gif" /></div>});
+        $.ajax({
+            aysnc: false,
+            url: "/api/zendesk",
+            dataType: "json",
+            type: 'GET',
+            data: {email: that.refs.accountInput.getDOMNode().value},
+            success: function (response) {
+                  if (response.error.isWhiteString()) {
+                    that.setState({zendeskResponse: response, zendeskStatus: null});
+                }
+                else {
+                    that.setState({zendeskResponse: response, zendeskStatus: <Well>{response.error}</Well>});
+                }
+            }
+        });
+    },
+
     handleSubmit: function() {
         history.pushState({}, '', '/account_profile/?account_input=' + this.refs.accountInput.getDOMNode().value);
         this.setState(this.getInitialState());
@@ -396,6 +456,7 @@ var AccountProfile = React.createClass({
         this.loadTimezone();
         this.loadPartner();
         this.loadTimeline();
+        this.loadZendeskTickets();
 
         this.setState({submitted: true});
         return false;
@@ -417,6 +478,9 @@ var AccountProfile = React.createClass({
                 <Col xs={4}><Tile img="svg/sense_logs.svg" title="Sense Logs" content={<SenseLogsTile accountInput={this.state.accountInput} />} /></Col>
                 <Col xs={4}><Tile img="svg/sense_events.svg" title="Sense Events" content={<SenseEventsTile accountInput={this.state.accountInput} />} /></Col>
                 <Col xs={4}><Tile img="svg/pill_status.svg" title="Pill Status" content={<PillStatusTile accountInput={this.state.accountInput} />} /></Col>
+            </Row>
+            <Row>
+                <Col md={8}><Tile img="svg/zendesk.svg" title="Zendesk" content={<ZendeskTile accountInput={this.state.accountInput} zendeskResponse={this.state.zendeskResponse} zendeskStatus={this.props.zendeskStatus} />} /></Col>
             </Row></div>;
         return <div>
             <Row><Col id="submit" xs={6} xsOffset={3}><form onSubmit={this.handleSubmit}>

@@ -2,19 +2,18 @@ import json
 import requests
 import settings
 from handlers.analysis import get_zendesk_stats
-from handlers.helpers import CustomerExperienceRequestHandler
+from handlers.helpers import CustomerExperienceRequestHandler, ResponseOutput
 from handlers.utils import display_error
 from models.ext import ZendeskDailyStats
-from utils import iso_to_utc_timestamp
 
 class ZendeskAPI(CustomerExperienceRequestHandler):
-    def get(self):
+    def get_tickets(self, page_limit=100000):
         """
         Grab tickets filed by a customer
         - input: user email (required)
         - auth params: domain, email_account, api_token (required by Zendesk)
         """
-        output = {'data': [], 'error': ''}
+        output = ResponseOutput()
         user_email = self.request.get('email')
 
         zendesk_cred = settings.ZENDESK
@@ -22,7 +21,7 @@ class ZendeskAPI(CustomerExperienceRequestHandler):
             self.error(500)
 
         tickets = []
-        search_url = "{}/api/v2/search.json?query=type:ticket%20requester:{}".format(zendesk_cred.domain, user_email)
+        search_url = "{}/api/v2/search.json?query=type:ticket%20requester:{}&sort_by=created_at&sort_order=desc".format(zendesk_cred.domain, user_email)
         zen_auth = (zendesk_cred.email_account + '/token', zendesk_cred.api_token)
 
         try:
@@ -30,31 +29,33 @@ class ZendeskAPI(CustomerExperienceRequestHandler):
                 raise RuntimeError("Missing input: user email")
             zen_response = requests.get(search_url, auth=zen_auth)
 
+            ticket_count = 0
             if zen_response.ok:
                 tickets += zen_response.json().get('results', [])
+                ticket_count = zen_response.json().get('count', 0)
 
             # Keep querying on as long as paginating is possible
-            while zen_response.json().get('next_page') is not None:
+            page_count = 1
+            while zen_response.json().get('next_page') is not None and page_count < page_limit:
                 zen_response = requests.get(zen_response.json().get('next_page'), auth=zen_auth)
                 if zen_response.ok:
                     tickets += zen_response.json().get('results', [])
+                page_count += 1
 
-            tickets = sorted(tickets, key=lambda k: iso_to_utc_timestamp(k.get('created_at')))
-            output['data'] = tickets
+            output.set_data({'count': ticket_count, 'tickets': tickets})
+            output.set_status(200)
 
         except Exception as e:
-            output['error'] = display_error(e)
+            output.set_error(e.message)
+            output.set_status(500)
 
-        self.response.write(json.dumps(output))
+        self.response.write(output.get_serialized_output())
 
+    def get(self):
+        self.get_tickets(1)
 
 class ZendeskStatsAPI(CustomerExperienceRequestHandler):
     def get(self):
-        """
-        Grab tickets filed by a customer
-        - input: user email (required)
-        - auth params: domain, email_account, api_token (required by Zendesk)
-        """
         output = {'data': {}, 'error': ''}
         start_date = self.request.get('start_date')  ## yyyy-mm-dd
         end_date = self.request.get('end_date')  ## yyyy-mm-dd

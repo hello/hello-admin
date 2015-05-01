@@ -48,3 +48,36 @@ body {
 #account-input {
     padding-left: 15px;
 }
+
+.tile-zendesk {
+    max-width: 100% !important;
+}
+.tile-icon-wrapper {
+    text-align: left;
+}
+
+.carousel-content {
+    background: white;
+    color:black;
+    display:flex;
+    align-items:center;
+}
+.carousel-control {
+    background-image: none !important;
+    width: 40px;
+}
+.carousel-control>span.glyphicon {
+    rgba(66, 139, 202, 0.2);
+}
+
+.carousel-indicators>li {
+    border-color: rgba(66, 139, 202, 0.26)
+}
+
+.carousel-indicators>li.active {
+    background-color: rgba(66, 139, 202, 0.26)
+}
+
+.zendesk-well {
+    margin: 0 50px 50px;
+}
