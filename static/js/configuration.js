@@ -21,7 +21,7 @@ var FeaturesTableBody = React.createClass({
             <td><span className="feature-td cursor-custom">{d.name}</span></td>
             <td>{idsSpans}</td>
             <td>{d.groups.join(", ")}</td>
-            <td>{d.percentage}</td>
+            <td className="percentage-td">{d.percentage}</td>
         </tr>);
       });
       return (<tbody>
@@ -59,7 +59,12 @@ var ConfigMaestro = React.createClass({
   },
 
   populateInput: function () {
+    var that = this;
     $('.feature-td').click(function(){
+      var updatedSliderValue = Number($(this).parent().siblings(".percentage-td").text());
+      var mySlider = $('input.slider').slider();
+      mySlider.slider("setValue", updatedSliderValue);
+      that.setState({sliderValue: updatedSliderValue});
       $('#feature-input').focus().val($(this).text());
     });
     $('.ids-td').click(function(){
@@ -133,8 +138,8 @@ var ConfigMaestro = React.createClass({
     $('#groups-input').change(function(){
       that.setState({ids: $('#groups-input').val()});
     });
-
-    $('.slider').slider({value: 0}).on('slide', function(slideEvt){
+    var mySlider = $('input.slider').slider();
+    mySlider.slider("setValue", 0).on('slide', function(slideEvt){
       that.setState({sliderValue: slideEvt.value});
     });
   },
@@ -188,7 +193,7 @@ var ConfigMaestro = React.createClass({
             {groupsOptions}
           </Input>
           <h4>Percentage: <span>{this.state.sliderValue}</span></h4>
-          <span>0&nbsp;</span>
+          <span>0&nbsp;&nbsp;&nbsp;</span>
           <input type="text" className="span2 slider" value="" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square" />
           <span>&nbsp;100</span>
           <h4>Submit</h4>
