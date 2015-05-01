@@ -131,14 +131,26 @@ var ZendeskTile = React.createClass({
             ticketsCount = zendeskResponse.data.count;
             var zendeskTickets = <ReactBootstrap.Carousel index={0} pause="true" interval={Math.pow(10, 10)}>
                 {zendeskResponse.data.tickets.map(function(ticket){
+                    var ticketURL = "https://helloinc.zendesk.com/tickets/" + ticket.id;
+                    var ticketFrom = Object.keys(ticket.via.source.from).map(function(k){return ticket.via.source.from[k]}).join(" | ") || ticket.via.channel;
+                    var ticketTags = ticket.tags.map(function(tag){return <span><Label bsStyle="info">{tag}</Label>&nbsp;</span>;});
                     return <ReactBootstrap.CarouselItem>
-                        <Well className="zendesk-well">
-                            Created: {new Date(ticket.created_at).toString()}<br/>
-                            Updated: {new Date(ticket.updated_at).toString()}<br/>
-                            Subject: {ticket.subject}
-                            <hr/>
-                            <em>{ticket.description}</em>
-                        </Well>
+                        <div className="zendesk-well">
+                            <Table>
+                                <thead/>
+                                <tbody>
+                                    <tr><td>Created</td><td>{new Date(ticket.created_at).toString()}</td></tr>
+                                    <tr><td>From</td><td>{ticketFrom}</td></tr>
+                                    <tr><td>To</td><td>{ticket.recipient}</td></tr>
+                                    <tr><td>Subject</td><td>{ticket.subject}</td></tr>
+                                    <tr><td>Tags</td><td>{ticketTags}</td></tr>
+                                    <tr><td>Updated</td><td>{new Date(ticket.updated_at).toString()}</td></tr>
+                                    <tr><td>Status</td><td>{ticket.status}</td></tr>
+                                    <tr><td>URL</td><td><a target="_blank" href={ticketURL}>{ticketURL}</a></td></tr>
+                                    <tr><td/><td/></tr>
+                                </tbody>
+                            </Table>
+                        </div>
                     </ReactBootstrap.CarouselItem>;
                 })}</ReactBootstrap.Carousel>;
         }

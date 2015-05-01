@@ -79,7 +79,5 @@ body {
 }
 
 .zendesk-well {
-    height: 220px;
-    overflow-y: scroll;
     margin: 0 50px 50px;
 }
