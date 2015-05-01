@@ -27,7 +27,7 @@ class PCHSerialNumberCheckAPI(ProtectedRequestHandler):
     def post(self):
         key = PCH_SENSE_SN_KEY[self.device_type]
         current_cache = memcache.get(key=key)
-        if current_cache is None:  # memcache has expired, i.e. can check sn sense now
+        if current_cache is None:  # memcache has expired, i.e. can check device serial number now
             next_expiration_time = time.time() + THROTTLE_PERIOD
             memcache.add(key=key, value=epoch_to_human(next_expiration_time), time=next_expiration_time)
             self.check_sn()
