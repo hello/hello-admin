@@ -96,7 +96,9 @@ var DebugLog = React.createClass({
             $('#text-input').val(textInputFromURL);
         }
 
-        that.handleSubmit();
+        if (!(textInputFromURL.isWhiteString() && devicesInputFromURL.isWhiteString())) {
+            that.handleSubmit();
+        }
 
         $('.slider').slider({value: Number(maxDocsFromURL)}).on('slide', function(slideEvt){
             $('#sliderValue').text(slideEvt.value);
