@@ -38,7 +38,7 @@ var SenseEventsMaestro = React.createClass({
     },
 
     handleSubmit: function(willRetainOldData) {
-        var that = this, accountInput = $('#account-input').val();
+        var that = this, accountInput = $('#account-input').val().trim();
         that.setState({loading: "Loading ...", haltQuery: false});
         var startTs = new Date().getTime();
         if (willRetainOldData){

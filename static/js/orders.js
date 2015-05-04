@@ -24,7 +24,7 @@ var OrdersMaestro = React.createClass({
 
     handleSubmit: function() {
         var that = this;
-        var orderId = $("#order-id-input").val();
+        var orderId = $("#order-id-input").val().trim();
         var requestData = {
             order_id: orderId
         };

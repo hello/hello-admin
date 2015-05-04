@@ -26,9 +26,9 @@ var TokenGenMaestro = React.createClass({
     },
     handleTokenRequest: function() {
       var putData = {
-        app: $('#token-app-input').val(),
-        username: $('#token-username-input').val(),
-        password: $('#token-password-input').val()
+        app: $('#token-app-input').val().trim(),
+        username: $('#token-username-input').val().trim(),
+        password: $('#token-password-input').val().trim()
       };
       $.ajax({
         url: '/api/tokens',

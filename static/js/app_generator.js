@@ -23,12 +23,12 @@ var AppGenMaestro = React.createClass({
     },
     handleSubmit: function() {
       var postData = {
-        name: $('#app-name-input').val(),
-        scopes: $('#app-scopes-input').val(),
-        description: $('#app-description-input').val(),
-        client_id: $('#app-client-id-input').val(),
-        client_secret: $('#app-client-secret-input').val(),
-        redirect_uri: $('#app-redirect-uri-input').val()
+        name: $('#app-name-input').val().trim(),
+        scopes: $('#app-scopes-input').val().trim(),
+        description: $('#app-description-input').val().trim(),
+        client_id: $('#app-client-id-input').val().trim(),
+        client_secret: $('#app-client-secret-input').val().trim(),
+        redirect_uri: $('#app-redirect-uri-input').val().trim()
       };
       console.log("sending post", postData);
       $.ajax({
@@ -38,7 +38,7 @@ var AppGenMaestro = React.createClass({
         type: 'POST',
         data: JSON.stringify(postData),
         success: function(response) {
-          this.setState({generatedApp: $('#app-name-input').val()});
+          this.setState({generatedApp: $('#app-name-input').val().trim()});
         }.bind(this),
         error: function(e) {
           console.error(e);

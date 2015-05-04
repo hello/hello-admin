@@ -63,7 +63,7 @@ var MotionMaestro = React.createClass({
 
     getMotionData: function() {
         var that = this;
-        var emailInput = $("#email-input").val();
+        var emailInput = $("#email-input").val().trim();
         var dateInput = $("#date-input").val();
         var requestData = {
             email: emailInput,
