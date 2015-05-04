@@ -6,6 +6,7 @@ const ACTIVE_SENSE_HOURS_THRESHOLD = 1;
 const ACTIVE_PILL_HOURS_THRESHOLD = 4;
 const INSPECT_POPULATION = 500;  // users
 const INSPECT_HEADWAY = 2700;  // ms
+const TICKET_AGE_THRESHOLD = 7; // days
 
 var RemarksModal =  React.createClass({
     render: function() {
@@ -65,6 +66,7 @@ var ProblemUsersMaestro = React.createClass({
         }
 
         var that = this;
+        that.loadZendeskTickets(email, i);
         $.ajax({
             url: '/api/device_by_email',
             dataType: 'json',
@@ -173,7 +175,6 @@ var ProblemUsersMaestro = React.createClass({
             var delay = j * INSPECT_HEADWAY;
             setTimeout(function() {
                 that.getDevicesInfo(user.email, j);
-                that.loadZendeskTickets(user.email, j);
             }, delay);
         });
     },
@@ -270,7 +271,7 @@ var ProblemUsersMaestro = React.createClass({
             var thisZendeskTicket = that.state.zendeskTickets[i];
             if (thisZendeskTicket !== undefined) {
                 if (thisZendeskTicket !== null) {
-                    hasNoTicketLastWeek = new Date().getTime() < new Date(that.state.zendeskTickets[i].created_at).getTime() + 7*24*3600*1000;
+                    hasNoTicketLastWeek = new Date().getTime() > new Date(that.state.zendeskTickets[i].created_at).getTime() + TICKET_AGE_THRESHOLD*24*3600*1000;
                 }
                 else {
                     hasNoTicketLastWeek = true;
