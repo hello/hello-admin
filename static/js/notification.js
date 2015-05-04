@@ -7,8 +7,8 @@ var NotificationMaestro = React.createClass({
     handleSubmit: function() {
         var that = this;
         var requestData = {
-            receiver: $("#receiver-input").val(),
-            target: $("#target-input").val(),
+            receiver: $("#receiver-input").val().trim(),
+            target: $("#target-input").val().trim(),
             details: $("#details-input").val(),
             body: $("#body-input").val()
         };

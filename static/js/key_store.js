@@ -29,8 +29,8 @@ var KeyStoreMaestro = React.createClass({
 
     handleSubmit: function() {
         var that = this;
-        var deviceInput = $("#device-input").val();
-        var typeInput = $("#type-input").val();
+        var deviceInput = $("#device-input").val().trim();
+        var typeInput = $("#type-input").val().trim();
         var requestData = {
             device_id: deviceInput.toUpperCase(),
             device_type: typeInput

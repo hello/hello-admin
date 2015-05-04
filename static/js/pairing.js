@@ -30,8 +30,8 @@ var PairSenseTile = React.createClass({
             dataType: 'json',
             type: 'POST',
             data: {
-                email: that.refs.emailInput.getDOMNode().value,
-                device_id: that.refs.deviceIdInput.getDOMNode().value,
+                email: that.refs.emailInput.getDOMNode().value.trim(),
+                device_id: that.refs.deviceIdInput.getDOMNode().value.trim(),
                 timezone: that.refs.timezoneInput.getDOMNode().value,
                 device_type: "sense"
             },
@@ -76,8 +76,8 @@ var PairPillTile = React.createClass({
             dataType: 'json',
             type: 'POST',
             data: {
-                email: that.refs.emailInput.getDOMNode().value,
-                device_id: that.refs.deviceIdInput.getDOMNode().value,
+                email: that.refs.emailInput.getDOMNode().value.trim(),
+                device_id: that.refs.deviceIdInput.getDOMNode().value.trim(),
                 device_type: "pill"
             },
             success: function (response) {
@@ -117,8 +117,8 @@ var UnpairSenseTile = React.createClass({
             dataType: 'json',
             type: 'PUT',
             data: {
-                email: that.refs.emailInput.getDOMNode().value,
-                device_id: that.refs.deviceIdInput.getDOMNode().value,
+                email: that.refs.emailInput.getDOMNode().value.trim(),
+                device_id: that.refs.deviceIdInput.getDOMNode().value.trim(),
                 device_type: "sense"
             },
             success: function (response) {
@@ -158,8 +158,8 @@ var UnpairPillTile = React.createClass({
             dataType: 'json',
             type: 'PUT',
             data: {
-                email: that.refs.emailInput.getDOMNode().value,
-                device_id: that.refs.deviceIdInput.getDOMNode().value,
+                email: that.refs.emailInput.getDOMNode().value.trim(),
+                device_id: that.refs.deviceIdInput.getDOMNode().value.trim(),
                 device_type: "pill"
             },
             success: function (response) {

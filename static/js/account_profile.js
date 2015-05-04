@@ -301,7 +301,7 @@ var AccountProfile = React.createClass({
             url: "/api/user_search",
             dataType: 'json',
             type: "GET",
-            data: {search_input: that.refs.accountInput.getDOMNode().value, search_method: "email"},
+            data: {search_input: that.refs.accountInput.getDOMNode().value.trim(), search_method: "email"},
             success: function (response) {
                 that.setState({basicProfileResponse: response});
             }
@@ -314,7 +314,7 @@ var AccountProfile = React.createClass({
             url: '/api/device_by_email',
             dataType: 'json',
             type: 'GET',
-            data: {email: that.refs.accountInput.getDOMNode().value, device_type: "sense"},
+            data: {email: that.refs.accountInput.getDOMNode().value.trim(), device_type: "sense"},
             success: function (response) {
                 console.log(response);
                 that.setState({senseInfoResponse: response});
@@ -336,7 +336,7 @@ var AccountProfile = React.createClass({
             url: '/api/device_by_email',
             dataType: 'json',
             type: 'GET',
-            data: {email: that.refs.accountInput.getDOMNode().value, device_type: "pill"},
+            data: {email: that.refs.accountInput.getDOMNode().value.trim(), device_type: "pill"},
             success: function (response) {
                 that.setState({pillInfoResponse: response});
                 if (response.data.length > 0) {
@@ -401,7 +401,7 @@ var AccountProfile = React.createClass({
             url: "/api/timeline",
             dataType: "json",
             type: 'GET',
-            data: {email: that.refs.accountInput.getDOMNode().value, date: d3.time.format("%Y-%m-%d")(new Date(new Date().getTime() - 24*3600*1000))},
+            data: {email: that.refs.accountInput.getDOMNode().value.trim(), date: d3.time.format("%Y-%m-%d")(new Date(new Date().getTime() - 24*3600*1000))},
             success: function (response) {
                 if (response.error.isWhiteString()) {
                     that.setState({timelineResponse: response, timelineStatus: null});
@@ -419,7 +419,7 @@ var AccountProfile = React.createClass({
             url: "/api/user_search",
             dataType: "json",
             type: 'GET',
-            data: {search_input: that.refs.accountInput.getDOMNode().value, search_method: "partner"},
+            data: {search_input: that.refs.accountInput.getDOMNode().value.trim(), search_method: "partner"},
             success: function (response) {
                 that.setState({partnerResponse: response});
             }
@@ -432,7 +432,7 @@ var AccountProfile = React.createClass({
             url: "/api/timezone",
             dataType: "json",
             type: 'GET',
-            data: {email: that.refs.accountInput.getDOMNode().value, event_ts: new Date().getTime()},
+            data: {email: that.refs.accountInput.getDOMNode().value.trim(), event_ts: new Date().getTime()},
             success: function (response) {
                 that.setState({timezoneResponse: response})
             }
@@ -446,7 +446,7 @@ var AccountProfile = React.createClass({
             url: "/api/zendesk",
             dataType: "json",
             type: 'GET',
-            data: {email: that.refs.accountInput.getDOMNode().value},
+            data: {email: that.refs.accountInput.getDOMNode().value.trim()},
             success: function (response) {
                   if (response.error.isWhiteString()) {
                     that.setState({zendeskResponse: response, zendeskStatus: null});
@@ -459,9 +459,9 @@ var AccountProfile = React.createClass({
     },
 
     handleSubmit: function() {
-        history.pushState({}, '', '/account_profile/?account_input=' + this.refs.accountInput.getDOMNode().value);
+        history.pushState({}, '', '/account_profile/?account_input=' + this.refs.accountInput.getDOMNode().value.trim());
         this.setState(this.getInitialState());
-        this.setState({accountInput: this.refs.accountInput.getDOMNode().value});
+        this.setState({accountInput: this.refs.accountInput.getDOMNode().value.trim()});
 
         this.loadSenseInfo();
         this.loadPillInfo();

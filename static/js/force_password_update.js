@@ -6,13 +6,13 @@ var ForcePasswordUpdateMaestro = React.createClass({
     },
     handleSubmit: function() {
         var that = this;
-        var passwordInput = $("#force-password-input-1").val();
-        if (passwordInput !== $("#force-password-input-2").val()) {
+        var passwordInput = $("#force-password-input-1").val().trim();
+        if (passwordInput !== $("#force-password-input-2").val().trim()) {
             that.setState({alert: "Mismatched password inputs"});
             return false;
         }
         var requestData = {
-            email: $("#force-email-input").val(),
+            email: $("#force-email-input").val().trim(),
             password: passwordInput
         };
         console.log(requestData);

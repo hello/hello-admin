@@ -268,7 +268,7 @@ var FirmwareMaestro = React.createClass({
     },
     retrieve: function() {
         console.log("retrieving");
-        var sourceInput = $('#sourceInput').val();
+        var sourceInput = $('#sourceInput').val().trim();
         history.pushState({}, '', '/firmware/?source=' + sourceInput);
         $.ajax({ //nested ajax to avoid race condition
           url: '/api/firmware',
@@ -329,7 +329,7 @@ var FirmwareMaestro = React.createClass({
             },
     fwHistoryList: function() {
             console.log("fetching firmware history");
-            var device_id = $('#device_id').val();
+            var device_id = $('#device_id').val().trim();
             history.pushState({}, '', '/firmware/?device_id=' + device_id);
             $.ajax({ //nested ajax to avoid race condition
               url: '/api/firmware/history',

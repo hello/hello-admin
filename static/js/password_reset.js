@@ -7,7 +7,7 @@ var PasswordResetMaestro = React.createClass({
     handleSubmit: function() {
         var that = this;
         var requestData = {
-            email: $("#email-input").val()
+            email: $("#email-input").val().trim()
         };
         console.log(requestData);
         if (isValidRequest(requestData)) {

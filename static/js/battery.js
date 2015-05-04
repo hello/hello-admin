@@ -132,7 +132,7 @@ var BatteryChart = React.createClass({
             alert: "Loading ...",
             data: [[], [], [], [], [], [], [], [], [], []]
         });
-        var searchInput = $('#search-input').val();
+        var searchInput = $('#search-input').val().trim();
         var endTs = $('#end-ts').val();
         var requestData = {
             search_input: searchInput,
