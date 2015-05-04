@@ -163,6 +163,22 @@ var ZendeskTile = React.createClass({
 });
 
 var SenseSummary = React.createClass({
+    loadUnhashedFirmware: function(version) {
+        $.ajax({
+            url: "/api/firmware_unhash",
+            dataType: 'json',
+            type: 'GET',
+            async: false,
+            data: {version: version},
+            success: function(response) {
+                if (response.error.isWhiteString()) {
+                    version = (version || "unknown hashed")
+                        + " (" + (response.data.join(", ") || "unknown unhashed") + ")";
+                }
+            }
+        });
+        return version;
+    },
     render: function() {
         var senseInfoResponse = this.props.senseInfoResponse,
             senseKeyStoreResponse = this.props.senseKeyStoreResponse,
@@ -189,7 +205,7 @@ var SenseSummary = React.createClass({
                 <tbody>
                     <tr><td>ID</td><td>{senseId}</td></tr>
                     <tr><td>Keystore</td><td>{keyStore}</td></tr>
-                    <tr><td>Firmware</td><td>{firmwareVersion}</td></tr>
+                    <tr><td>Firmware</td><td>{this.loadUnhashedFirmware(firmwareVersion)}</td></tr>
                     <tr><td>Timezone</td><td>{timezone}</td></tr>
                     <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
                     <tr><td/><td/></tr>
@@ -300,6 +316,7 @@ var AccountProfile = React.createClass({
             type: 'GET',
             data: {email: that.refs.accountInput.getDOMNode().value, device_type: "sense"},
             success: function (response) {
+                console.log(response);
                 that.setState({senseInfoResponse: response});
                 if (response.data.length > 0) {
                     if (response.data[0].device_account_pair) {
@@ -381,7 +398,6 @@ var AccountProfile = React.createClass({
         var that = this;
         that.setState({timelineStatus: <div className="loader"><img src="/static/image/loading.gif" /></div>});
         $.ajax({
-            aysnc: false,
             url: "/api/timeline",
             dataType: "json",
             type: 'GET',
@@ -400,7 +416,6 @@ var AccountProfile = React.createClass({
     loadPartner: function() {
         var that = this;
         $.ajax({
-            aysnc: false,
             url: "/api/user_search",
             dataType: "json",
             type: 'GET',
@@ -414,7 +429,6 @@ var AccountProfile = React.createClass({
     loadTimezone: function() {
         var that = this;
         $.ajax({
-            aysnc: false,
             url: "/api/timezone",
             dataType: "json",
             type: 'GET',
@@ -429,7 +443,6 @@ var AccountProfile = React.createClass({
         var that = this;
         that.setState({zendeskStatus: <div className="loader"><img src="/static/image/loading.gif" /></div>});
         $.ajax({
-            aysnc: false,
             url: "/api/zendesk",
             dataType: "json",
             type: 'GET',
