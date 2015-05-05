@@ -66,18 +66,23 @@ body {
     background-image: none !important;
     width: 40px;
 }
-.carousel-control>span.glyphicon {
-    rgba(66, 139, 202, 0.2);
+
+.carousel-control>span.glyphicon, .carousel-control>span.glyphicon:hover {
+    color: rgb(229, 236, 245);
 }
 
 .carousel-indicators>li {
-    border-color: rgba(66, 139, 202, 0.26)
+    border-color: rgba(66, 139, 202, 0.26);
 }
 
 .carousel-indicators>li.active {
-    background-color: rgba(66, 139, 202, 0.26)
+    background-color: rgba(66, 139, 202, 0.26);
 }
 
 .zendesk-well {
     margin: 0 50px 50px;
+}
+
+.loading-inline {
+    height: 14px;
 }
