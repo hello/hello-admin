@@ -17,9 +17,12 @@ cron:
 - description: purge active devices history
   url: /cron/active_devices_history_purge
   schedule: every 10 mins
-- description: store recently active devices stats
-  url: /cron/store_recently_active_devices_stats
+- description: store recently active devices stats every minute
+  url: /cron/store_recently_active_devices_stats_minute
   schedule: every 1 mins
+- description: store recently active devices stats daily
+  url: /cron/store_recently_active_devices_stats_daily
+  schedule: every day 08:10
 - description: conserve searchify stats
   url: /cron/conserve_searchify_stats
   schedule: every 60 mins

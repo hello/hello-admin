@@ -12,6 +12,7 @@ from handlers.utils import get_current_pacific_datetime
 from handlers.utils import epoch_to_human
 from models.ext import ZendeskDailyStats
 from models.ext import RecentlyActiveDevicesStats
+from models.ext import RecentlyActiveDevicesStatsDaily
 from models.ext import SearchifyStats
 from models.ext import SearchifyPurgeStats
 from indextank import ApiClient
@@ -310,7 +311,7 @@ class HoldsCountPush(GeckoboardPush):
             }))
 
 
-class StoreRecentlyActiveDevicesStats(BaseRequestHandler):
+class StoreRecentlyActiveDevicesStatsMinute(BaseRequestHandler):
     def get(self):
         zstats = self.hello_request(
             type="GET",
@@ -326,6 +327,25 @@ class StoreRecentlyActiveDevicesStats(BaseRequestHandler):
         )
 
         recently_active_devices_stats.put()
+
+
+class StoreRecentlyActiveDevicesStatsDaily(BaseRequestHandler):
+    def get(self):
+        zstats = self.hello_request(
+            type="GET",
+            api_url="devices/status_breakdown",
+            raw_output=True,
+            app_info=settings.ADMIN_APP_INFO,
+            url_params={'start_ts': int(time.time()*1000) - 24*3600*1000, 'end_ts': int(time.time()*1000)}
+        ).data
+
+        recently_active_devices_stats = RecentlyActiveDevicesStatsDaily(
+            senses_zcount=zstats["senses_count"],
+            pills_zcount=zstats["pills_count"]
+        )
+
+        recently_active_devices_stats.put()
+
 
 
 class ActiveDevicesHistoryPurge(BaseRequestHandler):
