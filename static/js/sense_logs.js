@@ -1,12 +1,40 @@
 /** @jsx React.DOM */
 
 var LogTable = React.createClass({
+    getInitialState: function() {
+        return {timezone: "browser"};
+    },
+
     searchAroundByTs: function(e) {
         clickedTs = new Date($(e.target).text()).getTime();
         $('#start-time').val(d3.time.format("%m-%d-%Y %H:%M:%S")(new Date(clickedTs-5*1000*60)));
         $('#end-time').val(d3.time.format("%m-%d-%Y %H:%M:%S")(new Date(clickedTs+5*1000*60)));
         $('#submit').click().focus();
     },
+
+    showTimeInLocalTimeZone: function(senseId, eventTs) {
+        var tzOffsetMillis = -25200000;
+        var tzId = "America/Los_Angeles";
+        $.ajax({
+            url: "/api/timezone",
+            dataType: "json",
+            type: 'GET',
+            async: false,
+            data: {sense_id: senseId, event_ts: eventTs},
+            success: function (response) {
+                if (response.error.isWhiteString()) {
+                    tzOffsetMillis = response.data.timezone_offset;
+                    tzId = response.data.timezone_id;
+                }
+            }
+        });
+        return displayDateTimeByTimeZoneOffset(eventTs, tzOffsetMillis, tzId);
+    },
+
+    updateDisplayTimeZone: function() {
+        this.setState({timezone: $('#select-timezone').val()});
+    },
+
     render: function(){
         var logTableRows = [], that = this;
         that.props.logs.forEach(function(log){
@@ -29,9 +57,20 @@ var LogTable = React.createClass({
                 nCount = highlightedRegex.nCount, // number of \n
                 rCount = highlightedRegex.rCount, // number of \r
                 deviceId = log.docid.split('-')[0];
+
+            var displayTimestamp;
+            switch (that.state.timezone) {
+                case "browser": displayTimestamp = new Date(log.timestamp * 1000).toString();
+                    break;
+                case "user": displayTimestamp = that.showTimeInLocalTimeZone(deviceId, log.timestamp * 1000);
+                    break;
+                case "gmt": displayTimestamp = new Date(log.timestamp * 1000).toUTCString();
+                    break;
+                default: displayTimestamp = new Date(log.timestamp * 1000).toString();
+            }
             var ts = [
                 <a href={"/users/?omni_input=" + deviceId}><span className="label label-success">{deviceId}</span></a>, <br/>, <br/>,
-                <a className="cursor-hand" onClick={that.searchAroundByTs}>{getFullDateTimeStringFromUTC(Number(log.timestamp))}</a>, <br/>, <br/>,
+                <a className="cursor-hand" onClick={that.searchAroundByTs}>{displayTimestamp}</a>, <br/>, <br/>,
                 <span>Keyword Count: {matchCount}</span>, <br/>
             ];
             var msgClasses = React.addons.classSet({
@@ -49,8 +88,12 @@ var LogTable = React.createClass({
         return (
             <table className="table table-condensed table-striped table-bordered">
                 <thead><tr>
-                    <th className="alert alert-success"><span className="glyphicon glyphicon-time"> Time</span></th>
-                    <th className="alert alert-warning"><span className="glyphicon glyphicon-paperclip"> Messages</span></th>
+                    <th className="alert alert-success"><Input onChange={that.updateDisplayTimeZone} id="select-timezone" type="select">
+                        <option value="browser">Browser Timezone</option>
+                        <option value="user">User Timezone</option>
+                        <option value="gmt">GMT</option>
+                    </Input></th>
+                    <th className="alert alert-warning"><Glyphicon glyph="paperclip"/> Messages</th>
                 </tr></thead>
                 <tbody>{logTableRows}</tbody>
             </table>
@@ -305,4 +348,25 @@ function compareTimestamp(log1, log2) {
         return 1;
     }
     return 0;
+}
+
+function displayDateTimeByTimeZoneOffset(ts, tzOffsetMillis, tzId) {
+    var omniTimeFormat = d3.time.format('%a %d %b %H:%M %Z');
+    var omniTimeFormatWithoutTz = d3.time.format('%a %d %b %H:%M');
+    if (tzOffsetMillis && tzId) {
+        var adjustedDateTimeString = new Date(ts + tzOffsetMillis).toUTCString().split("GMT")[0];
+        var tzOffsetHours =  tzOffsetMillis / 3600000, adjustTimezoneString;
+        if (tzOffsetHours >= 0 && tzOffsetHours < 10 ) {
+            adjustTimezoneString = "0" + tzOffsetHours.toString() + "00 " + tzId;
+        }
+        else if (tzOffsetHours < 0 && tzOffsetHours > -10) {
+            adjustTimezoneString = "-0" + Math.abs(tzOffsetHours).toString() + "00 " + tzId;
+        }
+        else {
+            adjustTimezoneString = tzOffsetHours.toString() + "00 " + tzId;
+        }
+        return omniTimeFormatWithoutTz(new Date(adjustedDateTimeString)) +  " " + adjustTimezoneString;
+    }
+
+    return omniTimeFormat(new Date(ts));
 }
