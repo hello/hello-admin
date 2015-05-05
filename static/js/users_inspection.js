@@ -15,17 +15,28 @@ var RemarksModal =  React.createClass({
                 <div className="modal-body">
                     <p>Acceptable battery level = {ACCEPTABLE_BATTERY_LEVEL + " (%)"}</p>
                     <p>Active sense threshold = {ACTIVE_SENSE_HOURS_THRESHOLD + " (hours)"}</p>
-                    <p>Active pill threshold = {ACTIVE_PILL_HOURS_THRESHOLD + " (hours)"}</p><br/><br/>
-                    <p><span className="inspection-ok">&#10004;</span> &nbsp; means <em> positive</em></p><br/>
-                    <p><span className="inspection-not-ok">&#10008;</span> &nbsp; means <em> negative</em></p><br/>
-                    <p>&#8211; &nbsp; means <em> not applicable</em></p><br/>
-                    <p>&#63; &nbsp; means <em> uninspected</em></p><br/><br/>
-                    <p><Button bsSize="xsmall" bsStyle="danger"><Glyphicon glyph="thumbs-down"/></Button>&nbsp;&#10230; Trouble Detected</p><br/>
-                    <p><Button bsSize="xsmall" bsStyle="primary"><Glyphicon glyph="hand-right"/></Button>&nbsp;&#10230; Skipped</p><br/>
-                    <p><Button bsSize="xsmall" bsStyle="success"><Glyphicon glyph="thumbs-up"/></Button>&nbsp;&#10230; Flawless</p><br/><br/>
+                    <p>Active pill threshold = {ACTIVE_PILL_HOURS_THRESHOLD + " (hours)"}</p><br/>
+                    <Row>
+                        <Col xs={6}><span className="inspection-ok">&#10004;</span> &nbsp; means <em> positive</em></Col>
+                        <Col xs={6}><Button bsSize="xsmall" bsStyle="success"><Glyphicon glyph="thumbs-up"/></Button>&nbsp;&#10230; Flawless</Col>
+                    </Row><br/>
+                    <Row>
+                        <Col xs={6}><span className="inspection-not-ok">&#10008;</span> &nbsp; means <em> negative</em></Col>
+                        <Col xs={6}><Button bsSize="xsmall" bsStyle="danger"><Glyphicon glyph="thumbs-down"/></Button>&nbsp;&#10230; Trouble Detected - No Ticket</Col>
+                    </Row><br/>
+                    <Row>
+                        <Col xs={6}>&#8211; &nbsp; means <em> not applicable</em></Col>
+                        <Col xs={6}><Button bsSize="xsmall" bsStyle="warning"><Glyphicon glyph="thumbs-down"/></Button>&nbsp;&#10230; Trouble Detected - Contacted</Col>
+                    </Row><br/>
+                    <Row>
+                        <Col xs={6}>&#63; &nbsp; means <em> uninspected</em></Col>
+                        <Col xs={6}><Button bsSize="xsmall" bsStyle="primary"><Glyphicon glyph="hand-right"/></Button>&nbsp;&#10230; Skipped</Col>
+                    </Row><br/>
                     <p>Trouble signal</p>
                     <Alert>!({"(hasSense === true && (isSenseActive !== true || isSenseProvisioned !== true || hasPill === false))" +
-                        "|| (hasPill === true && (isPillActive !== true || isPillProvisioned !== true || isBatteryLevelOk !== true)) && (hasNoTicketLastWeek === true)"})</Alert>
+                        " || (hasPill === true && (isPillActive !== true || isPillProvisioned !== true || isBatteryLevelOk !== true))"})</Alert>
+                    <p>Non OK signal</p>
+                    <Alert bsStyle="danger">{"hasTrouble === true && hasTicketLastWeek === false"}</Alert>
                 </div>
             </Modal>
         );
@@ -197,7 +208,7 @@ var ProblemUsersMaestro = React.createClass({
     render: function() {
         var that = this;
         var usersInfo = this.state.recentUsers.map(function(user, i) {
-            var hasSense, isSenseActive, isSenseProvisioned, hasPill, isPillActive, isPillProvisioned, isBatteryLevelOk, hasNoTicketLastWeek;
+            var hasSense, isSenseActive, isSenseProvisioned, hasPill, isPillActive, isPillProvisioned, isBatteryLevelOk, hasTicketLastWeek;
             var thisSense = that.state.senses[i];
             if (thisSense !== undefined){
                 if (thisSense !== null) {
@@ -271,14 +282,14 @@ var ProblemUsersMaestro = React.createClass({
             var thisZendeskTicket = that.state.zendeskTickets[i];
             if (thisZendeskTicket !== undefined) {
                 if (thisZendeskTicket !== null) {
-                    hasNoTicketLastWeek = new Date().getTime() > new Date(that.state.zendeskTickets[i].created_at).getTime() + TICKET_AGE_THRESHOLD*24*3600*1000;
+                    hasTicketLastWeek = new Date().getTime() < new Date(that.state.zendeskTickets[i].created_at).getTime() + TICKET_AGE_THRESHOLD*24*3600*1000;
                 }
                 else {
-                    hasNoTicketLastWeek = true;
+                    hasTicketLastWeek = false;
                 }
             }
 
-            var metricsSet = [hasSense, isSenseActive, isSenseProvisioned, hasPill, isPillActive, isPillProvisioned, isBatteryLevelOk, hasNoTicketLastWeek];
+            var metricsSet = [hasSense, isSenseActive, isSenseProvisioned, hasPill, isPillActive, isPillProvisioned, isBatteryLevelOk, hasTicketLastWeek];
             var undefinedMetricCount = metricsSet.filter(function(v){return v === undefined}).length;
 
             var inspectStatusIcon, inspectStatusStyle;
@@ -289,12 +300,17 @@ var ProblemUsersMaestro = React.createClass({
                     break;
                 case 0:                                 // inspection complete
                     if ((hasSense === true && (isSenseActive !== true || isSenseProvisioned !== true || hasPill === false))
-                        || (hasPill === true && (isPillActive !== true || isPillProvisioned !== true || isBatteryLevelOk !== true))
-                        && (hasNoTicketLastWeek == true)) {
+                        || (hasPill === true && (isPillActive !== true || isPillProvisioned !== true || isBatteryLevelOk !== true))) {
                         inspectStatusIcon = "thumbs-down";
-                        inspectStatusStyle = "danger";
-                        if (that.state.nonOkUsers.indexOf(user.email) === -1) {
-                            that.state.nonOkUsers.push(user.email);
+
+                        if (hasTicketLastWeek === false) {
+                            inspectStatusStyle = "danger";
+                            if (that.state.nonOkUsers.indexOf(user.email) === -1) {
+                                that.state.nonOkUsers.push(user.email);
+                            }
+                        }
+                        else {
+                            inspectStatusStyle = "warning";
                         }
                     }
                     else {
@@ -313,14 +329,14 @@ var ProblemUsersMaestro = React.createClass({
                     break;
                 default:                                // inspection in progress
                     inspectStatusIcon = "time";
-                    inspectStatusStyle = "warning";
+                    inspectStatusStyle = "info";
             }
 
             return <tr>
                 <td className="col-xs-1"><Button bsSize="small" bsStyle={inspectStatusStyle} id={"fire"+i} onClick={that.getDevicesInfo.bind(that, user.email, i)}><Glyphicon glyph={inspectStatusIcon}/></Button></td>
                 <td className="col-xs-2 user-val"><a target="_blank" href={"/account_profile/?account_input=" + user.email}>{user.email}</a></td>
                 <td className="col-xs-1 user-val">{d3TimeFormat(new Date(user.last_modified))}</td>
-                <td className="col-xs-1 inspection-result">{booleanPresent(hasNoTicketLastWeek)}</td>
+                <td className="col-xs-1 inspection-result">{booleanPresent(hasTicketLastWeek)}</td>
                 <td className="col-xs-1 inspection-result">{booleanPresent(hasSense)}</td>
                 <td className="col-xs-1 inspection-result">{booleanPresent(isSenseActive)}</td>
                 <td className="col-xs-1 inspection-result">{booleanPresent(isSenseProvisioned)}</td>
@@ -338,7 +354,7 @@ var ProblemUsersMaestro = React.createClass({
                         <th className="col-xs-1 counter"> {that.state.inspectedUsers.length + "/" + INSPECT_POPULATION}</th>
                         <th className="col-xs-2 user-attr"><em>Account Email</em></th>
                         <th className="col-xs-1 user-attr"><em>Last Modified</em></th>
-                        <th className="col-xs-1 metric"><em>hasNoTicket LastWeek</em></th>
+                        <th className="col-xs-1 metric"><em>hasTicket LastWeek</em></th>
                         <th className="col-xs-1 metric"><em>hasSense</em></th>
                         <th className="col-xs-1 metric"><em>isSense Active</em></th>
                         <th className="col-xs-1 metric"><em>isSense Provisioned</em></th>
