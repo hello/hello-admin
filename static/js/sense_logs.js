@@ -19,6 +19,7 @@ var LogTable = React.createClass({
             url: "/api/timezone",
             dataType: "json",
             type: 'GET',
+            async: false,
             data: {sense_id: senseId, event_ts: eventTs},
             success: function (response) {
                 if (response.error.isWhiteString()) {
