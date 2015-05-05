@@ -85,8 +85,39 @@ var TimelineTile = React.createClass({
 var RoomConditionsTile = React.createClass({
     render: function() {
         var nowDateTime = d3.time.format("%m/%d/%Y %H:%M:%S")(new Date());
+        var temperatureResponseData = this.props.temperatureResponse.data ? this.props.temperatureResponse.data.filter(purgeSentinels) : [];
+        var humidityResponseData = this.props.humidityResponse.data ? this.props.humidityResponse.data.filter(purgeSentinels) : [];
+        var particulatesResponseData = this.props.particulatesResponse.data ? this.props.particulatesResponse.data.filter(purgeSentinels) : [];
+        var lightResponseData = this.props.lightResponse.data ? this.props.lightResponse.data.filter(purgeSentinels) : [];
+        var soundResponseData = this.props.soundResponse.data ? this.props.soundResponse.data.filter(purgeSentinels) : [];
+        var latestTemperature = temperatureResponseData.length > 0 ?
+            [<td>{temperatureResponseData[temperatureResponseData.length - 1].value.toFixed(2)}</td>, <td>°C</td>]
+            :[<td><img className="loading-inline" src="/static/image/loading.gif" /></td>, <td/>];
+        var latestHumidity = humidityResponseData.length > 0 ?
+            [<td>{humidityResponseData[humidityResponseData.length - 1].value.toFixed(2)}</td>, <td>%</td>]
+            :[<td><img className="loading-inline" src="/static/image/loading.gif" /></td>, <td/>];
+        var latestParticulates = particulatesResponseData.length > 0 ?
+            [<td>{particulatesResponseData[particulatesResponseData.length - 1].value.toFixed(2)}</td>, <td>µg/m³</td>]
+            :[<td><img className="loading-inline" src="/static/image/loading.gif" /></td>, <td/>];
+        var latestLight = lightResponseData.length > 0 ?
+            [<td>{lightResponseData[lightResponseData.length - 1].value.toFixed(2)}</td>, <td>lm</td>]
+            :[<td><img className="loading-inline" src="/static/image/loading.gif" /></td>, <td/>];
+        var latestSound = soundResponseData.length > 0 ?
+            [<td>{soundResponseData[soundResponseData.length - 1].value.toFixed(2)}</td>, <td>dB</td>]
+            :<td><img className="loading-inline" src="/static/image/loading.gif" /></td>;
         return <div>
-            <p><a target="_blank" href={"/room_conditions/?email=" + this.props.accountInput + "&until=" + nowDateTime}>Last 7 days</a></p>
+            <Table>
+                <thead></thead>
+                <tbody>
+                    <tr><td>Temperature</td>{latestTemperature}</tr>
+                    <tr><td>Humidity</td>{latestHumidity}</tr>
+                    <tr><td>Particulates</td>{latestParticulates}</tr>
+                    <tr><td>Light</td>{latestLight}</tr>
+                    <tr><td>Sound</td>{latestSound}</tr>
+                    <tr><td/><td/><td/></tr>
+                </tbody>
+            </Table>
+            <p><a target="_blank" href={"/room_conditions/?email=" + this.props.accountInput + "&until=" + nowDateTime}>Last day</a></p>
         </div>
     }
 });
@@ -265,7 +296,7 @@ var PillSummary = React.createClass({
                 <tbody>
                     <tr><td>ID</td><td>{pillId}</td></tr>
                     <tr><td>Keystore</td><td>{keyStore}</td></tr>
-                    <tr><td>Battery</td><td>{batteryLevel}</td></tr>
+                    <tr><td>Battery</td><td>{batteryLevel + " %"}</td></tr>
                     <tr><td>Uptime</td><td>{uptime}</td></tr>
                     <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
                     <tr><td/><td/></tr>
@@ -291,6 +322,11 @@ var AccountProfile = React.createClass({
             partnerResponse: {data: {}, error: ""},
             timezoneResponse: {data: {}, error: ""},
             zendeskResponse: {data: {}, error: ""},
+            temperatureResponse: {data: [], error: ""},
+            humidityResponse: {data: [], error: ""},
+            particulatesResponse: {data: [], error: ""},
+            lightResponse: {data: [], error: ""},
+            soundResponse: {data: [], error: ""},
             accountInput: "",
             submitted: false,
             timelineStatus: null,
@@ -327,7 +363,6 @@ var AccountProfile = React.createClass({
             type: 'GET',
             data: {email: that.refs.accountInput.getDOMNode().value.trim(), device_type: "sense"},
             success: function (response) {
-                console.log(response);
                 that.setState({senseInfoResponse: response});
                 if (response.data.length > 0) {
                     if (response.data[0].device_account_pair) {
@@ -420,6 +455,7 @@ var AccountProfile = React.createClass({
                 else {
                     that.setState({timelineResponse: response, timelineStatus: <Well>{response.error}</Well>});
                 }
+                that.loadRoomConditions();
             }
         });
     },
@@ -469,6 +505,23 @@ var AccountProfile = React.createClass({
         });
     },
 
+    loadRoomConditions: function() {
+        var that = this;
+        ['temperature', 'humidity', 'particulates', 'light', 'sound'].forEach(function(sensor){
+            $.ajax({
+                url: "/api/room_conditions",
+                dataType: "json",
+                type: 'GET',
+                data: {email: that.refs.accountInput.getDOMNode().value.trim(), ts: new Date().getTime(), resolution: "day", sensor: sensor},
+                success: function (response) {
+                    var r = {};
+                    r[sensor + "Response"] = response;
+                    that.setState(r);
+                }
+            });
+        });
+    },
+
     handleSubmit: function() {
         history.pushState({}, '', '/account_profile/?account_input=' + this.refs.accountInput.getDOMNode().value.trim());
         this.setState(this.getInitialState());
@@ -495,7 +548,7 @@ var AccountProfile = React.createClass({
             </Row>
             <Row>
                 <Col xs={4}><Tile img="svg/timeline.svg" title="Timeline" content={<TimelineTile accountInput={this.state.accountInput} response={this.state.timelineResponse} status={this.state.timelineStatus} />} /></Col>
-                <Col xs={4}><Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}><Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile accountInput={this.state.accountInput} temperatureResponse={this.state.temperatureResponse} humidityResponse={this.state.humidityResponse} particulatesResponse={this.state.particulatesResponse} lightResponse={this.state.lightResponse} soundResponse={this.state.soundResponse} />} /></Col>
                 <Col xs={4}><Tile img="svg/motion.svg" title="Motion "content={<MotionTile accountInput={this.state.accountInput}/>} /></Col>
             </Row>
             <Row>
@@ -527,4 +580,8 @@ function debunkMarkdown(md) {
         return <span/>
     }
     return <span>{partials[1]}<span className="stress">{partials[3]}</span>{partials[5]}</span>;
+}
+
+function purgeSentinels(d) {
+    return d.value != 0 && d.value != -1;
 }
