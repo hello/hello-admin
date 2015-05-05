@@ -80,7 +80,8 @@ from handlers.orders import OrdersAPI
 from handlers.users import RecentUsersAPI
 from handlers.setup import AppendAppInfo
 from handlers.users import ForcePasswordUpdateAPI
-from handlers.cron import StoreRecentlyActiveDevicesStats
+from handlers.cron import StoreRecentlyActiveDevicesStatsMinute
+from handlers.cron import StoreRecentlyActiveDevicesStatsDaily
 from handlers.devices import ActiveDevicesHistoryAPI
 from handlers.views import ActiveDevicesHistoryView
 from handlers.events import SenseEventsAPI
@@ -111,7 +112,8 @@ cron_routes = [
     ('/cron/alarms_count_push', AlarmsCountPush),
     ('/cron/waves_count_push', WavesCountPush),
     ('/cron/holds_count_push', HoldsCountPush),
-    ('/cron/store_recently_active_devices_stats', StoreRecentlyActiveDevicesStats),
+    ('/cron/store_recently_active_devices_stats_minute', StoreRecentlyActiveDevicesStatsMinute),
+    ('/cron/store_recently_active_devices_stats_daily', StoreRecentlyActiveDevicesStatsDaily),
     ('/cron/active_devices_history_purge', ActiveDevicesHistoryPurge),
     ('/cron/conserve_searchify_stats', ConserveSearchifyStats),
     ('/cron/remove_old_searchify_purge_stats', RemoveOldSearchifyPurgeStats),
