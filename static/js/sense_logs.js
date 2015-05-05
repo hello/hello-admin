@@ -1,5 +1,6 @@
 /** @jsx React.DOM */
 
+var deviceTimezoneMap = {};
 var LogTable = React.createClass({
     getInitialState: function() {
         return {timezone: "browser"};
@@ -12,9 +13,11 @@ var LogTable = React.createClass({
         $('#submit').click().focus();
     },
 
-    showTimeInLocalTimeZone: function(senseId, eventTs) {
-        var tzOffsetMillis = -25200000;
-        var tzId = "America/Los_Angeles";
+    getDeviceTimezone: function(senseId, eventTs) {
+        var deviceTimezone = {
+            timezone_offset: -25200000,
+            timezone_id: "America/Los_Angeles"
+        };
         $.ajax({
             url: "/api/timezone",
             dataType: "json",
@@ -23,12 +26,11 @@ var LogTable = React.createClass({
             data: {sense_id: senseId, event_ts: eventTs},
             success: function (response) {
                 if (response.error.isWhiteString()) {
-                    tzOffsetMillis = response.data.timezone_offset;
-                    tzId = response.data.timezone_id;
+                    deviceTimezone = response.data;
                 }
             }
         });
-        return displayDateTimeByTimeZoneOffset(eventTs, tzOffsetMillis, tzId);
+        return deviceTimezone;
     },
 
     updateDisplayTimeZone: function() {
@@ -37,6 +39,7 @@ var LogTable = React.createClass({
 
     render: function(){
         var logTableRows = [], that = this;
+
         that.props.logs.forEach(function(log){
             var regexList = that.props.showLineBreaks === true ? []
                 : [new RegExp('\r', 'g'), new RegExp('\n', 'g')];
@@ -62,7 +65,23 @@ var LogTable = React.createClass({
             switch (that.state.timezone) {
                 case "browser": displayTimestamp = new Date(log.timestamp * 1000).toString();
                     break;
-                case "user": displayTimestamp = that.showTimeInLocalTimeZone(deviceId, log.timestamp * 1000);
+                case "user":
+                    if (Object.keys(deviceTimezoneMap).indexOf(deviceId) > -1) {
+                        displayTimestamp = displayDateTimeByTimeZoneOffset(
+                            log.timestamp * 1000,
+                            deviceTimezoneMap[deviceId].timezone_offset,
+                            deviceTimezoneMap[deviceId].timezone_id
+                        )
+                    }
+                    else {
+                        var deviceTimezoneFromServer = that.getDeviceTimezone(deviceId, log.timestamp);
+                        displayTimestamp = displayDateTimeByTimeZoneOffset(
+                            log.timestamp * 1000,
+                            deviceTimezoneFromServer.timezone_offset,
+                            deviceTimezoneFromServer.timezone_id
+                        );
+                        deviceTimezoneMap[deviceId] = deviceTimezoneFromServer;
+                    }
                     break;
                 case "gmt": displayTimestamp = new Date(log.timestamp * 1000).toUTCString();
                     break;
