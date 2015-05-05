@@ -4,3 +4,4 @@ table.table-bordered>thead>tr>th, table.table-bordered>tbody>tr>td {border: 1px 
 #start-time, #end-time  {font-size: 86%;}
 #content {font-size: 75%;}
 #colorpickContainer{margin-left: 100px;}
+#select-timezone {font-size: 8px;}
