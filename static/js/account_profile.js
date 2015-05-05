@@ -172,8 +172,10 @@ var SenseSummary = React.createClass({
             data: {version: version},
             success: function(response) {
                 if (response.error.isWhiteString()) {
-                    version = (version || "unknown hashed")
-                        + " (" + (response.data.join(", ") || "unknown unhashed") + ")";
+                    version = <span>
+                        {version || <span className="not-ok">unknown-hashed</span>}<span> (</span>
+                        {response.data.join(", ") || <span className="not-ok">unknown-unhashed</span>}<span>)</span>
+                    </span>;
                 }
             }
         });
@@ -200,7 +202,13 @@ var SenseSummary = React.createClass({
         if (senseInfoResponse.data.length > 0) {
             var senseId = senseInfoResponse.data[0].device_account_pair ? senseInfoResponse.data[0].device_account_pair.externalDeviceId : undefined;
             var firmwareVersion = senseInfoResponse.data[0].device_status ? senseInfoResponse.data[0].device_status.firmwareVersion : undefined;
-            lastSeen =  senseInfoResponse.data[0].device_status ? new Date(senseInfoResponse.data[0].device_status.lastSeen).toUTCString() : undefined;
+
+            if (senseInfoResponse.data[0].device_status){
+                var lastSeenEpoch = senseInfoResponse.data[0].device_status.lastSeen;
+                lastSeen = <span className={lastSeenEpoch < new Date().getTime() - 3600*1000 ? "not-ok" : "ok"}>
+                    {new Date(lastSeenEpoch).toUTCString()}</span>;
+            }
+
             result = <Table>
                 <tbody>
                     <tr><td>ID</td><td>{senseId}</td></tr>
@@ -228,7 +236,9 @@ var PillSummary = React.createClass({
         if (pillStatusResponse.data.length > 0) {
             if(pillStatusResponse.data[0][0]) {
                 batteryLevel = pillStatusResponse.data[0][0].batteryLevel;
-                lastSeen = new Date(pillStatusResponse.data[0][0].lastSeen).toUTCString();
+                var lastSeenEpoch = pillStatusResponse.data[0][0].lastSeen;
+                lastSeen = <span className={lastSeenEpoch < new Date().getTime() - 4*3600*1000 ? "not-ok" : "ok"}>
+                    {new Date(lastSeenEpoch).toUTCString()}</span>;
                 uptime = millisecondsToHumanReadableString(pillStatusResponse.data[0][0].uptime * 1000);
             }
             else {
@@ -295,6 +305,7 @@ var AccountProfile = React.createClass({
             that.handleSubmit();
         }
     },
+
     loadBasicProfile: function() {
         var that = this;
         $.ajax({
