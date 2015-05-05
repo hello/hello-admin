@@ -216,7 +216,7 @@ var SenseSummary = React.createClass({
         var senseInfoResponse = this.props.senseInfoResponse,
             senseKeyStoreResponse = this.props.senseKeyStoreResponse,
             timezoneResponse = this.props.timezoneResponse,
-            result = null, lastSeen, keyStore;
+            result = null, lastSeen = null, keyStore = null;
 
         var timezone = <span>{timezoneResponse.error.isWhiteString() && !$.isEmptyObject(timezoneResponse) ?
             timezoneResponse.data.timezone_id : "-" }</span>;
@@ -262,11 +262,12 @@ var PillSummary = React.createClass({
         var pillInfoResponse = this.props.pillInfoResponse,
             pillStatusResponse = this.props.pillStatusResponse,
             pillKeyStoreResponse = this.props.pillKeyStoreResponse,
-            result = null, batteryLevel, lastSeen, keyStore, uptime;
+            result = null, batteryLevel = null, lastSeen = null, keyStore = null, uptime = null;
 
         if (pillStatusResponse.data.length > 0) {
             if(pillStatusResponse.data[0][0]) {
-                batteryLevel = pillStatusResponse.data[0][0].batteryLevel;
+                batteryLevel = pillStatusResponse.data[0][0].batteryLevel ?
+                    <span>{pillStatusResponse.data[0][0].batteryLevel + " %"}</span> : null;
                 var lastSeenEpoch = pillStatusResponse.data[0][0].lastSeen;
                 lastSeen = <span className={lastSeenEpoch < new Date().getTime() - 4*3600*1000 ? "not-ok" : "ok"}>
                     {new Date(lastSeenEpoch).toUTCString()}</span>;
@@ -296,7 +297,7 @@ var PillSummary = React.createClass({
                 <tbody>
                     <tr><td>ID</td><td>{pillId}</td></tr>
                     <tr><td>Keystore</td><td>{keyStore}</td></tr>
-                    <tr><td>Battery</td><td>{batteryLevel + " %"}</td></tr>
+                    <tr><td>Battery</td><td>{batteryLevel}</td></tr>
                     <tr><td>Uptime</td><td>{uptime}</td></tr>
                     <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
                     <tr><td/><td/></tr>
