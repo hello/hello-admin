@@ -2,11 +2,11 @@ import json
 import requests
 import settings
 from handlers.analysis import get_zendesk_stats
-from handlers.helpers import CustomerExperienceRequestHandler, ResponseOutput
+from handlers.helpers import ProtectedRequestHandler, ResponseOutput
 from handlers.utils import display_error
 from models.ext import ZendeskDailyStats
 
-class ZendeskAPI(CustomerExperienceRequestHandler):
+class ZendeskAPI(ProtectedRequestHandler):
     def get_tickets(self, page_limit=100000):
         """
         Grab tickets filed by a customer
@@ -54,7 +54,7 @@ class ZendeskAPI(CustomerExperienceRequestHandler):
     def get(self):
         self.get_tickets(1)
 
-class ZendeskStatsAPI(CustomerExperienceRequestHandler):
+class ZendeskStatsAPI(ProtectedRequestHandler):
     def get(self):
         output = {'data': {}, 'error': ''}
         start_date = self.request.get('start_date')  ## yyyy-mm-dd
@@ -107,7 +107,7 @@ class ZendeskStatsAPI(CustomerExperienceRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class ZendeskHistoryAPI(CustomerExperienceRequestHandler):
+class ZendeskHistoryAPI(ProtectedRequestHandler):
     def get(self):
         output = {'data': [], 'error': ''}
         try:
@@ -125,7 +125,7 @@ class ZendeskHistoryAPI(CustomerExperienceRequestHandler):
 
         self.response.write(json.dumps(output))
 
-class ZendeskNowAPI(CustomerExperienceRequestHandler):
+class ZendeskNowAPI(ProtectedRequestHandler):
     def get(self):
         output = {'data': {'status': {}, 'recipient': {}}, 'error': ''}
 

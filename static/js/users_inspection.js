@@ -25,7 +25,7 @@ var RemarksModal =  React.createClass({
                     <p><Button bsSize="xsmall" bsStyle="success"><Glyphicon glyph="thumbs-up"/></Button>&nbsp;&#10230; Flawless</p><br/><br/>
                     <p>Trouble signal</p>
                     <Alert>!({"(hasSense === true && (isSenseActive !== true || isSenseProvisioned !== true || hasPill === false))" +
-                        "|| (hasPill === true && (isPillActive !== true || isPillProvisioned !== true || isBatteryLevelOk !== true)) || (hasNoTicketLastWeek == false)"})</Alert>
+                        "|| (hasPill === true && (isPillActive !== true || isPillProvisioned !== true || isBatteryLevelOk !== true)) && (hasNoTicketLastWeek === true)"})</Alert>
                 </div>
             </Modal>
         );
@@ -290,7 +290,7 @@ var ProblemUsersMaestro = React.createClass({
                 case 0:                                 // inspection complete
                     if ((hasSense === true && (isSenseActive !== true || isSenseProvisioned !== true || hasPill === false))
                         || (hasPill === true && (isPillActive !== true || isPillProvisioned !== true || isBatteryLevelOk !== true))
-                        || (hasNoTicketLastWeek == false)) {
+                        && (hasNoTicketLastWeek == true)) {
                         inspectStatusIcon = "thumbs-down";
                         inspectStatusStyle = "danger";
                         if (that.state.nonOkUsers.indexOf(user.email) === -1) {
