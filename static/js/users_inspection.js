@@ -4,7 +4,9 @@ const d3TimeFormat = d3.time.format('%b %d %H:%M');
 const ACCEPTABLE_BATTERY_LEVEL = 10;
 const ACTIVE_SENSE_HOURS_THRESHOLD = 1;
 const ACTIVE_PILL_HOURS_THRESHOLD = 4;
-const INSPECT_POPULATION = 500;
+const INSPECT_POPULATION = 500;  // users
+const INSPECT_HEADWAY = 2700;  // ms
+const TICKET_AGE_THRESHOLD = 7; // days
 
 var RemarksModal =  React.createClass({
     render: function() {
@@ -23,7 +25,7 @@ var RemarksModal =  React.createClass({
                     <p><Button bsSize="xsmall" bsStyle="success"><Glyphicon glyph="thumbs-up"/></Button>&nbsp;&#10230; Flawless</p><br/><br/>
                     <p>Trouble signal</p>
                     <Alert>!({"(hasSense === true && (isSenseActive !== true || isSenseProvisioned !== true || hasPill === false))" +
-                        "|| (hasPill === true && (isPillActive !== true || isPillProvisioned !== true || isBatteryLevelOk !== true))"})</Alert>
+                        "|| (hasPill === true && (isPillActive !== true || isPillProvisioned !== true || isBatteryLevelOk !== true)) || (hasNoTicketLastWeek == false)"})</Alert>
                 </div>
             </Modal>
         );
@@ -32,7 +34,11 @@ var RemarksModal =  React.createClass({
 
 var ProblemUsersMaestro = React.createClass({
     getInitialState: function() {
-        return {recentUsers: [], error: "", senses: [], pills: [], pillStatuses: [], senseProvisionStatuses: [], pillProvisionStatuses: [], nonOkUsers: [], inspectedUsers: []}
+        return {
+            recentUsers: [], error: "", senses: [], pills: [],
+            pillStatuses: [], senseProvisionStatuses: [], pillProvisionStatuses: [], zendeskTickets: [],
+            nonOkUsers: [], inspectedUsers: []
+        }
     },
 
     getRecentUsers: function() {
@@ -60,6 +66,7 @@ var ProblemUsersMaestro = React.createClass({
         }
 
         var that = this;
+        that.loadZendeskTickets(email, i);
         $.ajax({
             url: '/api/device_by_email',
             dataType: 'json',
@@ -126,6 +133,7 @@ var ProblemUsersMaestro = React.createClass({
                 that.setState({pillProvisionStatuses: newPillProvisionStatuses});
             }
         });
+
         $.ajax({
             url: "/api/battery",
             type: "GET",
@@ -138,16 +146,21 @@ var ProblemUsersMaestro = React.createClass({
                 that.setState({pillStatuses: newPillStatuses});
             }
         });
+    },
+
+    loadZendeskTickets: function(email, i) {
+        var that = this;
         $.ajax({
-            url: "/api/battery",
-            type: "GET",
+            url: "/api/zendesk",
             dataType: "json",
-            data: {search_input: email, end_ts: new Date().getTime()},
+            type: 'GET',
+            data: {email: email},
+            async: false,
             success: function (response) {
-                var newPillStatuses = that.state.pillStatuses;
-                newPillStatuses[i] = (response.data && response.data[0] ?
-                    response.data[0][0] : undefined) || null;  //assume only 1 pill per user & only care about latest heartbeat
-                that.setState({pillStatuses: newPillStatuses});
+                var newZendeskTicket = that.state.zendeskTickets;
+                newZendeskTicket[i] = ((!$.isEmptyObject(response.data) && response.data.tickets && response.data.tickets.length > 0) ?
+                    response.data.tickets[0] : undefined) || null;
+                that.setState({zendeskTickets: newZendeskTicket});
             }
         });
     },
@@ -159,7 +172,7 @@ var ProblemUsersMaestro = React.createClass({
     inspectAll: function() {
         var that = this;
         that.state.recentUsers.forEach(function(user, j){
-            var delay = j * 888;
+            var delay = j * INSPECT_HEADWAY;
             setTimeout(function() {
                 that.getDevicesInfo(user.email, j);
             }, delay);
@@ -184,7 +197,7 @@ var ProblemUsersMaestro = React.createClass({
     render: function() {
         var that = this;
         var usersInfo = this.state.recentUsers.map(function(user, i) {
-            var hasSense, isSenseActive, isSenseProvisioned, hasPill, isPillActive, isPillProvisioned, isBatteryLevelOk;
+            var hasSense, isSenseActive, isSenseProvisioned, hasPill, isPillActive, isPillProvisioned, isBatteryLevelOk, hasNoTicketLastWeek;
             var thisSense = that.state.senses[i];
             if (thisSense !== undefined){
                 if (thisSense !== null) {
@@ -254,7 +267,18 @@ var ProblemUsersMaestro = React.createClass({
                     isPillProvisioned = null;
                 }
             }
-            var metricsSet = [hasSense, isSenseActive, isSenseProvisioned, hasPill, isPillActive, isPillProvisioned, isBatteryLevelOk];
+
+            var thisZendeskTicket = that.state.zendeskTickets[i];
+            if (thisZendeskTicket !== undefined) {
+                if (thisZendeskTicket !== null) {
+                    hasNoTicketLastWeek = new Date().getTime() > new Date(that.state.zendeskTickets[i].created_at).getTime() + TICKET_AGE_THRESHOLD*24*3600*1000;
+                }
+                else {
+                    hasNoTicketLastWeek = true;
+                }
+            }
+
+            var metricsSet = [hasSense, isSenseActive, isSenseProvisioned, hasPill, isPillActive, isPillProvisioned, isBatteryLevelOk, hasNoTicketLastWeek];
             var undefinedMetricCount = metricsSet.filter(function(v){return v === undefined}).length;
 
             var inspectStatusIcon, inspectStatusStyle;
@@ -265,7 +289,8 @@ var ProblemUsersMaestro = React.createClass({
                     break;
                 case 0:                                 // inspection complete
                     if ((hasSense === true && (isSenseActive !== true || isSenseProvisioned !== true || hasPill === false))
-                        || (hasPill === true && (isPillActive !== true || isPillProvisioned !== true || isBatteryLevelOk !== true))) {
+                        || (hasPill === true && (isPillActive !== true || isPillProvisioned !== true || isBatteryLevelOk !== true))
+                        || (hasNoTicketLastWeek == false)) {
                         inspectStatusIcon = "thumbs-down";
                         inspectStatusStyle = "danger";
                         if (that.state.nonOkUsers.indexOf(user.email) === -1) {
@@ -290,10 +315,12 @@ var ProblemUsersMaestro = React.createClass({
                     inspectStatusIcon = "time";
                     inspectStatusStyle = "warning";
             }
+
             return <tr>
                 <td className="col-xs-1"><Button bsSize="small" bsStyle={inspectStatusStyle} id={"fire"+i} onClick={that.getDevicesInfo.bind(that, user.email, i)}><Glyphicon glyph={inspectStatusIcon}/></Button></td>
                 <td className="col-xs-2 user-val"><a target="_blank" href={"/account_profile/?account_input=" + user.email}>{user.email}</a></td>
                 <td className="col-xs-1 user-val">{d3TimeFormat(new Date(user.last_modified))}</td>
+                <td className="col-xs-1 inspection-result">{booleanPresent(hasNoTicketLastWeek)}</td>
                 <td className="col-xs-1 inspection-result">{booleanPresent(hasSense)}</td>
                 <td className="col-xs-1 inspection-result">{booleanPresent(isSenseActive)}</td>
                 <td className="col-xs-1 inspection-result">{booleanPresent(isSenseProvisioned)}</td>
@@ -311,13 +338,14 @@ var ProblemUsersMaestro = React.createClass({
                         <th className="col-xs-1 counter"> {that.state.inspectedUsers.length + "/" + INSPECT_POPULATION}</th>
                         <th className="col-xs-2 user-attr"><em>Account Email</em></th>
                         <th className="col-xs-1 user-attr"><em>Last Modified</em></th>
+                        <th className="col-xs-1 metric"><em>hasNoTicket LastWeek</em></th>
                         <th className="col-xs-1 metric"><em>hasSense</em></th>
-                        <th className="col-xs-1 metric"><em>isSenseActive</em></th>
-                        <th className="col-xs-1 metric"><em>isSenseProvisioned</em></th>
+                        <th className="col-xs-1 metric"><em>isSense Active</em></th>
+                        <th className="col-xs-1 metric"><em>isSense Provisioned</em></th>
                         <th className="col-xs-1 metric"><em>hasPill</em></th>
-                        <th className="col-xs-1 metric"><em>isPillActive</em></th>
-                        <th className="col-xs-1 metric"><em>isPillProvisioned</em></th>
-                        <th className="col-xs-1 metric"><em>isBatteryLevelOk</em></th>
+                        <th className="col-xs-1 metric"><em>isPill Active</em></th>
+                        <th className="col-xs-1 metric"><em>isPill Provisioned</em></th>
+                        <th className="col-xs-1 metric"><em>isBattery LevelOk</em></th>
                 </tr></thead>
                 <tbody>
                     {usersInfo}
