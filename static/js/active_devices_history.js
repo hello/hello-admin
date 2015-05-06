@@ -1,11 +1,31 @@
 /** @jsx React.DOM */
 
+var NotesModal =  React.createClass({
+    render: function() {
+        return this.transferPropsTo(
+            <Modal pra title="Definitions">
+                <div className="modal-body">
+                    <p> - Scroll to zoom, drag to pan</p>
+                    <p> - Legends are clickable to toggle visiblity by group</p>
+                    <p> - Zooming/Dragging may be laggy in certain browsers</p>
+                    <hr/>
+                    <p> Why the 2 charts can't be merged &#63; </p>
+                    <p> - The measurement is different, while first chart cares about live status (number of sense seen last minute), the second chart illustrates the aggregate count of senses which is last seen anytime during the last 24 hours </p>
+                    <p> - Counts are not accumulative, i.e. if we know there is <em>x</em> sense seen last minute and <em>y</em> sense seen the minute before last minute, it is still impossible to tell how many sense seen last 2 minutes as the result could be anything between <em>max(x,y)</em> and <em>x+y</em> </p>
+                    <p> - Minute data is kept for maximum 4 days, there is a purge mechanism to get rid of out-of-date data. For daily data, it's likely I'll keep them permanently</p>
+                </div>
+            </Modal>
+        );
+    }
+});
+
 var ActiveDevicesHistory = React.createClass({
     getInitialState: function() {
         return {
-            data: [],
-            filteredData: [],
-            stackable: true,
+            minuteData: [],
+            filteredMinuteData: [],
+            dailyData: [],
+            stackable: false,
             zoomable: true,
             chartType: "bar",
             alert: "Loading ..."
@@ -17,7 +37,7 @@ var ActiveDevicesHistory = React.createClass({
         var endDate = $("#end-date").val();
         history.pushState({}, '', '/active_devices_history/?start_date=' + startDate + '&end_date=' + endDate);
         this.setState({
-            filteredData: this.state.data.filter(function(d) {
+            filteredMinuteData: this.state.minuteData.filter(function(d) {
                 if (startDate && endDate && !startDate.isWhiteString() && !endDate.isWhiteString()) {
                     return d.created_at*1000 >= new Date(startDate).getTime() && d.created_at*1000 <= new Date(endDate).getTime();
                 }
@@ -45,24 +65,47 @@ var ActiveDevicesHistory = React.createClass({
         return false;
     },
 
-    componentDidMount: function() {
-        $("#stack-check").attr("checked", true);
-        $("#zoom-check").attr("checked", true);
+    loadMinuteData: function() {
         var that = this;
         $.ajax({
-            url: "/api/active_devices_history",
+            url: "/api/active_devices_minute_history",
             type: "GET",
             dataType: "json",
             success: function(response) {
                 console.log(response);
                 if (response.error.isWhiteString()){
-                    that.setState({data: response.data, filteredData: response.data.slice(0, 480), alert: ""});
+                    that.setState({minuteData: response.data, filteredMinuteData: response.data.reverse().filter(function(d, i){return i%20 === 0;}) , alert: ""});
                 }
                 else {
-                    that.setState({data: [], filteredData: [], alert: response.error});
+                    that.setState({minuteData: [], filteredMinuteData: [], alert: response.error});
                 }
             }
         });
+    },
+
+    loadDailyData: function() {
+        var that = this;
+        $.ajax({
+            url: "/api/active_devices_daily_history",
+            type: "GET",
+            dataType: "json",
+            success: function(response) {
+                console.log(response);
+                if (response.error.isWhiteString()){
+                    that.setState({dailyData: response.data, alert: ""});
+                }
+                else {
+                    that.setState({dailyData: [], alert: response.error});
+                }
+            }
+        });
+    },
+
+    componentDidMount: function() {
+        $("#stack-check").attr("checked", false);
+        $("#zoom-check").attr("checked", true);
+        this.loadMinuteData();
+        this.loadDailyData();
     },
 
     handleStack: function() {
@@ -90,8 +133,11 @@ var ActiveDevicesHistory = React.createClass({
 
         return (<div>
             <form className="row">
-                <LongDatetimePicker size="2" placeHolder="start date" id="start-date" pickTime={false} format="MM-DD-YYYY"/>
-                <LongDatetimePicker size="2" placeHolder="end date" id="end-date" pickTime={false} format="MM-DD-YYYY"/>
+                <Col xs={1} sm={1} md={1}><ModalTrigger modal={<NotesModal />}>
+                    <Button bsSize="small">Notes</Button>
+                </ModalTrigger></Col>
+                <LongDatetimePicker size="1" placeHolder="start date" id="start-date" pickTime={false} format="MM-DD-YYYY"/>
+                <LongDatetimePicker size="1" placeHolder="end date" id="end-date" pickTime={false} format="MM-DD-YYYY"/>
                 <Col xs={1} sm={1} md={1}>
                     <Button id="filter-by-date" bsSize="large" bsStyle="info" title="Query !" className="btn-circle" type="submit">{<Glyphicon glyph="filter"/>}</Button>
                 </Col>
@@ -109,17 +155,18 @@ var ActiveDevicesHistory = React.createClass({
                 </Col>
             </form>
             {alert}
+            <h3>Active Devices Minute History</h3>
             <Row>
                 <Col xs={12} sm={12} md={12}>
-                    <c3HistoryChart data={this.state.filteredData} stackable={this.state.stackable} zoomable={this.state.zoomable} chartType={this.state.chartType} xTickFormat="short"/>
+                    <c3HistoryChart id="minute-chart" data={this.state.filteredMinuteData} stackable={this.state.stackable} zoomable={this.state.zoomable} chartType={this.state.chartType} xTickFormat="short"/>
                 </Col>
             </Row>
-            <p className="chart-remark">Notes: <br/>
-                &nbsp;&nbsp;- Scroll to zoom, drag to pan<br/>
-                &nbsp;&nbsp;- Legends are clickable to toggle visiblity by group<br/>
-                &nbsp;&nbsp;- Zooming/Dragging may be laggy in certain browsers<br/>
-                &nbsp;&nbsp;- Showing latest 720 data points<br/>
-            </p>
+            <h3>Active Devices Daily History</h3>
+            <Row>
+                <Col xs={12} sm={12} md={12}>
+                    <c3HistoryChart id="daily-chart" data={this.state.dailyData} stackable={this.state.stackable} zoomable={this.state.zoomable} chartType={this.state.chartType} xTickFormat="short"/>
+                </Col>
+            </Row>
         </div>)
     }
 });
