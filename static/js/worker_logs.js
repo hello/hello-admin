@@ -5,6 +5,7 @@ var LogTable = React.createClass({
        clickedTs = new Date($(e.target).text()).getTime();
        $('#start-time').val(d3.time.format("%m-%d-%Y %H:%M:%S")(new Date(clickedTs-5*1000*60)));
        $('#end-time').val(d3.time.format("%m-%d-%Y %H:%M:%S")(new Date(clickedTs+5*1000*60)));
+       $('text-input').val("");
        $('#submit').click().focus();
    },
    render: function(){
@@ -137,7 +138,10 @@ var DebugLog = React.createClass({
         this.setState({showLineBreaks: $('#whitespace-check').is(':checked')});
     },
     handleSubmit: function(){
-        $preloader.fadeIn('fast');
+        this.setState({
+            logs: [],
+            searchAlert: <img src="/static/image/loading.gif" />
+        });
         var textInput = $('#text-input').val().trim(),
             levelsInput = $('#levels-input').val().trim(),
             originsInput = $('#origins-input').val().trim(),
@@ -160,7 +164,6 @@ var DebugLog = React.createClass({
               end_time: endInput
           },
           success: function(response) {
-            $preloader.fadeOut('slow');
             history.pushState({}, '', '/worker_logs/?text=' + textInput + '&levels=' + levelsInput + '&origins=' + originsInput + '&versions=' + versionsInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + startInputHuman + '&end=' + endInputHuman);
             if (response.error) {
                 this.setState({
@@ -177,7 +180,6 @@ var DebugLog = React.createClass({
             }
           }.bind(this),
           error: function(xhr, status, err) {
-            $preloader.fadeOut('fast');
             this.setState({
                 logs: [],
                 searchAlert: "☹ Query failed"
@@ -233,7 +235,7 @@ var DebugLog = React.createClass({
                 </Col>
               </Row>
             </form><br/>
-            <p><em>Leaving all inputs blank will query latest documents</em></p>
+            <p><em>Leaving all inputs blank will query latest documents. Search timestamps are in browser timezone</em></p>
             {result}
         </div>)
     }
