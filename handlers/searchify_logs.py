@@ -6,7 +6,7 @@ from handlers.helpers import ProtectedRequestHandler
 from handlers.utils import stripStringToList, display_error
 from handlers.utils import get_pacific_time_from_epoch_seconds
 from indextank import ApiClient
-
+from google.appengine.api import urlfetch
 
 
 class SearchifyLogsHandler(ProtectedRequestHandler):
@@ -20,6 +20,7 @@ class SearchifyLogsHandler(ProtectedRequestHandler):
 
     def get_logs_by_index(self, index_name, filters={}):
         output = {'data': [], 'error': ''}
+        urlfetch.set_default_fetch_deadline(30)
 
         max_results = int(self.request.get('max_results', default_value=100))
         text_input = self.request.get('text', default_value="")
