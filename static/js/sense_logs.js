@@ -8,8 +8,9 @@ var LogTable = React.createClass({
 
     searchAroundByTs: function(e) {
         clickedTs = new Date($(e.target).text()).getTime();
-        $('#start-time').val(dateTimePickerStringFormat(clickedTs));
-        $('#end-time').val(dateTimePickerStringFormat(clickedTs));
+        $('#start-time').val(dateTimePickerStringFormat(clickedTs - 5*60*1000));
+        $('#end-time').val(dateTimePickerStringFormat(clickedTs + 5*60*1000));
+        $('#text-input').val("");
         $('#submit').click().focus();
     },
 
@@ -190,10 +191,9 @@ var DebugLog = React.createClass({
         this.setState({showLineBreaks: $('#whitespace-check').is(':checked')});
     },
     handleSubmit: function(){
-        $preloader.fadeIn('fast');
         this.setState({
             logs: [],
-            searchAlert: "searching in progress"
+            searchAlert: <img src="/static/image/loading.gif" />
         });
         var textInput = $('#text-input').val().trim(),
             devicesInput = $('#devices-input').val().trim(),
@@ -213,7 +213,6 @@ var DebugLog = React.createClass({
                 end_time: endInput
             },
             success: function(response) {
-                $preloader.fadeOut('slow');
                 history.pushState({}, '', '/sense_logs/?text=' + textInput + '&devices=' + devicesInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + startInputHuman + '&end=' + endInputHuman);
                 if (response.error) {
                     this.setState({
@@ -230,7 +229,6 @@ var DebugLog = React.createClass({
                 }
             }.bind(this),
             error: function(xhr, status, err) {
-                $preloader.fadeOut('slow');
                 this.setState({
                     logs: [],
                     searchAlert: "☹ Query failed"
