@@ -371,22 +371,22 @@ var ProblemUsersMaestro = React.createClass({
         return (<div>
             <Row>
                 <Col xs={2}>
-                    <Button onClick={that.inspectAll}><Glyphicon glyph="search"/> Inspect All</Button>
+                    <Button bsSize="small" onClick={that.inspectAll}><Glyphicon glyph="search"/> Inspect All</Button>
                 </Col>
                 <Col xs={4}>
-                    <ButtonGroup>
+                    <ButtonGroup bsSize="small">
                         <Button id="hide-ok-users" onClick={that.hideOkUsers}><Glyphicon glyph="eye-open"/> Hide OK Users</Button>
                         <Button id="unhide-ok-users" onClick={that.unhideOkUsers}><Glyphicon glyph="eye-close"/> Unhide OK Users</Button>
                     </ButtonGroup>
                 </Col>
                 <Col xs={4}>
-                    <Button>
+                    <Button bsSize="small">
                         <FileExporter fileContent={that.state.nonOkUsers.join(", ")} fileName="non-ok-users-list.txt" buttonName="Extract Non OK Users List"/>
                     </Button>
                 </Col>
                 <Col xs={2}>
                     <ModalTrigger modal={<RemarksModal />}>
-                        <Button>Definitions</Button>
+                        <Button bsSize="small">Definitions</Button>
                     </ModalTrigger>
                 </Col>
             </Row>
