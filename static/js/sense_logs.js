@@ -8,8 +8,9 @@ var LogTable = React.createClass({
 
     searchAroundByTs: function(e) {
         clickedTs = new Date($(e.target).text()).getTime();
-        $('#start-time').val(dateTimePickerStringFormat(clickedTs));
-        $('#end-time').val(dateTimePickerStringFormat(clickedTs));
+        $('#start-time').val(dateTimePickerStringFormat(clickedTs - 5*60*1000));
+        $('#end-time').val(dateTimePickerStringFormat(clickedTs + 5*60*1000));
+        $('#text-input').val("");
         $('#submit').click().focus();
     },
 
