@@ -102,6 +102,8 @@ from handlers.views import AccountProfileView
 from handlers.devices import DeviceByEmailAPI
 from handlers.timezone import TimezoneAPI
 from handlers.pch_serial import PCHSerialNumberCheckAPI
+from handlers.papertrail import PaperTrailEventsAPI
+from handlers.papertrail import PaperTrailSystemsAPI
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -171,6 +173,8 @@ api_routes = [
     ('/api/device_by_email/?$', DeviceByEmailAPI),
     ('/api/timezone/?$', TimezoneAPI),
     ('/api/pch_sn_check/?$', PCHSerialNumberCheckAPI),
+    ('/api/papertrail_events/?$', PaperTrailEventsAPI),
+    ('/api/papertrail_systems/?$', PaperTrailSystemsAPI),
 ]
 
 page_routes = [

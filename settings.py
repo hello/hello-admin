@@ -5,7 +5,6 @@ from models.setup import UserGroup
 from models.ext import SearchifyCredentials
 from models.ext import ZendeskCredentials
 from models.ext import GeckoboardCredentials
-from google.appengine.api import memcache
 
 DEBUG = False
 ENVIRONMENT = "prod"
@@ -80,3 +79,5 @@ SEARCHIFY_PURGE_STATS_KEEP_DAYS = 7
 ACTIVE_DEVICES_MINUTE_HISTORY_KEEP_DAYS = 4
 
 SEARCHIFY_STATS_KEEP_SIZE = 2880
+
+PAPERTRAIL_TOKEN = "AllkLtsvxLdFfsneCb3"
