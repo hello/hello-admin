@@ -350,7 +350,7 @@ class StoreRecentlyActiveDevicesStatsDaily(BaseRequestHandler):
 
 class ActiveDevicesHistoryPurge(BaseRequestHandler):
     def get(self):
-        end_ts = datetime.datetime.now() - datetime.timedelta(days=settings.ACTIVE_DEVICES_KEEP_DAYS)
+        end_ts = datetime.datetime.now() - datetime.timedelta(days=settings.ACTIVE_DEVICES_MINUTE_HISTORY_KEEP_DAYS)
         keys = RecentlyActiveDevicesStats.query_keys_by_created(end_ts)
         output = {}
 

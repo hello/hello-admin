@@ -82,7 +82,8 @@ from handlers.setup import AppendAppInfo
 from handlers.users import ForcePasswordUpdateAPI
 from handlers.cron import StoreRecentlyActiveDevicesStatsMinute
 from handlers.cron import StoreRecentlyActiveDevicesStatsDaily
-from handlers.devices import ActiveDevicesHistoryAPI
+from handlers.devices import ActiveDevicesMinuteHistoryAPI
+from handlers.devices import ActiveDevicesDailyHistoryAPI
 from handlers.views import ActiveDevicesHistoryView
 from handlers.events import SenseEventsAPI
 from handlers.views import SenseEventsView
@@ -161,7 +162,8 @@ api_routes = [
     ('/api/omni_search/?$', OmniSearchAPI),
     ('/api/force_password_update/?$', ForcePasswordUpdateAPI),
     ('/api/update_geckoboard_credentials/?$', UpdateGeckoBoardCredentials),
-    ('/api/active_devices_history/?$', ActiveDevicesHistoryAPI),
+    ('/api/active_devices_minute_history/?$', ActiveDevicesMinuteHistoryAPI),
+    ('/api/active_devices_daily_history/?$', ActiveDevicesDailyHistoryAPI),
     ('/api/sense_events/?$', SenseEventsAPI),
     ('/api/firmware_unhash/?$', FirmwareUnhashAPI),
     ('/api/dust_stats/?$', DustStatsAPI),

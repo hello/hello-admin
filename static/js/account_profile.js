@@ -117,7 +117,7 @@ var RoomConditionsTile = React.createClass({
                     <tr><td/><td/><td/></tr>
                 </tbody>
             </Table>
-            <p><a target="_blank" href={"/room_conditions/?email=" + this.props.accountInput + "&until=" + nowDateTime}>Last day</a></p>
+            <p><a target="_blank" href={"/room_conditions/?email=" + this.props.accountInput + "&until=" + nowDateTime}>Last "Day" (not necessarily 24 hours)</a></p>
         </div>
     }
 });

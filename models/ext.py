@@ -44,7 +44,7 @@ class RecentlyActiveDevicesStats(ndb.Model):
     created_at = ndb.DateTimeProperty(auto_now_add=True)
 
     @classmethod
-    def query_stats(cls, limit=None):
+    def query_stats(cls, limit=30):
         return cls.query().order(-cls.created_at).fetch(limit)
 
     @classmethod
@@ -58,7 +58,7 @@ class RecentlyActiveDevicesStatsDaily(ndb.Model):
     created_at = ndb.DateTimeProperty(auto_now_add=True)
 
     @classmethod
-    def query_stats(cls, limit=None):
+    def query_stats(cls, limit=30):
         return cls.query().order(-cls.created_at).fetch(limit)
 
     @classmethod
