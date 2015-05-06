@@ -8,8 +8,8 @@ var LogTable = React.createClass({
 
     searchAroundByTs: function(e) {
         clickedTs = new Date($(e.target).text()).getTime();
-        $('#start-time').val(d3.time.format("%m-%d-%Y %H:%M:%S")(new Date(clickedTs-5*1000*60)));
-        $('#end-time').val(d3.time.format("%m-%d-%Y %H:%M:%S")(new Date(clickedTs+5*1000*60)));
+        $('#start-time').val(dateTimePickerStringFormat(clickedTs));
+        $('#end-time').val(dateTimePickerStringFormat(clickedTs));
         $('#submit').click().focus();
     },
 
@@ -199,8 +199,8 @@ var DebugLog = React.createClass({
             devicesInput = $('#devices-input').val().trim(),
             startInputHuman = $('#start-time').val().trim(),
             endInputHuman = $('#end-time').val().trim(),
-            startInput = startInputHuman.isWhiteString() ? "": getUTCEpochFromLocalTime(startInputHuman),
-            endInput = endInputHuman.isWhiteString() ? "": getUTCEpochFromLocalTime(endInputHuman);
+            startInput = startInputHuman.isWhiteString() ? "": new Date(startInputHuman + " GMT").getTime()/1000,
+            endInput = endInputHuman.isWhiteString() ? "": new Date(endInputHuman + " GMT").getTime()/1000;
         $.ajax({
             url: "/api/sense_logs",
             dataType: 'json',
@@ -222,7 +222,7 @@ var DebugLog = React.createClass({
                     });
                 }
                 else {
-                    refinedLogs = logsFilter(response.data, startInput, endInput);
+                    var refinedLogs = logsFilter(response.data, startInput, endInput);
                     this.setState({
                         logs: refinedLogs,
                         searchAlert: "found " + refinedLogs.length + " documents"
@@ -255,8 +255,8 @@ var DebugLog = React.createClass({
         return (<div>
             <form onSubmit={this.handleSubmit}>
                 <Row>
-                    <LongDatetimePicker placeHolder="start (14 days ago)" id="start-time" size="2" />
-                    <LongDatetimePicker placeHolder="end (now)" id="end-time" size="2" />
+                    <LongDatetimePicker placeHolder="start time(GMT)" id="start-time" size="2" />
+                    <LongDatetimePicker placeHolder="end time(GMT)" id="end-time" size="2" />
                     <Col xs={3} sm={3} md={3} lg={3}>
                         <input className="form-control" id="text-input" placeholder='Text e.g UART' />
                     </Col>
@@ -285,7 +285,7 @@ var DebugLog = React.createClass({
                 </Row>
 
             </form><br/>
-            <p><em>Leaving all inputs blank will query latest documents</em></p>
+            <p><em>Leaving all inputs blank will query latest documents. Query start and end timestamps are in GMT</em></p>
             {result}
         </div>)
     }
@@ -388,4 +388,8 @@ function displayDateTimeByTimeZoneOffset(ts, tzOffsetMillis, tzId) {
     }
 
     return omniTimeFormat(new Date(ts));
+}
+
+function dateTimePickerStringFormat(ts) {
+    return d3.time.format("%m-%d-%Y %H:%M:%S")(new Date(new Date(ts).toUTCString().split(" GMT")[0]));
 }
