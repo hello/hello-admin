@@ -101,6 +101,7 @@ class DeviceInactiveAPI(ProtectedRequestHandler):
             url_params={
                 'after': after,
                 'before': before,
+                'limit': 10000
             },
             app_info=settings.ADMIN_APP_INFO
         )

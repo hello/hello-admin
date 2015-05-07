@@ -4,7 +4,7 @@ var today = new Date();
 var lastWeek = new Date();
 lastWeek.setDate(lastWeek.getDate() -7);
 
-var datepickerFormat = d3.time.format("%m/%d/%Y %I:%M:%S %p");
+var datepickerFormat = d3.time.format("%m/%d/%Y %H:%M:%S");
 function convertEpochToDate(epoch) {
     return datepickerFormat(new Date(Number(epoch)));
 }
@@ -62,7 +62,7 @@ var Pagination = React.createClass({
 //          history.go(-2);
 //          that.props.parent.handleSubmit();
 //        });
-        $('.nextPage').click(function(){
+        $('.next-page').click(function(){
           $('#start-time').val(convertEpochToDate(that.props.parent.state.next));
           that.props.parent.handleSubmit();
         });
@@ -70,7 +70,7 @@ var Pagination = React.createClass({
     render: function() {
         return (
             <Pager>
-              <PageItem className="nextPage" next>Next  &rarr;</PageItem>
+              <PageItem className="next-page" next disabled>Next  &rarr;</PageItem>
             </Pager>
         )
     }
@@ -81,12 +81,14 @@ var TroubleshootMaestro = React.createClass({
         return {
             data: [],
             sliderValue: 24,
-            end: 0
+            end: 0,
+            sigma: null
         }
     },
 
     handleSubmit: function() {
         var that = this;
+        that.setState({sigma: <img src="/static/image/loading.gif" />, data: []});
         var start = new Date($('#start-time').val()).getTime() || 0;
         var end = new Date($('#end-time').val()).getTime() || 0;
         var thresholdInMilliseconds = Number(that.state.sliderValue) * 3600 * 1000 || "";
@@ -103,7 +105,12 @@ var TroubleshootMaestro = React.createClass({
           data: requestData,
           success: function(response) {
             console.log(response);
-            this.setState({data: response.data.content, end: end, prev: response.data.previous, next: response.data.next});
+            if (response.error.isWhiteString()) {
+                this.setState({data: response.data.content, end: end, prev: response.data.previous, next: response.data.next, sigma: response.data.content.length});
+            }
+            else {
+                this.setState({data: [], sigma: <Alert>{response.error}</Alert>})
+            }
           }.bind(this),
           error: function(e) {
             console.error(e);
@@ -167,7 +174,8 @@ var TroubleshootMaestro = React.createClass({
             </Input></Col>
             &nbsp;&nbsp;&nbsp;<Button onClick={this.handleSubmit}><Glyphicon glyph="search"/></Button>
             <Pagination parent={this} />
-            <em id="narration">You are looking at <strong>{$('#device-type').val()}</strong> devices which were last seen after <strong>{$('#start-time').val()}</strong> and have been inactive for at least <strong>{this.state.sliderValue} hours</strong> by <strong>{$('#end-time').val()}</strong></em><p/>
+            <em id="narration">You are looking at <strong>{$('#device-type').val()}</strong> devices which were last seen after <strong>{new Date($('#start-time').val()).toString()}</strong> and have been inactive for at least <strong>{this.state.sliderValue} hours</strong> by <strong>{new Date($('#end-time').val()).toString()}</strong></em><p/>
+            <br/><div>&Sigma; = {this.state.sigma}</div>
             <TroubleshootTableHeaders data={this.state.data}/>
             <TroubleshootTableBody parent={this} data={this.state.data}/>
         </table></code>)
