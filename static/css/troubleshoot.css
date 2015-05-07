@@ -1,3 +1,4 @@
 div.slider-horizontal {width: 400px !important;}
 #start-time, #end-time  {font-size: 75%;}
 #narration {font-size: 95%;}
+.next-page {display: none !important ;}
