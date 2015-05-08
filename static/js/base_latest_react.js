@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 var Alert = ReactBootstrap.Alert;
 var Button = ReactBootstrap.Button;
 var ButtonGroup = ReactBootstrap.ButtonGroup;
@@ -75,7 +73,7 @@ var SideBar = React.createClass({
        </ListGroup>)
    }
 });
-React.renderComponent(<SideBar />, document.getElementById('sidebar'));
+React.render(<SideBar />, document.getElementById('sidebar'));
 
 var Header = React.createClass({
     render: function() {
@@ -125,7 +123,7 @@ var Header = React.createClass({
         </div>)
     }
 });
-React.renderComponent(<Header/>, document.getElementById("env-switcher"));
+React.render(<Header/>, document.getElementById("env-switcher"));
 
 
 function getParameterByName(name) {

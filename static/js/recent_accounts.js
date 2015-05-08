@@ -1,0 +1,1 @@
+React.render(<Alert>Hi Mars</Alert>, document.getElementById("recent-accounts"));
