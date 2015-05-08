@@ -208,3 +208,8 @@ class AccountProfileView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/account_profile.html',
                                 context={'title': "Account Profile"})
+
+class RecentAccounts(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/recent_accounts.html',
+                                context={'title': "Recent Accounts"})
