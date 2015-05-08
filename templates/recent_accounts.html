@@ -1,0 +1,16 @@
+{% extends "templates/base_latest_react.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block extrastatic %}
+    <link rel="stylesheet" type="text/css" href="/static/css/react/index.min.css" />
+    <script type="text/jsx" src="/static/js/react/react-datagrid.min.js"></script>
+    <script type="text/jsx" src="/static/js/recent_accounts.js"></script>
+
+{% endblock %}
+
+{% block content %}
+    <div class="row" id="container">
+        <h3 id="page-name"> {{ title }}</h3>
+        <hr class="fancy-line"/>
+        <div class="col-xs-12" id="recent-accounts"></div>
+    </div>
+{% endblock %}
