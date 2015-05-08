@@ -104,6 +104,7 @@ from handlers.timezone import TimezoneAPI
 from handlers.pch_serial import PCHSerialNumberCheckAPI
 from handlers.papertrail import PaperTrailEventsAPI
 from handlers.papertrail import PaperTrailSystemsAPI
+from handlers.users import AccountCountsBreakdownByCreatedDateAPI
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -175,6 +176,7 @@ api_routes = [
     ('/api/pch_sn_check/?$', PCHSerialNumberCheckAPI),
     ('/api/papertrail_events/?$', PaperTrailEventsAPI),
     ('/api/papertrail_systems/?$', PaperTrailSystemsAPI),
+    ('/api/account_breakdown/?$', AccountCountsBreakdownByCreatedDateAPI),
 ]
 
 page_routes = [

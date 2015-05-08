@@ -290,3 +290,11 @@ class ForcePasswordUpdateAPI(CustomerExperienceRequestHandler):
             body_data=json.dumps({"email": email, "password": password}),
             app_info=settings.ADMIN_APP_INFO
         )
+
+class AccountCountsBreakdownByCreatedDateAPI(ProtectedRequestHandler):
+    def get(self):
+         self.hello_request(
+            api_url="account/count_by_craeted",
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO
+        )
