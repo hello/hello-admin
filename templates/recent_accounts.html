@@ -2,6 +2,12 @@
 {% block title %}{{ title }}{% endblock %}
 {% block extrastatic %}
     <link rel="stylesheet" type="text/css" href="/static/css/react/index.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/c3.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/recent_accounts.css" />
+
+    <script type="text/javascript" src="/static/js/third-party/d3.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/c3.min.js"></script>
+
     <script type="text/jsx" src="/static/js/react/react-datagrid.min.js"></script>
     <script type="text/jsx" src="/static/js/recent_accounts.js"></script>
 
@@ -9,8 +15,9 @@
 
 {% block content %}
     <div class="row" id="container">
-        <h3 id="page-name"> {{ title }}</h3>
-        <hr class="fancy-line"/>
-        <div class="col-xs-12" id="recent-accounts"></div>
+        <div class="row">
+            <div id="recent-accounts"></div>
+            <div id="account-breakdown"></div>
+        </div>
     </div>
 {% endblock %}
