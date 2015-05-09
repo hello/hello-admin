@@ -294,7 +294,7 @@ class ForcePasswordUpdateAPI(CustomerExperienceRequestHandler):
 class AccountCountsBreakdownByCreatedDateAPI(ProtectedRequestHandler):
     def get(self):
          self.hello_request(
-            api_url="account/count_by_craeted",
+            api_url="account/count_by_created",
             type="GET",
             app_info=settings.ADMIN_APP_INFO
         )
