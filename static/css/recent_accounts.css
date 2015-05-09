@@ -1,6 +1,6 @@
 #breakdown-chart {height: 85vh;}
-.z-show-menu {display: block !important ;}
-.z-show-filter {display: block !important;}
+.z-show-menu {display: none !important ;}
+.z-show-filter {display: block !important; background: #EEEEEE !important; border: 0 !important;  width: 40px !important ; padding: 7px !important; right: 2px !important;}
 input {
   display: block;
   width: 100%;

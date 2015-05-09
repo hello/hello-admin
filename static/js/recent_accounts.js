@@ -32,6 +32,9 @@ var RecentAccounts = React.createClass({
     },
     componentDidMount: function() {
         this.loadRecentAccounts();
+        var filters = $(".z-show-filter");
+        filters.children().remove();
+        filters.append('<button><span class="glyphicon glyphicon-filter"></span>');
     },
 
     handleSortChange: function(sortInfo){
