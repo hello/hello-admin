@@ -3,7 +3,7 @@ var RecentAccounts = React.createClass({
         return {
             data: [], filteredData: [], error: "", limit: 500,
             columns: [
-                {name: "id", title: <Glyphicon glyph="barcode"/>, width: 100, textAlign: "center"},
+                {name: "id", title: <Glyphicon glyph="barcode"/>, width: 90},
                 {name: "accountEmail", title: <Glyphicon glyph="envelope"/>},
                 {name: "name", title: <Glyphicon glyph="user"/>, width: 145},
                 {name: "lastModified", title: <Glyphicon glyph="time"/>, width: 115}
