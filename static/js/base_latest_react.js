@@ -29,6 +29,7 @@ var SideBar = React.createClass({
        return (<ListGroup>
            <ListGroupItem bsStyle="info" className="sidebar-group">Home</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/users">&#x029D0; Recent Users</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/recent_accounts">&#x029D0; Recent Accounts</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/account_profile">&#x029D0; Account Profile</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/users_inspection">&#x029D0; Users Inspection</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/password_reset">&#x029D0; Password Reset</ListGroupItem>
