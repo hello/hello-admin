@@ -164,6 +164,7 @@ var RecentUsersBox = React.createClass({
           url: '/api/recent_users',
           dataType: 'json',
           type: 'GET',
+          data: {limit: 400},
           success: function(response) {
             console.log(response);
             this.setState({
