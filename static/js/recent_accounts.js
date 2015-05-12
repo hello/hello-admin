@@ -1,7 +1,7 @@
 var RecentAccounts = React.createClass({
     getInitialState: function() {
         return {
-            data: [], filteredData: [], error: "", limit: 500,
+            data: [], filteredData: [], error: "", limit: 10000,
             columns: [
                 {name: "id", title: <Glyphicon glyph="barcode"/>, width: 90},
                 {name: "accountEmail", title: <Glyphicon glyph="envelope"/>},

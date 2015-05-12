@@ -159,13 +159,24 @@ class OmniSearchAPI(ProtectedRequestHandler):
 
 class RecentUsersAPI(ProtectedRequestHandler):
     def get(self):
-        limit = self.request.get("limit", default_value="")
-        self.hello_request(
-            type="GET",
-            app_info=settings.ADMIN_APP_INFO,
-            api_url="account/recent",
-            url_params={"limit": limit} if limit else {}
-        )
+        limit = int(self.request.get("limit", default_value=10))
+        output = ResponseOutput()
+        max_id = 100000000
+
+        while max_id > 1 and len(output.data) < limit:
+            raw_output = self.hello_request(
+                type="GET",
+                app_info=settings.ADMIN_APP_INFO,
+                api_url="account/paginate",
+                raw_output=True,
+                url_params={"limit": limit, "max_id": max_id} if limit else {}
+            )
+
+            output.set_error(raw_output.error)
+            output.set_status(raw_output.status)
+            output.set_data(output.data + raw_output.data)
+            max_id = int(raw_output.data[-1]["id"])
+        self.response.write(output.get_serialized_output())
 
     def get_from_cache(self):
         """Update cached recently users"""

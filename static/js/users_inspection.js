@@ -4,8 +4,9 @@ const d3TimeFormat = d3.time.format('%b %d %H:%M');
 const ACCEPTABLE_BATTERY_LEVEL = 10;
 const ACTIVE_SENSE_HOURS_THRESHOLD = 1;
 const ACTIVE_PILL_HOURS_THRESHOLD = 4;
-const INSPECT_POPULATION = 500;  // users
-const INSPECT_HEADWAY = 2700;  // ms
+const MAX_INSPECT_POPULATION = 100000;  // users
+const DEFAULT_INSPECT_POPULATION = 100;
+const INSPECT_HEADWAY = 1500;  // ms
 const TICKET_AGE_THRESHOLD = 7; // days
 
 var RemarksModal =  React.createClass({
@@ -35,7 +36,7 @@ var RemarksModal =  React.createClass({
                     <p>Trouble signal</p>
                     <Alert>!({"(hasSense === true && (isSenseActive !== true || isSenseProvisioned !== true || hasPill === false))" +
                         " || (hasPill === true && (isPillActive !== true || isPillProvisioned !== true || isBatteryLevelOk !== true))"})</Alert>
-                    <p>Non OK signal</p>
+                    <p>Not-OK signal</p>
                     <Alert bsStyle="danger">{"hasTrouble === true && hasTicketLastWeek === false"}</Alert>
                 </div>
             </Modal>
@@ -46,7 +47,7 @@ var RemarksModal =  React.createClass({
 var ProblemUsersMaestro = React.createClass({
     getInitialState: function() {
         return {
-            recentUsers: [], error: "", senses: [], pills: [],
+            recentUsers: [], selectedUsers: [], error: "", senses: [], pills: [],
             pillStatuses: [], senseProvisionStatuses: [], pillProvisionStatuses: [], zendeskTickets: [],
             nonOkUsers: [], inspectedUsers: []
         }
@@ -57,14 +58,14 @@ var ProblemUsersMaestro = React.createClass({
         $.ajax({
             url: '/api/recent_users',
             dataType: 'json',
-            data: {limit: INSPECT_POPULATION},
+            data: {limit: MAX_INSPECT_POPULATION},
             type: 'GET',
             success: function(response) {
                 if (response.error.isWhiteString()) {
-                    that.setState({error: "", recentUsers: response.data});
+                    that.setState({error: "", recentUsers: response.data, selectedUsers: response.data});
                 }
                 else {
-                    that.setState({recentUsers: [], error: response.error});
+                    that.setState({recentUsers: [], error: response.error, selectedUsers: []});
                 }
             }
         });
@@ -179,10 +180,18 @@ var ProblemUsersMaestro = React.createClass({
     componentDidMount: function() {
         this.getRecentUsers();
     },
-
-    inspectAll: function() {
+    slicePop: function(pop) {
+        this.setState({selectedUsers: this.state.recentUsers.slice(0, pop)});
+    },
+    inspect: function(pop) {
+        console.log('pop', pop);
+        $('h3').click();
         var that = this;
-        that.state.recentUsers.forEach(function(user, j){
+        that.setState({error: "", senses: [], pills: [], pillStatuses: [], senseProvisionStatuses: [], pillProvisionStatuses: [], zendeskTickets: [], nonOkUsers: [], inspectedUsers: []});
+        that.slicePop(pop);
+
+        this.state.recentUsers.slice(0, pop).forEach(function(user, j){
+            console.log(j);
             var delay = j * INSPECT_HEADWAY;
             setTimeout(function() {
                 that.getDevicesInfo(user.email, j);
@@ -207,7 +216,7 @@ var ProblemUsersMaestro = React.createClass({
 
     render: function() {
         var that = this;
-        var usersInfo = this.state.recentUsers.map(function(user, i) {
+        var usersInfo = this.state.selectedUsers.map(function(user, i) {
             var hasSense, isSenseActive, isSenseProvisioned, hasPill, isPillActive, isPillProvisioned, isBatteryLevelOk, hasTicketLastWeek;
             var thisSense = that.state.senses[i];
             if (thisSense !== undefined){
@@ -348,10 +357,12 @@ var ProblemUsersMaestro = React.createClass({
         });
 
         var alert = this.state.error === "" ? null : <Alert>{this.state.error}</Alert>;
+        var loadingInspector = that.state.selectedUsers.length > 0 ? null :
+            <div className="loading-inspector" ><img src="/static/image/loading.gif"/></div>;
         var results = this.state.error !== "" ? null :
-            <Table id="events-table" striped>
+            [<Table id="events-table" striped>
                 <thead><tr>
-                        <th className="col-xs-1 counter"> {that.state.inspectedUsers.length + "/" + INSPECT_POPULATION}</th>
+                        <th className="col-xs-1 counter"> {that.state.inspectedUsers.length + "/" + that.state.selectedUsers.length}</th>
                         <th className="col-xs-2 user-attr"><em>Account Email</em></th>
                         <th className="col-xs-1 user-attr"><em>Last Modified</em></th>
                         <th className="col-xs-1 metric"><em>hasTicket LastWeek</em></th>
@@ -366,22 +377,32 @@ var ProblemUsersMaestro = React.createClass({
                 <tbody>
                     {usersInfo}
                 </tbody>
-            </Table>;
+            </Table>,
+            loadingInspector];
 
         return (<div>
             <Row>
-                <Col xs={2}>
-                    <Button bsSize="small" onClick={that.inspectAll}><Glyphicon glyph="search"/> Inspect All</Button>
+                <Col xs={3}>
+                    <DropdownButton bsSize="small" title={<span><Glyphicon glyph="search"/> Inspect</span>} key={1}>
+                        <MenuItem eventKey='1' onClick={that.inspect.bind(that, 10)}>latest 10</MenuItem>
+                        <MenuItem eventKey='2' onClick={that.inspect.bind(that, 50)}>latest 50</MenuItem>
+                        <MenuItem eventKey='3' onClick={that.inspect.bind(that, 100)}>latest 100</MenuItem>
+                        <MenuItem eventKey='4' onClick={that.inspect.bind(that, 500)}>latest 500</MenuItem>
+                        <MenuItem eventKey='5' onClick={that.inspect.bind(that, 1000)}>latest 1000</MenuItem>
+                        <MenuItem divider />
+                        <MenuItem eventKey='6' onClick={that.inspect.bind(that, MAX_INSPECT_POPULATION)}>ALL</MenuItem>
+                    </DropdownButton>
                 </Col>
+
                 <Col xs={4}>
                     <ButtonGroup bsSize="small">
-                        <Button id="hide-ok-users" onClick={that.hideOkUsers}><Glyphicon glyph="eye-open"/> Hide OK Users</Button>
-                        <Button id="unhide-ok-users" onClick={that.unhideOkUsers}><Glyphicon glyph="eye-close"/> Unhide OK Users</Button>
+                        <Button id="hide-ok-users" onClick={that.hideOkUsers}><Glyphicon glyph="eye-open"/> Hide OK</Button>
+                        <Button id="unhide-ok-users" onClick={that.unhideOkUsers}><Glyphicon glyph="eye-close"/> Unhide OK</Button>
                     </ButtonGroup>
                 </Col>
-                <Col xs={4}>
+                <Col xs={3}>
                     <Button bsSize="small">
-                        <FileExporter fileContent={that.state.nonOkUsers.join(", ")} fileName="non-ok-users-list.txt" buttonName="Extract Non OK Users List"/>
+                        <FileExporter fileContent={that.state.nonOkUsers.join(", ")} fileName="non-ok-users-list.txt" buttonName="Extract Not-OK List"/>
                     </Button>
                 </Col>
                 <Col xs={2}>
