@@ -3,6 +3,8 @@ import time
 from handlers.helpers import ProtectedRequestHandler, ResponseOutput
 from utils import epoch_to_human
 from google.appengine.api import memcache
+from google.appengine.api import urlfetch
+import logging as log
 
 THROTTLE_PERIOD = 2*60
 PCH_SENSE_SN_KEY = {
@@ -17,11 +19,14 @@ class PCHSerialNumberCheckAPI(ProtectedRequestHandler):
         return self.request.get("device_type", default_value="sense")
 
     def check_sn(self):
+        urlfetch.set_default_fetch_deadline(15)
+        log.info("SNs: {}".format(self.request.get("sn")))
         self.hello_request(
             api_url="pch/check/{}".format(self.device_type),
             type="POST",
-            body_data=self.request.body,
-            app_info=settings.ADMIN_APP_INFO
+            body_data=self.request.get("sn"),
+            app_info=settings.ADMIN_APP_INFO,
+            content_type="text/plain" if self.device_type == "pill" else "application/json"
         )
 
     def post(self):
@@ -34,7 +39,7 @@ class PCHSerialNumberCheckAPI(ProtectedRequestHandler):
         else:
             response_output = ResponseOutput()
             response_output.set_status(400)
-            response_output.set_error("You can't query again until {}".format(current_cache))
+            response_output.set_error("You can't check {} serial number again until {}".format(self.device_type, current_cache))
             self.response.write(response_output.get_serialized_output())
 
 
