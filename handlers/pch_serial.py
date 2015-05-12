@@ -4,6 +4,7 @@ from handlers.helpers import ProtectedRequestHandler, ResponseOutput
 from utils import epoch_to_human
 from google.appengine.api import memcache
 from google.appengine.api import urlfetch
+import logging as log
 
 THROTTLE_PERIOD = 2*60
 PCH_SENSE_SN_KEY = {
@@ -19,6 +20,7 @@ class PCHSerialNumberCheckAPI(ProtectedRequestHandler):
 
     def check_sn(self):
         urlfetch.set_default_fetch_deadline(15)
+        log.info("SNs: {}".format(self.request.get("sn")))
         self.hello_request(
             api_url="pch/check/{}".format(self.device_type),
             type="POST",

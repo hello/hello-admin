@@ -51,7 +51,12 @@ var PCHSerialNumberCheckForSense = React.createClass({
                 console.log(response);
                 that.setState({alert: response.error ?
                     <Alert bsStyle="danger">{response.error}</Alert> :
-                    <Alert bsStyle="success">Missing sense serial numbers: <br/>{JSON.stringify(response.data)}</Alert>
+                    <Alert bsStyle="success">
+                        Missing sense serial numbers: <br/>
+                        {!(response.data && response.data.length) > 0 ? "[]" : response.data.map(function(ssn){
+                            return <p>{ssn}</p>
+                        })}
+                    </Alert>
                 });
             }
         });
@@ -107,7 +112,7 @@ var PCHSerialNumberCheckForPill = React.createClass({
                 console.log(response);
                 that.setState({alert: response.error ?
                     <Alert bsStyle="danger">{response.error}</Alert> :
-                    <Alert bsStyle="success">Missing pill serial numbers: <br/>{response.data}</Alert>
+                    <Alert bsStyle="success">{response.data}</Alert>
                 });
             }
         });
