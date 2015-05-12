@@ -95,7 +95,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         return hello.get_session(token)
 
     def hello_request(self, api_url, body_data="", url_params={}, type="GET", raw_output=False, filter_fields=[]
-                          , access_token=settings.DEFAULT_ACCESS_TOKEN, app_info=settings.APP_INFO):
+                          , access_token=settings.DEFAULT_ACCESS_TOKEN, app_info=settings.APP_INFO, content_type='application/json'):
         """
         :param api_url: api URL
         :type api_url: str
@@ -120,7 +120,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         session = self.authorize_session(app_info, access_token)
 
         request_detail = {
-            "headers": {'Content-Type': 'application/json'},
+            "headers": {'Content-Type': content_type},
         }
 
         if body_data and type in ['PUT', 'POST', 'PATCH']:

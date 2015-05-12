@@ -104,8 +104,9 @@ from handlers.timezone import TimezoneAPI
 from handlers.pch_serial import PCHSerialNumberCheckAPI
 from handlers.papertrail import PaperTrailEventsAPI
 from handlers.papertrail import PaperTrailSystemsAPI
-from handlers.views import RecentAccounts
+from handlers.views import RecentAccountsView
 from handlers.users import AccountCountsBreakdownByCreatedDateAPI
+from handlers.views import PCHSerialNumberCheckView
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -222,7 +223,8 @@ page_routes = [
     ('/dust_stats/?$', DustStatsView),
     ('/users_inspection/?$', UsersInpsectionView),
     ('/account_profile/?$', AccountProfileView),
-    ('/recent_accounts/?$', RecentAccounts),
+    ('/recent_accounts/?$', RecentAccountsView),
+    ('/pch_serial_number_check/?$', PCHSerialNumberCheckView),
 ]
 
 file_upload_routes = [
