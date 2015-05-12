@@ -17,7 +17,6 @@ class PCHSerialNumberCheckAPI(ProtectedRequestHandler):
         return self.request.get("device_type", default_value="sense")
 
     def check_sn(self):
-        print self.request.get("sn")
         self.hello_request(
             api_url="pch/check/{}".format(self.device_type),
             type="POST",
