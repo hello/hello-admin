@@ -24,7 +24,7 @@ var AppGenMaestro = React.createClass({
     handleSubmit: function() {
       var postData = {
         name: $('#app-name-input').val().trim(),
-        scopes: $('#app-scopes-input').val().trim(),
+        scopes: $('#app-scopes-input').val(),
         description: $('#app-description-input').val().trim(),
         client_id: $('#app-client-id-input').val().trim(),
         client_secret: $('#app-client-secret-input').val().trim(),
