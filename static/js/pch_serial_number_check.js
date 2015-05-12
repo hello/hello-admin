@@ -14,24 +14,44 @@ var Tile = React.createClass({
 
 var PCHSerialNumberCheckForSense = React.createClass({
     getInitialState: function () {
-        return {alert: null};
+        return {alert: null, placeholder: "SNs(new line separated), e.g:\nsense_sn1\nsense_sn2\nsense_sn3"};
+    },
+    componentDidMount: function() {
+        var ssn = $("#ssn"), that = this;
+        ssn.val(that.state.placeholder);
+
+        ssn.focus(function(){
+            if($(this).val() === that.state.placeholder){
+                $(this).val('');
+            }
+        });
+
+        ssn.blur(function(){
+            if($(this).val() === ''){
+                $(this).val(that.state.placeholder);
+            }
+        });
     },
     handleSubmit: function () {
         var that = this;
-        that.setState(that.getInitialState());
+        if (that.refs.sn.getDOMNode().value === that.state.placeholder || that.refs.sn.getDOMNode().value.isWhiteString()) {
+            that.setState({alert: <Alert bsStyle="info">Invalid input !</Alert>});
+            return false;
+        }
+        that.setState({alert: <Alert bsStyle="warning">Checking...</Alert>});
         $.ajax({
             url: '/api/pch_sn_check',
             dataType: 'json',
             type: 'POST',
             data: {
-                sn: JSON.stringify(that.refs.sn.getDOMNode().value.split(",").map(function(ssn){return ssn.trim()})),
+                sn: JSON.stringify(that.refs.sn.getDOMNode().value.split("\n").map(function(ssn){return ssn.trim()})),
                 device_type: "sense"
             },
             success: function (response) {
                 console.log(response);
                 that.setState({alert: response.error ?
                     <Alert bsStyle="danger">{response.error}</Alert> :
-                    <Alert bsStyle="success">Missing pill serial numbers: <br/>{JSON.stringify(response.data)}</Alert>
+                    <Alert bsStyle="success">Missing sense serial numbers: <br/>{JSON.stringify(response.data)}</Alert>
                 });
             }
         });
@@ -40,7 +60,7 @@ var PCHSerialNumberCheckForSense = React.createClass({
     render: function() {
         return (<div>
             <form onSubmit={this.handleSubmit}>
-                <div><textarea id="ssn" className="form-control" ref="sn" type="text" placeholder="SNs (comma seprated), e.g: ssn1, ssn2 "/></div><br/>
+                <div><textarea id="ssn" className="form-control" ref="sn" type="text"/></div><br/>
                 <div><Button className="submit" type="submit">Submit</Button></div><br/>
             </form>
             {this.state.alert}
@@ -50,28 +70,31 @@ var PCHSerialNumberCheckForSense = React.createClass({
 
 var PCHSerialNumberCheckForPill = React.createClass({
     getInitialState: function () {
-        return {alert: null};
+        return {alert: null, placeholder: "SNs(new line separated), e.g:\npill_sn1\npill_sn2\npill_sn3"};
     },
     componentDidMount: function() {
-        var placeholder = 'SNs(new line separated), e.g:\nsn1\nsn2',
-            psn = $("#psn");
-        psn.val(placeholder);
+        var psn = $("#psn"), that = this;
+        psn.val(that.state.placeholder);
 
         psn.focus(function(){
-            if($(this).val() === placeholder){
+            if($(this).val() === that.state.placeholder){
                 $(this).val('');
             }
         });
 
         psn.blur(function(){
             if($(this).val() === ''){
-                $(this).val(placeholder);
+                $(this).val(that.state.placeholder);
             }
         });
     },
     handleSubmit: function () {
         var that = this;
-        that.setState(that.getInitialState());
+        if (that.refs.sn.getDOMNode().value === that.state.placeholder || that.refs.sn.getDOMNode().value.isWhiteString()) {
+            that.setState({alert: <Alert bsStyle="info">Invalid input !</Alert>});
+            return false;
+        }
+        that.setState({alert: <Alert bsStyle="warning">Checking...</Alert>});
         $.ajax({
             url: '/api/pch_sn_check',
             dataType: 'json',
