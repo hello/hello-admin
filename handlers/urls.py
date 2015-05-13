@@ -108,6 +108,9 @@ from handlers.views import RecentAccountsView
 from handlers.users import AccountCountsBreakdownByCreatedDateAPI
 from handlers.views import PCHSerialNumberCheckView
 from handlers.searchify_logs import WifiSignalStrengthAPI
+from handlers.onboarding import OnboardingLogsByResultAPI
+from handlers.onboarding import OnboardingLogsBySenseIdAPI
+from handlers.views import OnboardingLogsView
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -181,6 +184,8 @@ api_routes = [
     ('/api/papertrail_systems/?$', PaperTrailSystemsAPI),
     ('/api/account_breakdown/?$', AccountCountsBreakdownByCreatedDateAPI),
     ('/api/wifi_signal_strength/?$', WifiSignalStrengthAPI),
+    ('/api/onboarding_logs_by_result/?$', OnboardingLogsByResultAPI),
+    ('/api/onboarding_logs_by_sense_id/?$', OnboardingLogsBySenseIdAPI),
 ]
 
 page_routes = [
@@ -227,6 +232,7 @@ page_routes = [
     ('/account_profile/?$', AccountProfileView),
     ('/recent_accounts/?$', RecentAccountsView),
     ('/pch_serial_number_check/?$', PCHSerialNumberCheckView),
+    ('/onboarding_logs/?$', OnboardingLogsView),
 ]
 
 file_upload_routes = [
