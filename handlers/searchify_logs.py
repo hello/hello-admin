@@ -208,24 +208,32 @@ class WifiSignalStrengthAPI(ProtectedRequestHandler):
         query = SearchifyQuery()
 
         try:
+            device_id = self.request.get("device_id", "")
             query.set_query("text:UNIQUE")
-            query.set_category_filters({"device_id": self.request.get("device_id", "")})
+            query.set_category_filters({"device_id": device_id})
             query.set_length(min(700, int(self.request.get("length", 100))))
+            query.set_fetch_fields(['text', 'device_id', 'timestamp'])
 
             results = index.search(**query.mapping())['results']
 
             regex_pattern = "(.*?) (-[0-9]+) ([0-2]) ([a-z0-9]+):([a-z0-9]+):([a-z0-9]+):([a-z0-9]+):([a-z0-9]+):([a-z0-9]+):"
 
-            matches = [re.findall(regex_pattern, r['text']) for r in results]
+            latest_log_with_unique_ssid = sorted([r for r in results
+                                                  if r['device_id'] == device_id and "SSID RSSI UNIQUE" in r['text']],
+                                                 key=lambda z: int(z.get('timestamp', 0)))
 
-            all_wifis_seen = [{
-                'network_name': item[0],
-                'signal_strength': int(item[1]),
-                'network_security': int(item[2])
-            } for sublist in matches for item in sublist]
+            if len(latest_log_with_unique_ssid) > 0:
+                matches = re.findall(regex_pattern, latest_log_with_unique_ssid[-1]['text'].split("SSID RSSI UNIQUE")[-1])
+                all_wifis_seen = [{
+                    'network_name': item[0],
+                    'signal_strength': item[1],
+                    'network_security': item[2]
+                } for item in matches]
 
-            unique_wifis = sorted({w['network_name']: w for w in all_wifis_seen}.values(), key=lambda x:x.get('signal_strength'), reverse=True)
-            output['data'] = unique_wifis
+                output['data'] = {
+                    "scan_time": latest_log_with_unique_ssid[-1]['timestamp'],
+                    "networks": sorted(all_wifis_seen, key=lambda w: int(w.get("signal_strength", 0)), reverse=True)
+                }
 
         except Exception as e:
             output['error'] = display_error(e)

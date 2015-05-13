@@ -86,3 +86,5 @@ body {
 .loading-inline {
     height: 14px;
 }
+
+th {text-align: left !important ;}

@@ -158,14 +158,19 @@ var MotionTile = React.createClass({
 var WifiInfoTile = React.createClass({
     render: function() {
         var response = this.props.wifiInfoResponse;
-        return response.data && response.data.length > 0 ? <Table>
-            <thead>
-                <tr><th>Security</th><th>Name</th><th>Strength</th></tr>
-            </thead>
-            <tbody>
-                {response.data.map(function(w){return <tr><td>{w.network_security}</td><td>{w.network_name}</td><td>{w.signal_strength}</td></tr>;})}
-            </tbody>
-        </Table> : null
+        var networksTable = response.data.networks && response.data.networks.length > 0 ? <Table>
+                <thead>
+                    <tr><th>Name</th><th>Security</th><th>Strength</th></tr>
+                </thead>
+                <tbody>
+                    {response.data.networks.map(function(w){return <tr><td>{w.network_name}</td><td>{w.network_security}</td><td>{w.signal_strength}</td></tr>;})}
+                </tbody>
+            </Table> : null;
+
+        return <div>
+            {networksTable}
+            <p> Last Scan: {response.data.scan_time ? new Date(Number(response.data.scan_time) * 1000).toUTCString() : null}</p>
+        </div>
     }
 });
 
@@ -347,7 +352,7 @@ var AccountProfile = React.createClass({
             particulatesResponse: {data: [], error: ""},
             lightResponse: {data: [], error: ""},
             soundResponse: {data: [], error: ""},
-            wifiInfoResponse: {data: [], error: ""},
+            wifiInfoResponse: {data: {}, error: ""},
             accountInput: "",
             submitted: false,
             timelineStatus: null,
@@ -577,24 +582,29 @@ var AccountProfile = React.createClass({
     },
 
     render: function() {
-        var results = this.state.submitted === false ? null :
-            <div><Row>
-                <Col xs={4}>
-                    <Tile img="svg/sleep.svg" title="Basic Info" img="svg/sleep.svg" content={<UserBasicProfileTile response={this.state.basicProfileResponse} accountInput={this.state.accountInput} partnerResponse={this.state.partnerResponse} />} />
-                    <Tile img="svg/timeline.svg" title="Timeline" content={<TimelineTile accountInput={this.state.accountInput} response={this.state.timelineResponse} status={this.state.timelineStatus} />} />
-                </Col>
-                <Col xs={4}>
-                    <Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseInfoResponse={this.state.senseInfoResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} timezoneResponse={this.state.timezoneResponse} accountInput={this.state.accountInput} />} />
-                    <Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile accountInput={this.state.accountInput} temperatureResponse={this.state.temperatureResponse} humidityResponse={this.state.humidityResponse} particulatesResponse={this.state.particulatesResponse} lightResponse={this.state.lightResponse} soundResponse={this.state.soundResponse} />} />
+        var results = this.state.submitted === false ? null : <div>
+            <Row>
+                <Col xs={8}>
+                    <Row>
+                        <Col xs={6}>
+                            <Tile img="svg/sleep.svg" title="Basic Info" img="svg/sleep.svg" content={<UserBasicProfileTile response={this.state.basicProfileResponse} accountInput={this.state.accountInput} partnerResponse={this.state.partnerResponse} />} />
+                            <Tile img="svg/timeline.svg" title="Timeline" content={<TimelineTile accountInput={this.state.accountInput} response={this.state.timelineResponse} status={this.state.timelineStatus} />} />
+                        </Col>
+                        <Col xs={6}>
+                            <Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseInfoResponse={this.state.senseInfoResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} timezoneResponse={this.state.timezoneResponse} accountInput={this.state.accountInput} />} />
+                            <Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile accountInput={this.state.accountInput} temperatureResponse={this.state.temperatureResponse} humidityResponse={this.state.humidityResponse} particulatesResponse={this.state.particulatesResponse} lightResponse={this.state.lightResponse} soundResponse={this.state.soundResponse} />} />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={12}><Tile img="svg/zendesk.svg" title="Zendesk" content={<ZendeskTile accountInput={this.state.accountInput} zendeskResponse={this.state.zendeskResponse} zendeskStatus={this.props.zendeskStatus} />} /></Col>
+                    </Row>
                 </Col>
                 <Col xs={4}>
                     <Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary pillInfoResponse={this.state.pillInfoResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} accountInput={this.state.accountInput} />} />
                     <Tile img="svg/wifi.svg" title="Wifi Info" content={<WifiInfoTile wifiInfoResponse={this.state.wifiInfoResponse} />} />
                 </Col>
             </Row>
-            <Row>
-                <Col md={8}><Tile img="svg/zendesk.svg" title="Zendesk" content={<ZendeskTile accountInput={this.state.accountInput} zendeskResponse={this.state.zendeskResponse} zendeskStatus={this.props.zendeskStatus} />} /></Col>
-            </Row></div>;
+        </div>;
         return <div>
             <Row><Col id="submit" xs={6} xsOffset={3}><form onSubmit={this.handleSubmit}>
                 <div className="icon-addon addon-md">
