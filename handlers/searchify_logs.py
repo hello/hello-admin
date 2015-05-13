@@ -162,6 +162,7 @@ class SearchifyStatsAPI(ProtectedRequestHandler):
 
 class DustStatsAPI(ProtectedRequestHandler):
     def get(self):
+        urlfetch.set_default_fetch_deadline(20)
         output = {"data": [], "error": ""}
         index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX)
         query = SearchifyQuery()
@@ -198,6 +199,40 @@ class DustStatsAPI(ProtectedRequestHandler):
             log.error('ERROR: {}'.format(display_error(e)))
 
         self.response.write(json.dumps(output))
+
+
+class WifiSignalStrengthAPI(ProtectedRequestHandler):
+    def get(self):
+        output = {"data": [], "error": ""}
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX)
+        query = SearchifyQuery()
+
+        try:
+            query.set_query("text:UNIQUE")
+            query.set_category_filters({"device_id": self.request.get("device_id", "")})
+            query.set_length(min(700, int(self.request.get("length", 100))))
+
+            results = index.search(**query.mapping())['results']
+
+            regex_pattern = "(.*?) (-[0-9]+) ([0-2]) ([a-z0-9]+):([a-z0-9]+):([a-z0-9]+):([a-z0-9]+):([a-z0-9]+):([a-z0-9]+):"
+
+            matches = [re.findall(regex_pattern, r['text']) for r in results]
+
+            all_wifis_seen = [{
+                'network_name': item[0],
+                'signal_strength': int(item[1]),
+                'network_security': int(item[2])
+            } for sublist in matches for item in sublist]
+
+            unique_wifis = sorted({w['network_name']: w for w in all_wifis_seen}.values(), key=lambda x:x.get('signal_strength'), reverse=True)
+            output['data'] = unique_wifis
+
+        except Exception as e:
+            output['error'] = display_error(e)
+            log.error('ERROR: {}'.format(display_error(e)))
+
+        self.response.write(json.dumps(output))
+
 
 class SearchifyQuery():
     def __init__(self):

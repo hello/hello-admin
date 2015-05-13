@@ -155,6 +155,20 @@ var MotionTile = React.createClass({
     }
 });
 
+var WifiInfoTile = React.createClass({
+    render: function() {
+        var response = this.props.wifiInfoResponse;
+        return response.data && response.data.length > 0 ? <Table>
+            <thead>
+                <tr><th>Security</th><th>Name</th><th>Strength</th></tr>
+            </thead>
+            <tbody>
+                {response.data.map(function(w){return <tr><td>{w.network_security}</td><td>{w.network_name}</td><td>{w.signal_strength}</td></tr>;})}
+            </tbody>
+        </Table> : null
+    }
+});
+
 var ZendeskTile = React.createClass({
     render: function() {
         var zendeskResponse = this.props.zendeskResponse, ticketsCount = 0;
@@ -240,7 +254,7 @@ var SenseSummary = React.createClass({
                     {new Date(lastSeenEpoch).toUTCString()}</span>;
             }
 
-            result = <Table>
+            result = <div><Table>
                 <tbody>
                     <tr><td>ID</td><td>{senseId}</td></tr>
                     <tr><td>Keystore</td><td>{keyStore}</td></tr>
@@ -249,7 +263,9 @@ var SenseSummary = React.createClass({
                     <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
                     <tr><td/><td/></tr>
                 </tbody>
-            </Table>;
+            </Table>
+            <p><a target="_blank" href={"/sense_logs/?text=&devices=" + senseId + "&max_docs=100&start=&end="}>Last 100 sense logs</a></p>
+            <p><a target="_blank" href={"/sense_events/?account_input=" + senseId + "&start_ts=" + new Date().getTime()}>Last 25 events</a></p></div>;
         }
 
         return !senseInfoResponse.error.isWhiteString ?
@@ -292,7 +308,8 @@ var PillSummary = React.createClass({
 
         if (pillInfoResponse.data.length > 0) {
             var pillId = pillInfoResponse.data[0].device_account_pair ? pillInfoResponse.data[0].device_account_pair.externalDeviceId : undefined;
-            result = <Table>
+            var lastNightDate =  d3.time.format("%m-%d-%Y")(new Date(new Date().getTime() - 24*3600*1000));
+            result = <div><Table>
                 <thead/>
                 <tbody>
                     <tr><td>ID</td><td>{pillId}</td></tr>
@@ -302,7 +319,9 @@ var PillSummary = React.createClass({
                     <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
                     <tr><td/><td/></tr>
                 </tbody>
-            </Table>;
+            </Table>
+            <p><a target="_blank" href={"/battery/?search=" + pillId + "&end_ts="}>Last 336 pill heartbeats</a></p>
+            <p><a target="_blank" href={"/motion/?email=" + this.props.accountInput + "&date=" + lastNightDate}>Last night motion</a></p></div>;
         }
 
         return !pillInfoResponse.error.isWhiteString ?
@@ -328,6 +347,7 @@ var AccountProfile = React.createClass({
             particulatesResponse: {data: [], error: ""},
             lightResponse: {data: [], error: ""},
             soundResponse: {data: [], error: ""},
+            wifiInfoResponse: {data: [], error: ""},
             accountInput: "",
             submitted: false,
             timelineStatus: null,
@@ -370,6 +390,7 @@ var AccountProfile = React.createClass({
                         if (response.data[0].device_account_pair.externalDeviceId) {
                             var senseId = response.data[0].device_account_pair.externalDeviceId;
                             that.loadSenseKeyStore(senseId);
+                            that.loadWifiInfo(senseId);
                         }
                     }
                 }
@@ -523,6 +544,21 @@ var AccountProfile = React.createClass({
         });
     },
 
+    loadWifiInfo: function(senseId) {
+        var that = this;
+        console.log({device_id: senseId});
+        $.ajax({
+            url: "/api/wifi_signal_strength",
+            dataType: "json",
+            type: 'GET',
+            aysnc: false,
+            data: {device_id: senseId},
+            success: function (response) {
+                that.setState({wifiInfoResponse: response});
+            }
+        });
+    },
+
     handleSubmit: function() {
         history.pushState({}, '', '/account_profile/?account_input=' + this.refs.accountInput.getDOMNode().value.trim());
         this.setState(this.getInitialState());
@@ -543,19 +579,18 @@ var AccountProfile = React.createClass({
     render: function() {
         var results = this.state.submitted === false ? null :
             <div><Row>
-                <Col xs={4}><Tile img="svg/sleep.svg" title="Basic Info" img="svg/sleep.svg" content={<UserBasicProfileTile response={this.state.basicProfileResponse} accountInput={this.state.accountInput} partnerResponse={this.state.partnerResponse} />} /></Col>
-                <Col xs={4}><Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseInfoResponse={this.state.senseInfoResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} timezoneResponse={this.state.timezoneResponse} accountInput={this.state.accountInput} />} /></Col>
-                <Col xs={4}><Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary pillInfoResponse={this.state.pillInfoResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} accountInput={this.state.accountInput} />} /></Col>
-            </Row>
-            <Row>
-                <Col xs={4}><Tile img="svg/timeline.svg" title="Timeline" content={<TimelineTile accountInput={this.state.accountInput} response={this.state.timelineResponse} status={this.state.timelineStatus} />} /></Col>
-                <Col xs={4}><Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile accountInput={this.state.accountInput} temperatureResponse={this.state.temperatureResponse} humidityResponse={this.state.humidityResponse} particulatesResponse={this.state.particulatesResponse} lightResponse={this.state.lightResponse} soundResponse={this.state.soundResponse} />} /></Col>
-                <Col xs={4}><Tile img="svg/motion.svg" title="Motion "content={<MotionTile accountInput={this.state.accountInput}/>} /></Col>
-            </Row>
-            <Row>
-                <Col xs={4}><Tile img="svg/sense_logs.svg" title="Sense Logs" content={<SenseLogsTile accountInput={this.state.accountInput} />} /></Col>
-                <Col xs={4}><Tile img="svg/sense_events.svg" title="Sense Events" content={<SenseEventsTile accountInput={this.state.accountInput} />} /></Col>
-                <Col xs={4}><Tile img="svg/pill_status.svg" title="Pill Status" content={<PillStatusTile accountInput={this.state.accountInput} />} /></Col>
+                <Col xs={4}>
+                    <Tile img="svg/sleep.svg" title="Basic Info" img="svg/sleep.svg" content={<UserBasicProfileTile response={this.state.basicProfileResponse} accountInput={this.state.accountInput} partnerResponse={this.state.partnerResponse} />} />
+                    <Tile img="svg/timeline.svg" title="Timeline" content={<TimelineTile accountInput={this.state.accountInput} response={this.state.timelineResponse} status={this.state.timelineStatus} />} />
+                </Col>
+                <Col xs={4}>
+                    <Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseInfoResponse={this.state.senseInfoResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} timezoneResponse={this.state.timezoneResponse} accountInput={this.state.accountInput} />} />
+                    <Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile accountInput={this.state.accountInput} temperatureResponse={this.state.temperatureResponse} humidityResponse={this.state.humidityResponse} particulatesResponse={this.state.particulatesResponse} lightResponse={this.state.lightResponse} soundResponse={this.state.soundResponse} />} />
+                </Col>
+                <Col xs={4}>
+                    <Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary pillInfoResponse={this.state.pillInfoResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} accountInput={this.state.accountInput} />} />
+                    <Tile img="svg/wifi.svg" title="Wifi Info" content={<WifiInfoTile wifiInfoResponse={this.state.wifiInfoResponse} />} />
+                </Col>
             </Row>
             <Row>
                 <Col md={8}><Tile img="svg/zendesk.svg" title="Zendesk" content={<ZendeskTile accountInput={this.state.accountInput} zendeskResponse={this.state.zendeskResponse} zendeskStatus={this.props.zendeskStatus} />} /></Col>

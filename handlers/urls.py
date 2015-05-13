@@ -107,6 +107,7 @@ from handlers.papertrail import PaperTrailSystemsAPI
 from handlers.views import RecentAccountsView
 from handlers.users import AccountCountsBreakdownByCreatedDateAPI
 from handlers.views import PCHSerialNumberCheckView
+from handlers.searchify_logs import WifiSignalStrengthAPI
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -179,6 +180,7 @@ api_routes = [
     ('/api/papertrail_events/?$', PaperTrailEventsAPI),
     ('/api/papertrail_systems/?$', PaperTrailSystemsAPI),
     ('/api/account_breakdown/?$', AccountCountsBreakdownByCreatedDateAPI),
+    ('/api/wifi_signal_strength/?$', WifiSignalStrengthAPI),
 ]
 
 page_routes = [
