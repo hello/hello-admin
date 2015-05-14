@@ -1,7 +1,7 @@
 var OnboardingLogs = React.createClass({
     getInitialState: function() {
         return {
-            originalData: [], data: [], error: "", limit: 10000,
+            data: [], filteredData: [], error: "", limit: 10000,
             columns: [
                 {name: "ts", title: "Time", width: "100px"},
                 {name: "sense_id", title: "Sense", width: "110px"},
@@ -12,60 +12,105 @@ var OnboardingLogs = React.createClass({
                 {name: "ip", title: "IP", width: "100px"},
                 {name: "info", title: "Info"}
             ],
-            loading: false
+            loading: false,
+            onboardingInfo: null
         };
     },
 
     loadOnboardingLogsByResult: function() {
-        var that = this;
+        this.setState({loading: true, data: [], filteredData: [], error: ""});
+        var result = $("#result").val();
+        var startTime = $("#start-time").val();
+        var endTime = $("#end-time").val();
+        history.pushState({}, '', '/onboarding_logs/?result=' + result + '&start=' + startTime + '&end=' + endTime);
         $.ajax({
             url: "/api/onboarding_logs_by_result",
             dataType: 'json',
             type: 'GET',
             async: false,
             data: {
-                result: $("#result").val(),
-                start_millis: new Date($("#start-time").val()).getTime(),
-                end_millis: new Date($("#end-time").val()).getTime()
+                result: result,
+                start_millis: startTime ? new Date(startTime).getTime() : "",
+                end_millis: endTime ? new Date(endTime).getTime() : ""
             },
             success: function(response) {
                 console.log(response);
                 if (response.error.isWhiteString()) {
-                    that.setState({
-                        originalData: response.data,
-                        data: manipulateData(response.data)
-                    })
+                    var mappedData = manipulateData(response.data);
+                    this.setState({error: "", data: mappedData, filteredData: mappedData, loading: false});
                 }
-            }
+                else {
+                    this.setState({data: [], filteredData: [], error: response.error, loading: false});
+                }
+            }.bind(this)
         });
         return false;
     },
 
     loadOnboardingLogsBySenseId: function() {
-        var that = this;
+        this.setState({loading: true, data: [], filteredData: [], error: ""});
+        var senseId = $("#sense-id").val();
+        var count = $("#count").val();
+        console.log(senseId, count);
+        history.pushState({}, '', '/onboarding_logs/?sense_id=' + senseId + '&count=' + count);
         $.ajax({
             url: "/api/onboarding_logs_by_sense_id",
             dataType: 'json',
             type: 'GET',
             async: false,
             data: {
-                sense_id: $("#sense-id").val(),
-                count: $("#count").val()
+                sense_id: senseId,
+                count: count
             },
             success: function(response) {
                 console.log(response);
                 if (response.error.isWhiteString()) {
-                    that.setState({data: manipulateData(response.data)})
+                    var mappedData = manipulateData(response.data);
+                    this.setState({error: "", data: mappedData, filteredData: mappedData, loading: false});
                 }
-            }
+                else {
+                    this.setState({data: [], filteredData: [], error: response.error, loading: false});
+                }
+            }.bind(this)
         });
         return false;
+    },
+
+    submitWithInputsFromURL: function() {
+        var resultFromURL = getParameterByName("result");
+        var startTimeFromURL = getParameterByName("start");
+        var endTimeFromURL = getParameterByName("end");
+
+        var senseIdFromURL = getParameterByName("sense_id");
+        var countFromURL = getParameterByName("count");
+
+        if (resultFromURL) {
+            $("#result").val(resultFromURL);
+            $("#start-time").val(startTimeFromURL);
+            $("#end-time").val(endTimeFromURL);
+            this.loadOnboardingLogsByResult();
+        }
+        else if (senseIdFromURL) {
+            $("#sense-id").val(senseIdFromURL);
+            $("#count").val(countFromURL);
+            this.loadOnboardingLogsBySenseId();
+        }
+        else {
+            return false;
+        }
     },
 
     componentDidMount: function() {
         var filters = $(".z-show-filter");
         filters.children().remove();
         filters.append('<button><span class="glyphicon glyphicon-filter"></span>');
+        this.submitWithInputsFromURL();
+    },
+
+    componentDidUpdate: function() {
+        var that = this;
+        $(".z-row .z-cell:nth-child(2)").click(function(){$("#sense-id").val($(this).find(".z-text").text());});
+//        $(".z-row .z-cell:nth-child(8)").click(function(){that.setState({onboardingInfo: ($(this).find(".z-text").text())});});
     },
 
     handleSortChange: function(sortInfo){
@@ -85,36 +130,29 @@ var OnboardingLogs = React.createClass({
             default: return null;
         }
 	},
-	handleColumnOrderChange: function (index, dropIndex){
-        var columns = this.state.columns;
-		var col = columns[index];
-		columns.splice(index, 1);
-		columns.splice(dropIndex, 0, col);
-		this.setState({columns: columns});
-	},
     handleColumnResize: function(firstCol, firstSize, secondCol, secondSize){
 	    this.setState({})
 	},
     handleFilter: function(column, value, allFilterValues){
 	    var filteredData = this.state.data;
     	Object.keys(allFilterValues).forEach(function(name){
-            console.log(allFilterValues);
     		var columnFilter = (allFilterValues[name].toString()).toLowerCase();
     		if (columnFilter == ''){
     			return
     		}
     		filteredData = filteredData.filter(function(item){
-                return (item[name].toString()).toLowerCase().indexOf(columnFilter)  > -1;
+                return (item[name] ? item[name].toString() : "").toLowerCase().indexOf(columnFilter)  > -1;
     		});
         });
-        console.log(filteredData);
-        this.setState({data: filteredData});
+        this.setState({filteredData: filteredData});
 	},
     reload: function(){
 		this.refs.grid.reload()
 	},
     render: function(){
 		return <div>
+            <h3>Onboarding Logs</h3>
+            <hr className="fancy-line"/>
             <form className="row" onSubmit={this.loadOnboardingLogsByResult}>
                 <Col xs={2}><Input type="select" id="result">
                     <option value="START">START</option>
@@ -129,23 +167,22 @@ var OnboardingLogs = React.createClass({
             </form>
             <form className="row" onSubmit={this.loadOnboardingLogsBySenseId}>
                 <Col xs={2}><Input type="text" id="sense-id" placeholder="Sense ID" /></Col>
-                <Col xs={2}><Input type="text" id="count" placeholder="Count" /></Col>
+                <Col xs={2}><Input type="number" id="count" placeholder="Count" /></Col>
                 <Col xs={1}><Button type="submit"><Glyphicon glyph="search"/></Button></Col>
+                <Col xs={7}><div><em>{this.state.onboardingInfo}</em></div></Col>
             </form>
             <Row>
                 <Col xs={12}>
-                    <h3>Onboarding Logs</h3>
-                    <hr className="fancy-line"/>
                     <DataGrid
                         ref="grid"
                         idProperty='id'
-                        dataSource={this.state.data}
+                        dataSource={this.state.filteredData}
                         columns={this.state.columns}
                         style={{height: 500}}
                         withColumnMenu={true}
                         onColumnResize={this.handleColumnResize}
                         onSortChange={this.handleSortChange}
-                        style={{height: "81vh", border: "1px solid rgb(194, 194, 245)"}}
+                        style={{height: "67vh", border: "1px solid rgb(194, 194, 245)"}}
                         emptyText={this.state.error}
                         showCellBorders={false}
                         loading={this.state.loading}
@@ -170,7 +207,7 @@ function manipulateData(data) {
 }
 
 function compareNumber(e1, e2, attr) {
-    return e1['attr'] - e2['attr'];
+    return e1[attr] - e2[attr];
 }
 
 function compareString(e1, e2, attr) {
@@ -212,7 +249,7 @@ function compareTimestamp(e1, e2) {
 }
 
 function compareIP(e1, e2) {
-    return compareNumber(evalIp(e1.ip), evalIp(e2.ip));
+    return evalIp(e1.ip) - evalIp(e2.ip);
 }
 
 function evalIp(ipString) {
