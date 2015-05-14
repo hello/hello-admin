@@ -20,4 +20,14 @@ class RoomConditionsAPI(ProtectedRequestHandler):
         )
 
 
+class LastRoomConditionsAPI(ProtectedRequestHandler):
+    def get(self):
+        """
+        Grab last temperature, humidity, light and sound data
+        """
+        self.hello_request(
+            api_url="data/current_room_conditions/{}".format(self.request.get("sense_id")),
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO
+        )
 

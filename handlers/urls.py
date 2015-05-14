@@ -111,6 +111,7 @@ from handlers.searchify_logs import WifiSignalStrengthAPI
 from handlers.onboarding import OnboardingLogsByResultAPI
 from handlers.onboarding import OnboardingLogsBySenseIdAPI
 from handlers.views import OnboardingLogsView
+from handlers.room_conditions import LastRoomConditionsAPI
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -186,6 +187,7 @@ api_routes = [
     ('/api/wifi_signal_strength/?$', WifiSignalStrengthAPI),
     ('/api/onboarding_logs_by_result/?$', OnboardingLogsByResultAPI),
     ('/api/onboarding_logs_by_sense_id/?$', OnboardingLogsBySenseIdAPI),
+    ('/api/last_room_conditions/?$', LastRoomConditionsAPI),
 ]
 
 page_routes = [
