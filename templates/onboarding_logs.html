@@ -1,0 +1,23 @@
+{% extends "templates/base_latest_react.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block extrastatic %}
+    <link rel="stylesheet" type="text/css" href="/static/css/react/index.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-datetimepicker.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/onboarding_logs.css" />
+
+    <script type="text/javascript" src="/static/js/third-party/d3.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/moment.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/bootstrap-datetimepicker.min.js"></script>
+
+    <script type="text/jsx" src="/static/js/third-party/long-datetimepicker.js"></script>
+    <script type="text/jsx" src="/static/js/react/react-datagrid.min.js"></script>
+    <script type="text/jsx" src="/static/js/onboarding_logs.js"></script>
+
+{% endblock %}
+
+{% block content %}
+    <div class="row" id="container">
+        <div id="onboarding-logs"></div>
+    </div>
+{% endblock %}

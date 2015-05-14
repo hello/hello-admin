@@ -218,3 +218,8 @@ class PCHSerialNumberCheckView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/pch_serial_number_check.html',
                                 context={'title': "PCH Serial Number Check"})
+
+class OnboardingLogsView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/onboarding_logs.html',
+                                context={'title': "Onboarding Logs"})
