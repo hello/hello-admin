@@ -51,6 +51,7 @@ var SideBar = React.createClass({
            <ListGroupItem bsStyle="default" href="/sense_logs">&#x029D0; Sense</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/application_logs">&#x029D0; Application</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/worker_logs">&#x029D0; Workers</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/onboarding_logs">&#x029D0; Onboarding</ListGroupItem>
 
            <ListGroupItem bsStyle="info" className="sidebar-group">Data Science</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/label">&#x029D0; Label</ListGroupItem>
