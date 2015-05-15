@@ -213,8 +213,9 @@ var DebugLog = React.createClass({
                 end_time: endInput
             },
             success: function(response) {
+                console.log(response);
                 history.pushState({}, '', '/sense_logs/?text=' + textInput + '&devices=' + devicesInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + startInputHuman + '&end=' + endInputHuman);
-                if (response.error) {
+                if (!response.error.isWhiteString()) {
                     this.setState({
                         logs: [],
                         searchAlert: "☹ " + response.error
