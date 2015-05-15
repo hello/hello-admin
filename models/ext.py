@@ -66,6 +66,20 @@ class RecentlyActiveDevicesStatsDaily(ndb.Model):
         return cls.query(cls.created_at < end_ts).order(-cls.created_at).fetch(keys_only=True)
 
 
+class RecentlyActiveDevicesStats10Minutes(ndb.Model):
+    senses_zcount = ndb.IntegerProperty(required=True, indexed=False)
+    pills_zcount = ndb.IntegerProperty(required=True, indexed=False)
+    created_at = ndb.DateTimeProperty(auto_now_add=True)
+
+    @classmethod
+    def query_stats(cls, limit=30):
+        return cls.query().order(-cls.created_at).fetch(limit)
+
+    @classmethod
+    def query_keys_by_created(cls, end_ts):
+        return cls.query(cls.created_at < end_ts).order(-cls.created_at).fetch(keys_only=True)
+
+
 class SearchifyStats(ndb.Model):
     index_sizes = ndb.StringProperty(required=True, indexed=False)
     created_at = ndb.DateTimeProperty(auto_now_add=True)
