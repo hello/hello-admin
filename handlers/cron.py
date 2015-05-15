@@ -13,6 +13,7 @@ from handlers.utils import epoch_to_human
 from models.ext import ZendeskDailyStats
 from models.ext import RecentlyActiveDevicesStats
 from models.ext import RecentlyActiveDevicesStatsDaily
+from models.ext import RecentlyActiveDevicesStats10Minutes
 from models.ext import SearchifyStats
 from models.ext import SearchifyPurgeStats
 from indextank import ApiClient
@@ -329,6 +330,24 @@ class StoreRecentlyActiveDevicesStatsMinute(BaseRequestHandler):
         recently_active_devices_stats.put()
 
 
+class StoreRecentlyActiveDevicesStats10Minutes(BaseRequestHandler):
+    def get(self):
+        zstats = self.hello_request(
+            type="GET",
+            api_url="devices/status_breakdown",
+            raw_output=True,
+            app_info=settings.ADMIN_APP_INFO,
+            url_params={'start_ts': int(time.time()*1000) - 10*60*1000, 'end_ts': int(time.time()*1000)}
+        ).data
+
+        recently_active_devices_stats = RecentlyActiveDevicesStats10Minutes(
+            senses_zcount=zstats["senses_count"],
+            pills_zcount=zstats["pills_count"]
+        )
+
+        recently_active_devices_stats.put()
+
+
 class StoreRecentlyActiveDevicesStatsDaily(BaseRequestHandler):
     def get(self):
         zstats = self.hello_request(
@@ -366,6 +385,29 @@ class ActiveDevicesHistoryPurge(BaseRequestHandler):
             output['error'] = e.message
 
         current_total = RecentlyActiveDevicesStats.query().count()
+        output['total'] = current_total
+
+        self.response.write(json.dumps(output))
+
+
+class ActiveDevicesHistory10MinutesPurge(BaseRequestHandler):
+    def get(self):
+        end_ts = datetime.datetime.now() - datetime.timedelta(days=settings.ACTIVE_DEVICES_MINUTE_HISTORY_KEEP_DAYS)
+        keys = RecentlyActiveDevicesStats10Minutes.query_keys_by_created(end_ts)
+        output = {}
+
+        try:
+            if keys:
+                ndb.delete_multi(keys=keys[:50])
+                output['success'] = True
+            else:
+                output['success'] = False
+                output['error'] = "No more to purge"
+        except Exception as e:
+            output['success'] = False
+            output['error'] = e.message
+
+        current_total = RecentlyActiveDevicesStats10Minutes.query().count()
         output['total'] = current_total
 
         self.response.write(json.dumps(output))

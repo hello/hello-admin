@@ -24,6 +24,8 @@ var ActiveDevicesHistory = React.createClass({
         return {
             minuteData: [],
             filteredMinuteData: [],
+            tenMinutesData: [],
+            filteredTenMinutesData: [],
             dailyData: [],
             stackable: false,
             zoomable: true,
@@ -83,6 +85,24 @@ var ActiveDevicesHistory = React.createClass({
         });
     },
 
+    load10MinutesData: function() {
+        var that = this;
+        $.ajax({
+            url: "/api/active_devices_10_minutes_history",
+            type: "GET",
+            dataType: "json",
+            success: function(response) {
+                console.log(response);
+                if (response.error.isWhiteString()){
+                    that.setState({tenMinutesData: response.data, filteredTenMinutesData: response.data.reverse().filter(function(d, i){return i%7 === 0;}) , alert: ""});
+                }
+                else {
+                    that.setState({tenMinutesData: [], filteredTenMinutesData: [], alert: response.error});
+                }
+            }
+        });
+    },
+
     loadDailyData: function() {
         var that = this;
         $.ajax({
@@ -105,6 +125,7 @@ var ActiveDevicesHistory = React.createClass({
         $("#stack-check").attr("checked", false);
         $("#zoom-check").attr("checked", true);
         this.loadMinuteData();
+        this.load10MinutesData();
         this.loadDailyData();
     },
 
@@ -155,16 +176,22 @@ var ActiveDevicesHistory = React.createClass({
                 </Col>
             </form>
             {alert}
-            <h3>Active Devices Minute History</h3>
+            <h3>Number of Devices Seen Last Minute History</h3>
             <Row>
                 <Col xs={12} sm={12} md={12}>
                     <c3HistoryChart id="minute-chart" data={this.state.filteredMinuteData} stackable={this.state.stackable} zoomable={this.state.zoomable} chartType={this.state.chartType} xTickFormat="short"/>
                 </Col>
             </Row>
-            <h3>Active Devices Daily History</h3>
+            <h3>Number of Devices Seen Last 24 Hours History</h3>
             <Row>
                 <Col xs={12} sm={12} md={12}>
                     <c3HistoryChart id="daily-chart" data={this.state.dailyData} stackable={this.state.stackable} zoomable={this.state.zoomable} chartType={this.state.chartType} xTickFormat="short"/>
+                </Col>
+            </Row>
+            <h3>Number of Devices Seen Last 10 Minutes History</h3>
+            <Row>
+                <Col xs={12} sm={12} md={12}>
+                    <c3HistoryChart id="ten-minutes-chart" data={this.state.filteredTenMinutesData} stackable={this.state.stackable} zoomable={this.state.zoomable} chartType={this.state.chartType} xTickFormat="short"/>
                 </Col>
             </Row>
         </div>)
