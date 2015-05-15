@@ -94,7 +94,7 @@ var ActiveDevicesHistory = React.createClass({
             success: function(response) {
                 console.log(response);
                 if (response.error.isWhiteString()){
-                    that.setState({tenMinutesData: response.data, filteredTenMinutesData: response.data.reverse().filter(function(d, i){return i%7 === 0;}) , alert: ""});
+                    that.setState({tenMinutesData: response.data, filteredTenMinutesData: response.data.reverse().filter(function(d, i){return i%1 === 0;}) , alert: ""});
                 }
                 else {
                     that.setState({tenMinutesData: [], filteredTenMinutesData: [], alert: response.error});
