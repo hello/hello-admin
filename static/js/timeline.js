@@ -36,9 +36,9 @@ var TimelineContent = React.createClass({
 
                 var svgIcon = "/static/svg/" + timelineSVG(segment.event_type);
                 var currentEmailInput = $('#email-input').val();
-                var currentDateInput = $('#date-input').val().replace(/\-/g, '/');
-                var start = currentDateInput + " 12:00:01 AM";
-                var end = currentDateInput + " 11:59:59 PM";
+                var currentTimeMillis = new Date().getTime();
+                var start = d3.time.format("%m/%d/%Y %H:%M:%S")(new Date(new Date(currentTimeMillis - 5*60*1000).toUTCString().split("GMT")[0]));
+                var end = d3.time.format("%m/%d/%Y %H:%M:%S")(new Date(new Date(currentTimeMillis + 5*60*1000).toUTCString().split("GMT")[0]));
                 blocks.push(
                     <div className="cd-timeline-block">
                         <div className={"cd-timeline-img " + timelineBackground(segment.event_type)}>
@@ -53,7 +53,7 @@ var TimelineContent = React.createClass({
                             {sleepDepth}
                             {sound}
                             <a href={"/sense_logs/?devices=" + currentEmailInput + "&start=" +  start + "&end=" + end + "&max_docs=100"}
-                               target="_blank" className="cd-read-more">See debug log</a>
+                               target="_blank" className="cd-read-more">See sense log</a>
                             {message}
                         </div>
                     </div>

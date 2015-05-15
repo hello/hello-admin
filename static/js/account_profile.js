@@ -113,6 +113,7 @@ var RoomConditionsTile = React.createClass({
         var lastReadingTs = temperatureData && !$.isEmptyObject(temperatureData) ?
             new Date(temperatureData.last_updated_utc).toUTCString() : null;
         return <div>
+            <p>Last Reading: {lastReadingTs}</p><br/>
             <Table>
                 <thead></thead>
                 <tbody>
@@ -124,7 +125,6 @@ var RoomConditionsTile = React.createClass({
                     <tr><td/><td/><td/></tr>
                 </tbody>
             </Table>
-            <p>Last Reading: {lastReadingTs}</p>
             <p><a target="_blank" href={"/room_conditions/?email=" + this.props.accountInput + "&until=" + nowDateTime}>Last "Day" (not necessarily 24 hours)</a></p>
         </div>
     }
@@ -269,19 +269,21 @@ var SenseSummary = React.createClass({
             var lastPairingTs = senseInfoResponse.data[0].pairing_ts ?
                 new Date(senseInfoResponse.data[0].pairing_ts).toUTCString() : null;
 
-            result = <div><Table>
-                <tbody>
-                    <tr><td>ID</td><td>{senseId}</td></tr>
-                    <tr><td>Keystore</td><td>{keyStore}</td></tr>
-                    <tr><td>Firmware</td><td>{this.loadUnhashedFirmware(firmwareVersion)}</td></tr>
-                    <tr><td>Timezone</td><td>{timezone}</td></tr>
-                    <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
-                    <tr><td>Last Pairing</td><td>{lastPairingTs}</td></tr>
-                    <tr><td/><td/></tr>
-                </tbody>
-            </Table>
-            <p><a target="_blank" href={"/sense_logs/?text=&devices=" + senseId + "&max_docs=100&start=&end="}>Last 100 sense logs</a></p>
-            <p><a target="_blank" href={"/sense_events/?account_input=" + senseId + "&start_ts=" + new Date().getTime()}>Last 25 events</a></p></div>;
+            result = <div>
+                <Table>
+                    <tbody>
+                        <tr><td>ID</td><td>{senseId}</td></tr>
+                        <tr><td>Keystore</td><td>{keyStore}</td></tr>
+                        <tr><td>Firmware</td><td>{this.loadUnhashedFirmware(firmwareVersion)}</td></tr>
+                        <tr><td>Timezone</td><td>{timezone}</td></tr>
+                        <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
+                        <tr><td>Last Pairing</td><td>{lastPairingTs}</td></tr>
+                        <tr><td/><td/></tr>
+                    </tbody>
+                </Table>
+                <p><a target="_blank" href={"/sense_logs/?text=&devices=" + senseId + "&max_docs=100&start=&end="}>Last 100 sense logs</a></p>
+                <p><a target="_blank" href={"/sense_events/?account_input=" + senseId + "&start_ts=" + new Date().getTime()}>Last 25 events</a></p>
+            </div>;
         }
 
         return !senseInfoResponse.error.isWhiteString ?
