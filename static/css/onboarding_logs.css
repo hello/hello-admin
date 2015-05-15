@@ -1,5 +1,5 @@
 .z-show-menu {display: none !important ;}
-.z-show-filter {display: block !important; background: #EEEEEE !important; border: 0 !important;  width: 40px !important ; padding: 7px !important; right: 2px !important;}
+.z-show-filter {display: block !important; background: #EEEEEE !important; border: 0 !important;  width: 40px !important ; padding: 7px !important; right: 2px !important; margin-right: -8px;}
 input {
   display: block;
   width: 100%;
@@ -32,4 +32,8 @@ input:focus {
 
 .react-datagrid {
     font-size: 70% !important;
+}
+
+.loading-inline {
+    height: 16px;
 }

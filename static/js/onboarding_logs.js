@@ -1,13 +1,13 @@
 var OnboardingLogs = React.createClass({
     getInitialState: function() {
         return {
-            data: [], filteredData: [], error: "", limit: 10000,
+            data: [], filteredData: [], error: "", limit: 10000, selectedId: 1,
             columns: [
                 {name: "ts", title: "Time", width: "100px"},
                 {name: "sense_id", title: "Sense", width: "110px"},
                 {name: "pill_id", title: "Pill", width: "110px"},
-                {name: "account_id", title: "Account", width: "115px"},
-                {name: "result", title: "Result", width: "115px"},
+                {name: "account_id", title: <img className="loading-inline" src="/static/svg/sleep.svg" />, width: "80px"},
+                {name: "result", title: "Result", width: "90px"},
                 {name: "action", title: "Action", width: "115px"},
                 {name: "ip", title: "IP", width: "100px"},
                 {name: "info", title: "Info"}
@@ -109,7 +109,7 @@ var OnboardingLogs = React.createClass({
 
     componentDidUpdate: function() {
         var that = this;
-        $(".z-row .z-cell:nth-child(2)").click(function(){$("#sense-id").val($(this).find(".z-text").text());});
+//        $(".z-row .z-cell:nth-child(2)").click(function(){$("#sense-id").val($(this).find(".z-text").text());});
 //        $(".z-row .z-cell:nth-child(8)").click(function(){that.setState({onboardingInfo: ($(this).find(".z-text").text())});});
     },
 
@@ -149,6 +149,12 @@ var OnboardingLogs = React.createClass({
     reload: function(){
 		this.refs.grid.reload()
 	},
+
+    onSelectionChange: function(newSelectedId, data){
+        this.setState({selectedId: newSelectedId, onboardingInfo: <Alert>{data.info}</Alert>});
+        $("#sense-id").val(data.sense_id);
+	},
+
     render: function(){
 		return <div>
             <h3>Onboarding Logs</h3>
@@ -161,15 +167,15 @@ var OnboardingLogs = React.createClass({
                     <option value="SUCCESS">SUCCESS</option>
                     <option value="EXIT">EXIT</option>
                 </Input></Col>
-                <LongDatetimePicker placeHolder="start time" id="start-time" size="3" />
-                <LongDatetimePicker placeHolder="end time" id="end-time" size="3" />
+                <LongDatetimePicker placeHolder="start (last week)" id="start-time" size="3" />
+                <LongDatetimePicker placeHolder="end (now)" id="end-time" size="3" />
                 <Col xs={1}><Button type="submit"><Glyphicon glyph="search"/></Button></Col>
             </form>
             <form className="row" onSubmit={this.loadOnboardingLogsBySenseId}>
-                <Col xs={2}><Input type="text" id="sense-id" placeholder="Sense ID" /></Col>
-                <Col xs={2}><Input type="number" id="count" placeholder="Count" /></Col>
+                <Col xs={3}><Input type="text" id="sense-id" placeholder="Sense ID" /></Col>
+                <Col xs={1}><Input type="number" id="count" placeholder="limit" /></Col>
                 <Col xs={1}><Button type="submit"><Glyphicon glyph="search"/></Button></Col>
-                <Col xs={7}><div><em>{this.state.onboardingInfo}</em></div></Col>
+                <Col xs={7}>{this.state.onboardingInfo}</Col>
             </form>
             <Row>
                 <Col xs={12}>
@@ -190,6 +196,8 @@ var OnboardingLogs = React.createClass({
                         onFilter={this.handleFilter}
                         liveFilter={true}
                         sortInfo={this.state.sortInfo}
+                        selected={this.state.selectedId}
+                        onSelectionChange={this.onSelectionChange}
                     />
                 </Col>
             </Row>
