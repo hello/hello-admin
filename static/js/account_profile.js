@@ -85,38 +85,46 @@ var TimelineTile = React.createClass({
 var RoomConditionsTile = React.createClass({
     render: function() {
         var nowDateTime = d3.time.format("%m/%d/%Y %H:%M:%S")(new Date());
-        var temperatureResponseData = this.props.temperatureResponse.data ? this.props.temperatureResponse.data.filter(purgeSentinels) : [];
-        var humidityResponseData = this.props.humidityResponse.data ? this.props.humidityResponse.data.filter(purgeSentinels) : [];
+        var temperatureData = this.props.lastRoomConditionsResponse.data.temperature;
+        var humidityData = this.props.lastRoomConditionsResponse.data.humidity;
+        var lightData = this.props.lastRoomConditionsResponse.data.light;
+        var soundData = this.props.lastRoomConditionsResponse.data.sound;
+
         var particulatesResponseData = this.props.particulatesResponse.data ? this.props.particulatesResponse.data.filter(purgeSentinels) : [];
-        var lightResponseData = this.props.lightResponse.data ? this.props.lightResponse.data.filter(purgeSentinels) : [];
-        var soundResponseData = this.props.soundResponse.data ? this.props.soundResponse.data.filter(purgeSentinels) : [];
-        var latestTemperature = temperatureResponseData.length > 0 ?
-            [<td>{temperatureResponseData[temperatureResponseData.length - 1].value.toFixed(2)}</td>, <td>°C</td>]
+
+        var latestTemperature = temperatureData && !$.isEmptyObject(temperatureData) ?
+            [<td>{temperatureData.value.toFixed(2)}</td>, <td>{"°" + temperatureData.unit.toUpperCase()}</td>]
             :[<td><img className="loading-inline" src="/static/image/loading.gif" /></td>, <td/>];
-        var latestHumidity = humidityResponseData.length > 0 ?
-            [<td>{humidityResponseData[humidityResponseData.length - 1].value.toFixed(2)}</td>, <td>%</td>]
+        var latestHumidity = humidityData && !$.isEmptyObject(humidityData) ?
+            [<td>{humidityData.value.toFixed(2)}</td>, <td>{humidityData.unit}</td>]
             :[<td><img className="loading-inline" src="/static/image/loading.gif" /></td>, <td/>];
+
+        var latestLight = lightData && !$.isEmptyObject(lightData) ?
+            [<td>{lightData.value.toFixed(2)}</td>, <td>{lightData.unit}</td>]
+            :[<td><img className="loading-inline" src="/static/image/loading.gif" /></td>, <td/>];
+        var latestSound = soundData && !$.isEmptyObject(soundData) ?
+            [<td>{soundData.value.toFixed(2)}</td>, <td>{soundData.unit}</td>]
+            :<td><img className="loading-inline" src="/static/image/loading.gif" /></td>;
+
         var latestParticulates = particulatesResponseData.length > 0 ?
             [<td>{particulatesResponseData[particulatesResponseData.length - 1].value.toFixed(2)}</td>, <td>µg/m³</td>]
             :[<td><img className="loading-inline" src="/static/image/loading.gif" /></td>, <td/>];
-        var latestLight = lightResponseData.length > 0 ?
-            [<td>{lightResponseData[lightResponseData.length - 1].value.toFixed(2)}</td>, <td>lm</td>]
-            :[<td><img className="loading-inline" src="/static/image/loading.gif" /></td>, <td/>];
-        var latestSound = soundResponseData.length > 0 ?
-            [<td>{soundResponseData[soundResponseData.length - 1].value.toFixed(2)}</td>, <td>dB</td>]
-            :<td><img className="loading-inline" src="/static/image/loading.gif" /></td>;
+
+        var lastReadingTs = temperatureData && !$.isEmptyObject(temperatureData) ?
+            new Date(temperatureData.last_updated_utc).toUTCString() : null;
         return <div>
             <Table>
                 <thead></thead>
                 <tbody>
                     <tr><td>Temperature</td>{latestTemperature}</tr>
                     <tr><td>Humidity</td>{latestHumidity}</tr>
-                    <tr><td>Particulates</td>{latestParticulates}</tr>
                     <tr><td>Light</td>{latestLight}</tr>
                     <tr><td>Sound</td>{latestSound}</tr>
+                    <tr><td>Particulates</td>{latestParticulates}</tr>
                     <tr><td/><td/><td/></tr>
                 </tbody>
             </Table>
+            <p>Last Reading: {lastReadingTs}</p>
             <p><a target="_blank" href={"/room_conditions/?email=" + this.props.accountInput + "&until=" + nowDateTime}>Last "Day" (not necessarily 24 hours)</a></p>
         </div>
     }
@@ -169,7 +177,7 @@ var WifiInfoTile = React.createClass({
 
         return <div>
             {networksTable}
-            <p> Last Scan: {response.data.scan_time ? new Date(Number(response.data.scan_time) * 1000).toUTCString() : null}</p>
+            <p> Last Scan: {response.data.scan_time ? new Date(Number(response.data.scan_time) * 1000).toUTCString() : <img className="loading-inline" src="/static/image/loading.gif" />}</p>
         </div>
     }
 });
@@ -258,6 +266,8 @@ var SenseSummary = React.createClass({
                 lastSeen = <span className={lastSeenEpoch < new Date().getTime() - 3600*1000 ? "not-ok" : "ok"}>
                     {new Date(lastSeenEpoch).toUTCString()}</span>;
             }
+            var lastPairingTs = senseInfoResponse.data[0].pairing_ts ?
+                new Date(senseInfoResponse.data[0].pairing_ts).toUTCString() : null;
 
             result = <div><Table>
                 <tbody>
@@ -266,6 +276,7 @@ var SenseSummary = React.createClass({
                     <tr><td>Firmware</td><td>{this.loadUnhashedFirmware(firmwareVersion)}</td></tr>
                     <tr><td>Timezone</td><td>{timezone}</td></tr>
                     <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
+                    <tr><td>Last Pairing</td><td>{lastPairingTs}</td></tr>
                     <tr><td/><td/></tr>
                 </tbody>
             </Table>
@@ -322,6 +333,7 @@ var PillSummary = React.createClass({
                     <tr><td>Battery</td><td>{batteryLevel}</td></tr>
                     <tr><td>Uptime</td><td>{uptime}</td></tr>
                     <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
+                    <tr><td>Last Pairing</td><td>{new Date(pillInfoResponse.data[0].pairing_ts).toUTCString()}</td></tr>
                     <tr><td/><td/></tr>
                 </tbody>
             </Table>
@@ -353,6 +365,7 @@ var AccountProfile = React.createClass({
             lightResponse: {data: [], error: ""},
             soundResponse: {data: [], error: ""},
             wifiInfoResponse: {data: {}, error: ""},
+            lastRoomConditionsResponse: {data: {}, error: ""},
             accountInput: "",
             submitted: false,
             timelineStatus: null,
@@ -382,24 +395,24 @@ var AccountProfile = React.createClass({
     },
 
     loadSenseInfo: function() {
-        var that = this;
         $.ajax({
             url: '/api/device_by_email',
             dataType: 'json',
             type: 'GET',
-            data: {email: that.refs.accountInput.getDOMNode().value.trim(), device_type: "sense"},
+            data: {email: this.refs.accountInput.getDOMNode().value.trim(), device_type: "sense"},
             success: function (response) {
-                that.setState({senseInfoResponse: response});
+                this.setState({senseInfoResponse: response});
                 if (response.data.length > 0) {
                     if (response.data[0].device_account_pair) {
                         if (response.data[0].device_account_pair.externalDeviceId) {
                             var senseId = response.data[0].device_account_pair.externalDeviceId;
-                            that.loadSenseKeyStore(senseId);
-                            that.loadWifiInfo(senseId);
+                            this.loadSenseKeyStore(senseId);
+                            this.loadWifiInfo(senseId);
+                            this.loadLastRoomConditions(senseId);
                         }
                     }
                 }
-            }
+            }.bind(this)
         });
     },
 
@@ -534,7 +547,8 @@ var AccountProfile = React.createClass({
 
     loadRoomConditions: function() {
         var that = this;
-        ['temperature', 'humidity', 'particulates', 'light', 'sound'].forEach(function(sensor){
+//        ['temperature', 'humidity', 'particulates', 'light', 'sound'].forEach(function(sensor){
+        ['particulates'].forEach(function(sensor){
             $.ajax({
                 url: "/api/room_conditions",
                 dataType: "json",
@@ -550,8 +564,6 @@ var AccountProfile = React.createClass({
     },
 
     loadWifiInfo: function(senseId) {
-        var that = this;
-        console.log({device_id: senseId});
         $.ajax({
             url: "/api/wifi_signal_strength",
             dataType: "json",
@@ -559,8 +571,21 @@ var AccountProfile = React.createClass({
             aysnc: false,
             data: {device_id: senseId},
             success: function (response) {
-                that.setState({wifiInfoResponse: response});
-            }
+                this.setState({wifiInfoResponse: response});
+            }.bind(this)
+        });
+    },
+
+    loadLastRoomConditions: function(senseId) {
+        $.ajax({
+            url: "/api/last_room_conditions",
+            dataType: "json",
+            type: 'GET',
+            aysnc: false,
+            data: {sense_id: senseId},
+            success: function (response) {
+                this.setState({lastRoomConditionsResponse: response});
+            }.bind(this)
         });
     },
 
@@ -592,7 +617,7 @@ var AccountProfile = React.createClass({
                         </Col>
                         <Col xs={6}>
                             <Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseInfoResponse={this.state.senseInfoResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} timezoneResponse={this.state.timezoneResponse} accountInput={this.state.accountInput} />} />
-                            <Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile accountInput={this.state.accountInput} temperatureResponse={this.state.temperatureResponse} humidityResponse={this.state.humidityResponse} particulatesResponse={this.state.particulatesResponse} lightResponse={this.state.lightResponse} soundResponse={this.state.soundResponse} />} />
+                            <Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile accountInput={this.state.accountInput} lastRoomConditionsResponse={this.state.lastRoomConditionsResponse} particulatesResponse={this.state.particulatesResponse} />} />
                         </Col>
                     </Row>
                     <Row>
