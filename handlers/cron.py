@@ -154,7 +154,7 @@ class SearchifyPurgeHandler(BaseRequestHandler):
 
 class SensePurge(SearchifyPurgeHandler):
     def get(self):
-        self.mass_purge_by_keep_days(index_name=settings.SENSE_LOGS_INDEX,
+        self.mass_purge_by_keep_days(index_name=settings.SENSE_LOGS_INDEX_MARCH,
                                      keep_days=self.request.get("keep_days", 30))
 
 
@@ -176,7 +176,7 @@ class SearchifyPurgeQueue(SearchifyPurgeHandler):
         taskqueue.add(
             url='/cron/sense_purge',
             params={
-                'keep_days': settings.SEARCHIFY_LOGS_KEEP_DAYS[settings.SENSE_LOGS_INDEX]
+                'keep_days': settings.SEARCHIFY_LOGS_KEEP_DAYS[settings.SENSE_LOGS_INDEX_MARCH]
             },
             method="GET",
             queue_name="sense-purge"
@@ -252,7 +252,7 @@ class AlarmsCountPush(GeckoboardPush):
         alarm_pattern = "ALARM RINGING"
         alarms_count = -1
 
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX)
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_MARCH)
 
         try:
             alarms_count = index.search(query=alarm_pattern, docvar_filters={0:[[time.time() - 24*3600, None]]})['matches']
@@ -274,7 +274,7 @@ class WavesCountPush(GeckoboardPush):
         wave_pattern = "Gesture: WAVE"
         waves_count = -1
 
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX)
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_MARCH)
 
         try:
             results = index.search(query=wave_pattern, docvar_filters={0:[[time.time() - 24*3600, None]]}, length=5000, fetch_fields=['text'])['results']
@@ -297,7 +297,7 @@ class HoldsCountPush(GeckoboardPush):
         hold_pattern = "Gesture: HOLD"
         holds_count = -1
 
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX)
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_MARCH)
 
         try:
             results = index.search(query=hold_pattern, docvar_filters={0:[[time.time() - 24*3600, None]]}, length=5000, fetch_fields=['text'])['results']

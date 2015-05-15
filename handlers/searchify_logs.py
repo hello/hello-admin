@@ -10,9 +10,6 @@ from google.appengine.api import urlfetch
 
 
 class SearchifyLogsHandler(ProtectedRequestHandler):
-    """
-    Retrieve debug logs
-    """
     def normalize_epoch(self, ts, index_name):
         if "sense" in index_name:
             return ts
@@ -50,7 +47,8 @@ class SearchifyLogsHandler(ProtectedRequestHandler):
                 searchify_query.set_scoring_function(3)
             elif '2015' not in index_name:
                 searchify_query.set_query("all:0") # Do not look for latest documents in the old index
-
+            elif index_name=="sense-logs-2015-05":
+                searchify_query.set_query("date:20150515PM")
             if filters:
                 searchify_query.set_category_filters(filters)
 
@@ -104,7 +102,6 @@ class SearchifyLogsHandler(ProtectedRequestHandler):
         return self.get_logs_by_index(index_name, filters)
 
 
-
 class ApplicationLogsAPI(SearchifyLogsHandler):
     """
     Retrieve application logs
@@ -118,7 +115,14 @@ class SenseLogsAPI(SearchifyLogsHandler):
     Retrieve sense logs
     """
     def get(self):
-        self.response.write(json.dumps(self.get_logs_filtered_by_devices(settings.SENSE_LOGS_INDEX)))
+        march_logs = {"error": "", "data": []}
+        may_logs = self.get_logs_filtered_by_devices(settings.SENSE_LOGS_INDEX_MAY)
+        if len(may_logs['data']) == 0:
+            march_logs = self.get_logs_filtered_by_devices(settings.SENSE_LOGS_INDEX_MARCH)
+        self.response.write(json.dumps({
+            "error": " ".join([march_logs["error"], may_logs["error"]]),
+            "data": sorted(march_logs["data"] + may_logs["data"], key=lambda d: int(d.get("timestamp", 0)))
+        }))
 
 
 class WorkerLogsAPI(SearchifyLogsHandler):
@@ -164,7 +168,7 @@ class DustStatsAPI(ProtectedRequestHandler):
     def get(self):
         urlfetch.set_default_fetch_deadline(20)
         output = {"data": [], "error": ""}
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX)
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_MARCH)
         query = SearchifyQuery()
 
         try:
@@ -204,7 +208,7 @@ class DustStatsAPI(ProtectedRequestHandler):
 class WifiSignalStrengthAPI(ProtectedRequestHandler):
     def get(self):
         output = {"data": [], "error": ""}
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX)
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_MARCH)
         query = SearchifyQuery()
 
         try:

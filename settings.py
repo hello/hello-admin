@@ -35,7 +35,8 @@ GECKOBOARD = GeckoboardCredentials.query().get()
 DEFAULT_ACCESS_TOKEN = APP_INFO.access_token if APP_INFO else None
 
 ## Seachify Index
-SENSE_LOGS_INDEX = "sense-logs-2015-03"
+SENSE_LOGS_INDEX_MARCH = "sense-logs-2015-03"
+SENSE_LOGS_INDEX_MAY = "sense-logs-2015-05"
 APPLICATION_LOGS_INDEX = "application-logs-2015-03"
 WORKERS_LOGS_INDEX = "workers-logs-2015-03"
 
@@ -57,7 +58,7 @@ WORKERS_LOGS_KEEP_SIZE = {
 
 ## Keep N lastest days of docs from being purge
 SEARCHIFY_LOGS_KEEP_DAYS = {
-    SENSE_LOGS_INDEX: 10,
+    SENSE_LOGS_INDEX_MARCH: 10,
     APPLICATION_LOGS_INDEX: {
         "DEBUG": 3,
         "INFO": 3,
