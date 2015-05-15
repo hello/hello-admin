@@ -24,110 +24,13 @@ var Panel = ReactBootstrap.Panel;
 var Well = ReactBootstrap.Well;
 var Badge = ReactBootstrap.Badge;
 
-var SideBar = React.createClass({
-   render: function() {
-       return (<ListGroup>
-           <ListGroupItem bsStyle="info" className="sidebar-group">Home</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/users">&#x029D0; Recent Users</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/recent_accounts">&#x029D0; Recent Accounts</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/account_profile">&#x029D0; Account Profile</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/users_inspection">&#x029D0; Users Inspection</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/password_reset">&#x029D0; Password Reset</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/troubleshoot">&#x029D0; Inactive Devices</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/active_devices_history">&#x029D0; Devices Count</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/pch_serial_number_check">&#x029D0; Serial Check</ListGroupItem>
 
-           <ListGroupItem bsStyle="info" className="sidebar-group">Data</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/timeline">&#x029D0; Timeline</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/room_conditions">&#x029D0; Room Conditions</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/battery">&#x029D0; Pill Status</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/motion">&#x029D0; Motion</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/sense_events">&#x029D0; Sense Events</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/dust_stats">&#x029D0; Dust Statistics</ListGroupItem>
-
-           <ListGroupItem bsStyle="info" className="sidebar-group">Logs</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/sense_logs">&#x029D0; Sense</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/application_logs">&#x029D0; Application</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/worker_logs">&#x029D0; Workers</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/onboarding_logs">&#x029D0; Onboarding</ListGroupItem>
-
-           <ListGroupItem bsStyle="info" className="sidebar-group">Data Science</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/label">&#x029D0; Label</ListGroupItem>
-
-           <ListGroupItem bsStyle="info" className="sidebar-group">Keystore</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/key_store">&#x029D0; Keystore Hints</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/keys">&#x029D0; Keystore Provision</ListGroupItem>
-
-           <ListGroupItem bsStyle="info" className="sidebar-group">Zendesk</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/zendesk_now">&#x029D0; Zendesk Now</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/zendesk_history">&#x029D0; Zendesk History</ListGroupItem>
-
-           <ListGroupItem bsStyle="info" className="sidebar-group">Operation</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/teams">&#x029D0; Teams</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/configuration">&#x029D0; Configuration</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/firmware">&#x029D0; Firmware</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/pairing">&#x029D0; Pairing</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/notification">&#x029D0; Notification</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/alarms">&#x029D0; Alarms</ListGroupItem>
-
-           <ListGroupItem bsStyle="info" className="sidebar-group">Admin only</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/settings">&#x029D0; Settings</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/orders">&#x029D0; Orders</ListGroupItem>
-       </ListGroup>)
-   }
-});
-React.render(<SideBar />, document.getElementById('sidebar'));
-
-var Header = React.createClass({
-    render: function() {
-        var cx = React.addons.classSet;
-        var envProd, envDev, localSwitcher=null, prodSwitcher=null, devSwitcher=null;
-        if (document.URL.startsWith("http://localhost")) {
-            envLocal = cx({
-                activeEnv: true,
-                env: true
-            })
-            localSwitcher =  <div className="col-xs-1 col-sm-1 col-md-1 col-lg-1">
-                <a className={envLocal} href={document.URL}> Local-Env </a>
-            </div>;
-        }
-        else {
-            if (!document.URL.startsWith("https://dev")) {
-                envProd = cx({
-                    activeEnv: true,
-                    env: true
-                });
-                envDev = cx({
-                    activeEnv: false,
-                    env: true
-                });
-            }
-            else {
-                envProd = cx({
-                    activeEnv: false,
-                    env: true
-                });
-                envDev = cx({
-                    activeEnv: true,
-                    env: true
-                });
-            }
-            prodSwitcher = <div className="col-xs-1 col-sm-1 col-md-1 col-lg-1">
-                <a className={envProd} href="https://hello-admin.appspot.com/"> Prod-Env </a>
-            </div>;
-            devSwitcher =  <div className="col-xs-1 col-sm-1 col-md-1 col-lg-1">
-                <a className={envDev} href="https://dev-dot-hello-admin.appspot.com/"> Dev-Env </a>
-            </div>;
-        }
-        return (<div>
-            {localSwitcher}
-            {prodSwitcher}
-            {devSwitcher}
-        </div>)
-    }
-});
-React.render(<Header/>, document.getElementById("env-switcher"));
-
+if (typeof String.prototype.startsWith != 'function') {
+  // see below for better implementation!
+  String.prototype.startsWith = function (str){
+    return this.indexOf(str) === 0;
+  };
+}
 
 function getParameterByName(name) {
   name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
@@ -206,12 +109,6 @@ if (!Array.prototype.last){
     };
 }
 
-if (typeof String.prototype.startsWith != 'function') {
-  // see below for better implementation!
-  String.prototype.startsWith = function (str){
-    return this.indexOf(str) === 0;
-  };
-}
 var $preloader = $('.preloader');
 
 function hexToRgb(hex) {
@@ -248,3 +145,108 @@ function luminate(hex, lum) {
 	}
 	return rgb;
 }
+
+var SideBar = React.createClass({
+   render: function() {
+       return (<ListGroup>
+           <ListGroupItem bsStyle="info" className="sidebar-group">Home</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/users">&#x029D0; Recent Users</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/recent_accounts">&#x029D0; Recent Accounts</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/account_profile">&#x029D0; Account Profile</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/users_inspection">&#x029D0; Users Inspection</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/password_reset">&#x029D0; Password Reset</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/troubleshoot">&#x029D0; Inactive Devices</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/active_devices_history">&#x029D0; Devices Count</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/pch_serial_number_check">&#x029D0; Serial Check</ListGroupItem>
+
+           <ListGroupItem bsStyle="info" className="sidebar-group">Data</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/timeline">&#x029D0; Timeline</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/room_conditions">&#x029D0; Room Conditions</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/battery">&#x029D0; Pill Status</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/motion">&#x029D0; Motion</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/sense_events">&#x029D0; Sense Events</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/dust_stats">&#x029D0; Dust Statistics</ListGroupItem>
+
+           <ListGroupItem bsStyle="info" className="sidebar-group">Logs</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/sense_logs">&#x029D0; Sense</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/application_logs">&#x029D0; Application</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/worker_logs">&#x029D0; Workers</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/onboarding_logs">&#x029D0; Onboarding</ListGroupItem>
+
+           <ListGroupItem bsStyle="info" className="sidebar-group">Data Science</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/label">&#x029D0; Label</ListGroupItem>
+
+           <ListGroupItem bsStyle="info" className="sidebar-group">Keystore</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/key_store">&#x029D0; Keystore Hints</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/keys">&#x029D0; Keystore Provision</ListGroupItem>
+
+           <ListGroupItem bsStyle="info" className="sidebar-group">Zendesk</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/zendesk_now">&#x029D0; Zendesk Now</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/zendesk_history">&#x029D0; Zendesk History</ListGroupItem>
+
+           <ListGroupItem bsStyle="info" className="sidebar-group">Operation</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/teams">&#x029D0; Teams</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/configuration">&#x029D0; Configuration</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/firmware">&#x029D0; Firmware</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/pairing">&#x029D0; Pairing</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/notification">&#x029D0; Notification</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/alarms">&#x029D0; Alarms</ListGroupItem>
+
+           <ListGroupItem bsStyle="info" className="sidebar-group">Admin only</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/settings">&#x029D0; Settings</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/orders">&#x029D0; Orders</ListGroupItem>
+       </ListGroup>)
+   }
+});
+React.render(<SideBar />, document.getElementById('sidebar'));
+
+var Header = React.createClass({
+    render: function() {
+        var cx = React.addons.classSet;
+        var envProd, envDev, localSwitcher=null, prodSwitcher=null, devSwitcher=null;
+        var documentURL = document.URL || window.location.href;
+        if (documentURL.startsWith("http://localhost")) {
+            envLocal = cx({
+                activeEnv: true,
+                env: true
+            })
+            localSwitcher =  <div className="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+                <a className={envLocal} href={documentURL}> Local-Env </a>
+            </div>;
+        }
+        else {
+            if (!documentURL.startsWith("https://dev")) {
+                envProd = cx({
+                    activeEnv: true,
+                    env: true
+                });
+                envDev = cx({
+                    activeEnv: false,
+                    env: true
+                });
+            }
+            else {
+                envProd = cx({
+                    activeEnv: false,
+                    env: true
+                });
+                envDev = cx({
+                    activeEnv: true,
+                    env: true
+                });
+            }
+            prodSwitcher = <div className="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+                <a className={envProd} href="https://hello-admin.appspot.com/"> Prod-Env </a>
+            </div>;
+            devSwitcher =  <div className="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+                <a className={envDev} href="https://dev-dot-hello-admin.appspot.com/"> Dev-Env </a>
+            </div>;
+        }
+        return (<div>
+            {localSwitcher}
+            {prodSwitcher}
+            {devSwitcher}
+        </div>)
+    }
+});
+React.render(<Header/>, document.getElementById("env-switcher"));
