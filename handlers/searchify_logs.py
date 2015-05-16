@@ -1,5 +1,6 @@
 import json
 import re
+import datetime
 import settings
 import logging as log
 from handlers.helpers import ProtectedRequestHandler
@@ -15,7 +16,7 @@ class SearchifyLogsHandler(ProtectedRequestHandler):
             return ts
         return 1000*int(ts)
 
-    def get_logs_by_index(self, index_name, filters={}):
+    def get_logs_by_index(self, index_name, filters={}, date_field=""):
         output = {'data': [], 'error': ''}
         urlfetch.set_default_fetch_deadline(30)
 
@@ -45,10 +46,9 @@ class SearchifyLogsHandler(ProtectedRequestHandler):
 
                 index.add_function(3, scoring_function)
                 searchify_query.set_scoring_function(3)
-            elif '2015' not in index_name:
-                searchify_query.set_query("all:0") # Do not look for latest documents in the old index
-            elif index_name=="sense-logs-2015-05":
-                searchify_query.set_query("date:20150515PM")
+            elif index_name=="sense-logs-2015-05" and not text_input:
+                searchify_query.set_query(date_field)
+
             if filters:
                 searchify_query.set_category_filters(filters)
 
@@ -61,7 +61,7 @@ class SearchifyLogsHandler(ProtectedRequestHandler):
 
         return output
 
-    def get_logs_filtered_by_devices(self, index_name):
+    def get_logs_filtered_by_devices(self, index_name, date_field=""):
         devices_input = self.request.get('devices', default_value="")
         devices_list = []
         if devices_input:
@@ -81,9 +81,9 @@ class SearchifyLogsHandler(ProtectedRequestHandler):
                     devices_list.append(d)
 
         if devices_list:  # Only filter if list of devices is not empty
-            return self.get_logs_by_index(index_name, {'device_id': devices_list})
+            return self.get_logs_by_index(index_name, {'device_id': devices_list}, date_field=date_field)
 
-        return self.get_logs_by_index(index_name)
+        return self.get_logs_by_index(index_name, date_field=date_field)
 
     def get_logs_filtered_by_levels_orgins_versions(self, index_name):
         levels_input = self.request.get('levels', default_value="")
@@ -116,13 +116,31 @@ class SenseLogsAPI(SearchifyLogsHandler):
     """
     def get(self):
         march_logs = {"error": "", "data": []}
-        may_logs = self.get_logs_filtered_by_devices(settings.SENSE_LOGS_INDEX_MAY)
-        if len(may_logs['data']) == 0:
+        may_logs = {"error": "", "data": []}
+        max_results = int(self.request.get('max_results'))
+        selected_date_field = ""
+        date_field_count = 0
+        while selected_date_field != "20150515PM" and max_results > len(may_logs['data']):
+            selected_date_field = (datetime.datetime.utcnow() - datetime.timedelta(hours=date_field_count*12)).strftime("%Y%m%d%p")
+            may_logs =self.concat_logs(
+                may_logs,
+                self.get_logs_filtered_by_devices(
+                    settings.SENSE_LOGS_INDEX_MAY,
+                    date_field="date:{}".format(selected_date_field)
+                ),
+            )
+            date_field_count += 1
+
+        if max_results > len(may_logs['data']):
             march_logs = self.get_logs_filtered_by_devices(settings.SENSE_LOGS_INDEX_MARCH)
-        self.response.write(json.dumps({
-            "error": " ".join([march_logs["error"], may_logs["error"]]),
-            "data": sorted(march_logs["data"] + may_logs["data"], key=lambda d: int(d.get("timestamp", 0)))
-        }))
+        self.response.write(json.dumps(self.concat_logs(march_logs, may_logs)))
+
+    @staticmethod
+    def concat_logs(log1, log2):
+        return {
+            "error": " ".join([log1["error"], log2["error"]]),
+            "data": sorted(log1["data"] + log2["data"], key=lambda d: int(d.get("timestamp", 0)))
+        }
 
 
 class WorkerLogsAPI(SearchifyLogsHandler):
