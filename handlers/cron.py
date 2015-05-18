@@ -13,7 +13,7 @@ from handlers.utils import epoch_to_human
 from models.ext import ZendeskDailyStats
 from models.ext import RecentlyActiveDevicesStats
 from models.ext import RecentlyActiveDevicesStatsDaily
-from models.ext import RecentlyActiveDevicesStats10Minutes
+from models.ext import RecentlyActiveDevicesStats15Minutes
 from models.ext import SearchifyStats
 from models.ext import SearchifyPurgeStats
 from indextank import ApiClient
@@ -252,10 +252,10 @@ class AlarmsCountPush(GeckoboardPush):
         alarm_pattern = "ALARM RINGING"
         alarms_count = -1
 
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_MARCH)
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_MAY)
 
         try:
-            alarms_count = index.search(query=alarm_pattern, docvar_filters={0:[[time.time() - 24*3600, None]]})['matches']
+            alarms_count = index.search(query=alarm_pattern, docvar_filters={0: [[time.time() - 24*3600, None]]})['matches']
 
         except Exception as e:
             self.error(e.message)
@@ -330,20 +330,22 @@ class StoreRecentlyActiveDevicesStatsMinute(BaseRequestHandler):
         recently_active_devices_stats.put()
 
 
-class StoreRecentlyActiveDevicesStats10Minutes(BaseRequestHandler):
+class StoreRecentlyActiveDevicesStats15Minutes(BaseRequestHandler):
     def get(self):
         zstats = self.hello_request(
             type="GET",
             api_url="devices/status_breakdown",
             raw_output=True,
             app_info=settings.ADMIN_APP_INFO,
-            url_params={'start_ts': int(time.time()*1000) - 10*60*1000, 'end_ts': int(time.time()*1000)}
+            url_params={'start_ts': int(time.time()*1000) - 15*60*1000, 'end_ts': int(time.time()*1000)}
         ).data
 
-        recently_active_devices_stats = RecentlyActiveDevicesStats10Minutes(
+        recently_active_devices_stats = RecentlyActiveDevicesStats15Minutes(
             senses_zcount=zstats["senses_count"],
             pills_zcount=zstats["pills_count"]
         )
+
+        print recently_active_devices_stats
 
         recently_active_devices_stats.put()
 
@@ -390,10 +392,10 @@ class ActiveDevicesHistoryPurge(BaseRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class ActiveDevicesHistory10MinutesPurge(BaseRequestHandler):
+class ActiveDevicesHistory15MinutesPurge(BaseRequestHandler):
     def get(self):
         end_ts = datetime.datetime.now() - datetime.timedelta(days=settings.ACTIVE_DEVICES_MINUTE_HISTORY_KEEP_DAYS)
-        keys = RecentlyActiveDevicesStats10Minutes.query_keys_by_created(end_ts)
+        keys = RecentlyActiveDevicesStats15Minutes.query_keys_by_created(end_ts)
         output = {}
 
         try:
@@ -407,7 +409,7 @@ class ActiveDevicesHistory10MinutesPurge(BaseRequestHandler):
             output['success'] = False
             output['error'] = e.message
 
-        current_total = RecentlyActiveDevicesStats10Minutes.query().count()
+        current_total = RecentlyActiveDevicesStats15Minutes.query().count()
         output['total'] = current_total
 
         self.response.write(json.dumps(output))

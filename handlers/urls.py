@@ -81,7 +81,7 @@ from handlers.users import RecentUsersAPI
 from handlers.setup import AppendAppInfo
 from handlers.users import ForcePasswordUpdateAPI
 from handlers.cron import StoreRecentlyActiveDevicesStatsMinute
-from handlers.cron import StoreRecentlyActiveDevicesStats10Minutes
+from handlers.cron import StoreRecentlyActiveDevicesStats15Minutes
 from handlers.cron import StoreRecentlyActiveDevicesStatsDaily
 from handlers.devices import ActiveDevicesMinuteHistoryAPI
 from handlers.devices import ActiveDevicesDailyHistoryAPI
@@ -95,7 +95,7 @@ from handlers.cron import AlarmsCountPush
 from handlers.cron import WavesCountPush
 from handlers.cron import HoldsCountPush
 from handlers.cron import ActiveDevicesHistoryPurge
-from handlers.cron import ActiveDevicesHistory10MinutesPurge
+from handlers.cron import ActiveDevicesHistory15MinutesPurge
 from handlers.cron import ConserveSearchifyStats
 from handlers.cron import RemoveOldSearchifyPurgeStats
 from handlers.users import UserSearchAPI
@@ -114,7 +114,7 @@ from handlers.onboarding import OnboardingLogsByResultAPI
 from handlers.onboarding import OnboardingLogsBySenseIdAPI
 from handlers.views import OnboardingLogsView
 from handlers.room_conditions import LastRoomConditionsAPI
-from handlers.devices import ActiveDevices10MinutesHistoryAPI
+from handlers.devices import ActiveDevices15MinutesHistoryAPI
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -127,10 +127,10 @@ cron_routes = [
     ('/cron/waves_count_push', WavesCountPush),
     ('/cron/holds_count_push', HoldsCountPush),
     ('/cron/store_recently_active_devices_stats_minute', StoreRecentlyActiveDevicesStatsMinute),
-    ('/cron/store_recently_active_devices_stats_10_minutes', StoreRecentlyActiveDevicesStats10Minutes),
+    ('/cron/store_recently_active_devices_stats_15_minutes', StoreRecentlyActiveDevicesStats15Minutes),
     ('/cron/store_recently_active_devices_stats_daily', StoreRecentlyActiveDevicesStatsDaily),
     ('/cron/active_devices_history_purge', ActiveDevicesHistoryPurge),
-    ('/cron/active_devices_history_10_minutes_purge', ActiveDevicesHistory10MinutesPurge),
+    ('/cron/active_devices_history_15_minutes_purge', ActiveDevicesHistory15MinutesPurge),
     ('/cron/conserve_searchify_stats', ConserveSearchifyStats),
     ('/cron/remove_old_searchify_purge_stats', RemoveOldSearchifyPurgeStats),
 ]
@@ -178,7 +178,7 @@ api_routes = [
     ('/api/force_password_update/?$', ForcePasswordUpdateAPI),
     ('/api/update_geckoboard_credentials/?$', UpdateGeckoBoardCredentials),
     ('/api/active_devices_minute_history/?$', ActiveDevicesMinuteHistoryAPI),
-    ('/api/active_devices_10_minutes_history/?$', ActiveDevices10MinutesHistoryAPI),
+    ('/api/active_devices_15_minutes_history/?$', ActiveDevices15MinutesHistoryAPI),
     ('/api/active_devices_daily_history/?$', ActiveDevicesDailyHistoryAPI),
     ('/api/sense_events/?$', SenseEventsAPI),
     ('/api/firmware_unhash/?$', FirmwareUnhashAPI),

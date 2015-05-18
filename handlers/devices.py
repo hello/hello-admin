@@ -5,7 +5,7 @@ import settings
 from handlers.helpers import ProtectedRequestHandler
 from models.ext import RecentlyActiveDevicesStats
 from models.ext import RecentlyActiveDevicesStatsDaily
-from models.ext import RecentlyActiveDevicesStats10Minutes
+from models.ext import RecentlyActiveDevicesStats15Minutes
 
 
 class DeviceAPI(ProtectedRequestHandler):
@@ -136,12 +136,12 @@ class ActiveDevicesMinuteHistoryAPI(ProtectedRequestHandler):
 
         self.response.write(json.dumps(output))
 
-class ActiveDevices10MinutesHistoryAPI(ProtectedRequestHandler):
-    """Retrieve recently active devices (seen last 10 minutes) zcount from redis"""
+class ActiveDevices15MinutesHistoryAPI(ProtectedRequestHandler):
+    """Retrieve recently active devices (seen last 15 minutes) zcount from redis"""
     def get(self):
         output = {'data': [], 'error': ''}
         try:
-            for daily_stats in RecentlyActiveDevicesStats10Minutes.query_stats(limit=2880):
+            for daily_stats in RecentlyActiveDevicesStats15Minutes.query_stats(limit=2880):
                 output['data'].append({
                     'senses_zcount': daily_stats.senses_zcount,
                     'pills_zcount': daily_stats.pills_zcount,
