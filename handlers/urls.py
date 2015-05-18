@@ -197,7 +197,7 @@ api_routes = [
 ]
 
 page_routes = [
-    ('/', UserView),
+    ('/', AccountProfileView),
     ('/battery/?$', BatteryView),
     ('/charts', ChartHandler),
     ('/configuration/?$', ConfigurationView),

@@ -191,7 +191,7 @@ React.render(<AccountBreakdown/>, document.getElementById("account-breakdown"));
 function mapAccountInfo(data) {
     return data.map(function(d){
         d.lastModified = d3.time.format("%b %d %H:%M")(new Date(d.last_modified));
-        d.accountEmail = <a target="_blank" href={"/account_profile/?account_input="+ d.email}>{d.email}</a>;
+        d.accountEmail = <a target="_blank" href={"/account_profile/?type=email&input="+ d.email}>{d.email}</a>;
         return d;
     });
 }
