@@ -66,7 +66,7 @@ class RecentlyActiveDevicesStatsDaily(ndb.Model):
         return cls.query(cls.created_at < end_ts).order(-cls.created_at).fetch(keys_only=True)
 
 
-class RecentlyActiveDevicesStats10Minutes(ndb.Model):
+class RecentlyActiveDevicesStats15Minutes(ndb.Model):
     senses_zcount = ndb.IntegerProperty(required=True, indexed=False)
     pills_zcount = ndb.IntegerProperty(required=True, indexed=False)
     created_at = ndb.DateTimeProperty(auto_now_add=True)

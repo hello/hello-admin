@@ -17,15 +17,15 @@ cron:
 - description: purge active devices history
   url: /cron/active_devices_history_purge
   schedule: every 10 mins
-- description: purge active devices 10 mins history every 60 mins
-  url: /cron/active_devices_history_10_minutes_purge
+- description: purge active devices 15 mins history every 60 mins
+  url: /cron/active_devices_history_15_minutes_purge
   schedule: every 60 mins
 - description: store recently active devices stats every minute
   url: /cron/store_recently_active_devices_stats_minute
   schedule: every 1 mins
-- description: store recently active devices stats every 10 minutes
-  url: /cron/store_recently_active_devices_stats_10_minutes
-  schedule: every 10 mins
+- description: store recently active devices stats every 15 minutes
+  url: /cron/store_recently_active_devices_stats_15_minutes
+  schedule: every 15 mins
 - description: store recently active devices stats daily
   url: /cron/store_recently_active_devices_stats_daily
   schedule: every day 08:10

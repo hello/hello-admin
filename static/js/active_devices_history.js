@@ -85,10 +85,10 @@ var ActiveDevicesHistory = React.createClass({
         });
     },
 
-    load10MinutesData: function() {
+    load15MinutesData: function() {
         var that = this;
         $.ajax({
-            url: "/api/active_devices_10_minutes_history",
+            url: "/api/active_devices_15_minutes_history",
             type: "GET",
             dataType: "json",
             success: function(response) {
@@ -125,7 +125,7 @@ var ActiveDevicesHistory = React.createClass({
         $("#stack-check").attr("checked", false);
         $("#zoom-check").attr("checked", true);
         this.loadMinuteData();
-        this.load10MinutesData();
+        this.load15MinutesData();
         this.loadDailyData();
     },
 
@@ -188,7 +188,7 @@ var ActiveDevicesHistory = React.createClass({
                     <c3HistoryChart id="daily-chart" data={this.state.dailyData} stackable={this.state.stackable} zoomable={this.state.zoomable} chartType={this.state.chartType} xTickFormat="short"/>
                 </Col>
             </Row>
-            <h3>Number of Devices Seen Last 10 Minutes History</h3>
+            <h3>Number of Devices Seen Last 15 Minutes History</h3>
             <Row>
                 <Col xs={12} sm={12} md={12}>
                     <c3HistoryChart id="ten-minutes-chart" data={this.state.filteredTenMinutesData} stackable={this.state.stackable} zoomable={this.state.zoomable} chartType={this.state.chartType} xTickFormat="short"/>
