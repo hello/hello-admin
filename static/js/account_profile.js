@@ -382,8 +382,7 @@ var AccountProfile = React.createClass({
 
     clearHits: function() {
 //        this.setState({hits: []});
-        $(".btn-group").hide();
-
+        $("#account-hits").hide();
     },
 
     loadAccount: function(input, type, clearProfile) {
@@ -411,7 +410,7 @@ var AccountProfile = React.createClass({
                     });
                     if (response.data.length > 1) {
                         this.setState({
-                            hits: <div className="center-wrapper"><ButtonGroup>
+                            hits: <div id="account-hits" className="center-wrapper"><ButtonGroup>
                                 <Button disabled>Hits: </Button>{
                                     response.data.map(function (d) {
                                         return <Button onClick={this.loadAccount.bind(this, d.email, "email")}>
