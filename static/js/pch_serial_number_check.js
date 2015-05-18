@@ -112,7 +112,12 @@ var PCHSerialNumberCheckForPill = React.createClass({
                 console.log(response);
                 that.setState({alert: response.error ?
                     <Alert bsStyle="danger">{response.error}</Alert> :
-                    <Alert bsStyle="success">{response.data}</Alert>
+                    <Alert bsStyle="success">
+                        Missing pill serial numbers: <br/>
+                        {response.data.split("\n").map(function(psn){
+                            return <p>{psn}</p>
+                        })}
+                    </Alert>
                 });
             }
         });
