@@ -23,7 +23,6 @@ body {
 .tile-title {text-transform: uppercase;}
 .not-ok {color: #ff0000;}
 .tile-content {font-size: 90%;}
-#submit{max-width: 700px;}
 .stress {font-weight: bold;}
 .tile-icon {height: 18px; margin: 0 0 -3px 8px; opacity: 0.6;}
 .tile-title {text-align: center;}
@@ -38,15 +37,6 @@ body {
     border: 1px dotted #000000;
     border-radius: 100%;
     background-color: white;
-}
-
-#submit {
-    left: inherit;
-    top: 0;
-    right: 12px;
-}
-#account-input {
-    padding-left: 15px;
 }
 
 .tile-zendesk {
@@ -88,3 +78,29 @@ body {
 }
 
 th {text-align: left !important ;}
+
+#search-type-toggle {opacity: 0; height: 0;}
+#search-type-icon-active {height: 18px; margin: -2px 7px; opacity: 0.6;}
+.search-type-icon {height: 18px; margin: 0 11px -3px -6px; opacity: 0.6;}
+#submit {
+    left: inherit;
+    top: 0;
+    right: 12px;
+    max-width: 700px;
+}
+#account-input {
+    padding: 0;
+    text-align: center;
+}
+.dropdown-menu {
+    margin: -16px 0;
+}
+
+.dropdown-menu>li>a {
+    outline: none;
+}
+
+::-webkit-input-placeholder {
+   text-align: center;
+}
+.center-wrapper {text-align: center;}

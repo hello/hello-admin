@@ -17,32 +17,23 @@ var Tile = React.createClass({
     }
 });
 
-var UserBasicProfileTile = React.createClass({
+var AccountTile = React.createClass({
     render: function() {
-        var response = this.props.response;
-        var partnerResponse = this.props.partnerResponse;
-        var alert = response.error.isWhiteString() ? null : <Well>{response.error}</Well>;
-        var partner = partnerResponse.error.isWhiteString() && !$.isEmptyObject(partnerResponse) ?
-            <a title={partnerResponse.data.name} href={"/account_profile/?account_input=" + partnerResponse.data.email} target="_blank">{partnerResponse.data.email}</a>
-            : <span> - </span>;
-
-        var basicProfileTable = ($.isEmptyObject(response.data) || response.data.length === 0) ? null:
-            <Table>
-                <thead></thead>
-                <tbody>
-                    <tr><td>ID</td><td>{response.data.id}</td></tr>
-                    <tr><td>Name</td><td>{response.data.name}</td></tr>
-                    <tr><td>Email</td><td>{response.data.email}</td></tr>
-                    <tr><td>Partner</td><td>{partner}</td></tr>
-                    <tr><td>Last Modified</td><td>{new Date(response.data.last_modified).toUTCString()}</td></tr>
-                    <tr><td/><td/></tr>
-                </tbody>
-            </Table>;
-        return (<div>
-            {alert}
-            {basicProfileTable}
-        </div>)
-
+        var partnerLink = this.props.partner ? <a
+                title={this.props.partner.name} target="_blank"
+                href={"/account_profile/?type=email&input=" + this.props.partner.email}>
+            {this.props.partner.email}</a> : "-";
+        return <Table>
+            <thead></thead>
+            <tbody>
+                <tr><td>ID</td><td>{this.props.account.id}</td></tr>
+                <tr><td>Name</td><td>{this.props.account.name}</td></tr>
+                <tr><td>Email</td><td>{this.props.account.email}</td></tr>
+                <tr><td>Partner</td><td>{partnerLink}</td></tr>
+                <tr><td>Last Modified</td><td>{new Date(this.props.account.last_modified).toUTCString()}</td></tr>
+                <tr><td/><td/></tr>
+            </tbody>
+        </Table>
     }
 });
 
@@ -58,10 +49,10 @@ var TimelineTile = React.createClass({
                 response.data[0].message : <span className="not-ok">unavailable</span>;
             var lastNightInsights = response.data[0].insights && response.data[0].insights.length > 0 ?
                 response.data[0].insights.map(function(insight){
-                        return <tr><td>{insight.sensor.capitalize()}</td>
-                            <td>{debunkMarkdown(insight.message)}</td>
-                            </tr>;
-                    })
+                    return <tr><td>{insight.sensor.capitalize()}</td>
+                        <td>{debunkMarkdown(insight.message)}</td>
+                    </tr>;
+                })
                 : <span className="not-ok">unavailable</span>;
             timelinePreview = <Table>
                 <thead></thead>
@@ -77,7 +68,7 @@ var TimelineTile = React.createClass({
         return <div>
             {this.props.status}
             {timelinePreview}
-            <p><a target="_blank" href={"/timeline/?email=" + this.props.accountInput + "&date=" + lastNightDate}>See more</a></p>
+            <p><a target="_blank" href={"/timeline/?email=" + this.props.email + "&date=" + lastNightDate}>See more</a></p>
         </div>
     }
 });
@@ -91,18 +82,16 @@ var RoomConditionsTile = React.createClass({
         var soundData = this.props.lastRoomConditionsResponse.data.sound;
 
         var particulatesResponseData = this.props.particulatesResponse.data ? this.props.particulatesResponse.data.filter(purgeSentinels) : [];
-
-        var latestTemperature = temperatureData && !$.isEmptyObject(temperatureData) ?
+        var latestTemperature = temperatureData && !$.isEmptyObject(temperatureData) && temperatureData.value != undefined ?
             [<td>{temperatureData.value.toFixed(2)}</td>, <td>{"°" + temperatureData.unit.toUpperCase()}</td>]
             :[<td><img className="loading-inline" src="/static/image/loading.gif" /></td>, <td/>];
-        var latestHumidity = humidityData && !$.isEmptyObject(humidityData) ?
+        var latestHumidity = humidityData && !$.isEmptyObject(humidityData) && humidityData.value != undefined ?
             [<td>{humidityData.value.toFixed(2)}</td>, <td>{humidityData.unit}</td>]
             :[<td><img className="loading-inline" src="/static/image/loading.gif" /></td>, <td/>];
-
-        var latestLight = lightData && !$.isEmptyObject(lightData) ?
+        var latestLight = lightData && !$.isEmptyObject(lightData) && lightData.value != undefined ?
             [<td>{lightData.value.toFixed(2)}</td>, <td>{lightData.unit}</td>]
             :[<td><img className="loading-inline" src="/static/image/loading.gif" /></td>, <td/>];
-        var latestSound = soundData && !$.isEmptyObject(soundData) ?
+        var latestSound = soundData && !$.isEmptyObject(soundData) && soundData.value != undefined?
             [<td>{soundData.value.toFixed(2)}</td>, <td>{soundData.unit}</td>]
             :<td><img className="loading-inline" src="/static/image/loading.gif" /></td>;
 
@@ -125,55 +114,23 @@ var RoomConditionsTile = React.createClass({
                     <tr><td/><td/><td/></tr>
                 </tbody>
             </Table>
-            <p><a target="_blank" href={"/room_conditions/?email=" + this.props.accountInput + "&until=" + nowDateTime}>Last "Day" (not necessarily 24 hours)</a></p>
+            <p><a target="_blank" href={"/room_conditions/?email=" + this.props.email + "&until=" + nowDateTime}>Last "Day" (not necessarily 24 hours)</a></p>
         </div>
     }
 });
 
-var SenseLogsTile = React.createClass({
-    render: function() {
-        return <div>
-            <p><a target="_blank" href={"/sense_logs/?text=&devices=" + this.props.accountInput + "&max_docs=100&start=&end="}>Last 100 documents</a></p>
-        </div>
-    }
-});
 
-var PillStatusTile = React.createClass({
+var WifiTile = React.createClass({
     render: function() {
-        return <div>
-            <p><a target="_blank" href={"/battery/?search=" + this.props.accountInput + "&end_ts="}>Last 336 heartbeats</a></p>
-        </div>
-    }
-});
-
-var SenseEventsTile = React.createClass({
-    render: function() {
-        return <div>
-            <p><a target="_blank" href={"/sense_events/?account_input=" + this.props.accountInput + "&start_ts=" + new Date().getTime()}>Last 25 events</a></p>
-        </div>
-    }
-});
-
-var MotionTile = React.createClass({
-    render: function() {
-        var lastNightDate =  d3.time.format("%m-%d-%Y")(new Date(new Date().getTime() - 24*3600*1000));
-        return <div>
-            <p><a target="_blank" href={"/motion/?email=" + this.props.accountInput + "&date=" + lastNightDate}>Last Night</a></p>
-        </div>
-    }
-});
-
-var WifiInfoTile = React.createClass({
-    render: function() {
-        var response = this.props.wifiInfoResponse;
+        var response = this.props.wifiResponse;
         var networksTable = response.data.networks && response.data.networks.length > 0 ? <Table>
-                <thead>
-                    <tr><th>Name</th><th>Security</th><th>Strength</th></tr>
-                </thead>
-                <tbody>
+            <thead>
+                <tr><th>Name</th><th>Security</th><th>Strength</th></tr>
+            </thead>
+            <tbody>
                     {response.data.networks.map(function(w){return <tr><td>{w.network_name}</td><td>{w.network_security}</td><td>{w.signal_strength}</td></tr>;})}
-                </tbody>
-            </Table> : null;
+            </tbody>
+        </Table> : null;
 
         return <div>
             {networksTable}
@@ -240,7 +197,7 @@ var SenseSummary = React.createClass({
         return version;
     },
     render: function() {
-        var senseInfoResponse = this.props.senseInfoResponse,
+        var senseResponse = this.props.senseResponse,
             senseKeyStoreResponse = this.props.senseKeyStoreResponse,
             timezoneResponse = this.props.timezoneResponse,
             result = null, lastSeen = null, keyStore = null;
@@ -257,17 +214,17 @@ var SenseSummary = React.createClass({
             }
         }
 
-        if (senseInfoResponse.data.length > 0) {
-            var senseId = senseInfoResponse.data[0].device_account_pair ? senseInfoResponse.data[0].device_account_pair.externalDeviceId : undefined;
-            var firmwareVersion = senseInfoResponse.data[0].device_status ? senseInfoResponse.data[0].device_status.firmwareVersion : undefined;
+        if (senseResponse.data.length > 0) {
+            var senseId = senseResponse.data[0].device_account_pair ? senseResponse.data[0].device_account_pair.externalDeviceId : undefined;
+            var firmwareVersion = senseResponse.data[0].device_status ? senseResponse.data[0].device_status.firmwareVersion : undefined;
 
-            if (senseInfoResponse.data[0].device_status){
-                var lastSeenEpoch = senseInfoResponse.data[0].device_status.lastSeen;
+            if (senseResponse.data[0].device_status){
+                var lastSeenEpoch = senseResponse.data[0].device_status.lastSeen;
                 lastSeen = <span className={lastSeenEpoch < new Date().getTime() - 3600*1000 ? "not-ok" : "ok"}>
                     {new Date(lastSeenEpoch).toUTCString()}</span>;
             }
-            var lastPairingTs = senseInfoResponse.data[0].pairing_ts ?
-                new Date(senseInfoResponse.data[0].pairing_ts).toUTCString() : null;
+            var lastPairingTs = senseResponse.data[0].pairing_ts ?
+                new Date(senseResponse.data[0].pairing_ts).toUTCString() : null;
 
             result = <div>
                 <Table>
@@ -286,14 +243,14 @@ var SenseSummary = React.createClass({
             </div>;
         }
 
-        return !senseInfoResponse.error.isWhiteString ?
-            <Well>{senseInfoResponse.error}</Well>: result;
+        return !senseResponse.error.isWhiteString ?
+            <Well>{senseResponse.error}</Well>: result;
     }
 });
 
 var PillSummary = React.createClass({
     render: function() {
-        var pillInfoResponse = this.props.pillInfoResponse,
+        var pillResponse = this.props.pillResponse,
             pillStatusResponse = this.props.pillStatusResponse,
             pillKeyStoreResponse = this.props.pillKeyStoreResponse,
             result = null, batteryLevel = null, lastSeen = null, keyStore = null, uptime = null;
@@ -324,8 +281,8 @@ var PillSummary = React.createClass({
             }
         }
 
-        if (pillInfoResponse.data.length > 0) {
-            var pillId = pillInfoResponse.data[0].device_account_pair ? pillInfoResponse.data[0].device_account_pair.externalDeviceId : undefined;
+        if (pillResponse.data.length > 0) {
+            var pillId = pillResponse.data[0].device_account_pair ? pillResponse.data[0].device_account_pair.externalDeviceId : undefined;
             var lastNightDate =  d3.time.format("%m-%d-%Y")(new Date(new Date().getTime() - 24*3600*1000));
             result = <div><Table>
                 <thead/>
@@ -335,30 +292,28 @@ var PillSummary = React.createClass({
                     <tr><td>Battery</td><td>{batteryLevel}</td></tr>
                     <tr><td>Uptime</td><td>{uptime}</td></tr>
                     <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
-                    <tr><td>Last Pairing</td><td>{new Date(pillInfoResponse.data[0].pairing_ts).toUTCString()}</td></tr>
+                    <tr><td>Last Pairing</td><td>{new Date(pillResponse.data[0].pairing_ts).toUTCString()}</td></tr>
                     <tr><td/><td/></tr>
                 </tbody>
             </Table>
-            <p><a target="_blank" href={"/battery/?search=" + pillId + "&end_ts="}>Last 336 pill heartbeats</a></p>
-            <p><a target="_blank" href={"/motion/?email=" + this.props.accountInput + "&date=" + lastNightDate}>Last night motion</a></p></div>;
+                <p><a target="_blank" href={"/battery/?search=" + pillId + "&end_ts="}>Last 336 pill heartbeats</a></p>
+                <p><a target="_blank" href={"/motion/?email=" + this.props.email + "&date=" + lastNightDate}>Last night motion</a></p></div>;
         }
 
-        return !pillInfoResponse.error.isWhiteString ?
-            <Well>{pillInfoResponse.error}</Well>: result;
+        return !pillResponse.error.isWhiteString ?
+            <Well>{pillResponse.error}</Well>: result;
     }
 });
 
 var AccountProfile = React.createClass({
     getInitialState: function() {
         return {
-            basicProfileResponse: {data: {}, error: ""},
-            senseInfoResponse: {data: [], error: ""},
-            pillInfoResponse: {data: [], error: ""},
+            senseResponse: {data: [], error: ""},
+            pillResponse: {data: [], error: ""},
             pillStatusResponse: {data: [], error: ""},
             senseKeyStoreResponse: {data: {}, error: ""},
             pillKeyStoreResponse: {data: {}, error: ""},
             timelineResponse: {data: [], error: ""},
-            partnerResponse: {data: {}, error: ""},
             timezoneResponse: {data: {}, error: ""},
             zendeskResponse: {data: {}, error: ""},
             temperatureResponse: {data: [], error: ""},
@@ -366,51 +321,128 @@ var AccountProfile = React.createClass({
             particulatesResponse: {data: [], error: ""},
             lightResponse: {data: [], error: ""},
             soundResponse: {data: [], error: ""},
-            wifiInfoResponse: {data: {}, error: ""},
+            wifiResponse: {data: {}, error: ""},
             lastRoomConditionsResponse: {data: {}, error: ""},
             accountInput: "",
-            submitted: false,
             timelineStatus: null,
-            zendeskStatus: null
+            zendeskStatus: null,
+            searchType: "email",
+            hits: [],
+            email: "",
+            senseId: "",
+            pillId: "",
+            accountError: undefined,
+            partner: undefined,
+            account: undefined
         }
+    },
+
+    clearProfile: function() {
+        this.setState({
+            senseResponse: {data: [], error: ""},
+            pillResponse: {data: [], error: ""},
+            pillStatusResponse: {data: [], error: ""},
+            senseKeyStoreResponse: {data: {}, error: ""},
+            pillKeyStoreResponse: {data: {}, error: ""},
+            timelineResponse: {data: [], error: ""},
+            timezoneResponse: {data: {}, error: ""},
+            zendeskResponse: {data: {}, error: ""},
+            temperatureResponse: {data: [], error: ""},
+            humidityResponse: {data: [], error: ""},
+            particulatesResponse: {data: [], error: ""},
+            lightResponse: {data: [], error: ""},
+            soundResponse: {data: [], error: ""},
+            wifiResponse: {data: {}, error: ""},
+            lastRoomConditionsResponse: {data: {}, error: ""},
+            senseId: "",
+            pillId: ""
+        })
     },
 
     componentDidMount: function() {
-        var accountInputFromURL = getParameterByName("account_input"), that = this;
-        if (accountInputFromURL){
-            this.refs.accountInput.getDOMNode().value = accountInputFromURL;
-            that.handleSubmit();
+        var inputFromURL = getParameterByName("input"),
+            typeFromURL = getParameterByName("type");
+        if (inputFromURL){
+            this.refs.accountInput.getDOMNode().value = inputFromURL;
+            this.setState({searchType: typeFromURL});
+            this.handleSubmit();
         }
     },
 
-    loadBasicProfile: function() {
-        var that = this;
+    getPlaceholder: function(searchType) {
+        switch (searchType) {
+            case "email": return "Enter Account Email"; break;
+            case "name": return "Enter Name Partials"; break;
+            case "account_id": return "Enter Account ID"; break;
+            case "sense_id": return "Enter Sense ID"; break;
+            case "pill_id": return "Enter Pill ID"; break;
+            default: return "Enter Account Email";
+        }
+    },
+
+    clearHits: function() {
+//        this.setState({hits: []});
+        $(".btn-group").hide();
+
+    },
+
+    loadAccount: function(input, type, clearProfile) {
+        if (clearProfile) {
+            this.clearProfile();
+        }
         $.ajax({
             url: "/api/user_search",
             dataType: 'json',
             type: "GET",
-            data: {search_input: that.refs.accountInput.getDOMNode().value.trim(), search_method: "email"},
+            data: {input: input, type: type},
             success: function (response) {
-                that.setState({basicProfileResponse: response});
-            }
+                if (!response.error.isWhiteString()) {
+                    this.setState({accountError: <Alert>{response.error}</Alert>});
+                }
+                else if (response.data.length === 0) {
+                    this.setState({accountError: <Alert>Account Not Found !</Alert>});
+                }
+                else {
+                    this.loadProfile(response.data[0].email);
+                    this.setState({
+                        email: response.data[0].email,
+                        accountError: null,
+                        account: response.data[0]
+                    });
+                    if (response.data.length > 1) {
+                        this.setState({
+                            hits: <div className="center-wrapper"><ButtonGroup>
+                                <Button disabled>Hits: </Button>{
+                                    response.data.map(function (d) {
+                                        return <Button onClick={this.loadAccount.bind(this, d.email, "email")}>
+                                                {d.email}
+                                        </Button>;
+                                    }.bind(this))
+                                }<Button onClick={this.clearHits}><Glyphicon glyph="trash"/></Button>
+                            </ButtonGroup></div>
+                        });
+                    }
+                }
+            }.bind(this)
         });
     },
 
-    loadSenseInfo: function() {
+    loadSense: function(email) {
         $.ajax({
             url: '/api/device_by_email',
             dataType: 'json',
             type: 'GET',
-            data: {email: this.refs.accountInput.getDOMNode().value.trim(), device_type: "sense"},
+            data: {email: email, device_type: "sense"},
             success: function (response) {
-                this.setState({senseInfoResponse: response});
+                this.setState({senseResponse: response});
                 if (response.data.length > 0) {
                     if (response.data[0].device_account_pair) {
                         if (response.data[0].device_account_pair.externalDeviceId) {
                             var senseId = response.data[0].device_account_pair.externalDeviceId;
                             this.loadSenseKeyStore(senseId);
-                            this.loadWifiInfo(senseId);
-                            this.loadLastRoomConditions(senseId);
+                            this.loadWifi(senseId);
+                            this.loadLastRoomConditionsWithoutParticulates(senseId);
+                            this.loadParticulates(email);
                         }
                     }
                 }
@@ -418,25 +450,22 @@ var AccountProfile = React.createClass({
         });
     },
 
-    loadPillInfo: function() {
-        var that = this;
+    loadPill: function(email) {
         $.ajax({
             url: '/api/device_by_email',
             dataType: 'json',
             type: 'GET',
-            data: {email: that.refs.accountInput.getDOMNode().value.trim(), device_type: "pill"},
+            data: {email: email, device_type: "pill"},
             success: function (response) {
-                that.setState({pillInfoResponse: response});
+                this.setState({pillResponse: response});
                 if (response.data.length > 0) {
-                    if (response.data[0].device_account_pair) {
-                        if (response.data[0].device_account_pair.externalDeviceId) {
-                            var pillId = response.data[0].device_account_pair.externalDeviceId;
-                            that.loadPillStatus(pillId);
-                            that.loadPillKeyStore(pillId);
-                        }
+                    if (response.data[0].device_account_pair && response.data[0].device_account_pair.externalDeviceId) {
+                        var pillId = response.data[0].device_account_pair.externalDeviceId;
+                        this.loadPillStatus(pillId);
+                        this.loadPillKeyStore(pillId);
                     }
                 }
-            }
+            }.bind(this)
         });
     },
 
@@ -455,7 +484,6 @@ var AccountProfile = React.createClass({
     },
 
     loadSenseKeyStore: function(senseId) {
-        var that = this;
         $.ajax({
             aysnc: false,
             url: "/api/devices/key_store",
@@ -463,8 +491,8 @@ var AccountProfile = React.createClass({
             type: 'GET',
             data: {device_id: senseId, device_type: "sense"},
             success: function (response) {
-                that.setState({senseKeyStoreResponse: response});
-            }
+                this.setState({senseKeyStoreResponse: response});
+            }.bind(this)
         });
     },
 
@@ -482,90 +510,83 @@ var AccountProfile = React.createClass({
         });
     },
 
-    loadTimeline: function() {
-        var that = this;
-        that.setState({timelineStatus: <div className="loader"><img src="/static/image/loading.gif" /></div>});
+    loadTimeline: function(email) {
+        this.setState({timelineStatus: <div className="loader"><img src="/static/image/loading.gif" /></div>});
         $.ajax({
             url: "/api/timeline",
             dataType: "json",
             type: 'GET',
-            data: {email: that.refs.accountInput.getDOMNode().value.trim(), date: d3.time.format("%Y-%m-%d")(new Date(new Date().getTime() - 24*3600*1000))},
+            data: {email: email, date: d3.time.format("%Y-%m-%d")(new Date(new Date().getTime() - 24*3600*1000))},
             success: function (response) {
                 if (response.error.isWhiteString()) {
-                    that.setState({timelineResponse: response, timelineStatus: null});
+                    this.setState({timelineResponse: response, timelineStatus: null});
                 }
                 else {
-                    that.setState({timelineResponse: response, timelineStatus: <Well>{response.error}</Well>});
+                    this.setState({timelineResponse: response, timelineStatus: <Well>{response.error}</Well>});
                 }
-                that.loadRoomConditions();
-            }
+            }.bind(this)
         });
     },
 
-    loadPartner: function() {
-        var that = this;
+    loadPartner: function(email) {
         $.ajax({
             url: "/api/user_search",
             dataType: "json",
             type: 'GET',
-            data: {search_input: that.refs.accountInput.getDOMNode().value.trim(), search_method: "partner"},
+            data: {input: email, type: "partner"},
             success: function (response) {
-                that.setState({partnerResponse: response});
-            }
+                if (response.error.isWhiteString()) {
+                    this.setState({partner: response.data});
+                }
+            }.bind(this)
         });
     },
 
-    loadTimezone: function() {
-        var that = this;
+    loadTimezone: function(email) {
         $.ajax({
             url: "/api/timezone",
             dataType: "json",
             type: 'GET',
-            data: {email: that.refs.accountInput.getDOMNode().value.trim(), event_ts: new Date().getTime()},
+            data: {email: email, event_ts: new Date().getTime()},
             success: function (response) {
-                that.setState({timezoneResponse: response})
-            }
+                this.setState({timezoneResponse: response})
+            }.bind(this)
         });
     },
 
-    loadZendeskTickets: function() {
-        var that = this;
-        that.setState({zendeskStatus: <div className="loader"><img src="/static/image/loading.gif" /></div>});
+    loadZendeskTickets: function(email) {
+        this.setState({zendeskStatus: <div className="loader"><img src="/static/image/loading.gif" /></div>});
         $.ajax({
             url: "/api/zendesk",
             dataType: "json",
             type: 'GET',
-            data: {email: that.refs.accountInput.getDOMNode().value.trim()},
+            data: {email: email},
             success: function (response) {
-                  if (response.error.isWhiteString()) {
-                    that.setState({zendeskResponse: response, zendeskStatus: null});
+                if (response.error.isWhiteString()) {
+                    this.setState({zendeskResponse: response, zendeskStatus: null});
                 }
                 else {
-                    that.setState({zendeskResponse: response, zendeskStatus: <Well>{response.error}</Well>});
+                    this.setState({zendeskResponse: response, zendeskStatus: <Well>{response.error}</Well>});
                 }
-            }
+            }.bind(this)
         });
     },
 
-    loadRoomConditions: function() {
-        var that = this;
-//        ['temperature', 'humidity', 'particulates', 'light', 'sound'].forEach(function(sensor){
+    loadParticulates: function(email) {
         ['particulates'].forEach(function(sensor){
             $.ajax({
                 url: "/api/room_conditions",
                 dataType: "json",
                 type: 'GET',
-                data: {email: that.refs.accountInput.getDOMNode().value.trim(), ts: new Date().getTime(), resolution: "day", sensor: sensor},
+                data: {email: email, ts: new Date().getTime(), resolution: "day", sensor: sensor},
                 success: function (response) {
-                    var r = {};
-                    r[sensor + "Response"] = response;
-                    that.setState(r);
-                }
+                    this.setState({particulatesResponse: response});
+                }.bind(this)
             });
-        });
+        }.bind(this));
     },
 
-    loadWifiInfo: function(senseId) {
+    loadWifi: function(senseId) {
         $.ajax({
             url: "/api/wifi_signal_strength",
             dataType: "json",
@@ -573,12 +594,12 @@ var AccountProfile = React.createClass({
             aysnc: false,
             data: {device_id: senseId},
             success: function (response) {
-                this.setState({wifiInfoResponse: response});
+                this.setState({wifiResponse: response});
             }.bind(this)
         });
     },
 
-    loadLastRoomConditions: function(senseId) {
+    loadLastRoomConditionsWithoutParticulates: function(senseId) {
         $.ajax({
             url: "/api/last_room_conditions",
             dataType: "json",
@@ -591,56 +612,92 @@ var AccountProfile = React.createClass({
         });
     },
 
+    loadProfile: function(email) {
+        this.loadPartner(email);
+        this.loadSense(email);
+        this.loadPill(email);
+        this.loadTimezone(email);
+        this.loadTimeline(email);
+        this.loadZendeskTickets(email);
+    },
+
+    loadData: function() {
+        this.loadAccount(this.refs.accountInput.getDOMNode().value.trim(), this.state.searchType, true);
+    },
+
     handleSubmit: function() {
-        history.pushState({}, '', '/account_profile/?account_input=' + this.refs.accountInput.getDOMNode().value.trim());
-        this.setState(this.getInitialState());
-        this.setState({accountInput: this.refs.accountInput.getDOMNode().value.trim()});
-
-        this.loadSenseInfo();
-        this.loadPillInfo();
-        this.loadBasicProfile();
-        this.loadTimezone();
-        this.loadPartner();
-        this.loadTimeline();
-        this.loadZendeskTickets();
-
-        this.setState({submitted: true});
+        history.pushState({}, '', '/account_profile/?input=' + this.refs.accountInput.getDOMNode().value.trim() + '&type=' + this.state.searchType);
+        var initialState = this.getInitialState();
+        delete initialState.searchType;
+        initialState.accountInput = this.refs.accountInput.getDOMNode().value.trim();
+        this.setState(initialState);
+        this.loadData();
         return false;
     },
 
+    showSearchType: function() {
+        $("#search-type-toggle").trigger("click");
+    },
+
+    switchSearchType: function(searchType) {
+        $("#page-name").trigger("click");
+        this.setState({searchType: searchType});
+    },
+
+    searchTypeIconMap: function(searchType) {
+        switch (searchType) {
+            case "email": return "/static/image/account-email.png"; break;
+            case "name": return "/static/image/account-name.png"; break;
+            case "account_id": return "/static/image/account-id.png"; break;
+            case "sense_id": return "/static/image/sense-bw.png"; break;
+            case "pill_id": return "/static/image/pill-bw.png"; break;
+            default: return "/static/image/account-email.png";
+        }
+    },
+
     render: function() {
-        var results = this.state.submitted === false ? null : <div>
+        var searchForm = <Row><Col id="submit" xs={6} xsOffset={3}><form onSubmit={this.handleSubmit}>
+            <div className="icon-addon addon-md">
+                <input className="form-control" type="text" id="account-input" ref="accountInput" placeholder={this.getPlaceholder(this.state.searchType)}/>
+                <Glyphicon className="cursor-hand" id="submit" glyph="search" onClick={this.handleSubmit}/>
+                <span className="glyphicon cursor-hand" onClick={this.showSearchType}><img id="search-type-icon-active" src={this.searchTypeIconMap(this.state.searchType)} /></span>
+                <DropdownButton title='Dropdown' id="search-type-toggle">
+                    <MenuItem onClick={this.switchSearchType.bind(this, "email")}><img className="search-type-icon" src={this.searchTypeIconMap("email")} />Email</MenuItem>
+                    <MenuItem onClick={this.switchSearchType.bind(this, "name")}><img className="search-type-icon" src={this.searchTypeIconMap("name")} />Name</MenuItem>
+                    <MenuItem onClick={this.switchSearchType.bind(this, "account_id")}><img className="search-type-icon" src={this.searchTypeIconMap("account_id")} />Internal ID</MenuItem>
+                    <MenuItem onClick={this.switchSearchType.bind(this, "sense_id")}><img className="search-type-icon" src={this.searchTypeIconMap("sense_id")} />External ID</MenuItem>
+                    <MenuItem onClick={this.switchSearchType.bind(this, "pill_id")}><img className="search-type-icon" src={this.searchTypeIconMap("pill_id")} />External ID</MenuItem>
+                </DropdownButton>
+            </div>
+        </form></Col></Row>;
+
+        var results = <div>
+            {this.state.hits}<br/>
             <Row>
                 <Col xs={8}>
                     <Row>
                         <Col xs={6}>
-                            <Tile img="svg/sleep.svg" title="Basic Info" img="svg/sleep.svg" content={<UserBasicProfileTile response={this.state.basicProfileResponse} accountInput={this.state.accountInput} partnerResponse={this.state.partnerResponse} />} />
-                            <Tile img="svg/timeline.svg" title="Timeline" content={<TimelineTile accountInput={this.state.accountInput} response={this.state.timelineResponse} status={this.state.timelineStatus} />} />
+                            <Tile img="svg/sleep.svg" title="Basic Info" img="svg/sleep.svg" content={<AccountTile account={this.state.account} partner={this.state.partner} />} />
+                            <Tile img="svg/timeline.svg" title="Timeline" content={<TimelineTile email={this.state.email} response={this.state.timelineResponse} status={this.state.timelineStatus} />} />
                         </Col>
                         <Col xs={6}>
-                            <Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseInfoResponse={this.state.senseInfoResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} timezoneResponse={this.state.timezoneResponse} accountInput={this.state.accountInput} />} />
-                            <Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile accountInput={this.state.accountInput} lastRoomConditionsResponse={this.state.lastRoomConditionsResponse} particulatesResponse={this.state.particulatesResponse} />} />
+                            <Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseResponse={this.state.senseResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} timezoneResponse={this.state.timezoneResponse} />} />
+                            <Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile email={this.state.email} lastRoomConditionsResponse={this.state.lastRoomConditionsResponse} particulatesResponse={this.state.particulatesResponse} />} />
                         </Col>
                     </Row>
                     <Row>
-                        <Col md={12}><Tile img="svg/zendesk.svg" title="Zendesk" content={<ZendeskTile accountInput={this.state.accountInput} zendeskResponse={this.state.zendeskResponse} zendeskStatus={this.props.zendeskStatus} />} /></Col>
+                        <Col md={12}><Tile img="svg/zendesk.svg" title="Zendesk" content={<ZendeskTile zendeskResponse={this.state.zendeskResponse} zendeskStatus={this.props.zendeskStatus} />} /></Col>
                     </Row>
                 </Col>
                 <Col xs={4}>
-                    <Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary pillInfoResponse={this.state.pillInfoResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} accountInput={this.state.accountInput} />} />
-                    <Tile img="svg/wifi.svg" title="Wifi Info" content={<WifiInfoTile wifiInfoResponse={this.state.wifiInfoResponse} />} />
+                    <Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary pillResponse={this.state.pillResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} email={this.state.email} />} />
+                    <Tile img="svg/wifi.svg" title="Wifi Info" content={<WifiTile wifiResponse={this.state.wifiResponse} />} />
                 </Col>
             </Row>
         </div>;
         return <div>
-            <Row><Col id="submit" xs={6} xsOffset={3}><form onSubmit={this.handleSubmit}>
-                <div className="icon-addon addon-md">
-                    <input className="form-control" type="text" id="account-input" ref="accountInput" placeholder="email please"/>
-                    <Glyphicon className="cursor-hand" id="submit" glyph="search" onClick={this.handleSubmit}/>
-                </div>
-            </form></Col></Row>
-            <br/><br/>
-            {results}
+            {searchForm}
+            {this.state.accountError === null ? results : this.state.accountError}
         </div>;
     }
 });

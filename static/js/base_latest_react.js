@@ -150,14 +150,14 @@ var SideBar = React.createClass({
    render: function() {
        return (<ListGroup>
            <ListGroupItem bsStyle="info" className="sidebar-group">Home</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/users">&#x029D0; Recent Users</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/recent_accounts">&#x029D0; Recent Accounts</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/account_profile">&#x029D0; Account Profile</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/recent_accounts">&#x029D0; Recent Accounts</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/users_inspection">&#x029D0; Users Inspection</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/password_reset">&#x029D0; Password Reset</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/troubleshoot">&#x029D0; Inactive Devices</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/active_devices_history">&#x029D0; Devices Count</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/pch_serial_number_check">&#x029D0; Serial Check</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/users">&#x029D0; Users(Deperecated)</ListGroupItem>
 
            <ListGroupItem bsStyle="info" className="sidebar-group">Data</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/timeline">&#x029D0; Timeline</ListGroupItem>
@@ -206,10 +206,10 @@ var Header = React.createClass({
         var envProd, envDev, localSwitcher=null, prodSwitcher=null, devSwitcher=null;
         var documentURL = document.URL || window.location.href;
         if (documentURL.startsWith("http://localhost")) {
-            envLocal = cx({
+            var envLocal = cx({
                 activeEnv: true,
                 env: true
-            })
+            });
             localSwitcher =  <div className="col-xs-1 col-sm-1 col-md-1 col-lg-1">
                 <a className={envLocal} href={documentURL}> Local-Env </a>
             </div>;

@@ -208,42 +208,51 @@ class RecentUsersAPI(ProtectedRequestHandler):
 
 class UserSearchAPI(ProtectedRequestHandler):
     @property
-    def search_input(self):
-        return self.request.get('search_input')
+    def input(self):
+        return self.request.get('input')
 
     @property
-    def search_method(self):
-        search_methods_switch = {
-            "user_id": self.get_by_user_id,
+    def search(self):
+        types_switch = {
+            "account_id": self.get_by_account_id,
             "email": self.get_by_email,
             "email_partial": self.get_by_email_partial,
-            "name_partial": self.get_by_name_partial,
-            "device_id": self.get_by_device_id,
+            "name": self.get_by_name_partial,
+            "sense_id": self.get_by_device_id,
+            "pill_id": self.get_by_device_id,
             "partner": self.get_by_partner
         }
-        return search_methods_switch[self.request.get('search_method', default_value='email')]
+        return types_switch[self.request.get('type', default_value='email')]
 
-    def get_by_user_id(self):
-        self.hello_request(
+    def get_by_account_id(self):
+        raw_response = self.hello_request(
             api_url="account",
             type="GET",
-            url_params={'id': int(self.search_input) if self.search_input.isdigit() else 1},
+            url_params={'id': self.input},
             app_info=settings.ADMIN_APP_INFO,
+            raw_output=True
         )
+        if raw_response.data:
+            raw_response.set_data([raw_response.data])
+        self.response.write(raw_response.get_serialized_output())
 
     def get_by_email(self):
-        self.hello_request(
+        raw_response = self.hello_request(
             api_url="account",
             type="GET",
-            url_params={'email': self.search_input},
+            url_params={'email': self.input},
             app_info=settings.ADMIN_APP_INFO,
+            raw_output=True
         )
+        if raw_response.data:
+            raw_response.set_data([raw_response.data])
+        self.response.write(raw_response.get_serialized_output())
 
     def get_by_email_partial(self):
         self.hello_request(
             api_url="account/partial",
             type="GET",
-            url_params={'email': self.search_input},
+            url_params={'email': self.input},
             app_info=settings.ADMIN_APP_INFO,
         )
 
@@ -251,26 +260,26 @@ class UserSearchAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="account/partial",
             type="GET",
-            url_params={'name': self.search_input},
+            url_params={'name': self.input},
             app_info=settings.ADMIN_APP_INFO,
         )
 
     def get_by_device_id(self):
         self.hello_request(
-            api_url="devices/{}/accounts".format(self.search_input),
+            api_url="devices/{}/accounts".format(self.input),
             type="GET",
             app_info=settings.ADMIN_APP_INFO,
         )
 
     def get_by_partner(self):
         self.hello_request(
-            api_url="account/{}/partner".format(self.search_input),
+            api_url="account/{}/partner".format(self.input),
             type="GET",
             app_info=settings.ADMIN_APP_INFO,
         )
 
     def get(self):
-        self.search_method()
+        self.search()
 
 
 class PasswordResetAPI(ProtectedRequestHandler):
