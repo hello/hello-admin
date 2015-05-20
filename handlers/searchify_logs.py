@@ -186,7 +186,7 @@ class DustStatsAPI(ProtectedRequestHandler):
     def get(self):
         urlfetch.set_default_fetch_deadline(20)
         output = {"data": [], "error": ""}
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_MARCH)
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_MAY)
         query = SearchifyQuery()
 
         try:
@@ -224,9 +224,9 @@ class DustStatsAPI(ProtectedRequestHandler):
 
 
 class WifiSignalStrengthAPI(ProtectedRequestHandler):
-    def get(self):
+    def get_wifi_from_index(self, index_name):
         output = {"data": [], "error": ""}
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_MARCH)
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(index_name)
         query = SearchifyQuery()
 
         try:
@@ -261,6 +261,15 @@ class WifiSignalStrengthAPI(ProtectedRequestHandler):
             output['error'] = display_error(e)
             log.error('ERROR: {}'.format(display_error(e)))
 
+        return output
+
+    def get(self):
+        output = self.get_wifi_from_index(settings.SENSE_LOGS_INDEX_MAY)
+        print 'wifi may', output
+        if not output['data']:
+            urlfetch.set_default_fetch_deadline(30)
+            output = self.get_wifi_from_index(settings.SENSE_LOGS_INDEX_MARCH)
+            print 'wifi march', output
         self.response.write(json.dumps(output))
 
 
@@ -311,6 +320,3 @@ class SearchifyQuery():
             'scoring_function': self.scoring_function,
             'length': self.length
         }
-
-
-
