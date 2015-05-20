@@ -64,29 +64,29 @@ var LogTable = React.createClass({
 
             var displayTimestamp;
             switch (that.state.timezone) {
-                case "browser": displayTimestamp = new Date(log.timestamp * 1000).toString();
+                case "browser": displayTimestamp = new Date(log.variable_0 * 1000).toString();
                     break;
                 case "user":
                     if (Object.keys(deviceTimezoneMap).indexOf(deviceId) > -1) {
                         displayTimestamp = displayDateTimeByTimeZoneOffset(
-                            log.timestamp * 1000,
+                            log.variable_0 * 1000,
                             deviceTimezoneMap[deviceId].timezone_offset,
                             deviceTimezoneMap[deviceId].timezone_id
                         )
                     }
                     else {
-                        var deviceTimezoneFromServer = that.getDeviceTimezone(deviceId, log.timestamp);
+                        var deviceTimezoneFromServer = that.getDeviceTimezone(deviceId, log.variable_0);
                         displayTimestamp = displayDateTimeByTimeZoneOffset(
-                            log.timestamp * 1000,
+                            log.variable_0 * 1000,
                             deviceTimezoneFromServer.timezone_offset,
                             deviceTimezoneFromServer.timezone_id
                         );
                         deviceTimezoneMap[deviceId] = deviceTimezoneFromServer;
                     }
                     break;
-                case "gmt": displayTimestamp = new Date(log.timestamp * 1000).toUTCString();
+                case "gmt": displayTimestamp = new Date(log.variable_0 * 1000).toUTCString();
                     break;
-                default: displayTimestamp = new Date(log.timestamp * 1000).toString();
+                default: displayTimestamp = new Date(log.variable_0 * 1000).toString();
             }
             var ts = [
                 <a href={"/users/?omni_input=" + deviceId}><span className="label label-success">{deviceId}</span></a>, <br/>, <br/>,
@@ -342,13 +342,13 @@ function highlightByRegexForJSX(text, regexList, color) {
 function logsFilter(data, start, end) {
     var filteredByTs = data.filter(function(log){
         if (start && end) {
-            return Number(log.timestamp) >= start && Number(log.timestamp) <= end;
+            return Number(log.variable_0) >= start && Number(log.variable_0) <= end;
         }
         else if(start) {
-            return Number(log.timestamp) >= start;
+            return Number(log.variable_0) >= start;
         }
         else if(end) {
-            return Number(log.timestamp) <= end;
+            return Number(log.variable_0) <= end;
         }
         else {
             return log;
@@ -359,10 +359,10 @@ function logsFilter(data, start, end) {
 }
 
 function compareTimestamp(log1, log2) {
-    if (log1.timestamp < log2.timestamp) {
+    if (log1.variable_0 < log2.variable_0) {
         return -1;
     }
-    if (log1.timestamp > log2.timestamp) {
+    if (log1.variable_0 > log2.variable_0) {
         return 1;
     }
     return 0;
