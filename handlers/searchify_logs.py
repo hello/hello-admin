@@ -13,7 +13,7 @@ from google.appengine.api import urlfetch
 class SearchifyLogsHandler(ProtectedRequestHandler):
     def normalize_epoch(self, ts, index_name):
         if "sense" in index_name:
-            return ts
+            return int(ts)
         return 1000*int(ts)
 
     def get_logs_by_index(self, index_name, filters={}, date_field=""):
@@ -35,24 +35,32 @@ class SearchifyLogsHandler(ProtectedRequestHandler):
 
             if text_input:
                 searchify_query.set_query("text:{}".format(text_input))
-
-            if start_time.isdigit() or end_time.isdigit():  # Use custom scoring function if there is time input
-                if not end_time.isdigit():
-                    scoring_function = 'if((doc.var[0] - {}) > 0, doc.var[0], rel)'.format(self.normalize_epoch(start_time, index_name))
-                elif not start_time.isdigit():
-                    scoring_function = 'if((doc.var[0] - {}) < 0, doc.var[0], rel)'.format(self.normalize_epoch(end_time, index_name))
-                else:
-                    scoring_function = 'if((doc.var[0] - {})*(doc.var[0] - {}) < 0, doc.var[0], rel)'.format(self.normalize_epoch(start_time, index_name), self.normalize_epoch(end_time, index_name))
-
-                index.add_function(3, scoring_function)
-                searchify_query.set_scoring_function(3)
-            elif index_name=="sense-logs-2015-05" and not text_input:
+            elif index_name == "sense-logs-2015-05":
                 searchify_query.set_query(date_field)
+                if start_time:
+                    searchify_query.set_query(
+                        "date:" + datetime.datetime.utcfromtimestamp(self.normalize_epoch(start_time, index_name)).strftime("%Y%m%d%p")
+                    )
+                if end_time:
+                    searchify_query.set_query(
+                        "date:" + datetime.datetime.utcfromtimestamp(self.normalize_epoch(end_time, index_name)).strftime("%Y%m%d%p")
+                    )
+
+            start_time_filter = None
+            end_time_filter = None
+            if start_time.isdigit():
+                start_time_filter = self.normalize_epoch(start_time, index_name)
+
+            if end_time.isdigit():
+                end_time_filter = self.normalize_epoch(end_time, index_name)
+
+            searchify_query.set_docvar_filters({0: [[start_time_filter, end_time_filter]]})
 
             if filters:
                 searchify_query.set_category_filters(filters)
 
             searchify_query.set_length(max_results)
+            log.info("{}".format(searchify_query.mapping()))
             output['data'] = index.search(**searchify_query.mapping())['results']
 
         except Exception as e:
@@ -281,6 +289,8 @@ class SearchifyQuery():
         self.scoring_function = 0  # by default looks for latest documents
         self.length = 100  # by default return at most 100 documents per search
         self.docvar_filters = {}
+        self.fetch_variables = True
+        self.fetch_categories = False
 
     def set_query(self, query):
         if not isinstance(query, str):
@@ -309,8 +319,18 @@ class SearchifyQuery():
 
     def set_docvar_filters(self, docvar_filters):
         if not isinstance(docvar_filters, dict):
-            raise TypeError("Results length must be a dict")
+            raise TypeError("Docvar filters must be a dict")
         self.docvar_filters = docvar_filters
+
+    def set_fetch_variables(self, fetch_variables):
+        if not isinstance(fetch_variables, bool):
+            raise TypeError("Fetch variables must be a bool")
+        self.docvar_filters = fetch_variables
+
+    def set_fetch_categories(self, fetch_categories):
+        if not isinstance(fetch_categories, bool):
+            raise TypeError("Fetch categories must be a bool")
+        self.docvar_filters = fetch_categories
 
     def mapping(self):
         return {
@@ -318,5 +338,8 @@ class SearchifyQuery():
             'fetch_fields': self.fetch_fields,
             'category_filters': self.category_filters,
             'scoring_function': self.scoring_function,
-            'length': self.length
+            'length': self.length,
+            'docvar_filters': self.docvar_filters,
+            'fetch_variables': self.fetch_variables,
+            'fetch_categories': self.fetch_categories
         }
