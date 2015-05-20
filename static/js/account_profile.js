@@ -205,13 +205,13 @@ var SenseSummary = React.createClass({
         var timezone = <span>{timezoneResponse.error.isWhiteString() && !$.isEmptyObject(timezoneResponse) ?
             timezoneResponse.data.timezone_id : "-" }</span>;
 
-        if (senseKeyStoreResponse.error.isWhiteString() && !$.isEmptyObject(senseKeyStoreResponse.data)) {
-            if(senseKeyStoreResponse.data.key) {
+        if (senseKeyStoreResponse.error.isWhiteString()) {
+            if(!$.isEmptyObject(senseKeyStoreResponse) && senseKeyStoreResponse.data.key) {
                 keyStore = senseKeyStoreResponse.data.key.slice(senseKeyStoreResponse.data.key.length-7, senseKeyStoreResponse.data.key.length);
             }
-            else {
-                keyStore = <span className="not-ok">unprovisioned</span>;
-            }
+        }
+        else {
+            keyStore = <span className="not-ok">unprovisioned</span>;
         }
 
         if (senseResponse.data.length > 0) {
@@ -272,13 +272,13 @@ var PillSummary = React.createClass({
             }
         }
 
-        if (pillKeyStoreResponse.error.isWhiteString() && !$.isEmptyObject(pillKeyStoreResponse.data)) {
-            if(pillKeyStoreResponse.data.key) {
+        if (pillKeyStoreResponse.error.isWhiteString()) {
+            if(!$.isEmptyObject(pillKeyStoreResponse) && pillKeyStoreResponse.data.key) {
                 keyStore = pillKeyStoreResponse.data.key.slice(pillKeyStoreResponse.data.key.length-7, pillKeyStoreResponse.data.key.length);
             }
-            else {
-                keyStore = <span className="not-ok">unprovisioned</span>;
-            }
+        }
+        else {
+            keyStore = <span className="not-ok">unprovisioned</span>;
         }
 
         if (pillResponse.data.length > 0) {
