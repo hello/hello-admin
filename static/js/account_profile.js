@@ -339,6 +339,7 @@ var AccountProfile = React.createClass({
 
     clearProfile: function() {
         this.setState({
+            alarmsResponse: {data: [], error: ""},
             senseResponse: {data: [], error: ""},
             pillResponse: {data: [], error: ""},
             pillStatusResponse: {data: [], error: ""},
@@ -611,12 +612,26 @@ var AccountProfile = React.createClass({
         });
     },
 
+    loadAlarms: function(email) {
+        $.ajax({
+            url: "/api/alarms_by_email",
+            dataType: "json",
+            type: 'GET',
+            aysnc: false,
+            data: {email: email},
+            success: function (response) {
+                this.setState({alarmsResponse: response});
+            }.bind(this)
+        });
+    },
+
     loadProfile: function(email) {
         this.loadPartner(email);
         this.loadSense(email);
         this.loadPill(email);
         this.loadTimezone(email);
         this.loadTimeline(email);
+        this.loadAlarms(email);
         this.loadZendeskTickets(email);
     },
 

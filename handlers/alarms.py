@@ -1,6 +1,7 @@
-from helpers import ProtectedRequestHandler
-from handlers.utils import get_current_pacific_datetime
 import json
+import settings
+from helpers import ProtectedRequestHandler
+
 
 class AlarmsAPI(ProtectedRequestHandler):
     def get(self):
@@ -19,4 +20,13 @@ class AlarmsAPI(ProtectedRequestHandler):
             type="POST",
             access_token=body['impersonatee_token'],
             body_data=json.dumps(body['data'])
+        )
+
+
+class AlarmsByEmailAPI(ProtectedRequestHandler):
+    def get(self):
+        self.hello_request(
+            api_url="alarms/{}".format(self.request.get("email")),
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO
         )
