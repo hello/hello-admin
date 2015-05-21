@@ -281,6 +281,40 @@ class WifiSignalStrengthAPI(ProtectedRequestHandler):
         self.response.write(json.dumps(output))
 
 
+class LogsPatternFacetsAPI(ProtectedRequestHandler):
+    @property
+    def pattern(self):
+        return self.request.get("pattern")
+
+    @property
+    def start_ts(self):
+        return self.request.get("start_ts", default_value=None) or None
+
+    @property
+    def end_ts(self):
+        return self.request.get("end_ts", default_value=None) or None
+
+    def get_facets(self, index_name):
+        output = {"data": [], "error": "Facets not found!"}
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(index_name)
+        try:
+            output['data'] = index.search(
+                query="text:{}".format(self.pattern),
+                docvar_filters = {0: [[self.start_ts, self.end_ts]]}
+            ).get("facets", {})
+            if output['data']:
+                output['error'] = ""
+        except Exception as e:
+            output['error'] = display_error(e)
+            log.error("")
+        return output
+
+    def get(self):
+        urlfetch.set_default_fetch_deadline(30)
+        may_facets = self.get_facets(settings.SENSE_LOGS_INDEX_MAY)
+        self.response.write(json.dumps(may_facets))
+
+
 class SearchifyQuery():
     def __init__(self):
         self.query = "all:1"  # by default search for all availalbe documents
