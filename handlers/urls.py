@@ -115,6 +115,8 @@ from handlers.onboarding import OnboardingLogsBySenseIdAPI
 from handlers.views import OnboardingLogsView
 from handlers.room_conditions import LastRoomConditionsAPI
 from handlers.devices import ActiveDevices15MinutesHistoryAPI
+from handlers.searchify_logs import LogsPatternFacetsAPI
+from handlers.views import LogsPatternFacetsView
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -194,6 +196,7 @@ api_routes = [
     ('/api/onboarding_logs_by_result/?$', OnboardingLogsByResultAPI),
     ('/api/onboarding_logs_by_sense_id/?$', OnboardingLogsBySenseIdAPI),
     ('/api/last_room_conditions/?$', LastRoomConditionsAPI),
+    ('/api/log_facets/?$', LogsPatternFacetsAPI),
 ]
 
 page_routes = [
@@ -241,6 +244,7 @@ page_routes = [
     ('/recent_accounts/?$', RecentAccountsView),
     ('/pch_serial_number_check/?$', PCHSerialNumberCheckView),
     ('/onboarding_logs/?$', OnboardingLogsView),
+    ('/log_facets/?$', LogsPatternFacetsView),
 ]
 
 file_upload_routes = [

@@ -223,3 +223,8 @@ class OnboardingLogsView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/onboarding_logs.html',
                                 context={'title': "Onboarding Logs"})
+
+class LogsPatternFacetsView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/log_facets.html',
+                                context={'title': "Log Facets"})

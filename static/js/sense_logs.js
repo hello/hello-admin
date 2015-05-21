@@ -89,7 +89,7 @@ var LogTable = React.createClass({
                 default: displayTimestamp = new Date(log.variable_0 * 1000).toString();
             }
             var ts = [
-                <a href={"/users/?omni_input=" + deviceId}><span className="label label-success">{deviceId}</span></a>, <br/>, <br/>,
+                <a href={"/account_profile/?type=sense_id&input=" + deviceId}><span className="label label-success">{deviceId}</span></a>, <br/>, <br/>,
                 <a className="cursor-hand" onClick={that.searchAroundByTs}>{displayTimestamp}</a>, <br/>, <br/>,
                 <span>Keyword Count: {matchCount}</span>, <br/>
             ];
@@ -340,7 +340,7 @@ function highlightByRegexForJSX(text, regexList, color) {
 }
 
 function logsFilter(data, start, end) {
-    var filteredByTs = data.filter(function(log){
+    var filteredAndSortedByTs = data.filter(function(log){
         if (start && end) {
             return Number(log.variable_0) >= start && Number(log.variable_0) <= end;
         }
@@ -353,9 +353,10 @@ function logsFilter(data, start, end) {
         else {
             return log;
         }
-    });
+    }).sort(compareTimestamp);
 
-    return filteredByTs.sort(compareTimestamp);
+    return _.uniq(filteredAndSortedByTs, "docid");
+
 }
 
 function compareTimestamp(log1, log2) {
