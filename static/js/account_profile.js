@@ -767,7 +767,7 @@ var AccountProfile = React.createClass({
     }
 });
 
-React.render(<AccountProfile />, document.getElementById('account-profile'));
+React.renderComponent(<AccountProfile />, document.getElementById('account-profile'));
 
 function debunkMarkdown(md) {
     var partials = md.match(/(.*?)(\*\*)(.*?)(\*\*)(.*?)/);
