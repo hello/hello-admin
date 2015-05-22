@@ -1,16 +1,16 @@
 /** @jsx React.DOM */
 
-var NotesModal =  React.createClass({
+var NotesModal = React.createClass({
     render: function() {
         return this.transferPropsTo(
-            <Modal pra title="Definitions">
+            <Modal pra title="Notes">
                 <div className="modal-body">
                     <p> - Scroll to zoom, drag to pan</p>
                     <p> - Legends are clickable to toggle visiblity by group</p>
                     <p> - Zooming/Dragging may be laggy in certain browsers</p>
                     <hr/>
-                    <p> Why the 2 charts can't be merged &#63; </p>
-                    <p> - The measurement is different, while first chart cares about live status (number of sense seen last minute), the second chart illustrates the aggregate count of senses which is last seen anytime during the last 24 hours </p>
+                    <p> Why the 3 charts can't be merged &#63; </p>
+                    <p> - The measurement is different, while first chart cares about live status (number of sense seen last minute), the second chart illustrates the aggregate count of senses which is last seen anytime during the last 24 hours. Third chart is meso-level </p>
                     <p> - Counts are not accumulative, i.e. if we know there is <em>x</em> sense seen last minute and <em>y</em> sense seen the minute before last minute, it is still impossible to tell how many sense seen last 2 minutes as the result could be anything between <em>max(x,y)</em> and <em>x+y</em> </p>
                     <p> - Minute data is kept for maximum 4 days, there is a purge mechanism to get rid of out-of-date data. For daily data, it's likely I'll keep them permanently</p>
                 </div>
