@@ -120,7 +120,7 @@ var AccountBreakdown = React.createClass({
             type: 'GET',
             success: function(response) {
                 if (response.error.isWhiteString()) {
-                    this.setState({error: "", data: response.data.slice(0, this.state.limit), loading: false});
+                    this.setState({error: "", data: response.data.slice(0, this.state.limit).map(function(d){d.createdDate = -d.createdDate; return d;}), loading: false});
                 }
                 else {
                     this.setState({data: [], error: response.error, loading: false});
@@ -150,7 +150,7 @@ var AccountBreakdown = React.createClass({
                 x: {
                     tick: {
                         format: function (x) {
-                            return d3.time.format("%b %d")(new Date(x));
+                            return d3.time.format("%b %d")(new Date(Math.abs(x)));
                         }
                     }
                 },
