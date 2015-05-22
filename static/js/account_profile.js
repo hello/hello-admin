@@ -178,7 +178,7 @@ var ZendeskTile = React.createClass({
 });
 
 var SenseSummary = React.createClass({
-    loadUnhashedFirmware: function(version) {
+    loadUnhashedFirmware: function(version, senseId) {
         $.ajax({
             url: "/api/firmware_unhash",
             dataType: 'json',
@@ -187,10 +187,10 @@ var SenseSummary = React.createClass({
             data: {version: version},
             success: function(response) {
                 if (response.error.isWhiteString()) {
-                    version = <span>
+                    version = <a href={"/firmware/?device_id=" + senseId} target="_blank">
                         {version || <span className="not-ok">unknown-hashed</span>}<span> (</span>
                         {response.data.join(", ") || <span className="not-ok">unknown-unhashed</span>}<span>)</span>
-                    </span>;
+                    </a>;
                 }
             }
         });
@@ -234,7 +234,7 @@ var SenseSummary = React.createClass({
                     <tbody>
                         <tr><td>ID</td><td>{senseId}</td></tr>
                         <tr><td>Keystore</td><td>{keyStore}</td></tr>
-                        <tr><td>Firmware</td><td>{this.loadUnhashedFirmware(firmwareVersion)}</td></tr>
+                        <tr><td>Firmware</td><td>{this.loadUnhashedFirmware(firmwareVersion, senseId)}</td></tr>
                         <tr><td>Timezone</td><td>{timezone}</td></tr>
                         <tr><td>Color</td><td>{senseColor}</td></tr>
                         <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
