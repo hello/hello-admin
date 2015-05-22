@@ -1,5 +1,23 @@
 /** @jsx React.DOM */
 
+var UpdateColorModal = React.createClass({
+    render: function() {
+        console.log(this.props.senseId);
+        return this.transferPropsTo(
+            <Modal pra title="Update Device Color">
+                <div className="modal-body">
+                    <Input type="select">
+                        <option value="BLACK">BLACK</option>
+                        <option value="WHITE">WHITE</option>
+                    </Input>
+                </div>
+                <div className="modal-footer">
+                </div>
+            </Modal>
+        );
+    }
+});
+
 var Tile = React.createClass({
     getDefaultProps: function() {
         return {img: "svg/motion.svg"}
@@ -125,10 +143,10 @@ var WifiTile = React.createClass({
         var response = this.props.wifiResponse;
         var networksTable = response.data.networks && response.data.networks.length > 0 ? <Table>
             <thead>
-                <tr><th>Name</th><th>Security</th><th>Strength</th></tr>
+                <tr><th>Network SSID</th><th>Security</th><th>Strength</th></tr>
             </thead>
             <tbody>
-                    {response.data.networks.map(function(w){return <tr><td>{w.network_name}</td><td>{w.network_security}</td><td>{w.signal_strength}</td></tr>;})}
+                    {response.data.networks.map(function(w){return <tr><td>{w.network_name}</td><td className="center-wrapper">{w.network_security}</td><td className="center-wrapper">{w.signal_strength}</td></tr>;})}
             </tbody>
         </Table> : null;
 
@@ -196,7 +214,16 @@ var SenseSummary = React.createClass({
         });
         return version;
     },
+    
+    closePopoverManually: function() {
+        $("#popover-trigger").trigger("click");
+    },
 
+    updateSenseColor: function(color) {
+        this.closePopoverManually();
+        alert("under construction");
+    },
+    
     render: function() {
         var senseResponse = this.props.senseResponse,
             senseKeyStoreResponse = this.props.senseKeyStoreResponse,
@@ -228,7 +255,15 @@ var SenseSummary = React.createClass({
             var lastPairingTs = senseResponse.data[0].pairing_ts ?
                 new Date(senseResponse.data[0].pairing_ts).toUTCString() : null;
 
-            var senseColor = senseColorResponse.error.isWhiteString() ? senseColorResponse.data : null;
+            var senseColor = senseColorResponse.error.isWhiteString() && senseColorResponse.data ?
+                <OverlayTrigger trigger="click" placement="right" overlay={
+                    <Popover title={<span>Update Color &nbsp;<Button id="popover-close" onClick={this.closePopoverManually} bsSize="xsmall">x</Button></span>}>
+                        <Button onClick={this.updateSenseColor.bind(this, "black")} className="device-color" bsSize="xsmall">BLACK</Button>&nbsp;
+                        <Button onClick={this.updateSenseColor.bind(this, "white")} className="device-color" bsSize="xsmall">WHITE</Button>
+                    </Popover>}>
+                    <Button id="popover-trigger" className="device-color" bsSize="xsmall">{senseColorResponse.data}</Button>
+                </OverlayTrigger> : null;
+
             result = <div>
                 <Table>
                     <tbody>
@@ -732,7 +767,7 @@ var AccountProfile = React.createClass({
     }
 });
 
-React.renderComponent(<AccountProfile />, document.getElementById('account-profile'));
+React.render(<AccountProfile />, document.getElementById('account-profile'));
 
 function debunkMarkdown(md) {
     var partials = md.match(/(.*?)(\*\*)(.*?)(\*\*)(.*?)/);

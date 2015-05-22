@@ -23,7 +23,8 @@ var TabPane = ReactBootstrap.TabPane;
 var Panel = ReactBootstrap.Panel;
 var Well = ReactBootstrap.Well;
 var Badge = ReactBootstrap.Badge;
-
+var Popover = ReactBootstrap.Popover;
+var OverlayTrigger = ReactBootstrap.OverlayTrigger;
 
 if (typeof String.prototype.startsWith != 'function') {
   // see below for better implementation!
