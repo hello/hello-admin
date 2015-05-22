@@ -118,6 +118,7 @@ from handlers.devices import ActiveDevices15MinutesHistoryAPI
 from handlers.searchify_logs import LogsPatternFacetsAPI
 from handlers.views import LogsPatternFacetsView
 from handlers.alarms import AlarmsByEmailAPI
+from handlers.devices import SenseColorAPI
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -199,6 +200,7 @@ api_routes = [
     ('/api/last_room_conditions/?$', LastRoomConditionsAPI),
     ('/api/log_facets/?$', LogsPatternFacetsAPI),
     ('/api/alarms_by_email/?$', AlarmsByEmailAPI),
+    ('/api/sense_color/?$', SenseColorAPI),
 ]
 
 page_routes = [

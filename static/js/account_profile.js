@@ -196,10 +196,12 @@ var SenseSummary = React.createClass({
         });
         return version;
     },
+
     render: function() {
         var senseResponse = this.props.senseResponse,
             senseKeyStoreResponse = this.props.senseKeyStoreResponse,
             timezoneResponse = this.props.timezoneResponse,
+            senseColorResponse = this.props.senseColorResponse,
             result = null, lastSeen = null, keyStore = null;
 
         var timezone = <span>{timezoneResponse.error.isWhiteString() && !$.isEmptyObject(timezoneResponse) ?
@@ -226,6 +228,7 @@ var SenseSummary = React.createClass({
             var lastPairingTs = senseResponse.data[0].pairing_ts ?
                 new Date(senseResponse.data[0].pairing_ts).toUTCString() : null;
 
+            var senseColor = senseColorResponse.error.isWhiteString() ? senseColorResponse.data : null;
             result = <div>
                 <Table>
                     <tbody>
@@ -233,6 +236,7 @@ var SenseSummary = React.createClass({
                         <tr><td>Keystore</td><td>{keyStore}</td></tr>
                         <tr><td>Firmware</td><td>{this.loadUnhashedFirmware(firmwareVersion)}</td></tr>
                         <tr><td>Timezone</td><td>{timezone}</td></tr>
+                        <tr><td>Color</td><td>{senseColor}</td></tr>
                         <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
                         <tr><td>Last Pairing</td><td>{lastPairingTs}</td></tr>
                         <tr><td/><td/></tr>
@@ -323,6 +327,7 @@ var AccountProfile = React.createClass({
             soundResponse: {data: [], error: ""},
             wifiResponse: {data: {}, error: ""},
             lastRoomConditionsResponse: {data: {}, error: ""},
+            senseColorResponse: {data: null, error: ""},
             accountInput: "",
             timelineStatus: null,
             zendeskStatus: null,
@@ -441,6 +446,7 @@ var AccountProfile = React.createClass({
                             var senseId = response.data[0].device_account_pair.externalDeviceId;
                             this.loadSenseKeyStore(senseId);
                             this.loadWifi(senseId);
+                            this.loadSenseColor(senseId);
                             this.loadLastRoomConditionsWithoutParticulates(senseId);
                             this.loadParticulates(email);
                         }
@@ -599,6 +605,19 @@ var AccountProfile = React.createClass({
         });
     },
 
+    loadSenseColor: function(senseId) {
+        $.ajax({
+            url: "/api/sense_color",
+            dataType: "json",
+            type: 'GET',
+            aysnc: false,
+            data: {sense_id: senseId},
+            success: function (response) {
+                this.setState({senseColorResponse: response});
+            }.bind(this)
+        });
+    },
+
     loadLastRoomConditionsWithoutParticulates: function(senseId) {
         $.ajax({
             url: "/api/last_room_conditions",
@@ -617,7 +636,6 @@ var AccountProfile = React.createClass({
             url: "/api/alarms_by_email",
             dataType: "json",
             type: 'GET',
-            aysnc: false,
             data: {email: email},
             success: function (response) {
                 this.setState({alarmsResponse: response});
@@ -695,7 +713,7 @@ var AccountProfile = React.createClass({
                             <Tile img="svg/timeline.svg" title="Timeline" content={<TimelineTile email={this.state.email} response={this.state.timelineResponse} status={this.state.timelineStatus} />} />
                         </Col>
                         <Col xs={6}>
-                            <Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseResponse={this.state.senseResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} timezoneResponse={this.state.timezoneResponse} />} />
+                            <Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseResponse={this.state.senseResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} timezoneResponse={this.state.timezoneResponse} senseColorResponse={this.state.senseColorResponse} />} />
                             <Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile email={this.state.email} lastRoomConditionsResponse={this.state.lastRoomConditionsResponse} particulatesResponse={this.state.particulatesResponse} />} />
                         </Col>
                     </Row>
