@@ -273,11 +273,9 @@ class WifiSignalStrengthAPI(ProtectedRequestHandler):
 
     def get(self):
         output = self.get_wifi_from_index(settings.SENSE_LOGS_INDEX_MAY)
-        print 'wifi may', output
         if not output['data']:
             urlfetch.set_default_fetch_deadline(30)
             output = self.get_wifi_from_index(settings.SENSE_LOGS_INDEX_MARCH)
-            print 'wifi march', output
         self.response.write(json.dumps(output))
 
 

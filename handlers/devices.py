@@ -168,3 +168,18 @@ class ActiveDevicesDailyHistoryAPI(ProtectedRequestHandler):
 
         self.response.write(json.dumps(output))
 
+
+class SenseColorAPI(ProtectedRequestHandler):
+    def get(self):
+        self.hello_request(
+            api_url="devices/color/{}".format(self.request.get("sense_id")),
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO
+        )
+
+    def put(self):
+        self.hello_request(
+            api_url="devices/color/{}/{}".format(self.request.get("sense_id"), self.request.get("color")),
+            type="PUT",
+            app_info=settings.ADMIN_APP_INFO
+        )
