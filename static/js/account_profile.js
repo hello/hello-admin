@@ -476,7 +476,6 @@ var AccountProfile = React.createClass({
     },
 
     loadPillStatus: function(pillId) {
-        var that = this;
         $.ajax({
             aysnc: false,
             url: '/api/battery',
@@ -484,8 +483,8 @@ var AccountProfile = React.createClass({
             type: 'GET',
             data: {search_input: pillId, end_ts: new Date().getTime()},
             success: function (response) {
-                that.setState({pillStatusResponse: response});
-            }
+                this.setState({pillStatusResponse: response});
+            }.bind(this)
         });
     },
 
@@ -503,7 +502,6 @@ var AccountProfile = React.createClass({
     },
 
     loadPillKeyStore: function(pillId) {
-        var that = this;
         $.ajax({
             aysnc: false,
             url: "/api/devices/key_store",
@@ -511,8 +509,8 @@ var AccountProfile = React.createClass({
             type: 'GET',
             data: {device_id: pillId, device_type: "pill"},
             success: function (response) {
-                that.setState({pillKeyStoreResponse: response});
-            }
+                this.setState({pillKeyStoreResponse: response});
+            }.bind(this)
         });
     },
 
