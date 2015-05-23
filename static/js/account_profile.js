@@ -220,7 +220,6 @@ var SenseSummary = React.createClass({
     },
 
     updateSenseColor: function(senseId, color) {
-        console.log(senseId, color);
         this.closePopoverManually();
         $.ajax({
             url: "/api/sense_color",
@@ -231,7 +230,6 @@ var SenseSummary = React.createClass({
                 if (response.error.isWhiteString()){
                     $("#popover-trigger").text(color);
                 }
-                console.log(response);
             }
         });
         return false;
