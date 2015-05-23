@@ -219,9 +219,22 @@ var SenseSummary = React.createClass({
         $("#popover-trigger").trigger("click");
     },
 
-    updateSenseColor: function(color) {
+    updateSenseColor: function(senseId, color) {
+        console.log(senseId, color);
         this.closePopoverManually();
-        alert("under construction");
+        $.ajax({
+            url: "/api/sense_color",
+            dataType: 'json',
+            type: 'PUT',
+            data: {sense_id: senseId, color: color},
+            success: function(response) {
+                if (response.error.isWhiteString()){
+                    $("#popover-trigger").text(color);
+                }
+                console.log(response);
+            }
+        });
+        return false;
     },
     
     render: function() {
@@ -258,8 +271,8 @@ var SenseSummary = React.createClass({
             var senseColor = senseColorResponse.error.isWhiteString() && senseColorResponse.data ?
                 <OverlayTrigger trigger="click" placement="right" overlay={
                     <Popover title={<span>Update Color &nbsp;<Button id="popover-close" onClick={this.closePopoverManually} bsSize="xsmall">x</Button></span>}>
-                        <Button onClick={this.updateSenseColor.bind(this, "black")} className="device-color" bsSize="xsmall">BLACK</Button>&nbsp;
-                        <Button onClick={this.updateSenseColor.bind(this, "white")} className="device-color" bsSize="xsmall">WHITE</Button>
+                        <Button onClick={this.updateSenseColor.bind(this, senseId, "BLACK")} className="device-color" bsSize="xsmall">BLACK</Button>&nbsp;
+                        <Button onClick={this.updateSenseColor.bind(this, senseId, "WHITE")} className="device-color" bsSize="xsmall">WHITE</Button>
                     </Popover>}>
                     <Button id="popover-trigger" className="device-color" bsSize="xsmall">{senseColorResponse.data}</Button>
                 </OverlayTrigger> : null;
