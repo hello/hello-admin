@@ -443,9 +443,13 @@ class SenseLogsNewAPI(ProtectedRequestHandler):
 
         index_date = latest_date
         while self.limit > len(aggregate_output['results']):
+            index_name = "sense-logs-" + index_date.strftime("%Y-%m-%d")
+            if index_date.strftime("%Y-%m-%d") == "2015-05-26":
+                log.warn("Querying backup index on searchify")
+                index_name = "sense-logs-backup"
             aggregate_output = self.concat_output(
                 aggregate_output,
-                self.search_within_index("sense-logs-" + index_date.strftime("%Y-%m-%d"))
+                self.search_within_index(index_name)
             )
             index_date -= datetime.timedelta(days=1)
             if index_date.strftime("%Y-%m-%d") == (earliest_date - datetime.timedelta(days=1)).strftime("%Y-%m-%d"):
