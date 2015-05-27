@@ -12,3 +12,15 @@
 #start, #end {
     padding-left: 40px;
 }
+
+.highlight {
+    color: red;
+}
+
+.zero-padding-right {
+    padding-right: 0;
+}
+
+.zero-padding-left {
+    padding-left: 0;
+}

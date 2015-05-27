@@ -1,6 +1,6 @@
 var SenseLogsNew = React.createClass({
     getInitialState: function() {
-        return {response: {}, alert: null, resultsSize: 0}
+        return {response: {}, alert: null, resultsSize: 0, loading: null}
     },
 
     componentDidMount: function() {
@@ -36,17 +36,19 @@ var SenseLogsNew = React.createClass({
     },
 
     loadSenseLogs: function() {
-        this.setState({alert: <img src="/static/image/loading.gif" />});
-        var field = $("#field").val(),
-            keyword = $("#keyword").val(),
-            senseId = $("#sense-id").val(),
-            limit = $("#limit").val(),
-            start = $("#start").val(),
-            end = $("#end").val();
+        this.setState({alert: null, loading: <img src="/static/image/loading.gif" />, resultsSize: 0, response: {}});
+        var field = $("#field").val().trim(),
+            keyword = $("#keyword").val().trim(),
+            senseId = $("#sense-id").val().trim(),
+            limit = $("#limit").val().trim(),
+            start = $("#start").val().trim(),
+            end = $("#end").val().trim();
 
         if (!keyword) {
-            this.setState({alert: <Alert bsStyle="warning">Keyword cannot be empty</Alert>});
-            return false;
+            this.setState({alert: <Alert bsStyle="warning">
+                Looking up ALL documents because no field keyword is entered. <br/>
+                This is very inefficient and not to be abused. Failure happens when index size reaches critical number.
+            </Alert>, loading: <img src="/static/image/loading.gif" />});
         }
 
         history.pushState({}, '', '/sense_logs_new/?field=' + field + '&keyword=' + keyword + '&sense_id=' + senseId + '&limit=' + limit + "&start=" + start + "&end=" + end);
@@ -68,13 +70,14 @@ var SenseLogsNew = React.createClass({
                 var errorAlert = !(!$.isEmptyObject(response) && response.results && response.results.length > 0) && response.error ?
                     <Alert bsStyle="danger">{response.error}</Alert> : null;
                 var resultsSize = response.results ? response.results.length : 0;
-                this.setState({response: response, alert: errorAlert, resultsSize: resultsSize});
+                this.setState({response: response, alert: errorAlert, resultsSize: resultsSize, loading: null});
             }.bind(this)
         });
         return false;
     },
 	render: function(){
         var response = this.state.response;
+        var keyword = $("#keyword").val();
         var resultsTable = !$.isEmptyObject(response) && response.results && response.results.length > 0 ?
             <Table striped>
                 <thead><tr>
@@ -89,7 +92,7 @@ var SenseLogsNew = React.createClass({
                                 </Button>
                                 - Sense ID: <a target="_blank" href={"/account_profile/?type=sense_id&input=" + r.device_id}>{r.device_id}</a>
                             </div><br/>
-                            <div>{r.text.split("\n").map(function(n){return <div>{n}<br/></div>})}</div>
+                            <div dangerouslySetInnerHTML={{__html: formatLogText(r.text, keyword)}}/>
                         </td></tr>;
                     })}
                 </tbody>
@@ -99,24 +102,25 @@ var SenseLogsNew = React.createClass({
 		return(<div>
             <form onSubmit={this.loadSenseLogs}>
                 <Row>
-                    <Col xs={3}><Input id="field" type="select" addonBefore="Field">
+                    <Col xs={3} className="zero-padding-right"><Input id="field" type="select" addonBefore="Field">
                         <option value="text">Text</option>
                         <option value="device_id">Sense ID</option>
                         <option value="date">Date</option>
                     </Input></Col>
-                    <Col xs={3}><Input id="keyword" type="text" placeholder="Keyword (required)"/></Col>
+                    <Col xs={3} className="zero-padding-left"><Input id="keyword" type="text" placeholder="Keyword <optional>"/></Col>
                     <Col xs={1}><Button className="time-window" disabled>From</Button></Col>
-                    <LongDatetimePicker glyphicon="time" placeHolder="start time(GMT)" id="start" size="3" />
-                    <Col xs={2}><Input id="limit" type="number" placeholder="Limit" addonBefore="Limit"/></Col>
+                    <LongDatetimePicker glyphicon="time" placeHolder="start (GMT) <optional>" id="start" size="3" />
+                    <Col xs={2}><Input id="limit" type="number" placeholder="20" addonBefore="Limit"/></Col>
                 </Row>
                 <Row>
-                    <Col xs={3}><Input id="category" type="select" addonBefore="Category">
+                    <Col xs={3} className="zero-padding-right"><Input id="category" type="select" addonBefore="Category">
                         <option value="device_id">Sense ID</option>
                     </Input></Col>
-                    <Col xs={3}> <Input id="sense-id" type="text" placeholder="Filter Value <optional>"/></Col>
+                    <Col xs={3} className="zero-padding-left"><Input id="sense-id" type="text" placeholder="Filter Value <optional>"/></Col>
                     <Col xs={1}><Button className="time-window" disabled>To</Button></Col>
-                    <LongDatetimePicker glyphicon="time" placeHolder="end time(GMT)" id="end" size="3" />
+                    <LongDatetimePicker glyphicon="time" placeHolder="end (GMT) <optional>" id="end" size="3" />
                     <Col xs={1}><Button type="submit">&nbsp;<Glyphicon glyph="search"/>&nbsp;</Button></Col>
+                    <Col xs={1}>{this.state.loading}</Col>
                 </Row>
             </form>
             {this.state.alert}
@@ -126,4 +130,13 @@ var SenseLogsNew = React.createClass({
 });
 
 React.render(<SenseLogsNew/>, document.getElementById("sense-logs"));
+
+function formatLogText(text, keyword){
+    console.log(keyword);
+    if (keyword.isWhiteString()) {
+        return text.replace(/\n/g, "<br>");
+    }
+    return text.replace(/\n/g, "<br>")
+        .replace(new RegExp(keyword, "gi"), function(m){return '<span class="highlight">' + m + '</span>';});
+}
 
