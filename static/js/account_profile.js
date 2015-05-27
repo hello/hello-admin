@@ -304,7 +304,7 @@ var PillSummary = React.createClass({
             pillStatusResponse = this.props.pillStatusResponse,
             pillKeyStoreResponse = this.props.pillKeyStoreResponse,
             result = null, batteryLevel = null, lastSeen = null, keyStore = null, uptime = null;
-
+        console.log("p", pillResponse);
         if (pillStatusResponse.data.length > 0) {
             if(pillStatusResponse.data[0][0]) {
                 batteryLevel = pillStatusResponse.data[0][0].batteryLevel ?
