@@ -104,5 +104,6 @@ th {text-align: left !important ;}
    text-align: center;
 }
 .center-wrapper {text-align: center;}
-.device-color {font-size: 9px;}
+.device-color {font-size: 9px; font-family: "Century Gothic",CenturyGothic,AppleGothic,sans-serif; margin-right: 10px;}
 #popover-close {font-size: 8px;}
+.popover {opacity: 0.8;}
