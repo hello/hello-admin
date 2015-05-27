@@ -379,6 +379,13 @@ class SearchifyQuery():
 
 class SenseLogsNewAPI(ProtectedRequestHandler):
     @property
+    def query(self):
+        q = self.request.get("query", default_value="all:1")
+        if q.strip() in ["text:", "device_id:", "date:"]:
+            return "all:1"
+        return q
+
+    @property
     def categories(self):
         categories = self.request.get("categories", None)
         if categories:
@@ -401,7 +408,7 @@ class SenseLogsNewAPI(ProtectedRequestHandler):
     @property
     def searchify_request(self):
         return {
-            "query": self.request.get("query", default_value="text:uart"),
+            "query": self.query,
             "fetch_fields": self.request.get("fetch_fields", default_value=["text", "device_id"]),
             "category_filters": self.categories,
             "docvar_filters": {0: [[self.start_ts, self.end_ts]]},
