@@ -1,0 +1,14 @@
+.span-upload-ts {
+    font-weight: bold;
+}
+.center-wrapper {
+    text-align: center;
+}
+
+.time-window {
+    border: none;
+}
+
+#start, #end {
+    padding-left: 40px;
+}

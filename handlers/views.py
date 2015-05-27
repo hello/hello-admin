@@ -228,3 +228,8 @@ class LogsPatternFacetsView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/log_facets.html',
                                 context={'title': "Log Facets"})
+
+class SenseLogsNewView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/sense_logs_new.html',
+                                context={'title': "Sense Logs New"})
