@@ -4,7 +4,7 @@ const d3TimeFormat = d3.time.format('%b %d %H:%M');
 const ACCEPTABLE_BATTERY_LEVEL = 10;
 const ACTIVE_SENSE_HOURS_THRESHOLD = 1;
 const ACTIVE_PILL_HOURS_THRESHOLD = 4;
-const MAX_INSPECT_POPULATION = 100000;  // users
+const MAX_INSPECT_POPULATION = 2500;  // users
 const DEFAULT_INSPECT_POPULATION = 100;
 const INSPECT_HEADWAY = 1500;  // ms
 const TICKET_AGE_THRESHOLD = 7; // days
@@ -390,7 +390,7 @@ var ProblemUsersMaestro = React.createClass({
                         <MenuItem eventKey='4' onClick={that.inspect.bind(that, 500)}>latest 500</MenuItem>
                         <MenuItem eventKey='5' onClick={that.inspect.bind(that, 1000)}>latest 1000</MenuItem>
                         <MenuItem divider />
-                        <MenuItem eventKey='6' onClick={that.inspect.bind(that, MAX_INSPECT_POPULATION)}>ALL</MenuItem>
+                        <MenuItem eventKey='6' onClick={that.inspect.bind(that, MAX_INSPECT_POPULATION)}>latest {MAX_INSPECT_POPULATION}</MenuItem>
                     </DropdownButton>
                 </Col>
 
