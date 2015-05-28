@@ -3,7 +3,7 @@ import json
 import logging as log
 from Crypto.Cipher import AES
 from handlers.helpers import ResponseOutput
-from handlers.helpers import ProtectedRequestHandler
+from handlers.helpers import BaseRequestHandler
 
 
 ALPHABET="123456789abcdefghijkmnopqrstuvwxyz"
@@ -26,7 +26,7 @@ def encrypt_order(order_id, cipher=cipher):
     return EncodeAES(cipher, str(order_id)).replace('/', '-')
 
 
-class OrdersAPI(ProtectedRequestHandler):
+class OrdersAPI(BaseRequestHandler):
     def get(self):
         order_id = self.request.get('order_id', default_value='')
         output = ResponseOutput()
