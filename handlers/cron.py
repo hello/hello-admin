@@ -345,8 +345,6 @@ class StoreRecentlyActiveDevicesStats15Minutes(BaseRequestHandler):
             pills_zcount=zstats["pills_count"]
         )
 
-        print recently_active_devices_stats
-
         recently_active_devices_stats.put()
 
 

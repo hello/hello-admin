@@ -44,8 +44,6 @@ class DeviceAPI(ProtectedRequestHandler):
         if device_type == "sense":
             post_data['timezone'] = timezone
 
-        print post_data
-
         self.hello_request(
             api_url="devices/register/{}".format(device_type),
             type="POST",

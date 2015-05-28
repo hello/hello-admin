@@ -51,7 +51,36 @@ var AccountTile = React.createClass({
                 <tr><td>Last Modified</td><td>{new Date(this.props.account.last_modified).toUTCString()}</td></tr>
                 <tr><td/><td/></tr>
             </tbody>
-        </Table>
+        </Table>;
+    }
+});
+
+AlarmsTile = React.createClass({
+    render: function() {
+        var response = this.props.alarmsResponse;
+        console.log("alarms", response);
+        return response.data.length === 0 ? <div>No alarm has been set</div>: <Table>
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Smart</th>
+                    <th>Repeated</th>
+                    <th>Enabled</th>
+                    <th>Day</th>
+                </tr>
+            </thead>
+            <tbody>{
+                response.data.map(function(alarm){
+                    return <tr>
+                        <td>{alarm.hour}:{alarm.minute}</td>
+                        <td>{alarm.smart ? <span>&#10004;</span> : <span>&#10008;</span>}</td>
+                        <td>{alarm.repeated ? <span>&#10004;</span> : <span>&#10008;</span>}</td>
+                        <td>{alarm.enabled ? <span>&#10004;</span> : <span>&#10008;</span>}</td>
+                        <td>{alarm.day_of_week}</td>
+                    </tr>
+                })
+            }</tbody>
+        </Table>;
     }
 });
 
@@ -304,7 +333,7 @@ var PillSummary = React.createClass({
             pillStatusResponse = this.props.pillStatusResponse,
             pillKeyStoreResponse = this.props.pillKeyStoreResponse,
             result = null, batteryLevel = null, lastSeen = null, keyStore = null, uptime = null;
-        console.log("p", pillResponse);
+
         if (pillStatusResponse.data.length > 0) {
             if(pillStatusResponse.data[0][0]) {
                 batteryLevel = pillStatusResponse.data[0][0].batteryLevel ?
@@ -358,6 +387,7 @@ var PillSummary = React.createClass({
 var AccountProfile = React.createClass({
     getInitialState: function() {
         return {
+            alarmsResponse: {data: [], error: ""},
             senseResponse: {data: [], error: ""},
             pillResponse: {data: [], error: ""},
             pillStatusResponse: {data: [], error: ""},
@@ -760,6 +790,9 @@ var AccountProfile = React.createClass({
                             <Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseResponse={this.state.senseResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} timezoneResponse={this.state.timezoneResponse} senseColorResponse={this.state.senseColorResponse} />} />
                             <Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile email={this.state.email} lastRoomConditionsResponse={this.state.lastRoomConditionsResponse} particulatesResponse={this.state.particulatesResponse} />} />
                         </Col>
+                    </Row>
+                    <Row>
+                        <Col md={6}><Tile img="svg/timeline.svg" title="Alarms" content={<AlarmsTile alarmsResponse={this.state.alarmsResponse} />} /></Col>
                     </Row>
                     <Row>
                         <Col md={12}><Tile img="svg/zendesk.svg" title="Zendesk" content={<ZendeskTile zendeskResponse={this.state.zendeskResponse} zendeskStatus={this.props.zendeskStatus} />} /></Col>
