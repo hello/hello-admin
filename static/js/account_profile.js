@@ -117,7 +117,7 @@ var TimelineTile = React.createClass({
         return <div>
             {this.props.status}
             {timelinePreview}
-            <p><a target="_blank" href={"/timeline/?email=" + this.props.email + "&date=" + lastNightDate}>See more</a></p>
+            <p><a target="_blank" href={"/timeline/?email=" + this.props.email + "&date=" + lastNightDate}>See full detail</a></p>
         </div>
     }
 });
@@ -164,6 +164,7 @@ var RoomConditionsTile = React.createClass({
                 </tbody>
             </Table>
             <p><a target="_blank" href={"/room_conditions/?email=" + this.props.email + "&until=" + nowDateTime}>Last "Day" (not necessarily 24 hours)</a></p>
+            <p><a target="_blank" href={"/dust_stats/?device_id=" + this.props.senseId + "&start_ts=&end_ts=&length=100"}>Last 100 Dust Counts</a></p>
         </div>
     }
 });
