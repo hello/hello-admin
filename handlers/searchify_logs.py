@@ -194,7 +194,8 @@ class DustStatsAPI(ProtectedRequestHandler):
     def get(self):
         urlfetch.set_default_fetch_deadline(20)
         output = {"data": [], "error": ""}
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_MAY)
+        now_date = datetime.datetime.now().strftime("%Y-%m-%d")
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_PREFIX + now_date)
         query = SearchifyQuery()
 
         try:
@@ -446,10 +447,10 @@ class SenseLogsNewAPI(ProtectedRequestHandler):
         index_date = latest_date
         while self.limit > len(aggregate_output['results']):
             log.info("Lacking {} results, will look into older index".format(self.limit - len(aggregate_output['results'])))
-            index_name = "sense-logs-" + index_date.strftime("%Y-%m-%d")
+            index_name = settings.SENSE_LOGS_INDEX_PREFIX + index_date.strftime("%Y-%m-%d")
             if index_date.strftime("%Y-%m-%d") == "2015-05-26":
                 log.warn("Querying backup index on searchify")
-                index_name = "sense-logs-backup"
+                index_name = settings.SENSE_LOGS_INDEX_BACKUP
             aggregate_output = self.concat_output(
                 aggregate_output,
                 self.search_within_index(index_name)
