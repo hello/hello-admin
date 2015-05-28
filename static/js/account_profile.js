@@ -2,7 +2,6 @@
 
 var UpdateColorModal = React.createClass({
     render: function() {
-        console.log(this.props.senseId);
         return this.transferPropsTo(
             <Modal pra title="Update Device Color">
                 <div className="modal-body">
@@ -66,17 +65,20 @@ AlarmsTile = React.createClass({
                     <th>Smart</th>
                     <th>Repeated</th>
                     <th>Enabled</th>
-                    <th>Day</th>
+                    <th>Day(s)</th>
                 </tr>
             </thead>
             <tbody>{
                 response.data.map(function(alarm){
                     return <tr>
-                        <td>{alarm.hour}:{alarm.minute}</td>
-                        <td>{alarm.smart ? <span>&#10004;</span> : <span>&#10008;</span>}</td>
-                        <td>{alarm.repeated ? <span>&#10004;</span> : <span>&#10008;</span>}</td>
-                        <td>{alarm.enabled ? <span>&#10004;</span> : <span>&#10008;</span>}</td>
-                        <td>{alarm.day_of_week}</td>
+                        <td className="center-wrapper">
+                            {alarm.hour.toString().length > 1 ? alarm.hour : "0" + alarm.hour}:
+                            {alarm.minute.toString().length > 1 ? alarm.minute : "0" + alarm.minute}
+                        </td>
+                        <td className="center-wrapper">{alarm.smart ? <span>&#10004;</span> : <span>&#10008;</span>}</td>
+                        <td className="center-wrapper">{alarm.repeated ? <span>&#10004;</span> : <span>&#10008;</span>}</td>
+                        <td className="center-wrapper">{alarm.enabled ? <span>&#10004;</span> : <span>&#10008;</span>}</td>
+                        <td>{weekDayNumberToShortName(alarm.day_of_week)}</td>
                     </tr>
                 })
             }</tbody>
@@ -520,6 +522,7 @@ var AccountProfile = React.createClass({
                     if (response.data[0].device_account_pair) {
                         if (response.data[0].device_account_pair.externalDeviceId) {
                             var senseId = response.data[0].device_account_pair.externalDeviceId;
+                            this.setState({senseId: senseId});
                             this.loadSenseKeyStore(senseId);
                             this.loadWifi(senseId);
                             this.loadSenseColor(senseId);
@@ -785,14 +788,12 @@ var AccountProfile = React.createClass({
                         <Col xs={6}>
                             <Tile img="svg/sleep.svg" title="Basic Info" img="svg/sleep.svg" content={<AccountTile account={this.state.account} partner={this.state.partner} />} />
                             <Tile img="svg/timeline.svg" title="Timeline" content={<TimelineTile email={this.state.email} response={this.state.timelineResponse} status={this.state.timelineStatus} />} />
+                            <Tile img="svg/alarm.svg" title="Alarms" content={<AlarmsTile alarmsResponse={this.state.alarmsResponse} />} />
                         </Col>
                         <Col xs={6}>
                             <Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseResponse={this.state.senseResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} timezoneResponse={this.state.timezoneResponse} senseColorResponse={this.state.senseColorResponse} />} />
-                            <Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile email={this.state.email} lastRoomConditionsResponse={this.state.lastRoomConditionsResponse} particulatesResponse={this.state.particulatesResponse} />} />
+                            <Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile email={this.state.email} lastRoomConditionsResponse={this.state.lastRoomConditionsResponse} particulatesResponse={this.state.particulatesResponse} senseId={this.state.senseId} />} />
                         </Col>
-                    </Row>
-                    <Row>
-                        <Col md={6}><Tile img="svg/timeline.svg" title="Alarms" content={<AlarmsTile alarmsResponse={this.state.alarmsResponse} />} /></Col>
                     </Row>
                     <Row>
                         <Col md={12}><Tile img="svg/zendesk.svg" title="Zendesk" content={<ZendeskTile zendeskResponse={this.state.zendeskResponse} zendeskStatus={this.props.zendeskStatus} />} /></Col>
@@ -823,4 +824,27 @@ function debunkMarkdown(md) {
 
 function purgeSentinels(d) {
     return d.value != 0 && d.value != -1;
+}
+
+function weekDayNumberToShortName(wdList) {
+    return wdList.map(function(wd) {
+        switch (wd) {
+            case 1:
+                return "M";
+            case 2:
+                return "T";
+            case 3:
+                return "W";
+            case 4:
+                return "Th";
+            case 5:
+                return "F";
+            case 6:
+                return "Sa";
+            case 7:
+                return "Su";
+            default:
+                return "Xe";
+        }
+    }).join(" ");
 }
