@@ -419,18 +419,20 @@ class SenseLogsNewAPI(ProtectedRequestHandler):
         }
 
     def search_within_index(self, index_name):
-        output = {'results': [], 'error': ''}
+        output = {'results': [], 'error': {}}
         index = ApiClient(settings.SEARCHIFY.api_client).get_index(index_name)
         try:
             output.update(index.search(**self.searchify_request))
         except Exception as e:
-            output['error'] = "Error when search in index {} \n{}".format(index_name, display_error(e))
+            output['error'] = {index_name: display_error(e)}
 
-        print self.searchify_request
+        log.info("Searching in {}".format(index_name))
+        log.info("{}".format(self.searchify_request))
         return output
 
     def get(self):
-        aggregate_output = {'results': [], 'error': ''}
+        urlfetch.set_default_fetch_deadline(60)
+        aggregate_output = {'results': [], 'error': {}}
 
         latest_date = datetime.datetime.utcnow()
         earliest_date = latest_date - datetime.timedelta(days=7)
@@ -443,6 +445,7 @@ class SenseLogsNewAPI(ProtectedRequestHandler):
 
         index_date = latest_date
         while self.limit > len(aggregate_output['results']):
+            log.info("Lacking {} results, will look into older index".format(self.limit - len(aggregate_output['results'])))
             index_name = "sense-logs-" + index_date.strftime("%Y-%m-%d")
             if index_date.strftime("%Y-%m-%d") == "2015-05-26":
                 log.warn("Querying backup index on searchify")
@@ -457,11 +460,13 @@ class SenseLogsNewAPI(ProtectedRequestHandler):
 
         self.response.write(json.dumps(aggregate_output))
 
-    @staticmethod
-    def concat_output(log1, log2):
+    def concat_output(self, log1, log2):
+        aggregateError = {}
+        aggregateError.update(log1["error"])
+        aggregateError.update(log2["error"])
         return {
-            "error": " ".join([log1["error"], log2["error"]]),
-            "results": sorted(log1["results"] + log2["results"], key=lambda d: d.get("variable_0", 0))
+            "error": aggregateError,
+            "results": sorted(log1["results"] + log2["results"], key=lambda d: d.get("variable_0", 0))[-1 - self.limit:-1]
         }
 
 

@@ -11,12 +11,6 @@ var SenseLogsNew = React.createClass({
             startFromURL = getParameterByName("start"),
             endFromURL = getParameterByName("end");
 
-        if (keywordFromURL.isWhiteString()) {
-            return false;
-        }
-        else {
-            $("#keyword").val(keywordFromURL);
-        }
         if (fieldFromURL) {
             $("#field").val(fieldFromURL);
         }
@@ -32,6 +26,14 @@ var SenseLogsNew = React.createClass({
         if (endFromURL) {
             $("#end").val(endFromURL);
         }
+
+        if (keywordFromURL.isWhiteString()) {
+            return false;
+        }
+        else {
+            $("#keyword").val(keywordFromURL);
+        }
+
         this.loadSenseLogs();
     },
 
@@ -43,6 +45,20 @@ var SenseLogsNew = React.createClass({
             limit = $("#limit").val().trim(),
             start = $("#start").val().trim(),
             end = $("#end").val().trim();
+
+        if (Number(limit) > 5000) {
+            this.setState({alert: <Alert bsStyle="danger">
+                Invalid request because ceiling limit is 5000
+            </Alert>, loading: null});
+            return false;
+        }
+
+        if (start && end && new Date(start).getTime() > new Date(end).getTime()) {
+            this.setState({alert: <Alert bsStyle="danger">
+                Invalid request because start time cannot be less than end time
+            </Alert>, loading: null});
+            return false;
+        }
 
         if (!keyword) {
             this.setState({alert: <Alert bsStyle="warning">
@@ -67,8 +83,8 @@ var SenseLogsNew = React.createClass({
             data: sendingData,
             success: function (response) {
                 console.log("getting", response);
-                var errorAlert = !(!$.isEmptyObject(response) && response.results && response.results.length > 0) && response.error ?
-                    <Alert bsStyle="danger">{response.error}</Alert> : null;
+                var errorAlert = !(!$.isEmptyObject(response) && response.results && response.results.length > 0) && !$.isEmptyObject(response.error) ?
+                    <Alert>No matches found!</Alert> : null;
                 var resultsSize = response.results ? response.results.length : 0;
                 this.setState({response: response, alert: errorAlert, resultsSize: resultsSize, loading: null});
             }.bind(this)
