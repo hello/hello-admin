@@ -212,7 +212,6 @@ def get_user(app_info_model):
     )
     return service
 
-
 class ProtectedRequestHandler(BaseRequestHandler):
     """
     Restrict general access and define priviedge users lists
@@ -224,9 +223,11 @@ class ProtectedRequestHandler(BaseRequestHandler):
             self.restrict()
 
     def restrict(self):
-        if not self.is_restricted_primary():
+        if self.current_user.email() == "customersupport@sayhello.com":
+             self.redirect('/error')
+        elif not self.is_restricted_primary():
             return
-        if self.is_restricted_secondary():
+        elif self.is_restricted_secondary():
             self.redirect('/error')
 
     def is_restricted_primary(self):

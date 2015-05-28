@@ -128,7 +128,7 @@ class MotionView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/motion.html',
                                 context={'title': 'Motion'})
 
-class ErrorView(ProtectedRequestHandler):
+class ErrorView(BaseRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/error.html',
                                 context={'title': 'Denied'})
@@ -173,12 +173,12 @@ class SetupView(BaseRequestHandler):
         self.render_to_response(template_file='templates/setup.html',
                                 context={'title': 'Setup'})
 
-class PasswordResetView(BaseRequestHandler):
+class PasswordResetView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/password_reset.html',
                                 context={'title': 'Password Reset'})
 
-class OrdersView(ProtectedRequestHandler):
+class OrdersView(BaseRequestHandler):
     """Search for order by order ID"""
     def get(self):
         self.render_to_response(template_file='templates/orders.html',
