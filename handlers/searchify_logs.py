@@ -194,7 +194,8 @@ class DustStatsAPI(ProtectedRequestHandler):
     def get(self):
         urlfetch.set_default_fetch_deadline(20)
         output = {"data": [], "error": ""}
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_MAY)
+        now_date = datetime.datetime.now().strftime("%Y-%m-%d")
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_PREFIX + now_date)
         query = SearchifyQuery()
 
         try:
