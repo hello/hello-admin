@@ -252,10 +252,11 @@ class AlarmsCountPush(GeckoboardPush):
         alarm_pattern = "ALARM RINGING"
         alarms_count = -1
 
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_MAY)
+        now_date = datetime.datetime.now().strftime("%Y-%m-%d")
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_PREFIX + now_date)
 
         try:
-            alarms_count = index.search(query=alarm_pattern, docvar_filters={0: [[time.time() - 24*3600, None]]})['matches']
+            alarms_count = index.search(query=alarm_pattern)['matches']
 
         except Exception as e:
             self.error(e.message)
