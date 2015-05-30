@@ -57,17 +57,14 @@ var AccountTile = React.createClass({
 AlarmsTile = React.createClass({
     render: function() {
         var response = this.props.alarmsResponse;
-        console.log("alarms", response);
         return response.data.length === 0 ? <div>No alarm has been set</div>: <Table>
-            <thead>
-                <tr>
-                    <th>Time</th>
-                    <th>Smart</th>
-                    <th>Repeated</th>
-                    <th>Enabled</th>
-                    <th>Day(s)</th>
-                </tr>
-            </thead>
+            <thead><tr>
+                <th>Time</th>
+                <th>Smart</th>
+                <th>Repeated</th>
+                <th>Enabled</th>
+                <th>Day(s)</th>
+            </tr></thead>
             <tbody>{
                 response.data.map(function(alarm){
                     return <tr>
@@ -79,6 +76,29 @@ AlarmsTile = React.createClass({
                         <td className="center-wrapper">{alarm.repeated ? <span>&#10004;</span> : <span>&#10008;</span>}</td>
                         <td className="center-wrapper">{alarm.enabled ? <span>&#10004;</span> : <span>&#10008;</span>}</td>
                         <td>{weekDayNumberToShortName(alarm.day_of_week)}</td>
+                    </tr>
+                })
+            }</tbody>
+        </Table>;
+    }
+});
+
+var TimezoneHistoryTile = React.createClass({
+    render: function() {
+        var data = this.props.timezoneHistoryResponse.data;
+        console.log("timezone history", data);
+        return $.isEmptyObject(data) ? <div>No timezone detected</div>: <Table>
+            <thead><tr>
+                <th className="center-wrapper">Updated (UTC)</th>
+                <th className="center-wrapper">Timezone ID</th>
+                <th className="center-wrapper">Offset (ms)</th>
+            </tr></thead>
+            <tbody>{
+                Object.keys(data).map(function(updatedAt){
+                    return <tr>
+                        <td className="center-wrapper">{d3.time.format.utc("%b %d %H:%M")(new Date(updatedAt))}</td>
+                        <td className="center-wrapper">{data[updatedAt].timezone_id}</td>
+                        <td className="center-wrapper">{data[updatedAt].timezone_offset}</td>
                     </tr>
                 })
             }</tbody>
@@ -320,7 +340,7 @@ var SenseSummary = React.createClass({
                         <tr><td/><td/></tr>
                     </tbody>
                 </Table>
-                <p><a target="_blank" href={"/sense_logs/?text=&devices=" + senseId + "&max_docs=100&start=&end="}>Last 100 sense logs</a></p>
+                <p><a target="_blank" href={"/sense_logs_new/?field=device_id&keyword=" + senseId + "&sense_id=&limit=&start=&end="}>Last 20 sense logs</a></p>
                 <p><a target="_blank" href={"/sense_events/?account_input=" + senseId + "&start_ts=" + new Date().getTime()}>Last 25 events</a></p>
             </div>;
         }
@@ -398,6 +418,7 @@ var AccountProfile = React.createClass({
             pillKeyStoreResponse: {data: {}, error: ""},
             timelineResponse: {data: [], error: ""},
             timezoneResponse: {data: {}, error: ""},
+            timezoneHistoryResponse: {data: {}, error: ""},
             zendeskResponse: {data: {}, error: ""},
             temperatureResponse: {data: [], error: ""},
             humidityResponse: {data: [], error: ""},
@@ -431,6 +452,7 @@ var AccountProfile = React.createClass({
             pillKeyStoreResponse: {data: {}, error: ""},
             timelineResponse: {data: [], error: ""},
             timezoneResponse: {data: {}, error: ""},
+            timezoneHistoryResponse: {data: {}, error: ""},
             zendeskResponse: {data: {}, error: ""},
             temperatureResponse: {data: [], error: ""},
             humidityResponse: {data: [], error: ""},
@@ -721,6 +743,18 @@ var AccountProfile = React.createClass({
         });
     },
 
+    loadTimezoneHistory: function(email) {
+        $.ajax({
+            url: "/api/timezone_history",
+            dataType: "json",
+            type: 'GET',
+            data: {email: email},
+            success: function (response) {
+                this.setState({timezoneHistoryResponse: response});
+            }.bind(this)
+        });
+    },
+
     loadProfile: function(email) {
         this.loadPartner(email);
         this.loadSense(email);
@@ -728,6 +762,7 @@ var AccountProfile = React.createClass({
         this.loadTimezone(email);
         this.loadTimeline(email);
         this.loadAlarms(email);
+        this.loadTimezoneHistory(email);
         this.loadZendeskTickets(email);
     },
 
@@ -794,6 +829,7 @@ var AccountProfile = React.createClass({
                         <Col xs={6}>
                             <Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseResponse={this.state.senseResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} timezoneResponse={this.state.timezoneResponse} senseColorResponse={this.state.senseColorResponse} />} />
                             <Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile email={this.state.email} lastRoomConditionsResponse={this.state.lastRoomConditionsResponse} particulatesResponse={this.state.particulatesResponse} senseId={this.state.senseId} />} />
+                            <Tile img="svg/timezone.svg" title="Timezone History" content={<TimezoneHistoryTile timezoneHistoryResponse={this.state.timezoneHistoryResponse} />} />
                         </Col>
                     </Row>
                     <Row>

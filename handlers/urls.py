@@ -121,6 +121,8 @@ from handlers.alarms import AlarmsByEmailAPI
 from handlers.devices import SenseColorAPI
 from handlers.views import SenseLogsNewView
 from handlers.searchify_logs import SenseLogsNewAPI
+from handlers.timezone import TimezoneHistoryAPI
+
 
 cron_routes = [
     ('/cron/sense_purge/?$', SensePurge),
@@ -204,6 +206,7 @@ api_routes = [
     ('/api/alarms_by_email/?$', AlarmsByEmailAPI),
     ('/api/sense_color/?$', SenseColorAPI),
     ('/api/sense_logs_new/?$', SenseLogsNewAPI),
+    ('/api/timezone_history/?$', TimezoneHistoryAPI),
 ]
 
 page_routes = [
