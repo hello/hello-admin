@@ -407,13 +407,17 @@ class SenseLogsNewAPI(ProtectedRequestHandler):
         return int(self.request.get("limit", default_value=10))
 
     @property
+    def order(self):
+        return int(self.request.get("order", default_value=0))
+
+    @property
     def searchify_request(self):
         return {
             "query": self.query,
             "fetch_fields": self.request.get("fetch_fields", default_value=["text", "device_id"]),
             "category_filters": self.categories,
             "docvar_filters": {0: [[self.start_ts, self.end_ts]]},
-            "scoring_function": self.request.get("order", default_value=0),
+            "scoring_function": self.order,
             "length": self.limit,
             "fetch_variables": self.request.get("fetch_variables", default_value=True),
             "fetch_categories": self.request.get("fetch_categories", default_value=False),
@@ -422,7 +426,10 @@ class SenseLogsNewAPI(ProtectedRequestHandler):
     def search_within_index(self, index_name):
         output = {'results': [], 'error': {}}
         index = ApiClient(settings.SEARCHIFY.api_client).get_index(index_name)
+        print self.searchify_request
         try:
+            if '1' not in index.list_functions().keys():
+                index.add_function(1, "age")
             output.update(index.search(**self.searchify_request))
         except Exception as e:
             output['error'] = {index_name: display_error(e)}
@@ -462,12 +469,20 @@ class SenseLogsNewAPI(ProtectedRequestHandler):
         self.response.write(json.dumps(aggregate_output))
 
     def concat_output(self, log1, log2):
-        aggregateError = {}
-        aggregateError.update(log1["error"])
-        aggregateError.update(log2["error"])
+        aggregate_error = {}
+        aggregate_error.update(log1["error"])
+        aggregate_error.update(log2["error"])
+
+        aggregate_results = sorted(log1["results"] + log2["results"], key=lambda d: d.get("variable_0", 0))
+        if len(aggregate_results) > self.limit:
+            print "overflow ZZZ"
+            if self.order == 0:
+                aggregate_results = aggregate_results[-1 - self.limit:-1]
+            elif self.order == 1:
+                aggregate_results = aggregate_results[:self.limit]
         return {
-            "error": aggregateError,
-            "results": sorted(log1["results"] + log2["results"], key=lambda d: d.get("variable_0", 0))[-1 - self.limit:-1]
+            "error": aggregate_error,
+            "results": aggregate_results
         }
 
 
