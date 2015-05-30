@@ -15,3 +15,12 @@ class TimezoneAPI(ProtectedRequestHandler):
             },
             app_info=settings.ADMIN_APP_INFO
         )
+
+
+class TimezoneHistoryAPI(ProtectedRequestHandler):
+    def get(self):
+        self.hello_request(
+            api_url="account/timezone_history/{}".format(self.request.get("email")),
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO
+        )
