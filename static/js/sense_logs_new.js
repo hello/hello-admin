@@ -37,7 +37,7 @@ var SenseLogsNew = React.createClass({
         this.loadSenseLogs();
     },
 
-    loadSenseLogs: function() {
+    loadSenseLogs: function(order) {
         this.setState({alert: null, loading: <img src="/static/image/loading.gif" />, resultsSize: 0, response: {}});
         var field = $("#field").val().trim(),
             keyword = $("#keyword").val().trim(),
@@ -73,7 +73,8 @@ var SenseLogsNew = React.createClass({
                 categories: senseId ? JSON.stringify({device_id: [senseId]}) : null,
                 limit: limit ? limit : 20,
                 start: start ? new Date(start + " GMT").getTime() : null,
-                end: end ? new Date(end + " GMT").getTime() : null
+                end: end ? new Date(end + " GMT").getTime() : null,
+                order: order
             };
         console.log("sending", sendingData);
         $.ajax({
@@ -86,37 +87,63 @@ var SenseLogsNew = React.createClass({
                 var errorAlert = !(!$.isEmptyObject(response) && response.results && response.results.length > 0) && !$.isEmptyObject(response.error) ?
                     <Alert>No matches found!</Alert> : null;
                 var resultsSize = response.results ? response.results.length : 0;
-                this.setState({response: response, alert: errorAlert, resultsSize: resultsSize, loading: null});
+                var newState = {
+                    response: response,
+                    alert: errorAlert,
+                    resultsSize: resultsSize,
+                    loading: null
+                };
+                if (resultsSize > 0) {
+                    newState.oldestTimestamp = response.results[0].variable_0;
+                    newState.newestTimestamp = response.results[resultsSize-1].variable_0;
+                }
+                this.setState(newState);
             }.bind(this)
         });
         return false;
+    },
+    loadOlderLogs: function() {
+        $("#start").val("");
+        $("#end").val(formatUTCDateFromEpoch(this.state.oldestTimestamp*1000));
+        this.loadSenseLogs(0);  // grab latest till time
+    },
+    loadNewerLogs: function() {
+        $("#start").val(formatUTCDateFromEpoch(this.state.newestTimestamp*1000));
+        $("#end").val("");
+        this.loadSenseLogs(1);  // grab earliest after time
     },
 	render: function(){
         var response = this.state.response;
         var keyword = $("#keyword").val();
         var resultsTable = !$.isEmptyObject(response) && response.results && response.results.length > 0 ?
-            <Table striped>
-                <thead><tr>
-                    <th className="alert-success">{this.state.resultsSize} documents</th>
-                </tr></thead>
-                <tbody>
-                    {response.results.map(function(r){
-                        return <tr><td>
-                            <div className="center-wrapper">
-                                <Button disabled>
-                                    <span className="span-upload-ts">{new Date(r.variable_0 * 1000).toUTCString()}</span>
-                                </Button>
-                                - Sense ID: <a target="_blank" href={"/account_profile/?type=sense_id&input=" + r.device_id}>{r.device_id}</a>
-                            </div><br/>
-                            <div dangerouslySetInnerHTML={{__html: formatLogText(r.text, keyword)}}/>
-                        </td></tr>;
-                    })}
-                </tbody>
-            </Table>
+            <div>
+                <Table striped>
+                    <thead><tr>
+                        <th className="alert-success">{this.state.resultsSize} documents</th>
+                    </tr></thead>
+                    <tbody>
+                        {response.results.map(function(r){
+                            return <tr><td>
+                                <div className="center-wrapper">
+                                    <Button disabled>
+                                        <span className="span-upload-ts">{new Date(r.variable_0 * 1000).toUTCString()}</span>
+                                    </Button>
+                                    - Sense ID: <a target="_blank" href={"/account_profile/?type=sense_id&input=" + r.device_id}>{r.device_id}</a>
+                                </div><br/>
+                                <div dangerouslySetInnerHTML={{__html: formatLogText(r.text, keyword)}}/>
+                            </td></tr>;
+                        })}
+                    </tbody>
+                </Table>
+                 <br/><Row>
+                    <Col xs={1}><Button onClick={this.loadOlderLogs} className="previous-time-window">Prev</Button></Col>
+                    <Col xs={1} xsOffset={10}><Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button></Col>
+                </Row>
+            </div>
             : null;
 
 		return(<div>
-            <form onSubmit={this.loadSenseLogs}>
+            <form onSubmit={this.loadSenseLogs.bind(this, 0)}>
                 <Row>
                     <Col xs={3} className="zero-padding-right"><Input id="field" type="select" addonBefore="Field">
                         <option value="text">Text</option>
@@ -140,6 +167,10 @@ var SenseLogsNew = React.createClass({
                 </Row>
             </form>
             {this.state.alert}
+            <Row>
+                <Col xs={1}><Button onClick={this.loadOlderLogs} className="previous-time-window">Prev</Button></Col>
+                <Col xs={1} xsOffset={10}><Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button></Col>
+            </Row><br/>
             {resultsTable}
         </div>)
 	}
@@ -156,3 +187,17 @@ function formatLogText(text, keyword){
         .replace(new RegExp(keyword, "gi"), function(m){return '<span class="highlight">' + m + '</span>';});
 }
 
+function formatUTCDateFromEpoch(ts) {
+    var dt = new Date(ts);
+    var convertedMonth = (dt.getUTCMonth() + 1).toString().length > 1 ? (dt.getUTCMonth() + 1) : "0" + (dt.getUTCMonth() + 1);
+    var convertedDate = dt.getUTCDate().toString().length > 1 ? dt.getUTCDate() : "0" + dt.getUTCDate();
+    var convertedHours = dt.getUTCHours().toString().length > 1 ? dt.getUTCHours() : "0" + dt.getUTCHours();
+    var convertedMinutes = dt.getUTCMinutes().toString().length > 1 ? dt.getUTCMinutes() : "0" + dt.getUTCMinutes();
+    var convertedSeconds = dt.getUTCSeconds().toString().length > 1 ? dt.getUTCSeconds() : "0" + dt.getUTCSeconds();
+    return convertedMonth +
+        "/" + convertedDate +
+        "/" + dt.getUTCFullYear() +
+        " " + convertedHours +
+        ":" + convertedMinutes +
+        ":" + convertedSeconds;
+}
