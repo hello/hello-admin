@@ -64,145 +64,6 @@ class ZendeskCronHandler(BaseRequestHandler):
             log.error('ERROR: {}'.format(display_error(e)))
 
 
-class SearchifyPurgeHandler(BaseRequestHandler):
-
-    @staticmethod
-    def normalize_epoch(ts, index_name):
-        if "sense" in index_name:
-            return ts
-        return 1000*int(ts)
-
-    @staticmethod
-    def get_searchify_index(index_name):
-        searchify_entity = settings.SEARCHIFY
-        if not searchify_entity:
-            raise RuntimeError("Missing AppInfo. Bailing.")
-        return ApiClient(searchify_entity.api_client).get_index(index_name)
-
-    def mass_purge_by_keep_size(self, index, level=None, keep_size=700000):
-        output = ResponseOutput()
-        query = "text:{}".format(level.upper()) if level else "all:1"
-        current_size = index.search(query=query)['matches']
-
-        if current_size > int(keep_size):
-            try:
-                index.add_function(4, "doc.var[0]")
-                index.delete_by_search(query=query, start=int(keep_size), scoring_function=4)
-                output.set_status(204)
-            except Exception as e:
-                output.set_error(e.message)
-                output.set_status(500)
-        else:
-            output.set_error("No need to purge since current size is {} while keep size is {}".format(current_size, keep_size))
-            output.set_status(400)
-
-        self.response.write(output.get_serialized_output())
-
-    def mass_purge_by_keep_days(self, index_name, keep_days=30, level=''):
-        output = ResponseOutput()
-        query = "text:{}".format(level.upper()) if level else "all:1"
-        index = self.get_searchify_index(index_name)
-        now = time.time()
-        try:
-            delete_query_params = {}
-            start_ts = None
-            end_ts = 0
-            keep_days = int(keep_days)
-            purge_size = settings.SEARCHIFY_PURGE_CAP_SIZE
-
-            while purge_size >= settings.SEARCHIFY_PURGE_CAP_SIZE:  # increase keep_days to lower delete size
-                end_ts = self.normalize_epoch(now - keep_days * 24 * 3600, index_name)
-                delete_query_params = {'query': query, 'docvar_filters': {0: [[start_ts, end_ts]]}}
-                purge_size = index.search(**delete_query_params)['matches']
-                keep_days += 0.25
-
-            if purge_size > 0 and end_ts > 0 and delete_query_params != {}:
-                log.info("About to purge {} documents from index {} over {} days, "
-                         "i.e. before {}".format(purge_size, index_name, keep_days, epoch_to_human(end_ts)))
-
-                index.delete_by_search(**delete_query_params)
-
-                message_text = "`{}-{}`: purged `{}` documents over {} days, " \
-                               "i.e. before {}".format(index_name, level, purge_size, keep_days-0.25, epoch_to_human(end_ts))
-
-            else:
-                message_text = "`{}-{}`: No need to purge - no document older " \
-                               "than {} days".format(index_name, level, keep_days-0.25)
-                log.info(message_text)
-
-            searchify_purge_stats = SearchifyPurgeStats(
-                purge_size=purge_size,
-                index_name=index_name,
-                level=level,
-            )
-            searchify_purge_stats.put()
-
-            self.send_to_slack_searchify_channel(message_text)
-
-            output.set_data({
-                "purge_size": purge_size,
-                "index_name": index_name,
-                "level": level,
-                "keep_days": int(keep_days),
-                "end_ts": epoch_to_human(end_ts)
-            })
-            output.set_status(204)
-        except Exception as e:
-            output.set_error(e.message)
-            output.set_status(500)
-        self.response.write(output.get_serialized_output())
-
-class SensePurge(SearchifyPurgeHandler):
-    def get(self):
-        self.mass_purge_by_keep_days(index_name=settings.SENSE_LOGS_INDEX_MARCH,
-                                     keep_days=self.request.get("keep_days", 30))
-
-
-class ApplicationPurge(SearchifyPurgeHandler):
-    def get(self):
-        self.mass_purge_by_keep_days(index_name=settings.APPLICATION_LOGS_INDEX,
-                                     keep_days=self.request.get("keep_days", 30),
-                                     level=self.request.get("level", "INFO"))
-
-class WorkersPurge(SearchifyPurgeHandler):
-    def get(self):
-        self.mass_purge_by_keep_days(index_name=settings.WORKERS_LOGS_INDEX,
-                                     keep_days=self.request.get("keep_days", 30),
-                                     level=self.request.get("level", "INFO"))
-
-
-class SearchifyPurgeQueue(SearchifyPurgeHandler):
-    def get(self):
-        taskqueue.add(
-            url='/cron/sense_purge',
-            params={
-                'keep_days': settings.SEARCHIFY_LOGS_KEEP_DAYS[settings.SENSE_LOGS_INDEX_MARCH]
-            },
-            method="GET",
-            queue_name="sense-purge"
-        )
-
-        for level in ['DEBUG', 'INFO', 'WARN', 'ERROR']:
-            taskqueue.add(
-                url='/cron/application_purge',
-                params={
-                    'level': '{}'.format(level),
-                    'keep_days': settings.SEARCHIFY_LOGS_KEEP_DAYS[settings.APPLICATION_LOGS_INDEX][level.upper()]
-                },
-                method="GET",
-                queue_name="application-purge"
-            )
-            taskqueue.add(
-                url='/cron/workers_purge',
-                params={
-                    'level': '{}'.format(level),
-                    'keep_days': settings.SEARCHIFY_LOGS_KEEP_DAYS[settings.WORKERS_LOGS_INDEX][level.upper()]
-                },
-                method="GET",
-                queue_name="workers-purge"
-            )
-
-
 class GeckoboardPush(BaseRequestHandler):
     @staticmethod
     def push_to_gecko(count, device_type, widget_id):
@@ -370,7 +231,7 @@ class StoreRecentlyActiveDevicesStatsDaily(BaseRequestHandler):
 
 class ActiveDevicesHistoryPurge(BaseRequestHandler):
     def get(self):
-        end_ts = datetime.datetime.now() - datetime.timedelta(days=settings.ACTIVE_DEVICES_MINUTE_HISTORY_KEEP_DAYS)
+        end_ts = datetime.datetime.now() - datetime.timedelta(days=settings.ACTIVE_DEVICES_HISTORY_KEEP_DAYS)
         keys = RecentlyActiveDevicesStats.query_keys_by_created(end_ts)
         output = {}
 
@@ -393,7 +254,7 @@ class ActiveDevicesHistoryPurge(BaseRequestHandler):
 
 class ActiveDevicesHistory15MinutesPurge(BaseRequestHandler):
     def get(self):
-        end_ts = datetime.datetime.now() - datetime.timedelta(days=settings.ACTIVE_DEVICES_MINUTE_HISTORY_KEEP_DAYS)
+        end_ts = datetime.datetime.now() - datetime.timedelta(days=settings.ACTIVE_DEVICES_HISTORY_KEEP_DAYS)
         keys = RecentlyActiveDevicesStats15Minutes.query_keys_by_created(end_ts)
         output = {}
 
@@ -414,47 +275,4 @@ class ActiveDevicesHistory15MinutesPurge(BaseRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class ConserveSearchifyStats(BaseRequestHandler):
-    def get(self):
-        searchify_client = ApiClient(settings.SEARCHIFY.api_client)
-        output = ResponseOutput()
 
-        try:
-            index_sizes =[{
-                'index_name': index.__dict__['_IndexClient__index_url'].split('/')[-1],
-                'index_size': index.get_size()
-            } for index in searchify_client.list_indexes()]
-
-            searchify_stats = SearchifyStats(index_sizes=json.dumps(index_sizes))
-            searchify_stats.put()
-
-            searchify_stats_count = SearchifyStats.query().count()
-            if searchify_stats_count > 2800:
-                ndb.delete_multi(SearchifyStats.get_oldest_items_key())
-
-            output.set_data({
-                'breakdown': index_sizes,
-                'stats_count': searchify_stats_count,
-                'total': sum([i.get("index_size", 0) for i in index_sizes])
-            })
-            output.set_status(200)
-
-        except Exception as e:
-            output.set_error(e.message)
-            output.set_status(500)
-
-        self.response.write(output.get_serialized_output())
-
-
-class RemoveOldSearchifyPurgeStats(BaseRequestHandler):
-    def get(self):
-        output = {'deleted_count': 0}
-        old_stats_keys = SearchifyPurgeStats.query_keys_by_created(
-            end_ts=datetime.datetime.now() - datetime.timedelta(days=settings.SEARCHIFY_PURGE_STATS_KEEP_DAYS)
-        )
-        if old_stats_keys:
-            ndb.delete_multi(old_stats_keys)
-            output['deleted_count'] = len(old_stats_keys)
-        output['current_count'] = SearchifyPurgeStats.query().count()
-
-        self.response.write(json.dumps(output))

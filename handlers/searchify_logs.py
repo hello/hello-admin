@@ -11,6 +11,7 @@ from google.appengine.api import urlfetch
 
 
 class SearchifyLogsHandler(ProtectedRequestHandler):
+    @staticmethod
     def normalize_epoch(self, ts, index_name):
         if "sense" in index_name:
             return int(ts)
@@ -110,14 +111,6 @@ class SearchifyLogsHandler(ProtectedRequestHandler):
         return self.get_logs_by_index(index_name, filters)
 
 
-class ApplicationLogsAPI(SearchifyLogsHandler):
-    """
-    Retrieve application logs
-    """
-    def get(self):
-        self.response.write(json.dumps(self.get_logs_filtered_by_levels_orgins_versions(settings.APPLICATION_LOGS_INDEX)))
-
-
 class SenseLogsAPI(SearchifyLogsHandler):
     """
     Retrieve sense logs
@@ -139,9 +132,7 @@ class SenseLogsAPI(SearchifyLogsHandler):
             )
             date_field_count += 1
 
-        if max_results > len(may_logs['data']):
-            march_logs = self.get_logs_filtered_by_devices(settings.SENSE_LOGS_INDEX_MARCH)
-        self.response.write(json.dumps(self.concat_logs(march_logs, may_logs)))
+        self.response.write(json.dumps(may_logs))
 
     @staticmethod
     def concat_logs(log1, log2):
@@ -149,14 +140,6 @@ class SenseLogsAPI(SearchifyLogsHandler):
             "error": " ".join([log1["error"], log2["error"]]),
             "data": sorted(log1["data"] + log2["data"], key=lambda d: int(d.get("timestamp", 0)))
         }
-
-
-class WorkerLogsAPI(SearchifyLogsHandler):
-    """
-    Retrieve worker logs
-    """
-    def get(self):
-        self.response.write(json.dumps(self.get_logs_filtered_by_levels_orgins_versions(settings.WORKERS_LOGS_INDEX)))
 
 
 class SearchifyStatsAPI(ProtectedRequestHandler):

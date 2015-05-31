@@ -1,15 +1,11 @@
 import webapp2
 from handlers.pill_status import PillStatusAPI
 from handlers.deprecated import InactiveDevicesAPI, PreSleepAPI
-from handlers.searchify_logs import SenseLogsAPI, ApplicationLogsAPI, SearchifyStatsAPI
+from handlers.searchify_logs import SenseLogsAPI, SearchifyStatsAPI
 from handlers.timeline import TimelineAPI
 import settings
 from handlers.configuration import FeaturesAPI
 from handlers.cron import ZendeskCronHandler
-from handlers.cron import SensePurge
-from handlers.cron import ApplicationPurge
-from handlers.cron import WorkersPurge
-from handlers.cron import SearchifyPurgeQueue
 from handlers.cron import DevicesCountPush
 from handlers.zendesk import ZendeskAPI
 from handlers.zendesk import ZendeskStatsAPI
@@ -73,7 +69,6 @@ from handlers.keys import PillKeyProvision
 from handlers.label_data import LabelDataAPI
 from handlers.alarms import AlarmsAPI
 from handlers.users import PasswordResetAPI
-from handlers.searchify_logs import WorkerLogsAPI
 from views import WorkerLogsView
 from handlers.memcache import RefreshMemcache
 from handlers.orders import OrdersAPI
@@ -96,8 +91,6 @@ from handlers.cron import WavesCountPush
 from handlers.cron import HoldsCountPush
 from handlers.cron import ActiveDevicesHistoryPurge
 from handlers.cron import ActiveDevicesHistory15MinutesPurge
-from handlers.cron import ConserveSearchifyStats
-from handlers.cron import RemoveOldSearchifyPurgeStats
 from handlers.users import UserSearchAPI
 from handlers.views import UsersInpsectionView
 from handlers.views import AccountProfileView
@@ -125,10 +118,6 @@ from handlers.timezone import TimezoneHistoryAPI
 
 
 cron_routes = [
-    ('/cron/sense_purge/?$', SensePurge),
-    ('/cron/application_purge/?$', ApplicationPurge),
-    ('/cron/workers_purge/?$', WorkersPurge),
-    ('/cron/searchify_purge_queue/?$', SearchifyPurgeQueue),
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
     ('/cron/devices_count_push', DevicesCountPush),
     ('/cron/alarms_count_push', AlarmsCountPush),
@@ -139,8 +128,6 @@ cron_routes = [
     ('/cron/store_recently_active_devices_stats_daily', StoreRecentlyActiveDevicesStatsDaily),
     ('/cron/active_devices_history_purge', ActiveDevicesHistoryPurge),
     ('/cron/active_devices_history_15_minutes_purge', ActiveDevicesHistory15MinutesPurge),
-    ('/cron/conserve_searchify_stats', ConserveSearchifyStats),
-    ('/cron/remove_old_searchify_purge_stats', RemoveOldSearchifyPurgeStats),
 ]
 
 api_routes = [
@@ -150,7 +137,6 @@ api_routes = [
     ('/api/create_groups/?$', CreateGroupsAPI),
     ('/api/create_key_store_locker/?$', CreateKeyStoreLockerAPI),
     ('/api/sense_logs/?$', SenseLogsAPI),
-    ('/api/application_logs/?$', ApplicationLogsAPI),
     ('/api/devices/?$', DeviceAPI),
     ('/api/devices/inactive/?$', DeviceInactiveAPI),
     ('/api/devices/owners/?$', DeviceOwnersAPI),
@@ -179,7 +165,6 @@ api_routes = [
     ('/api/label_data/?$', LabelDataAPI),
     ('/api/alarms/?$', AlarmsAPI),
     ('/api/password_reset/?$', PasswordResetAPI),
-    ('/api/worker_logs/?$', WorkerLogsAPI),
     ('/api/orders/?$', OrdersAPI),
     ('/api/append_app_info/?$', AppendAppInfo),
     ('/api/omni_search/?$', OmniSearchAPI),

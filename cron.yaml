@@ -8,12 +8,6 @@ cron:
 - description: alarms count push
   url: /cron/alarms_count_push
   schedule: every 2 mins
-#- description: waves count push
-#  url: /cron/waves_count_push
-#  schedule: every 2 mins
-#- description: holds count push
-#  url: /cron/holds_count_push
-#  schedule: every 2 mins
 - description: purge active devices history
   url: /cron/active_devices_history_purge
   schedule: every 10 mins
@@ -29,13 +23,4 @@ cron:
 - description: store recently active devices stats daily
   url: /cron/store_recently_active_devices_stats_daily
   schedule: every day 08:10
-- description: conserve searchify stats
-  url: /cron/conserve_searchify_stats
-  schedule: every 60 mins
-- description: remove old searchify purge stats
-  url: /cron/remove_old_searchify_purge_stats
-  schedule: every 60 mins
-#- description: searchify purge queue
-#  url: /cron/searchify_purge_queue
-#  schedule: every 1 mins
 
