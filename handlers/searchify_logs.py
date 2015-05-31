@@ -428,8 +428,8 @@ class SenseLogsNewAPI(ProtectedRequestHandler):
         index = ApiClient(settings.SEARCHIFY.api_client).get_index(index_name)
         print self.searchify_request
         try:
-            if '1' not in index.list_functions().keys():
-                index.add_function(1, "age")
+            if "1" not in index.list_functions().keys():
+                index.add_function(1, "-doc.var[0]")
             output.update(index.search(**self.searchify_request))
         except Exception as e:
             output['error'] = {index_name: display_error(e)}
@@ -445,13 +445,16 @@ class SenseLogsNewAPI(ProtectedRequestHandler):
         latest_date = datetime.datetime.utcnow()
         earliest_date = latest_date - datetime.timedelta(days=7)
 
-        if self.start_ts:
-            earliest_date = max(earliest_date, datetime.datetime.utcfromtimestamp(self.start_ts))
-
         if self.end_ts:
             latest_date = min(latest_date, datetime.datetime.utcfromtimestamp(self.end_ts))
 
         index_date = latest_date
+
+        if self.start_ts:
+            earliest_date = max(earliest_date, datetime.datetime.utcfromtimestamp(self.start_ts))
+            if not self.end_ts:
+                index_date = earliest_date
+
         while self.limit > len(aggregate_output['results']):
             log.info("Lacking {} results, will look into older index".format(self.limit - len(aggregate_output['results'])))
             index_name = settings.SENSE_LOGS_INDEX_PREFIX + index_date.strftime("%Y-%m-%d")
@@ -462,9 +465,14 @@ class SenseLogsNewAPI(ProtectedRequestHandler):
                 aggregate_output,
                 self.search_within_index(index_name)
             )
-            index_date -= datetime.timedelta(days=1)
-            if index_date.strftime("%Y-%m-%d") == (earliest_date - datetime.timedelta(days=1)).strftime("%Y-%m-%d"):
-                break
+            if self.order == 0:
+                if index_date.strftime("%Y-%m-%d") == earliest_date.strftime("%Y-%m-%d"):
+                    break
+                index_date -= datetime.timedelta(days=1)
+            elif self.order == 1:
+                if index_date.strftime("%Y-%m-%d") == latest_date.strftime("%Y-%m-%d"):
+                    break
+                index_date += datetime.timedelta(days=1)
 
         self.response.write(json.dumps(aggregate_output))
 
