@@ -177,7 +177,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         self.send_to_slack(webhook=SLACK_DEPLOYS_WEBHOOK_URL,
                            payload ={'text': message_text, "icon_emoji": ":ghost:", "username": "deploy-bot"})
 
-    def send_to_slack_searchify_channel(self, message_text=''):
+    def send_to_slack_stats_channel(self, message_text=''):
         self.send_to_slack(webhook=SLACK_SEARCHIFY_WEBHOOK_URL,
                            payload ={'text': message_text, "icon_emoji": ":hammer:", "username": "stats-bot"})
 
