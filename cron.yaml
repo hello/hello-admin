@@ -23,4 +23,6 @@ cron:
 - description: store recently active devices stats daily
   url: /cron/store_recently_active_devices_stats_daily
   schedule: every day 08:10
-
+- description: drop old sense logs searchify index
+  url: /cron/drop_old_sense_logs_searchify_index
+  schedule: every day 23:50

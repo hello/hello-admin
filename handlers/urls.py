@@ -115,6 +115,7 @@ from handlers.devices import SenseColorAPI
 from handlers.views import SenseLogsNewView
 from handlers.searchify_logs import SenseLogsNewAPI
 from handlers.timezone import TimezoneHistoryAPI
+from handlers.cron import DropOldSenseLogsSearchifyIndex
 
 
 cron_routes = [
@@ -128,6 +129,7 @@ cron_routes = [
     ('/cron/store_recently_active_devices_stats_daily', StoreRecentlyActiveDevicesStatsDaily),
     ('/cron/active_devices_history_purge', ActiveDevicesHistoryPurge),
     ('/cron/active_devices_history_15_minutes_purge', ActiveDevicesHistory15MinutesPurge),
+    ('/cron/drop_old_sense_logs_searchify_index', DropOldSenseLogsSearchifyIndex),
 ]
 
 api_routes = [

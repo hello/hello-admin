@@ -6,19 +6,15 @@ import requests
 import settings
 from handlers.analysis import get_zendesk_stats
 from handlers.helpers import BaseRequestHandler
-from handlers.helpers import ResponseOutput
 from handlers.utils import display_error
 from handlers.utils import get_current_pacific_datetime
-from handlers.utils import epoch_to_human
 from models.ext import ZendeskDailyStats
 from models.ext import RecentlyActiveDevicesStats
 from models.ext import RecentlyActiveDevicesStatsDaily
 from models.ext import RecentlyActiveDevicesStats15Minutes
-from models.ext import SearchifyStats
-from models.ext import SearchifyPurgeStats
 from indextank import ApiClient
-from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
+from handlers.helpers import ProtectedRequestHandler
 
 class ZendeskCronHandler(BaseRequestHandler):
     def get(self):
@@ -274,5 +270,30 @@ class ActiveDevicesHistory15MinutesPurge(BaseRequestHandler):
 
         self.response.write(json.dumps(output))
 
+
+class DropOldSenseLogsSearchifyIndex(ProtectedRequestHandler):
+    """
+    To be run at the end of  GMT day (23:50)
+    """
+    def get(self):
+        output = {"error": "", "deleted_index_size": 0, "deleted_index_name": ""}
+        searchify_cred = settings.SEARCHIFY
+        searchify_client = ApiClient(searchify_cred.api_client)
+        date_of_deleted_index = (datetime.datetime.now() - datetime.timedelta(days=settings.SENSE_LOGS_KEEP_DAYS - 1)).strftime("%Y-%m-%d")
+        log.info("Attempting to delete index date_of_deleted_index {}".format(date_of_deleted_index))
+
+        deleted_index_name = settings.SENSE_LOGS_INDEX_PREFIX + date_of_deleted_index
+        output["deleted_index_name"] = deleted_index_name
+        try:
+
+            deleted_index_size = searchify_client.get_index(deleted_index_name).get_size()
+            output["deleted_index_size"] = deleted_index_size
+            searchify_client.delete_index(deleted_index_name)
+        except Exception as e:
+            output['error'] = str(e.message)
+
+        dumped_output = json.dumps(output)
+        log.info(dumped_output)
+        self.response.write(dumped_output)
 
 
