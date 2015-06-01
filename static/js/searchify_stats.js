@@ -4,8 +4,8 @@ var SearchifyStats = React.createClass({
     getInitialState: function() {
         return {
             data: [],
-            stackable: false,
-            zoomable: true,
+            total: 0,
+            zoomable: false,
             chartType: "bar",
             alert: <Alert>Loading</Alert>
         }
@@ -20,18 +20,19 @@ var SearchifyStats = React.createClass({
             success: function(response) {
                 console.log(response);
                 if (response.error.isWhiteString()){
-                    this.setState({data: response.data, alert: null});
+                    this.setState({
+                        data: response.data, alert: null,
+                        total: response.data.map(function(z){return z.size;}).reduce(function(x,y){return x+y;})
+                    });
                 }
                 else {
-                    this.setState({alert: <Alert>{response.error}</Alert>});
+                    this.setState({alert: <Alert>{response.error}</Alert>, total: 0});
                 }
             }.bind(this)
         });
     },
 
     componentDidMount: function() {
-        $("#stack-check").attr("checked", false);
-        $("#zoom-check").attr("checked", true);
         this.loadData();
     },
 
@@ -82,7 +83,7 @@ var SearchifyStats = React.createClass({
               }
             },
             zoom: {
-                enabled: true
+                enabled: this.state.zoomable
             },
             legend: {
                 position: "right",
@@ -106,7 +107,9 @@ var SearchifyStats = React.createClass({
         return (<div>
             <h3>Index Size</h3>
             {this.state.alert}
+            <Col xs={3} xsOffset={1}>&Sigma; = {this.state.total}</Col>
             <div id="searchify-stats-chart" className="c3-chart"></div>
+
         </div>)
     }
 });
