@@ -233,3 +233,8 @@ class SenseLogsNewView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/sense_logs_new.html',
                                 context={'title': "Sense Logs New"})
+
+class SearchifyStatsView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/searchify_stats.html',
+                                context={'title': "Searchify Statistics"})

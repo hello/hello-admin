@@ -1,0 +1,18 @@
+{% extends "templates/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block extrastatic %}
+    <link rel="stylesheet" type="text/css"  href="/static/css/searchify_stats.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/c3.min.css" />
+
+    <script type="text/javascript" src="/static/js/third-party/d3.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/c3.min.js"></script>
+
+    <script type="text/jsx" src="/static/js/custom/c3HistoryChart.js"></script>
+    <script type="text/jsx" src="/static/js/searchify_stats.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="row" id="container">
+        <div class="col-xs-12" id="searchify-stats"></div>
+    </div>
+{% endblock %}

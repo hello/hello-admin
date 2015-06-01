@@ -152,21 +152,13 @@ class SearchifyStatsAPI(ProtectedRequestHandler):
             searchify_cred = settings.SEARCHIFY
             searchify_client = ApiClient(searchify_cred.api_client)
 
-            output['data'] = []
-            for index in sorted(searchify_client.list_indexes()):
-                try:
-                    oldest_ts = get_pacific_time_from_epoch_seconds(int(index.search("all:1", scoring_function=1)
-                        ['results'][0]['docid'].split('-')[-1])/1000)
-                    newest_ts = get_pacific_time_from_epoch_seconds(int(index.search("all:1", scoring_function=0)
-                        ['results'][0]['docid'].split('-')[-1])/1000)
-                except Exception as e:
-                    oldest_ts = 'n/a'
-                    newest_ts = 'n/a'
-                output['data'].append({
-                    "summary": index.__dict__,
-                    "oldest_ts": oldest_ts,
-                    "newest_ts": newest_ts
-                })
+            index_stats = [{
+                "name": index.__dict__['_IndexClient__index_url'].split("indexes/")[-1],
+                "size": index.get_size(),
+                "created_at": int(index.get_creation_time().strftime("%s"))*1000
+            } for index in searchify_client.list_indexes()]
+
+            output['data'] = sorted(index_stats, key=lambda i: i['created_at'])
         except Exception as e:
             output['error'] = display_error(e)
 
