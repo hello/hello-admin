@@ -115,6 +115,7 @@ from handlers.devices import SenseColorAPI
 from handlers.views import SenseLogsNewView
 from handlers.searchify_logs import SenseLogsNewAPI
 from handlers.timezone import TimezoneHistoryAPI
+from handlers.views import SearchifyStatsView
 from handlers.cron import DropOldSenseLogsSearchifyIndex
 
 
@@ -243,6 +244,7 @@ page_routes = [
     ('/onboarding_logs/?$', OnboardingLogsView),
     ('/log_facets/?$', LogsPatternFacetsView),
     ('/sense_logs_new/?$', SenseLogsNewView),
+    ('/searchify_stats/?$', SearchifyStatsView),
 ]
 
 file_upload_routes = [
