@@ -181,3 +181,38 @@ class SenseColorAPI(ProtectedRequestHandler):
             type="PUT",
             app_info=settings.ADMIN_APP_INFO
         )
+
+
+class SenseBlackListAPI(ProtectedRequestHandler):
+    def get(self):
+        self.hello_request(
+            api_url="devices/sense_black_list",
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO
+        )
+
+    def put(self):
+        self.hello_request(
+            api_url="devices/sense_black_list",
+            type="PUT",
+            app_info=settings.ADMIN_APP_INFO,
+            body_data=self.request.body
+        )
+
+    def post(self):
+        current_sense_black_list = self.hello_request(
+            api_url="devices/sense_black_list",
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO,
+            raw_output=True
+        ).data
+
+        new_sense_black_list = json.loads(self.request.body)
+        aggregate_black_list = current_sense_black_list + new_sense_black_list
+
+        self.hello_request(
+            api_url="devices/sense_black_list",
+            type="PUT",
+            app_info=settings.ADMIN_APP_INFO,
+            body_data=json.dumps(aggregate_black_list)
+        )

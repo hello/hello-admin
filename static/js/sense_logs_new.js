@@ -1,9 +1,10 @@
 var SenseLogsNew = React.createClass({
     getInitialState: function() {
-        return {response: {}, alert: null, resultsSize: 0, loading: null}
+        return {response: {}, alert: null, resultsSize: 0, loading: null, blackList: []}
     },
 
     componentDidMount: function() {
+        this.retrieveBlackList();
         var fieldFromURL = getParameterByName("field"),
             keywordFromURL = getParameterByName("keyword"),
             senseIdFromURL = getParameterByName("sense_id"),
@@ -35,6 +36,17 @@ var SenseLogsNew = React.createClass({
         }
 
         this.loadSenseLogs();
+    },
+
+    retrieveBlackList: function() {
+        $.ajax({
+            url: '/api/sense_black_list',
+            dataType: 'json',
+            type: 'GET',
+            success: function (response) {
+                this.setState({blackList: response.data});
+            }.bind(this)
+        });
     },
 
     loadSenseLogs: function(order) {
@@ -167,9 +179,15 @@ var SenseLogsNew = React.createClass({
                 </Row>
             </form>
             {this.state.alert}
+
             <Row>
-                <Col xs={1}><Button onClick={this.loadOlderLogs} className="previous-time-window">Prev</Button></Col>
-                <Col xs={1} xsOffset={10}><Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button></Col>
+                <Col xs={10}><a href="/black_list" target="_blank">Sense Black List:</a> {
+                    this.state.blackList.map(function(s){return <span><Button bsSize="xsmall" disabled>{s}</Button>&nbsp;</span>})
+                }</Col>
+                <Col xs={2}><ButtonGroup>
+                    <Button onClick={this.loadOlderLogs} className="previous-time-window">Prev</Button>
+                    <Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button>
+                </ButtonGroup></Col>
             </Row><br/>
             {resultsTable}
         </div>)

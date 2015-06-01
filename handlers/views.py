@@ -238,3 +238,8 @@ class SearchifyStatsView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/searchify_stats.html',
                                 context={'title': "Searchify Statistics"})
+
+class BlackListView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/black_list.html',
+                                context={'title': "Devices Whose Logs Do Not Matter"})
