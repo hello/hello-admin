@@ -147,9 +147,11 @@ var SenseLogsNew = React.createClass({
                         })}
                     </tbody>
                 </Table>
-                 <br/><Row>
-                    <Col xs={1}><Button onClick={this.loadOlderLogs} className="previous-time-window">Prev</Button></Col>
-                    <Col xs={1} xsOffset={10}><Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button></Col>
+                <br/><Row>
+                    <Col xs={2} xsOffset={10}><ButtonGroup>
+                        <Button onClick={this.loadOlderLogs} className="previous-time-window">Prev</Button>
+                            <Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button>
+                    </ButtonGroup></Col>
                 </Row>
             </div>
             : null;
