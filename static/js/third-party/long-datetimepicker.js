@@ -4,6 +4,7 @@ var LongDatetimePicker = React.createClass({
     getDefaultProps: function() {
         return {
             id: "datetimepicker",
+            reference: "datetimepicker",
             placeHolder: "datetimepicker",
             size: "3",
             minDate: "1/1/1970",
@@ -45,10 +46,10 @@ var LongDatetimePicker = React.createClass({
     render: function() {
         var s = this.props.size, input;
         if (this.props.format) {
-          input = <input id={this.props.id} className="form-control" placeholder={this.props.placeHolder} data-date-format={this.props.format}/>;
+          input = <input id={this.props.id} ref={this.props.reference} className="form-control" placeholder={this.props.placeHolder} data-date-format={this.props.format}/>;
         }
         else {
-          input = <input id={this.props.id} className="form-control" placeholder={this.props.placeHolder} />
+          input = <input id={this.props.id} ref={this.props.reference} className="form-control" placeholder={this.props.placeHolder} />
         }
         return (
 
