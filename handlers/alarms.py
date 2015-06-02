@@ -30,3 +30,16 @@ class AlarmsByEmailAPI(ProtectedRequestHandler):
             type="GET",
             app_info=settings.ADMIN_APP_INFO
         )
+
+class AlarmRingsHistoryAPI(ProtectedRequestHandler):
+    def get(self):
+        self.hello_request(
+            api_url="account/ring_history",
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO,
+            url_params={
+                "email": self.request.get("email"),
+                "start_time_millis": self.request.get("start"),
+                "end_time_millis": self.request.get("end")
+            }
+        )
