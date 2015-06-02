@@ -63,6 +63,4 @@ class TeamsAPI(ProtectedRequestHandler):
             teams_response.status
         )
 
-        print message_text
-
         self.send_to_slack_deploys_channel(message_text)
