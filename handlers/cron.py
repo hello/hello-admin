@@ -271,9 +271,9 @@ class ActiveDevicesHistory15MinutesPurge(BaseRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class DropOldSenseLogsSearchifyIndex(ProtectedRequestHandler):
+class DropOldSenseLogsSearchifyIndex(BaseRequestHandler):
     """
-    To be run at the end of GMT day (23:50)
+    To be run at the end of GMT day (23:55)
     """
     def get(self):
         output = {"status": "", "deleted_index_size": 0, "deleted_index_name": ""}

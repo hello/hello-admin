@@ -25,4 +25,4 @@ cron:
   schedule: every day 08:10
 - description: drop old sense logs searchify index
   url: /cron/drop_old_sense_logs_searchify_index
-  schedule: every day 23:50
+  schedule: every day 23:55
