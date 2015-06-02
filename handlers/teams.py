@@ -41,20 +41,28 @@ class TeamsAPI(ProtectedRequestHandler):
             "api_url": "teams/{}/{}".format(mode, group) if action == "delete-group" else "teams/{}".format(mode),
             "type": request_type_map[action],
             "body_data": json.dumps(body_data),
-            "app_info": settings.ADMIN_APP_INFO
+            "app_info": settings.ADMIN_APP_INFO,
+            "raw_output": True
         }
 
+        teams_response = self.hello_request(**request_specs)
         if action == "remove":
             for i in ids:
                 request_specs['api_url'] = "teams/{}/{}/{}".format(mode, group, i)
-                self.hello_request(**request_specs)
-        else:
-            self.hello_request(**request_specs)
+                teams_response = self.hello_request(**request_specs)
+
+        if teams_response.status not in [200, 204]:
+            log.error("Failed to update teams")
+
+        self.response.write(teams_response.get_serialized_output())
 
         request_context = self._extra_context({})
-        message_text = "%s updated teams: %s. ids :%s" % (
-                request_context['user'],
-                body_data['name'],
-                ','.join(body_data['ids'])
+        message_text = "{} updated teams with request: {}, response status is {}".format(
+            request_context['user'],
+            self.request.body,
+            teams_response.status
         )
+
+        print message_text
+
         self.send_to_slack_deploys_channel(message_text)

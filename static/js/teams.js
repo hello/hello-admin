@@ -112,7 +112,7 @@ var ConfigMaestro = React.createClass({
       data: JSON.stringify(sendData),
       type: 'PUT',
       success: function(response) {
-        console.log(response);
+        console.log("raw GET response", response);
         that.getTeams();
       }.bind(this),
       error: function(e) {
