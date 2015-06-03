@@ -120,7 +120,14 @@ class BaseRequestHandler(webapp2.RequestHandler):
         session = self.authorize_session(app_info, access_token)
 
         request_detail = {
-            "headers": {'Content-Type': content_type},
+            "headers": {
+                "Content-Type": content_type,
+                "user": self.current_user.email(),
+                "X-Appengine-Country": self.request.headers.get("X-Appengine-Country"),
+                "X-Appengine-Region": self.request.headers.get("X-Appengine-Region"),
+                "X-Appengine-City": self.request.headers.get("X-Appengine-City"),
+                "X-Appengine-CityLatLong": self.request.headers.get("X-Appengine-CityLatLong"),
+            },
         }
 
         if body_data and type in ['PUT', 'POST', 'PATCH']:
@@ -261,7 +268,6 @@ class ProtectedRequestHandler(BaseRequestHandler):
 
     def super_firmware(self):
         return stripStringToList(self.groups_entity.super_firmware)
-
 
 class CustomerExperienceRequestHandler(ProtectedRequestHandler):
     """
