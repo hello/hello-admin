@@ -25,14 +25,12 @@ if SERVER == "localhost":
     ENVIRONMENT = "local-dev"
 
 ## Grab settings saved in GAE memcache and only query from Datastore if they are not available
-APP_INFO = AppInfo.get_by_id(ENVIRONMENT)
-ADMIN_USER = AdminUser.get_by_id(ENVIRONMENT)
+
 SEARCHIFY = SearchifyCredentials.query().get()
 ZENDESK = ZendeskCredentials.query().get()
-USER_GROUP = UserGroup.query().get()
+
 GECKOBOARD = GeckoboardCredentials.query().get()
 
-DEFAULT_ACCESS_TOKEN = APP_INFO.access_token if APP_INFO else None
 ACTIVE_DEVICES_HISTORY_KEEP_DAYS = 4
 
 ## Seachify Index

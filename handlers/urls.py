@@ -18,6 +18,7 @@ from handlers.devices import DeviceAPI
 from handlers.devices import DeviceInactiveAPI
 from handlers.devices import DeviceKeyStoreHint
 from handlers.devices import DeviceOwnersAPI
+from handlers.diagnostic import DiagnosticAPI
 from handlers.room_conditions import RoomConditionsAPI
 from handlers.setup import AppAPI
 from handlers.setup import AppScopeAPI
@@ -198,6 +199,7 @@ api_routes = [
     ('/api/sense_logs_new/?$', SenseLogsNewAPI),
     ('/api/timezone_history/?$', TimezoneHistoryAPI),
     ('/api/sense_black_list/?$', SenseBlackListAPI),
+    ('/api/diagnostic/?$', DiagnosticAPI),
 ]
 
 page_routes = [
