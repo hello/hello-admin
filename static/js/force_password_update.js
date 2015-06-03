@@ -56,7 +56,7 @@ var ForcePasswordUpdateMaestro = React.createClass({
 });
 $(function(){
     var viewer = $('#viewer').val();
-    var legitList = ["tim@sayhello.com", "marina@sayhello.com", "chrisl@sayhello.com", "natalya@sayhello.com"];
+    var legitList = ["tim@sayhello.com", "marina@sayhello.com", "chrisl@sayhello.com", "natalya@sayhello.com", "lee@sayhello.com"];
     if (legitList.indexOf(viewer) > -1) {
         React.renderComponent(<ForcePasswordUpdateMaestro />, document.getElementById('force-password-update'));
     }
