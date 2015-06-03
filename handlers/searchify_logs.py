@@ -427,7 +427,11 @@ class SenseLogsNewAPI(ProtectedRequestHandler):
             if not self.end_ts:
                 index_date = earliest_date
 
+        count = 0
         while self.limit > len(aggregate_output['results']):
+            count += 1
+            if count > 7:
+                break
             log.info("Lacking {} results, will look into older index".format(self.limit - len(aggregate_output['results'])))
             index_name = settings.SENSE_LOGS_INDEX_PREFIX + index_date.strftime("%Y-%m-%d")
             if index_date.strftime("%Y-%m-%d") == "2015-05-26":
