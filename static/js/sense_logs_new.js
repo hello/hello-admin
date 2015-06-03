@@ -96,8 +96,10 @@ var SenseLogsNew = React.createClass({
             data: sendingData,
             success: function (response) {
                 console.log("getting", response);
-                var errorAlert = !(!$.isEmptyObject(response) && response.results && response.results.length > 0) && !$.isEmptyObject(response.error) ?
+                var errorAlert = response.results && response.results.length === 0 ?
                     <Alert>No matches found!</Alert> : null;
+
+                console.log("errorAlert", errorAlert);
                 var resultsSize = response.results ? response.results.length : 0;
                 var newState = {
                     response: response,
@@ -190,8 +192,6 @@ var SenseLogsNew = React.createClass({
                     <Col xs={1}>{this.state.loading}</Col>
                 </Row>
             </form>
-            {this.state.alert}
-
             <Row>
                 <Col xs={10}><a href="/black_list" target="_blank">Sense Black List:</a> {
                     this.state.blackList.map(function(s){return <span><Button bsSize="xsmall" disabled>{s}</Button>&nbsp;</span>})
@@ -201,6 +201,7 @@ var SenseLogsNew = React.createClass({
                     <Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button>
                 </ButtonGroup></Col>
             </Row><br/>
+            {this.state.alert}
             {resultsTable}
         </div>)
 	}
@@ -209,7 +210,6 @@ var SenseLogsNew = React.createClass({
 React.render(<SenseLogsNew/>, document.getElementById("sense-logs"));
 
 function formatLogText(text, keyword){
-    console.log(keyword);
     if (keyword.isWhiteString()) {
         return text.replace(/\n/g, "<br>");
     }
