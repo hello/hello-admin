@@ -119,16 +119,14 @@ class BaseRequestHandler(webapp2.RequestHandler):
 
         session = self.authorize_session(app_info, access_token)
 
-        location = {k: self.request.headers.get(k)
-            for k in ["X-Appengine-Country", "X-AppEngine-Region", "X-AppEngine-City", "X-AppEngine-CityLatLong"]}
-
         request_detail = {
             "headers": {
                 "Content-Type": content_type,
-                "location": location,
                 "user": self.current_user.email(),
-                "api_url": app_info.endpoint + api_url,
-                "url_params": url_params
+                "X-Appengine-Country": self.request.headers.get("X-Appengine-Country"),
+                "X-Appengine-Region": self.request.headers.get("X-Appengine-Region"),
+                "X-Appengine-City": self.request.headers.get("X-Appengine-City"),
+                "X-Appengine-CityLatLong": self.request.headers.get("X-Appengine-CityLatLong"),
             },
         }
 
