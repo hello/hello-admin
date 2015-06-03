@@ -120,6 +120,8 @@ from handlers.views import SearchifyStatsView
 from handlers.cron import DropOldSenseLogsSearchifyIndex
 from handlers.devices import SenseBlackListAPI
 from handlers.views import BlackListView
+from handlers.views import AlarmRingsHistoryView
+from handlers.alarms import AlarmRingsHistoryAPI
 
 
 cron_routes = [
@@ -200,6 +202,7 @@ api_routes = [
     ('/api/timezone_history/?$', TimezoneHistoryAPI),
     ('/api/sense_black_list/?$', SenseBlackListAPI),
     ('/api/diagnostic/?$', DiagnosticAPI),
+    ('/api/alarm_rings_history/?$', AlarmRingsHistoryAPI),
 ]
 
 page_routes = [
@@ -251,6 +254,7 @@ page_routes = [
     ('/sense_logs_new/?$', SenseLogsNewView),
     ('/searchify_stats/?$', SearchifyStatsView),
     ('/black_list/?$', BlackListView),
+    ('/alarm_rings_history/?$', AlarmRingsHistoryView),
 ]
 
 file_upload_routes = [

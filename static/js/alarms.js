@@ -57,9 +57,10 @@ var AlarmsMaster = React.createClass({
             url: '/api/tokens',
             dataType: 'json',
             contentType: 'application/json',
-            type: 'POST',
+            type: 'PUT',
             data: JSON.stringify(requestData),
             success: function(response) {
+                console.log("token API Response", response);
                 that.setState({token: response.data.token, error: null});
                 that.getAlarms();
             }.bind(that)

@@ -96,8 +96,10 @@ var SenseLogsNew = React.createClass({
             data: sendingData,
             success: function (response) {
                 console.log("getting", response);
-                var errorAlert = !(!$.isEmptyObject(response) && response.results && response.results.length > 0) && !$.isEmptyObject(response.error) ?
+                var errorAlert = response.results && response.results.length === 0 ?
                     <Alert>No matches found!</Alert> : null;
+
+                console.log("errorAlert", errorAlert);
                 var resultsSize = response.results ? response.results.length : 0;
                 var newState = {
                     response: response,
@@ -106,8 +108,8 @@ var SenseLogsNew = React.createClass({
                     loading: null
                 };
                 if (resultsSize > 0) {
-                    newState.oldestTimestamp = response.results[0].variable_0;
-                    newState.newestTimestamp = response.results[resultsSize-1].variable_0;
+                    newState.oldestTimestamp = response.results[0].variable_1;
+                    newState.newestTimestamp = response.results[resultsSize-1].variable_1;
                 }
                 this.setState(newState);
             }.bind(this)
@@ -116,13 +118,22 @@ var SenseLogsNew = React.createClass({
     },
     loadOlderLogs: function() {
         $("#start").val("");
-        $("#end").val(formatUTCDateFromEpoch(this.state.oldestTimestamp*1000));
+        $("#end").val(formatUTCDateFromEpoch(this.state.oldestTimestamp));
         this.loadSenseLogs(0);  // grab latest till time
     },
     loadNewerLogs: function() {
-        $("#start").val(formatUTCDateFromEpoch(this.state.newestTimestamp*1000));
+        $("#start").val(formatUTCDateFromEpoch(this.state.newestTimestamp));
         $("#end").val("");
         this.loadSenseLogs(1);  // grab earliest after time
+    },
+    focusWindow: function(senseId, ts) {
+        $("#field").val("device_id");
+        $("#keyword").val(senseId);
+        $("#sense-id").val("");
+        $("#start").val(d3.time.format.utc("%Y-%m-%d %H:%M:%S")(new Date(ts - 5*60*1000)));
+        $("#end").val(d3.time.format.utc("%Y-%m-%d %H:%M:%S")(new Date(ts + 5*60*1000)));
+        this.refs.submit.getDOMNode().focus();
+        this.loadSenseLogs();
     },
 	render: function(){
         var response = this.state.response;
@@ -137,14 +148,15 @@ var SenseLogsNew = React.createClass({
                         {response.results.map(function(r){
                             return <tr><td>
                                 <div className="center-wrapper">
-                                    <Button disabled>
-                                        <span className="span-upload-ts">{new Date(r.variable_0 * 1000).toUTCString()}</span>
+                                    <Button className="borderless" disabled>
+                                        <span className="span-upload-ts">{new Date(r.variable_1).toUTCString()}</span>
                                     </Button>
                                     - Sense ID: <a target="_blank" href={"/account_profile/?type=sense_id&input=" + r.device_id}>{r.device_id}</a>
+                                    &nbsp;<Button onClick={this.focusWindow.bind(this, r.device_id, r.variable_1)}>See all logs of this sense around this time</Button>
                                 </div><br/>
                                 <div dangerouslySetInnerHTML={{__html: formatLogText(r.text, keyword)}}/>
                             </td></tr>;
-                        })}
+                        }.bind(this))}
                     </tbody>
                 </Table>
                 <br/><Row>
@@ -176,12 +188,10 @@ var SenseLogsNew = React.createClass({
                     <Col xs={3} className="zero-padding-left"><Input id="sense-id" type="text" placeholder="Filter Value <optional>"/></Col>
                     <Col xs={1}><Button className="time-window" disabled>To</Button></Col>
                     <LongDatetimePicker glyphicon="time" placeHolder="end (GMT) <optional>" id="end" size="3" />
-                    <Col xs={1}><Button type="submit">&nbsp;<Glyphicon glyph="search"/>&nbsp;</Button></Col>
+                    <Col xs={1}><Button ref="submit" type="submit">&nbsp;<Glyphicon glyph="search"/>&nbsp;</Button></Col>
                     <Col xs={1}>{this.state.loading}</Col>
                 </Row>
             </form>
-            {this.state.alert}
-
             <Row>
                 <Col xs={10}><a href="/black_list" target="_blank">Sense Black List:</a> {
                     this.state.blackList.map(function(s){return <span><Button bsSize="xsmall" disabled>{s}</Button>&nbsp;</span>})
@@ -191,6 +201,7 @@ var SenseLogsNew = React.createClass({
                     <Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button>
                 </ButtonGroup></Col>
             </Row><br/>
+            {this.state.alert}
             {resultsTable}
         </div>)
 	}
@@ -199,7 +210,6 @@ var SenseLogsNew = React.createClass({
 React.render(<SenseLogsNew/>, document.getElementById("sense-logs"));
 
 function formatLogText(text, keyword){
-    console.log(keyword);
     if (keyword.isWhiteString()) {
         return text.replace(/\n/g, "<br>");
     }

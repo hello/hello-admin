@@ -243,3 +243,8 @@ class BlackListView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/black_list.html',
                                 context={'title': "Devices Whose Logs Do Not Matter"})
+
+class AlarmRingsHistoryView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/alarm_rings_history.html',
+                                context={'title': "Alarms, Ringtime & Timezone"})

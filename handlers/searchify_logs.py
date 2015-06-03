@@ -209,7 +209,7 @@ class DustStatsAPI(ProtectedRequestHandler):
 
 class WifiSignalStrengthAPI(ProtectedRequestHandler):
     def get_wifi_from_index(self, index_name):
-        output = {"data": [], "error": ""}
+        output = {"data": {}, "error": ""}
         index = ApiClient(settings.SEARCHIFY.api_client).get_index(index_name)
         query = SearchifyQuery()
 
@@ -248,10 +248,16 @@ class WifiSignalStrengthAPI(ProtectedRequestHandler):
         return output
 
     def get(self):
-        output = self.get_wifi_from_index(settings.SENSE_LOGS_INDEX_MAY)
-        if not output['data']:
-            urlfetch.set_default_fetch_deadline(30)
-            output = self.get_wifi_from_index(settings.SENSE_LOGS_INDEX_MARCH)
+        urlfetch.set_default_fetch_deadline(30)
+        now = datetime.datetime.utcnow()
+
+        output = {"data": {}, "error": ""}
+        count = 0
+
+        while (count < settings.SENSE_LOGS_KEEP_DAYS):
+            output = self.get_wifi_from_index(settings.SENSE_LOGS_INDEX_PREFIX + (now - datetime.timedelta(days=count)).strftime("%Y-%m-%d"))
+            if output['data']:
+                break
         self.response.write(json.dumps(output))
 
 
@@ -401,7 +407,7 @@ class SenseLogsNewAPI(ProtectedRequestHandler):
     def search_within_index(self, index_name):
         output = {'results': [], 'error': {}}
         index = ApiClient(settings.SEARCHIFY.api_client).get_index(index_name)
-        print self.searchify_request
+        log.info("searchify request {}".format(self.searchify_request))
         try:
             if "1" not in index.list_functions().keys():
                 index.add_function(1, "-doc.var[0]")
@@ -410,7 +416,6 @@ class SenseLogsNewAPI(ProtectedRequestHandler):
             output['error'] = {index_name: display_error(e)}
 
         log.info("Searching in {}".format(index_name))
-        log.info("{}".format(self.searchify_request))
         return output
 
     def get(self):
@@ -430,7 +435,11 @@ class SenseLogsNewAPI(ProtectedRequestHandler):
             if not self.end_ts:
                 index_date = earliest_date
 
+        count = 0
         while self.limit > len(aggregate_output['results']):
+            count += 1
+            if count > 7:
+                break
             log.info("Lacking {} results, will look into older index".format(self.limit - len(aggregate_output['results'])))
             index_name = settings.SENSE_LOGS_INDEX_PREFIX + index_date.strftime("%Y-%m-%d")
             if index_date.strftime("%Y-%m-%d") == "2015-05-26":
