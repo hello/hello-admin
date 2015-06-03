@@ -123,10 +123,10 @@ class BaseRequestHandler(webapp2.RequestHandler):
             "headers": {
                 "Content-Type": content_type,
                 "user": self.current_user.email(),
-                "X-Appengine-Country": self.request.headers.get("X-Appengine-Country"),
-                "X-Appengine-Region": self.request.headers.get("X-Appengine-Region"),
-                "X-Appengine-City": self.request.headers.get("X-Appengine-City"),
-                "X-Appengine-CityLatLong": self.request.headers.get("X-Appengine-CityLatLong"),
+                "X-Appengine-Country": self.request.headers.get("X-Appengine-Country", ""),
+                "X-Appengine-Region": self.request.headers.get("X-Appengine-Region", ""),
+                "X-Appengine-City": self.request.headers.get("X-Appengine-City", ""),
+                "X-Appengine-CityLatLong": self.request.headers.get("X-Appengine-CityLatLong", ""),
             },
         }
 
