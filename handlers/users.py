@@ -294,6 +294,7 @@ class PasswordResetAPI(ProtectedRequestHandler):
             type="POST",
             body_data=json.dumps({"email": email})
         )
+        self.send_to_slack_admin_logs_channel("Employee {} sent a link to reset password to customer {}".format(self.current_user.email(), email))
 
 
 class ForcePasswordUpdateAPI(CustomerExperienceRequestHandler):
@@ -310,6 +311,8 @@ class ForcePasswordUpdateAPI(CustomerExperienceRequestHandler):
             body_data=json.dumps({"email": email, "password": password}),
             app_info=settings.ADMIN_APP_INFO
         )
+        self.send_to_slack_admin_logs_channel("Employee {} hard-reseted password for customer {}".format(self.current_user.email(), email))
+
 
 class AccountCountsBreakdownByCreatedDateAPI(ProtectedRequestHandler):
     def get(self):
