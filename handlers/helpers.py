@@ -20,8 +20,6 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     autoescape=True
 )
 
-SLACK_DEPLOYS_WEBHOOK_URL = 'https://hooks.slack.com/services/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'
-SLACK_SEARCHIFY_WEBHOOK_URL = 'https://hooks.slack.com/services/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'
 
 class BaseRequestHandler(webapp2.RequestHandler):
     def log_and_redirect(self, redirect_path, redirect_message):
@@ -181,12 +179,16 @@ class BaseRequestHandler(webapp2.RequestHandler):
             log.error("Slack notification failed: %s", e)
 
     def send_to_slack_deploys_channel(self, message_text=''):
-        self.send_to_slack(webhook=SLACK_DEPLOYS_WEBHOOK_URL,
+        self.send_to_slack(webhook=settings.SLACK_DEPLOYS_WEBHOOK_URL,
                            payload ={'text': message_text, "icon_emoji": ":ghost:", "username": "deploy-bot"})
 
     def send_to_slack_stats_channel(self, message_text=''):
-        self.send_to_slack(webhook=SLACK_SEARCHIFY_WEBHOOK_URL,
-                           payload ={'text': message_text, "icon_emoji": ":hammer:", "username": "stats-bot"})
+        self.send_to_slack(webhook=settings.SLACK_STATS_WEBHOOK_URL,
+                           payload={'text': message_text, "icon_emoji": ":hammer:", "username": "stats-bot"})
+
+    def send_to_slack_admin_logs_channel(self, message_text=''):
+        self.send_to_slack(webhook=settings.SLACK_ADMIN_LOGS_WEBHOOK_URL,
+                           payload={'text': message_text, "icon_emoji": ":snake:", "username": "admin-logs-bot"})
 
 def make_oauth2_service(app_info_model):
     """
