@@ -209,7 +209,7 @@ class DustStatsAPI(ProtectedRequestHandler):
 
 class WifiSignalStrengthAPI(ProtectedRequestHandler):
     def get_wifi_from_index(self, index_name):
-        output = {"data": [], "error": ""}
+        output = {"data": {}, "error": ""}
         index = ApiClient(settings.SEARCHIFY.api_client).get_index(index_name)
         query = SearchifyQuery()
 
@@ -249,7 +249,15 @@ class WifiSignalStrengthAPI(ProtectedRequestHandler):
 
     def get(self):
         urlfetch.set_default_fetch_deadline(30)
-        output = self.get_wifi_from_index(settings.SENSE_LOGS_INDEX_MAY)
+        now = datetime.datetime.utcnow()
+
+        output = {"data": {}, "error": ""}
+        count = 0
+
+        while (count < settings.SENSE_LOGS_KEEP_DAYS):
+            output = self.get_wifi_from_index(settings.SENSE_LOGS_INDEX_PREFIX + (now - datetime.timedelta(days=count)).strftime("%Y-%m-%d"))
+            if output['data']:
+                break
         self.response.write(json.dumps(output))
 
 
