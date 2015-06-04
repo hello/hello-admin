@@ -34,15 +34,10 @@ class BaseRequestHandler(webapp2.RequestHandler):
     def get_admin_user(self):
         return AdminUser.get_by_id(settings.ENVIRONMENT)
 
-    def  get_user_group(self):
-        return UserGroup.query().get()
-
     def get_default_access_token(self):
         app_info = self.get_app_info()
-        print "app_info", app_info
         if app_info is None:
             self.error(500)
-            self.show_handler_error(friendly_user_message)
         else:
             print "token-->", app_info.access_token
             return app_info.access_token
@@ -282,7 +277,7 @@ class ProtectedRequestHandler(BaseRequestHandler):
     ## Retrieve groups grom DataStore
     @property
     def groups_entity(self):
-        return settings.USER_GROUP
+        return UserGroup.query().get()
 
     def super_engineer(self):
         return stripStringToList(self.groups_entity.super_engineer)
