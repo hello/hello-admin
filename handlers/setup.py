@@ -156,7 +156,7 @@ class TokenAPI(ProtectedRequestHandler):
         :type password: str
         :return: dict {'token': <token>}
         """
-        app_info_model = settings.APP_INFO
+        app_info_model = self.get_app_info()
 
         if app_info_model is None:
             self.error(500)
