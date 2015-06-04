@@ -197,14 +197,18 @@ var WifiTile = React.createClass({
             <thead>
                 <tr><th>Network SSID</th><th>Security</th><th>Strength</th></tr>
             </thead>
-            <tbody>
-                    {response.data.networks.map(function(w){return <tr><td>{w.network_name}</td><td className="center-wrapper">{w.network_security}</td><td className="center-wrapper">{w.signal_strength}</td></tr>;})}
-            </tbody>
+            <tbody>{
+                response.data.networks.map(function(w){return <tr>
+                    <td>{w.network_name}</td>
+                    <td className="center-wrapper">{w.network_security}</td>
+                    <td className="center-wrapper">{w.signal_strength}</td>
+                </tr>;})
+            }</tbody>
         </Table> : null;
 
         return <div>
             {networksTable}
-            <p> Last Scan: {response.data.scan_time ? new Date(Number(response.data.scan_time) * 1000).toUTCString() : <img className="loading-inline" src="/static/image/loading.gif" />}</p>
+            <p> Last Scan: {response.data.scan_time ? new Date(Number(response.data.scan_time) * 1000).toUTCString() : null}</p>
         </div>
     }
 });
