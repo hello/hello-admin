@@ -143,7 +143,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         request_detail = {
             "headers": {
                 "Content-Type": content_type,
-                "X-Hello-Admin": self.current_user.email(),
+                "X-Hello-Admin": self.current_user_email,
                 "X-Appengine-Country": self.request.headers.get("X-Appengine-Country", ""),
                 "X-Appengine-Region": self.request.headers.get("X-Appengine-Region", ""),
                 "X-Appengine-City": self.request.headers.get("X-Appengine-City", ""),
@@ -191,6 +191,13 @@ class BaseRequestHandler(webapp2.RequestHandler):
     @property
     def current_user(self):
         return users.get_current_user()
+
+    @property
+    def current_user_email(self):
+        if self.current_user is None:
+            return "cron bot"
+        else:
+            return self.current_user.email()
 
     def error_log(self):
         return
