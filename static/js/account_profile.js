@@ -411,36 +411,38 @@ var PillSummary = React.createClass({
     }
 });
 
-var UptimeTile = React.createClass({
+var UptimeProportionTile = React.createClass({
     getInitialState : function() {
         return {"uptime" : []}
     },
-    fetch : function(email) {
-        $.ajax({
-            url: "/api/diagnostic",
-            dataType: "json",
-            type: 'GET',
-            data: {email: 'pang@sayhello.com'},
-            success: function (response) {
-                this.setState({"uptime" : response.data})
-            }.bind(this)
-        });
+    loadUptimeByEmail : function(email) {
+        if (email) {
+            $.ajax({
+                url: "/api/diagnostic",
+                dataType: "json",
+                type: 'GET',
+                data: {email: email},
+                success: function (response) {
+                    this.setState({uptime : response.data})
+                }.bind(this)
+            });
+        }
+        else {
+            this.setState({uptime: 0});
+        }
     },
     componentWillReceiveProps : function() {
-        this.fetch(this.props.email);
+        this.loadUptimeByEmail(this.props.email);
     },
     render: function() {
-        var stuff = this.state.uptime;
-        var total = 0;
-        for(i=0;i < stuff.length;i++) {
-            total += stuff[i].count;
+        var upTimeProportion = <span>&nbsp;</span>;
+        if (this.state.uptime.length > 0) {
+            var totalUpTime = this.state.uptime.map(function(i){return i.count}).reduce(function(x, y){return x+y;}, 0);
+            upTimeProportion = (totalUpTime / 1440 * 10).toFixed(2) + " %";
         }
-
-        var up = total / 1440 * 10;
-        return <div>{up}%</div>
+        return <div>{upTimeProportion}</div>
     }
 });
-
 
 
 var AccountProfile = React.createClass({
@@ -874,8 +876,8 @@ var AccountProfile = React.createClass({
                 </Col>
                 <Col xs={4}>
                     <Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary pillResponse={this.state.pillResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} email={this.state.email} />} />
+                    <Tile img="svg/uptime.svg" title="Uptime Proportion" content={<UptimeProportionTile email={this.state.email} />} />
                     <Tile img="svg/wifi.svg" title="Wifi Info" content={<WifiTile wifiResponse={this.state.wifiResponse} />} />
-                    <Tile img="svg/wifi.svg" title="Uptime" content={<UptimeTile email={this.state.email} />} />
                 </Col>
             </Row>
         </div>;
