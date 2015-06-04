@@ -302,19 +302,18 @@ class UpdateAdminAccessTokenAPI(BaseRequestHandler):
     Update access token after admin user and app info entities are updated and memcache is flushed
     """
     def get(self):
-        admin_user = settings.ADMIN_USER
-        app_info_model = settings.APP_INFO
+        admin_user = self.get_admin_user()
+        app_info_model = self.get_app_info()
 
         if admin_user is None:
-
-            friendly_user_message = "User not found for id = %s" \
+            friendly_user_message = "User not found in environment = %s" \
                 % settings.ENVIRONMENT
             log.warn(friendly_user_message)
             self.show_handler_error(friendly_user_message)
             return
 
         if app_info_model is None:
-            friendly_user_message = "AppInfo not found for id = %s" \
+            friendly_user_message = "AppInfo not found for in environment = %s" \
                 % settings.ENVIRONMENT
             log.warn(friendly_user_message)
             self.show_handler_error(friendly_user_message)

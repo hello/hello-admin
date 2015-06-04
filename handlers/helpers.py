@@ -1,17 +1,23 @@
 import jinja2
 import os
-import settings
-import webapp2
 import json
 import logging as log
 from copy import copy
+import requests
+
+import webapp2
 from google.appengine.api import users
+from google.appengine.api import memcache
+
 from rauth import OAuth2Service
 from rauth.session import OAuth2Session
+
+import settings
 from utils import stripStringToList
 from utils import extract_dicts_by_fields
-from google.appengine.api import memcache
-import requests
+from models.setup import AppInfo
+from models.setup import AdminUser
+from models.setup import UserGroup
 
 this_file_path = os.path.dirname(__file__)
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -22,6 +28,25 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 
 class BaseRequestHandler(webapp2.RequestHandler):
+    def get_app_info(self):
+        return AppInfo.get_by_id(settings.ENVIRONMENT)
+
+    def get_admin_user(self):
+        return AdminUser.get_by_id(settings.ENVIRONMENT)
+
+    def  get_user_group(self):
+        return UserGroup.query().get()
+
+    def get_default_access_token(self):
+        app_info = self.get_app_info()
+        print "app_info", app_info
+        if app_info is None:
+            self.error(500)
+            self.show_handler_error(friendly_user_message)
+        else:
+            print "token-->", app_info.access_token
+            return app_info.access_token
+
     def log_and_redirect(self, redirect_path, redirect_message):
         pass
 
@@ -93,7 +118,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         return hello.get_session(token)
 
     def hello_request(self, api_url, body_data="", url_params={}, type="GET", raw_output=False, filter_fields=[]
-                          , access_token=settings.DEFAULT_ACCESS_TOKEN, app_info=settings.APP_INFO, content_type='application/json'):
+                          , access_token=None, app_info=None, content_type='application/json'):
         """
         :param api_url: api URL
         :type api_url: str
@@ -111,6 +136,10 @@ class BaseRequestHandler(webapp2.RequestHandler):
         :type filter_fields: list
         :return a ResponseOutput object in test mode  or a string otherwise
         """
+        if access_token is None:
+            access_token = self.get_default_access_token()
+        if app_info is None:
+            app_info = self.get_app_info()
 
         output = ResponseOutput()
         output.set_viewer(self.current_user.email() if self.current_user is not None else "cron-bot")
@@ -120,7 +149,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         request_detail = {
             "headers": {
                 "Content-Type": content_type,
-                "user": self.current_user.email(),
+                "X-Hello-Admin": self.current_user.email(),
                 "X-Appengine-Country": self.request.headers.get("X-Appengine-Country", ""),
                 "X-Appengine-Region": self.request.headers.get("X-Appengine-Region", ""),
                 "X-Appengine-City": self.request.headers.get("X-Appengine-City", ""),
@@ -133,8 +162,10 @@ class BaseRequestHandler(webapp2.RequestHandler):
         if url_params:
             request_detail['params'] = url_params
 
+        
         response = getattr(OAuth2Session, type.lower())(session, api_url, **request_detail)
         output.set_status(response.status_code)
+        print response.url
         if response.status_code == 200:
             if response.headers["content-type"] == "text/plain":
                 output.set_data(response.content)

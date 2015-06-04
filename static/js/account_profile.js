@@ -86,7 +86,7 @@ AlarmsTile = React.createClass({
 var TimezoneHistoryTile = React.createClass({
     render: function() {
         var data = this.props.timezoneHistoryResponse.data;
-        console.log("timezone history", data);
+        // console.log("timezone history", data);
         return $.isEmptyObject(data) ? <div>No timezone detected</div>: <Table>
             <thead><tr>
                 <th className="center-wrapper">Updated (UTC)</th>
@@ -406,6 +406,38 @@ var PillSummary = React.createClass({
             <Well>{pillResponse.error}</Well>: result;
     }
 });
+
+var UptimeTile = React.createClass({
+    getInitialState : function() {
+        return {"uptime" : []}
+    },
+    fetch : function(email) {
+        $.ajax({
+            url: "/api/diagnostic",
+            dataType: "json",
+            type: 'GET',
+            data: {email: 'pang@sayhello.com'},
+            success: function (response) {
+                this.setState({"uptime" : response.data})
+            }.bind(this)
+        });
+    },
+    componentWillReceiveProps : function() {
+        this.fetch(this.props.email);
+    },
+    render: function() {
+        var stuff = this.state.uptime;
+        var total = 0;
+        for(i=0;i < stuff.length;i++) {
+            total += stuff[i].count;
+        }
+
+        var up = total / 1440 * 10;
+        return <div>{up}%</div>
+    }
+});
+
+
 
 var AccountProfile = React.createClass({
     getInitialState: function() {
@@ -839,6 +871,7 @@ var AccountProfile = React.createClass({
                 <Col xs={4}>
                     <Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary pillResponse={this.state.pillResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} email={this.state.email} />} />
                     <Tile img="svg/wifi.svg" title="Wifi Info" content={<WifiTile wifiResponse={this.state.wifiResponse} />} />
+                    <Tile img="svg/wifi.svg" title="Uptime" content={<UptimeTile email={this.state.email} />} />
                 </Col>
             </Row>
         </div>;
