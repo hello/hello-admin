@@ -1,0 +1,15 @@
+{% extends "templates/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block extrastatic %}
+    <link rel="stylesheet" type="text/css"  href="/static/css/token_generator.css">
+    <script type="text/jsx" src="/static/js/token_generator.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="row" id="container">
+        <h3 id="page-name">Token Generator</h3>
+        <hr class="fancy-line"/>
+        <div class="col-xs-6 col-xs-offset-3" id="token-generator"></div>
+        <input type="hidden" id="restrict-app" value="Benjo">
+    </div>
+{% endblock %}

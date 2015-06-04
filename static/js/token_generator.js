@@ -17,6 +17,11 @@ var TokenGenMaestro = React.createClass({
         var apps = _.map(response.data, function(app){
           return {name: app.name, client_id: app.client_id}
         });
+        if ($("#restrict-app").val() === "Benjo") {
+          apps = apps.filter(function(appl){
+            return appl.name.indexOf("Benjo") > -1;
+          });
+        }
         this.setState({apps: apps});
         }.bind(this),
         error: function(e) {
