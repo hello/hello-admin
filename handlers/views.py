@@ -248,3 +248,8 @@ class AlarmRingsHistoryView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/alarm_rings_history.html',
                                 context={'title': "Alarms, Ringtime & Timezone"})
+
+class TokenGeneratorView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/token_generator.html',
+                                context={'title': "Token Generator"})

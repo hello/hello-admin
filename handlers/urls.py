@@ -121,6 +121,7 @@ from handlers.devices import SenseBlackListAPI
 from handlers.views import BlackListView
 from handlers.views import AlarmRingsHistoryView
 from handlers.alarms import AlarmRingsHistoryAPI
+from handlers.views import TokenGeneratorView
 
 
 cron_routes = [
@@ -253,6 +254,7 @@ page_routes = [
     ('/searchify_stats/?$', SearchifyStatsView),
     ('/black_list/?$', BlackListView),
     ('/alarm_rings_history/?$', AlarmRingsHistoryView),
+    ('/token_generator/?$', TokenGeneratorView),
 ]
 
 file_upload_routes = [

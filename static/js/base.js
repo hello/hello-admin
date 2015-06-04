@@ -197,6 +197,7 @@ var SideBar = React.createClass({
            <ListGroupItem bsStyle="default" href="/alarms">&#x029D0; Alarms</ListGroupItem>
 
            <ListGroupItem bsStyle="info" className="sidebar-group">Admin only</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/token_generator">&#x029D0; Token Generator</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/settings">&#x029D0; Settings</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/orders">&#x029D0; Orders</ListGroupItem>
        </ListGroup>)
