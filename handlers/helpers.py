@@ -39,7 +39,6 @@ class BaseRequestHandler(webapp2.RequestHandler):
         if app_info is None:
             self.error(500)
         else:
-            print "token-->", app_info.access_token
             return app_info.access_token
 
     def log_and_redirect(self, redirect_path, redirect_message):
@@ -160,7 +159,6 @@ class BaseRequestHandler(webapp2.RequestHandler):
         
         response = getattr(OAuth2Session, type.lower())(session, api_url, **request_detail)
         output.set_status(response.status_code)
-        print response.url
         if response.status_code == 200:
             if response.headers["content-type"] == "text/plain":
                 output.set_data(response.content)
