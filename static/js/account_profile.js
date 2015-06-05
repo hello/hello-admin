@@ -508,9 +508,9 @@ var AccountProfile = React.createClass({
         var inputFromURL = getParameterByName("input"),
             typeFromURL = getParameterByName("type");
         if (inputFromURL){
-            this.refs.accountInput.getDOMNode().value = inputFromURL;
             this.setState({searchType: typeFromURL});
-            this.handleSubmit();
+            this.refs.accountInput.getDOMNode().value = inputFromURL;
+            setTimeout(function(){this.handleSubmit()}.bind(this), 75);
         }
     },
 
@@ -888,7 +888,7 @@ var AccountProfile = React.createClass({
     }
 });
 
-React.renderComponent(<AccountProfile />, document.getElementById('account-profile'));
+React.render(<AccountProfile />, document.getElementById('account-profile'));
 
 function debunkMarkdown(md) {
     var partials = md.match(/(.*?)(\*\*)(.*?)(\*\*)(.*?)/);
