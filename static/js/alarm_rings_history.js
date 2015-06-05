@@ -64,16 +64,14 @@ var TimezoneHistory = React.createClass({
     render: function() {
         return <Table>
             <thead><tr>
-                <th>Actual UTC Ringtime</th>
-                <th>Expected UTC Ringtime</th>
-                <th>Sound IDs</th>
+                <th>Timezone ID</th>
+                <th>Timezone Offset</th>
             </tr></thead>
             <tbody>{this.props.data && this.props.data.length > 0 ?
                 this.props.data.map(function(d){
                     return <tr>
-                        <td>{d.actual_ring_time_utc}</td>
-                        <td>{d.expected_ring_time_utc}</td>
-                        <td>{d.sound_ids}</td>
+                        <td>{d.timezone_id}</td>
+                        <td>{d.timezone_offset}</td>
                     </tr>
                 })
                 : null}</tbody>
@@ -150,6 +148,7 @@ var AlarmRingsFromLogs = React.createClass({
     }
 });
 
+
 var RingTimeHistoryMaster = React.createClass({
     getInitialState: function () {
         return {alert: null, smartAlarmHistory: [], ringTimeHistory: [], email: "", startEpoch: 0, endEpoch: 0};
@@ -179,14 +178,16 @@ var RingTimeHistoryMaster = React.createClass({
                     this.setState({
                         alert: null,
                         smartAlarmHistory: response.data.smart_alarm_history,
-                        ringTimeHistory: response.data.ringtime_history
+                        ringTimeHistory: response.data.ringtime_history,
+                        timezoneHistory: response.data.timezone_history
                     });
                 }
                 else {
                     this.setState({
                         alert: <Alert bsStyle="danger">{response.error}</Alert>,
-                        smartAlarmHistory: response.data.smart_alarm_history,
-                        ringTimeHistory: response.data.ringtime_history
+                        smartAlarmHistory: [],
+                        ringTimeHistory: [],
+                        timezoneHistory: []
                     });
                 }
             }.bind(this)
@@ -212,7 +213,10 @@ var RingTimeHistoryMaster = React.createClass({
                 <Col xs={1}><Button type="submit"><Glyphicon glyph="search" /></Button></Col>
             </form><br/>
             <Row>
-                <Col xs={8}><Tile title="Smart Alarm History" content={<SmartAlarmHistory data={this.state.smartAlarmHistory}/>} /></Col>
+                <Col xs={8}>
+                    <Tile title="Smart Alarm History" content={<SmartAlarmHistory data={this.state.smartAlarmHistory}/>} />
+                    <Tile title="Timezone History" content={<TimezoneHistory data={this.state.timezoneHistory}/>} />
+                </Col>
                 <Col xs={4}>
                     <Row><Tile title="Alarm Rings From Logs" content={<AlarmRingsFromLogs email={this.state.email} start={this.state.start} end={this.state.end} />} /></Row>
                     <Row><Tile title="Ring Time History" content={<RingTimeHistory data={this.state.ringTimeHistory} />} /></Row>
