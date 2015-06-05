@@ -113,8 +113,7 @@ from handlers.searchify_logs import LogsPatternFacetsAPI
 from handlers.views import LogsPatternFacetsView
 from handlers.alarms import AlarmsByEmailAPI
 from handlers.devices import SenseColorAPI
-from handlers.views import SenseLogsNewView
-from handlers.searchify_logs import SenseLogsNewAPI
+from handlers.views import SenseLogsView
 from handlers.timezone import TimezoneHistoryAPI
 from handlers.views import SearchifyStatsView
 from handlers.cron import DropOldSenseLogsSearchifyIndex
@@ -199,7 +198,6 @@ api_routes = [
     ('/api/log_facets/?$', LogsPatternFacetsAPI),
     ('/api/alarms_by_email/?$', AlarmsByEmailAPI),
     ('/api/sense_color/?$', SenseColorAPI),
-    ('/api/sense_logs_new/?$', SenseLogsNewAPI),
     ('/api/timezone_history/?$', TimezoneHistoryAPI),
     ('/api/sense_black_list/?$', SenseBlackListAPI),
     ('/api/diagnostic/?$', DiagnosticAPI),
@@ -252,7 +250,7 @@ page_routes = [
     ('/pch_serial_number_check/?$', PCHSerialNumberCheckView),
     ('/onboarding_logs/?$', OnboardingLogsView),
     ('/log_facets/?$', LogsPatternFacetsView),
-    ('/sense_logs_new/?$', SenseLogsNewView),
+    ('/sense_logs_new/?$', SenseLogsView),
     ('/searchify_stats/?$', SearchifyStatsView),
     ('/black_list/?$', BlackListView),
     ('/alarm_rings_history/?$', AlarmRingsHistoryView),

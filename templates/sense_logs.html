@@ -1,26 +1,20 @@
-{% extends "templates/base.html" %}
+{% extends "templates/base_latest_react.html" %}
 {% block title %}{{ title }}{% endblock %}
 {% block extrastatic %}
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-datetimepicker.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/sense_logs.css" />
+
     <script type="text/javascript" src="/static/js/third-party/moment.js"></script>
     <script type="text/javascript" src="/static/js/third-party/bootstrap.min.js"></script>
     <script type="text/javascript" src="/static/js/third-party/bootstrap-datetimepicker.min.js"></script>
-    <script type="text/jsx" src="/static/js/third-party/long-datetimepicker.js"></script>
     <script type="text/javascript" src="/static/js/third-party/d3.min.js"></script>
-    <script type="text/javascript" src="/static/js/third-party/spectrum.js"></script>
-    <script type="text/javascript" src="/static/js/third-party/bootstrap-slider.js"></script>
-    <script type="text/javascript" src="/static/js/third-party/bootstrap-tagsinput.js"></script>
-    <script type="text/jsx" src="/static/js/third-party/long-tagsinput.js"></script>
-    <script type="text/jsx" src="/static/js/sense_logs.js"></script>
 
-    '
-    <link rel="stylesheet" type="text/css" href="/static/css/third-party/spectrum.css" />
-    <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-slider.css" />
-    <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-tagsinput.css" />
-    <link rel="stylesheet" type="text/css" href="/static/css/sense_logs.css" />
+    <script type="text/jsx" src="/static/js/third-party/long-datetimepicker.js"></script>
+    <script type="text/jsx" src="/static/js/sense_logs.js"></script>
 {% endblock %}
 
 {% block content %}
     <h3>{{ title }}</h3>
     <hr class="fancy-line"/>
-    <div id="debug-log"></div>
+    <div id="sense-logs"></div>
 {% endblock %}
