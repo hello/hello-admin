@@ -17,12 +17,12 @@ var FirmwareGroupStatus = React.createClass({
     getInitialState: function() {
         return {groupStatus: []}
     },
-    loadFirmwareGroupStatus: function() {
+    loadFirmwareGroupStatus: function(group) {
         $.ajax({
             url: '/api/firmware_group_status',
             dataType: 'json',
             contentType: 'application/json',
-            data: {group: this.props.group},
+            data: {group: group},
             type: 'GET',
             success: function(response) {
                 console.log("group status", response);
@@ -31,7 +31,7 @@ var FirmwareGroupStatus = React.createClass({
         });
     },
     componentWillReceiveProps: function() {
-        this.loadFirmwareGroupStatus();
+        this.loadFirmwareGroupStatus(this.props.parent.refs.group.getDOMNode().value);
     },
     render: function() {
         return <Table>
@@ -53,36 +53,35 @@ var FirmwareGroupStatus = React.createClass({
 
 var FirmwareGroupPath = React.createClass({
     getInitialState: function() {
-        return {groupPath: []}
+        return {groupPath: [], updateIter: 0}
     },
-    loadFirmwareGroupPath: function() {
+    loadFirmwareGroupPath: function(group) {
         $.ajax({
             url: '/api/firmware_group_path',
             dataType: 'json',
             contentType: 'application/json',
-            data: {group: this.props.group},
+            data: {group: group},
             type: 'GET',
             success: function(response) {
                 console.log("group path", response);
-                this.setState({groupStatus: response.data});
+                this.setState({groupPath: response.data});
             }.bind(this)
         });
     },
     componentWillReceiveProps: function() {
-        this.loadFirmwareGroupPath();
+        this.loadFirmwareGroupPath(this.props.parent.refs.group.getDOMNode().value);
     },
     render: function() {
         return <Table>
             <thead>
-                <th>Group Name</th><th>From Firmware</th><th>To Firmware</th><th>Rollout Percentage</th>
+                <th>From Firmware</th><th>To Firmware</th><th>Rollout Percentage</th>
             </thead>
             <tbody>{
                 this.state.groupPath.map(function(gp){
                     return <tr>
-                        <td>{gp.version}</td>
-                        <td>{gp.from_fw_version}</td>
-                        <td>{gp.to_fw_version}</td>
-                        <td>{gp.rollout_percent}</td>
+                        <td>{gp.fromFWVersion}</td>
+                        <td>{gp.toFWVersion}</td>
+                        <td>{gp.rolloutPercent}</td>
                     </tr>
                 })
             }</tbody>
@@ -108,28 +107,30 @@ var FirmwarePathMaster = React.createClass({
         });
     },
 
-    updateGroup: function() {
-        this.setState({selectedGroup: $("#group").val()});
+    handleChange: function() {
+        this.setState({updateIter: this.state.updateIter + 1});
     },
 
     componentDidMount: function() {
         this.loadFirmwareGroups();
-        this.updateGroup();
     },
 
     render: function() {
         return <div>
             <Row>
                 <Col xs={6} xsOffset={3}><form>
-                    <Input type="select" id="group" onChange={this.updateGroup}>{this.state.groups}</Input>
+                    <select className="form-control" id="group" ref="group" onChange={this.handleChange}>
+                        <option value="">Select a Group</option>
+                        {this.state.groups}
+                    </select>
                 </form></Col>
             </Row>
             <Row>
                 <Col xs={6}>
-                    <Tile title="Firmware Status" content={<FirmwareGroupStatus group={this.state.selectedGroup} />} />
+                    <Tile title="Firmware Status" content={<FirmwareGroupStatus parent={this} updateIter={this.state.updateIter} />} />
                 </Col>
                 <Col xs={6}>
-                    <Tile title="Firmware Path" content={<FirmwareGroupPath group={this.state.selectedGroup} />} />
+                    <Tile title="Firmware Path" content={<FirmwareGroupPath parent={this} updateIter={this.state.updateIter} />} />
                 </Col>
             </Row>
         </div>
