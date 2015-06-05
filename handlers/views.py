@@ -56,17 +56,12 @@ class SenseLogsView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/sense_logs.html',
                                 context={'title': 'Sense Logs'})
 
-class ApplicationLogsView(ProtectedRequestHandler):
-    """Returns application logs viewer"""
+class SenseLogsNewView(ProtectedRequestHandler):
+    """
+    Returns sense logs viewer
+    """
     def get(self):
-        self.render_to_response(template_file='templates/application_logs.html',
-                                context={'title': 'Application Logs'})
-
-class WorkerLogsView(ProtectedRequestHandler):
-    """Returns worker logs viewer"""
-    def get(self):
-        self.render_to_response(template_file='templates/worker_logs.html',
-                                context={'title': 'Worker Logs'})
+        self.redirect("/sense_logs")
 
 class FirmwareView(FirmwareRequestHandler):
     """Returns a panel for moderating firmware content"""

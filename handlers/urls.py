@@ -1,127 +1,125 @@
-import webapp2
-from handlers.pill_status import PillStatusAPI
-from handlers.deprecated import InactiveDevicesAPI, PreSleepAPI
-from handlers.searchify_logs import SenseLogsAPI, SearchifyStatsAPI
-from handlers.timeline import TimelineAPI
-import settings
+from handlers.alarms import AlarmRingsHistoryAPI
+from handlers.alarms import AlarmsAPI
+from handlers.alarms import AlarmsByEmailAPI
 from handlers.configuration import FeaturesAPI
-from handlers.cron import ZendeskCronHandler
+from handlers.cron import ActiveDevicesHistory15MinutesPurge
+from handlers.cron import ActiveDevicesHistoryPurge
+from handlers.cron import AlarmsCountPush
 from handlers.cron import DevicesCountPush
-from handlers.zendesk import ZendeskAPI
-from handlers.zendesk import ZendeskStatsAPI
-from handlers.zendesk import ZendeskHistoryAPI
-from handlers.zendesk import ZendeskNowAPI
-from handlers.firmware import FirmwareAPI
-from handlers.firmware import FirmwareInfoAPI
-from handlers.firmware import FirmwareHistoryAPI
+from handlers.cron import DropOldSenseLogsSearchifyIndex
+from handlers.cron import HoldsCountPush
+from handlers.cron import StoreRecentlyActiveDevicesStats15Minutes
+from handlers.cron import StoreRecentlyActiveDevicesStatsDaily
+from handlers.cron import StoreRecentlyActiveDevicesStatsMinute
+from handlers.cron import WavesCountPush
+from handlers.cron import ZendeskCronHandler
+from handlers.deprecated import InactiveDevicesAPI, PreSleepAPI
+from handlers.devices import ActiveDevices15MinutesHistoryAPI
+from handlers.devices import ActiveDevicesDailyHistoryAPI
+from handlers.devices import ActiveDevicesMinuteHistoryAPI
 from handlers.devices import DeviceAPI
+from handlers.devices import DeviceByEmailAPI
 from handlers.devices import DeviceInactiveAPI
 from handlers.devices import DeviceKeyStoreHint
 from handlers.devices import DeviceOwnersAPI
+from handlers.devices import SenseBlackListAPI
+from handlers.devices import SenseColorAPI
 from handlers.diagnostic import DiagnosticAPI
+from handlers.events import SenseEventsAPI
+from handlers.firmware import FirmwareAPI
+from handlers.firmware import FirmwareHistoryAPI
+from handlers.firmware import FirmwareInfoAPI
+from handlers.firmware import FirmwareUnhashAPI
+from handlers.keys import PillKeyDecryptAPI
+from handlers.keys import PillKeyProvision
+from handlers.keys import PillProvisionAPI
+from handlers.keys import SenseKeyProvision
+from handlers.label_data import LabelDataAPI
+from handlers.memcache import RefreshMemcache
+from handlers.motion import MotionAPI
+from handlers.notification import NotificationAPI
+from handlers.onboarding import OnboardingLogsByResultAPI
+from handlers.onboarding import OnboardingLogsBySenseIdAPI
+from handlers.orders import OrdersAPI
+from handlers.papertrail import PaperTrailEventsAPI
+from handlers.papertrail import PaperTrailSystemsAPI
+from handlers.pch_serial import PCHSerialNumberCheckAPI
+from handlers.pill_status import PillStatusAPI
+from handlers.room_conditions import LastRoomConditionsAPI
 from handlers.room_conditions import RoomConditionsAPI
+from handlers.searchify_logs import DustStatsAPI
+from handlers.searchify_logs import LogsPatternFacetsAPI
+from handlers.searchify_logs import SenseLogsAPI, SearchifyStatsAPI
+from handlers.searchify_logs import WifiSignalStrengthAPI
 from handlers.setup import AppAPI
+from handlers.setup import AppendAppInfo
 from handlers.setup import AppScopeAPI
 from handlers.setup import CreateAccountAPI
 from handlers.setup import CreateGroupsAPI
 from handlers.setup import CreateKeyStoreLockerAPI
 from handlers.setup import ProxyAPI
-from handlers.setup import TokenAPI
 from handlers.setup import RegisterPillAPI, SetupAPI
+from handlers.setup import TokenAPI
 from handlers.setup import UpdateAdminAccessTokenAPI
 from handlers.setup import UpdateGeckoBoardCredentials
+from handlers.setup import ViewPermissionAPI
 from handlers.teams import TeamsAPI
+from handlers.timeline import TimelineAPI
+from handlers.timezone import TimezoneAPI
+from handlers.timezone import TimezoneHistoryAPI
+from handlers.users import AccountCountsBreakdownByCreatedDateAPI
+from handlers.users import ForcePasswordUpdateAPI
 from handlers.users import OmniSearchAPI
+from handlers.users import PasswordResetAPI
+from handlers.users import RecentUsersAPI
+from handlers.users import UserSearchAPI
+from handlers.views import AccountProfileView
+from handlers.views import ActiveDevicesHistoryView
+from handlers.views import AlarmRingsHistoryView
+from handlers.views import AlarmsView
 from handlers.views import BatteryView
-from handlers.keys import SenseKeyProvision
+from handlers.views import BlackListView
 from handlers.views import ChartHandler
 from handlers.views import ConfigurationView
-from handlers.views import SenseLogsView
-from handlers.views import ApplicationLogsView
+from handlers.views import CreateKeyView
+from handlers.views import DustStatsView
 from handlers.views import ErrorView
 from handlers.views import FirmwareView
+from handlers.views import KeyStoreView
+from handlers.views import KeysView
+from handlers.views import LabelView
+from handlers.views import LogsPatternFacetsView
+from handlers.views import MotionView
+from handlers.views import NotificationView
+from handlers.views import OnboardingLogsView
+from handlers.views import OrdersView
+from handlers.views import PairingView
+from handlers.views import PasswordResetView
+from handlers.views import PCHSerialNumberCheckView
+from handlers.views import RecentAccountsView
+from handlers.views import RoomConditionsView
+from handlers.views import SearchifyStatsView
+from handlers.views import SenseEventsView
+from handlers.views import SenseLogsNewView
+from handlers.views import SenseLogsView
 from handlers.views import SenseVisualView
 from handlers.views import SettingsView
+from handlers.views import SetupView
 from handlers.views import TeamsView
-from handlers.views import UserView
-from handlers.views import ZendeskView
-from handlers.views import TroubleshootView
 from handlers.views import TimelineView
-from handlers.views import NotificationView
-from handlers.views import PairingView
-from handlers.views import KeyStoreView
-from handlers.views import MotionView
-from handlers.setup import ViewPermissionAPI
-from handlers.notification import NotificationAPI
-from handlers.motion import MotionAPI
-from handlers.views import OrdersView
-from handlers.views import KeysView
+from handlers.views import TokenGeneratorView
+from handlers.views import TroubleshootView
+from handlers.views import UsersInpsectionView
+from handlers.views import UserView
 from handlers.views import ZendeskHistoryView
 from handlers.views import ZendeskNowView
-from handlers.views import CreateKeyView
-from handlers.views import RoomConditionsView
-from handlers.views import LabelView
-from handlers.views import AlarmsView
-from handlers.views import SetupView
-from handlers.views import PasswordResetView
-from handlers.keys import PillProvisionAPI
-from handlers.keys import PillKeyDecryptAPI
-from handlers.keys import PillKeyProvision
-from handlers.label_data import LabelDataAPI
-from handlers.alarms import AlarmsAPI
-from handlers.users import PasswordResetAPI
-from views import WorkerLogsView
-from handlers.memcache import RefreshMemcache
-from handlers.orders import OrdersAPI
-from handlers.users import RecentUsersAPI
-from handlers.setup import AppendAppInfo
-from handlers.users import ForcePasswordUpdateAPI
-from handlers.cron import StoreRecentlyActiveDevicesStatsMinute
-from handlers.cron import StoreRecentlyActiveDevicesStats15Minutes
-from handlers.cron import StoreRecentlyActiveDevicesStatsDaily
-from handlers.devices import ActiveDevicesMinuteHistoryAPI
-from handlers.devices import ActiveDevicesDailyHistoryAPI
-from handlers.views import ActiveDevicesHistoryView
-from handlers.events import SenseEventsAPI
-from handlers.views import SenseEventsView
-from handlers.firmware import FirmwareUnhashAPI
-from handlers.searchify_logs import DustStatsAPI
-from handlers.views import DustStatsView
-from handlers.cron import AlarmsCountPush
-from handlers.cron import WavesCountPush
-from handlers.cron import HoldsCountPush
-from handlers.cron import ActiveDevicesHistoryPurge
-from handlers.cron import ActiveDevicesHistory15MinutesPurge
-from handlers.users import UserSearchAPI
-from handlers.views import UsersInpsectionView
-from handlers.views import AccountProfileView
-from handlers.devices import DeviceByEmailAPI
-from handlers.timezone import TimezoneAPI
-from handlers.pch_serial import PCHSerialNumberCheckAPI
-from handlers.papertrail import PaperTrailEventsAPI
-from handlers.papertrail import PaperTrailSystemsAPI
-from handlers.views import RecentAccountsView
-from handlers.users import AccountCountsBreakdownByCreatedDateAPI
-from handlers.views import PCHSerialNumberCheckView
-from handlers.searchify_logs import WifiSignalStrengthAPI
-from handlers.onboarding import OnboardingLogsByResultAPI
-from handlers.onboarding import OnboardingLogsBySenseIdAPI
-from handlers.views import OnboardingLogsView
-from handlers.room_conditions import LastRoomConditionsAPI
-from handlers.devices import ActiveDevices15MinutesHistoryAPI
-from handlers.searchify_logs import LogsPatternFacetsAPI
-from handlers.views import LogsPatternFacetsView
-from handlers.alarms import AlarmsByEmailAPI
-from handlers.devices import SenseColorAPI
-from handlers.views import SenseLogsView
-from handlers.timezone import TimezoneHistoryAPI
-from handlers.views import SearchifyStatsView
-from handlers.cron import DropOldSenseLogsSearchifyIndex
-from handlers.devices import SenseBlackListAPI
-from handlers.views import BlackListView
-from handlers.views import AlarmRingsHistoryView
-from handlers.alarms import AlarmRingsHistoryAPI
-from handlers.views import TokenGeneratorView
+from handlers.views import ZendeskView
+from handlers.zendesk import ZendeskAPI
+from handlers.zendesk import ZendeskHistoryAPI
+from handlers.zendesk import ZendeskNowAPI
+from handlers.zendesk import ZendeskStatsAPI
+import settings
+import webapp2
 
 
 cron_routes = [
@@ -211,7 +209,6 @@ page_routes = [
     ('/alarm_rings_history/?$', AlarmRingsHistoryView),
     ('/alarms/?$', AlarmsView),
     ('/api/setup', SetupAPI),
-    ('/application_logs/?$', ApplicationLogsView),
     ('/battery/?$', BatteryView),
     ('/black_list/?$', BlackListView),
     ('/charts', ChartHandler),
@@ -241,7 +238,7 @@ page_routes = [
     ('/sense/?$', SenseVisualView),
     ('/sense_events/?$', SenseEventsView),
     ('/sense_logs/?$', SenseLogsView),
-    ('/sense_logs_new/?$', SenseLogsView),
+    ('/sense_logs_new/?$', SenseLogsNewView),
     ('/settings/?$', SettingsView),
     ('/setup/?$', SetupView),
     ('/teams/?$', TeamsView),
@@ -251,7 +248,6 @@ page_routes = [
     ('/update', UpdateAdminAccessTokenAPI),
     ('/users/?$', UserView),
     ('/users_inspection/?$', UsersInpsectionView),
-    ('/worker_logs/?$', WorkerLogsView),
     ('/zendesk/?$', ZendeskView),
     ('/zendesk_history/?$', ZendeskHistoryView),
     ('/zendesk_now/?$', ZendeskNowView),
