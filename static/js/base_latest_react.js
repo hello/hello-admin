@@ -171,7 +171,6 @@ var SideBar = React.createClass({
 
            <ListGroupItem bsStyle="info" className="sidebar-group">Logs</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/sense_logs">&#x029D0; Sense</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/sense_logs_new">&#x029D0; Sense (NEW)</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/onboarding_logs">&#x029D0; Onboarding</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/log_facets">&#x029D0; Facets Breakdown</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/black_list">&#x029D0; Black List</ListGroupItem>
