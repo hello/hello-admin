@@ -427,7 +427,7 @@ var UptimeTile = React.createClass({
             });
         }
         else {
-            this.setState({uptime: 0});
+            this.setState({uptime: []});
         }
     },
     componentWillReceiveProps : function() {
@@ -440,7 +440,7 @@ var UptimeTile = React.createClass({
             var cleanUptime = this.state.uptime.slice(1, this.state.uptime.length-1) // remove last hour because incomplete
 
             var then = cleanUptime[0].ts;
-            var age = (new Date().getTime() - then) / 1000 / 360;
+            var age = (new Date().getTime() - then) / 1000 / 60;
         
             var totalUpTime = cleanUptime.map(function(i){return i.count}).reduce(function(x, y){return x+y;}, 0);
             upTimeProportion = Math.min((totalUpTime / age * 100), 100).toFixed(2) + " %";
@@ -450,7 +450,7 @@ var UptimeTile = React.createClass({
             <thead/>
             <tbody>
                 <tr><td>Proportion</td><td>{upTimeProportion}</td></tr>
-                <tr><td>10-day-history</td><td><SparkLine xAttr="ts" yAttr="count" data={this.state.uptime}/></td></tr>
+                <tr><td>10-day-history</td><td><SparkLine xAttr="ts" yAttr="count" data={this.state.uptime.slice(1, this.state.uptime.length -1)}/></td></tr>
                 <tr><td/><td/></tr>
             </tbody>
         </Table>
@@ -889,7 +889,7 @@ var AccountProfile = React.createClass({
                 </Col>
                 <Col xs={4}>
                     <Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary pillResponse={this.state.pillResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} email={this.state.email} />} />
-                    <Tile img="svg/uptime.svg" title="Sense Uptime" content={<UptimeTile email={this.state.email} />} />
+                    <Tile img="svg/uptime.svg" title="Sense Online Uptime" content={<UptimeTile email={this.state.email} />} />
                     <Tile img="svg/wifi.svg" title="Wifi Info" content={<WifiTile wifiResponse={this.state.wifiResponse} />} />
                 </Col>
             </Row>
