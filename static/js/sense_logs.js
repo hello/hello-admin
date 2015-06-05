@@ -79,7 +79,7 @@ var SenseLogsNew = React.createClass({
             </Alert>, loading: <img src="/static/image/loading.gif" />});
         }
 
-        history.pushState({}, '', '/sense_logs_new/?field=' + field + '&keyword=' + keyword + '&sense_id=' + senseId + '&limit=' + limit + "&start=" + start + "&end=" + end);
+        history.pushState({}, '', '/sense_logs/?field=' + field + '&keyword=' + keyword + '&sense_id=' + senseId + '&limit=' + limit + "&start=" + start + "&end=" + end);
         var sendingData = {
                 query: field + ":" + keyword,
                 categories: senseId ? JSON.stringify({device_id: senseId.split(",").map(function(s){return s.trim();})}) : null,
