@@ -30,6 +30,8 @@ from handlers.firmware import FirmwareAPI
 from handlers.firmware import FirmwareHistoryAPI
 from handlers.firmware import FirmwareInfoAPI
 from handlers.firmware import FirmwareUnhashAPI
+from handlers.firmware import FirmwareGroupStatusAPI
+from handlers.firmware import FirmwareGroupPathAPI
 from handlers.keys import PillKeyDecryptAPI
 from handlers.keys import PillKeyProvision
 from handlers.keys import PillProvisionAPI
@@ -84,6 +86,7 @@ from handlers.views import ConfigurationView
 from handlers.views import CreateKeyView
 from handlers.views import DustStatsView
 from handlers.views import ErrorView
+from handlers.views import FirmwarePathView
 from handlers.views import FirmwareView
 from handlers.views import KeyStoreView
 from handlers.views import KeysView
@@ -162,6 +165,8 @@ api_routes = [
     ('/api/firmware/history/?$', FirmwareHistoryAPI),
     ('/api/firmware/info/?$', FirmwareInfoAPI),
     ('/api/firmware_unhash/?$', FirmwareUnhashAPI),
+    ('/api/firmware_group_status/?$', FirmwareGroupStatusAPI),
+    ('/api/firmware_group_path/?$', FirmwareGroupPathAPI),
     ('/api/force_password_update/?$', ForcePasswordUpdateAPI),
     ('/api/label_data/?$', LabelDataAPI),
     ('/api/last_room_conditions/?$', LastRoomConditionsAPI),
@@ -217,6 +222,7 @@ page_routes = [
     ('/dust_stats/?$', DustStatsView),
     ('/error/?$', ErrorView),
     ('/firmware/?$', FirmwareView),
+    ('/firmware_path/?$', FirmwarePathView),
     ('/key_store/?$', KeyStoreView),
     ('/keys/?$', KeysView),
     ('/label/?$', LabelView),

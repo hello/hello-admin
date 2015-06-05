@@ -108,7 +108,7 @@ var AlarmRingsFromLogs = React.createClass({
     },
     loadRingTimeFromLogsBySenseIdList: function(senseIdList) {
         $.ajax({
-            url: '/api/sense_logs_new',
+            url: '/api/sense_logs',
             dataType: 'json',
             type: 'GET',
             data: {

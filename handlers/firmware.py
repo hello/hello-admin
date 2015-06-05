@@ -83,3 +83,22 @@ class FirmwareUnhashAPI(ProtectedRequestHandler):
             app_info=settings.ADMIN_APP_INFO
         )
 
+class FirmwareGroupStatusAPI(ProtectedRequestHandler):
+    def get(self):
+        self.hello_request(
+            api_url="firmware/{}/status".format(self.request.get("group")),
+            type="GET",
+            access_token=settings.ADMIN_APP_INFO.access_token,
+            app_info=settings.ADMIN_APP_INFO
+        )
+
+
+class FirmwareGroupPathAPI(ProtectedRequestHandler):
+    def get(self):
+        self.hello_request(
+            api_url="firmware/{}/upgrade_nodes".format(self.request.get("group")),
+            type="GET",
+            access_token=settings.ADMIN_APP_INFO.access_token,
+            app_info=settings.ADMIN_APP_INFO
+        )
+
