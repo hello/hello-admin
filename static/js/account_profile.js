@@ -78,7 +78,7 @@ AlarmsTile = React.createClass({
                         <td>{weekDayNumberToShortName(alarm.day_of_week)}</td>
                     </tr>
                 })
-            }</tbody>
+            }<tr><td/><td/><td/><td/><td/></tr></tbody>
         </Table>;
     }
 });
@@ -86,7 +86,6 @@ AlarmsTile = React.createClass({
 var TimezoneHistoryTile = React.createClass({
     render: function() {
         var data = this.props.timezoneHistoryResponse.data;
-        // console.log("timezone history", data);
         return $.isEmptyObject(data) ? <div>No timezone detected</div>: <Table>
             <thead><tr>
                 <th className="center-wrapper">Updated (UTC)</th>
@@ -203,7 +202,7 @@ var WifiTile = React.createClass({
                     <td className="center-wrapper">{w.network_security}</td>
                     <td className="center-wrapper">{w.signal_strength}</td>
                 </tr>;})
-            }</tbody>
+            }<tr><td/><td/><td/></tr></tbody>
         </Table> : null;
 
         return <div>
@@ -411,7 +410,7 @@ var PillSummary = React.createClass({
     }
 });
 
-var UptimeProportionTile = React.createClass({
+var UptimeTile = React.createClass({
     getInitialState : function() {
         return {"uptime" : []}
     },
@@ -440,7 +439,14 @@ var UptimeProportionTile = React.createClass({
             var totalUpTime = this.state.uptime.map(function(i){return i.count}).reduce(function(x, y){return x+y;}, 0);
             upTimeProportion = (totalUpTime / 1440 * 10).toFixed(2) + " %";
         }
-        return <div>{upTimeProportion}</div>
+        return <Table>
+            <thead/>
+            <tbody>
+                <tr><td>Proportion</td><td>{upTimeProportion}</td></tr>
+                <tr><td>10-day-history</td><td><SparkLine xAttr="ts" yAttr="count" data={this.state.uptime}/></td></tr>
+                <tr><td/><td/></tr>
+            </tbody>
+        </Table>
     }
 });
 
@@ -876,7 +882,7 @@ var AccountProfile = React.createClass({
                 </Col>
                 <Col xs={4}>
                     <Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary pillResponse={this.state.pillResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} email={this.state.email} />} />
-                    <Tile img="svg/uptime.svg" title="Uptime Proportion" content={<UptimeProportionTile email={this.state.email} />} />
+                    <Tile img="svg/uptime.svg" title="Sense Uptime" content={<UptimeTile email={this.state.email} />} />
                     <Tile img="svg/wifi.svg" title="Wifi Info" content={<WifiTile wifiResponse={this.state.wifiResponse} />} />
                 </Col>
             </Row>
