@@ -82,7 +82,7 @@ var SenseLogsNew = React.createClass({
         history.pushState({}, '', '/sense_logs_new/?field=' + field + '&keyword=' + keyword + '&sense_id=' + senseId + '&limit=' + limit + "&start=" + start + "&end=" + end);
         var sendingData = {
                 query: field + ":" + keyword,
-                categories: senseId ? JSON.stringify({device_id: [senseId]}) : null,
+                categories: senseId ? JSON.stringify({device_id: senseId.split(",").map(function(s){return s.trim();})}) : null,
                 limit: limit ? limit : 20,
                 start: start ? new Date(start + " GMT").getTime() : null,
                 end: end ? new Date(end + " GMT").getTime() : null,
