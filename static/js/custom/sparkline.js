@@ -70,13 +70,10 @@ var SparkLine = React.createClass({
             lastX = x(data.length - 1);
             lastY = y(data[data.length - 1]);
         }
-        console.log("first", data[0]);
-        console.log("last", data[data.length - 1]);
         var tip = d3.tip()
             .attr('class', 'd3-tip')
             .offset([-10, 10])
             .html(function(d) {
-                console.log(d);
                 return "<span class='label label-default label-uptime-terminal'>" +  (d[this.props.yAttr] || d) + "</span>";
             }.bind(this));
 
