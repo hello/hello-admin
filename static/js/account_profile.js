@@ -436,9 +436,16 @@ var UptimeTile = React.createClass({
     render: function() {
         var upTimeProportion = <span>&nbsp;</span>;
         if (this.state.uptime.length > 0) {
-            var totalUpTime = this.state.uptime.map(function(i){return i.count}).reduce(function(x, y){return x+y;}, 0);
-            upTimeProportion = (totalUpTime / 1440 * 10).toFixed(2) + " %";
+            
+            var cleanUptime = this.state.uptime.slice(1, this.state.uptime.length-1) // remove last hour because incomplete
+
+            var then = cleanUptime[0].ts;
+            var age = (new Date().getTime() - then) / 1000 / 360;
+        
+            var totalUpTime = cleanUptime.map(function(i){return i.count}).reduce(function(x, y){return x+y;}, 0);
+            upTimeProportion = Math.min((totalUpTime / age * 100), 100).toFixed(2) + " %";
         }
+        
         return <Table>
             <thead/>
             <tbody>
