@@ -343,7 +343,7 @@ var SenseSummary = React.createClass({
                         <tr><td/><td/></tr>
                     </tbody>
                 </Table>
-                <p><a target="_blank" href={"/sense_logs_new/?field=device_id&keyword=" + senseId + "&sense_id=&limit=&start=&end="}>Last 20 sense logs</a></p>
+                <p><a target="_blank" href={"/sense_logs/?field=device_id&keyword=" + senseId + "&sense_id=&limit=&start=&end="}>Last 20 sense logs</a></p>
                 <p><a target="_blank" href={"/sense_events/?account_input=" + senseId + "&start_ts=" + new Date().getTime()}>Last 25 events</a></p>
             </div>;
         }

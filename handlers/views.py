@@ -243,3 +243,8 @@ class TokenGeneratorView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/token_generator.html',
                                 context={'title': "Token Generator"})
+
+class FirmwarePathView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/firmware_path.html',
+                                context={'title': "Firmware Upgrade Path"})
