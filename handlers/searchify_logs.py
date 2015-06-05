@@ -9,137 +9,124 @@ from handlers.utils import get_pacific_time_from_epoch_seconds
 from indextank import ApiClient
 from google.appengine.api import urlfetch
 
+class SenseLogsAPI(ProtectedRequestHandler):
+    @property
+    def query(self):
+        q = self.request.get("query", default_value="all:1")
+        if q.strip() in ["text:", "device_id:", "date:"]:
+            return "all:1"
+        return q
 
-class SearchifyLogsHandler(ProtectedRequestHandler):
-    @staticmethod
-    def normalize_epoch(self, ts, index_name):
-        if "sense" in index_name:
-            return int(ts)
-        return 1000*int(ts)
+    @property
+    def categories(self):
+        categories = self.request.get("categories", None)
+        if categories:
+            return json.loads(categories)
+        return None
+    @property
+    def start_ts(self):
+        start_ts = self.request.get("start")
+        return int(start_ts)/1000 if start_ts else None
 
-    def get_logs_by_index(self, index_name, filters={}, date_field=""):
-        output = {'data': [], 'error': ''}
-        urlfetch.set_default_fetch_deadline(30)
+    @property
+    def end_ts(self):
+        end_ts = self.request.get("end")
+        return int(end_ts)/1000 if end_ts else None
 
-        max_results = int(self.request.get('max_results', default_value=100))
-        text_input = self.request.get('text', default_value="")
-        start_time = self.request.get('start_time', default_value="")
-        end_time = self.request.get('end_time', default_value="")
-        searchify_cred = settings.SEARCHIFY
+    @property
+    def limit(self):
+        return int(self.request.get("limit", default_value=10))
 
+    @property
+    def order(self):
+        return int(self.request.get("order", default_value=0))
+
+    @property
+    def searchify_request(self):
+        return {
+            "query": self.query,
+            "fetch_fields": self.request.get("fetch_fields", default_value=["text", "device_id"]),
+            "category_filters": self.categories,
+            "docvar_filters": {0: [[self.start_ts, self.end_ts]]},
+            "scoring_function": self.order,
+            "length": self.limit,
+            "fetch_variables": self.request.get("fetch_variables", default_value=True),
+            "fetch_categories": self.request.get("fetch_categories", default_value=False),
+        }
+
+    def search_within_index(self, index_name):
+        output = {'results': [], 'error': {}}
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(index_name)
+        log.info("searchify request {}".format(self.searchify_request))
         try:
-            if searchify_cred is None:
-                raise RuntimeError("Missing Searchify Credentials")
-
-            index = ApiClient(searchify_cred.api_client).get_index(index_name)
-            searchify_query = SearchifyQuery()
-
-            if text_input:
-                searchify_query.set_query("text:{}".format(text_input))
-            elif index_name == "sense-logs-2015-05":
-                searchify_query.set_query(date_field)
-                if start_time:
-                    searchify_query.set_query(
-                        "date:" + datetime.datetime.utcfromtimestamp(self.normalize_epoch(start_time, index_name)).strftime("%Y%m%d%p")
-                    )
-                if end_time:
-                    searchify_query.set_query(
-                        "date:" + datetime.datetime.utcfromtimestamp(self.normalize_epoch(end_time, index_name)).strftime("%Y%m%d%p")
-                    )
-
-            start_time_filter = None
-            end_time_filter = None
-            if start_time.isdigit():
-                start_time_filter = self.normalize_epoch(start_time, index_name)
-
-            if end_time.isdigit():
-                end_time_filter = self.normalize_epoch(end_time, index_name)
-
-            searchify_query.set_docvar_filters({0: [[start_time_filter, end_time_filter]]})
-
-            if filters:
-                searchify_query.set_category_filters(filters)
-
-            searchify_query.set_length(max_results)
-            log.info("{}".format(searchify_query.mapping()))
-            output['data'] = index.search(**searchify_query.mapping())['results']
-
+            if "1" not in index.list_functions().keys():
+                index.add_function(1, "-doc.var[0]")
+            output.update(index.search(**self.searchify_request))
         except Exception as e:
-            output['error'] = display_error(e)
-            log.error('ERROR: {}'.format(display_error(e)))
+            output['error'] = {index_name: display_error(e)}
 
+        log.info("Searching in {}".format(index_name))
         return output
 
-    def get_logs_filtered_by_devices(self, index_name, date_field=""):
-        devices_input = self.request.get('devices', default_value="")
-        devices_list = []
-        if devices_input:
-            input_list = stripStringToList(devices_input)
-            for d in input_list:
-                if '@' in d and '.' in d:
-                    device_info = self.hello_request(
-                        api_url="devices/sense",
-                        type="GET",
-                        url_params={'email': d},
-                        app_info=settings.ADMIN_APP_INFO,
-                        raw_output=True
-                    ).data
-                    if device_info:
-                        devices_list.append(device_info[0]['device_account_pair']['externalDeviceId'])
-                else:
-                    devices_list.append(d)
-
-        if devices_list:  # Only filter if list of devices is not empty
-            return self.get_logs_by_index(index_name, {'device_id': devices_list}, date_field=date_field)
-
-        return self.get_logs_by_index(index_name, date_field=date_field)
-
-    def get_logs_filtered_by_levels_orgins_versions(self, index_name):
-        levels_input = self.request.get('levels', default_value="")
-        origins_input = self.request.get('origins', default_value="")
-        versions_input = self.request.get('versions', default_value="")
-
-        filters = {}
-
-        if levels_input:
-            filters.update({"level": map(lambda x:x.upper(), stripStringToList(levels_input))})
-        if origins_input:
-            filters.update({"origin": stripStringToList(origins_input)})
-        if versions_input:
-            filters.update({"version": stripStringToList(versions_input)})
-
-        return self.get_logs_by_index(index_name, filters)
-
-
-class SenseLogsAPI(SearchifyLogsHandler):
-    """
-    Retrieve sense logs
-    """
     def get(self):
-        march_logs = {"error": "", "data": []}
-        may_logs = {"error": "", "data": []}
-        max_results = int(self.request.get('max_results'))
-        selected_date_field = ""
-        date_field_count = 0
-        while selected_date_field != "20150515PM" and max_results > len(may_logs['data']):
-            selected_date_field = (datetime.datetime.utcnow() - datetime.timedelta(hours=date_field_count*12)).strftime("%Y%m%d%p")
-            may_logs =self.concat_logs(
-                may_logs,
-                self.get_logs_filtered_by_devices(
-                    settings.SENSE_LOGS_INDEX_MAY,
-                    date_field="date:{}".format(selected_date_field)
-                ),
+        urlfetch.set_default_fetch_deadline(60)
+        aggregate_output = {'results': [], 'error': {}}
+
+        latest_date = datetime.datetime.utcnow()
+        earliest_date = latest_date - datetime.timedelta(days=7)
+
+        if self.end_ts:
+            latest_date = min(latest_date, datetime.datetime.utcfromtimestamp(self.end_ts))
+
+        index_date = latest_date
+
+        if self.start_ts:
+            earliest_date = max(earliest_date, datetime.datetime.utcfromtimestamp(self.start_ts))
+            if not self.end_ts:
+                index_date = earliest_date
+
+        count = 0
+        while self.limit > len(aggregate_output['results']):
+            count += 1
+            if count > 7:
+                break
+            log.info("Lacking {} results, will look into older index".format(self.limit - len(aggregate_output['results'])))
+            index_name = settings.SENSE_LOGS_INDEX_PREFIX + index_date.strftime("%Y-%m-%d")
+            if index_date.strftime("%Y-%m-%d") == "2015-05-26":
+                log.warn("Querying backup index on searchify")
+                index_name = settings.SENSE_LOGS_INDEX_BACKUP
+            aggregate_output = self.concat_output(
+                aggregate_output,
+                self.search_within_index(index_name)
             )
-            date_field_count += 1
+            if self.order == 0:
+                if index_date.strftime("%Y-%m-%d") == earliest_date.strftime("%Y-%m-%d"):
+                    break
+                index_date -= datetime.timedelta(days=1)
+            elif self.order == 1:
+                if index_date.strftime("%Y-%m-%d") == latest_date.strftime("%Y-%m-%d"):
+                    break
+                index_date += datetime.timedelta(days=1)
 
-        self.response.write(json.dumps(may_logs))
+        self.response.write(json.dumps(aggregate_output))
 
-    @staticmethod
-    def concat_logs(log1, log2):
+    def concat_output(self, log1, log2):
+        aggregate_error = {}
+        aggregate_error.update(log1["error"])
+        aggregate_error.update(log2["error"])
+
+        aggregate_results = sorted(log1["results"] + log2["results"], key=lambda d: d.get("variable_0", 0))
+        if len(aggregate_results) > self.limit:
+            print "overflow ZZZ"
+            if self.order == 0:
+                aggregate_results = aggregate_results[-1 - self.limit:-1]
+            elif self.order == 1:
+                aggregate_results = aggregate_results[:self.limit]
         return {
-            "error": " ".join([log1["error"], log2["error"]]),
-            "data": sorted(log1["data"] + log2["data"], key=lambda d: int(d.get("timestamp", 0)))
+            "error": aggregate_error,
+            "results": aggregate_results
         }
+
 
 
 class SearchifyStatsAPI(ProtectedRequestHandler):
@@ -360,127 +347,4 @@ class SearchifyQuery():
             'fetch_variables': self.fetch_variables,
             'fetch_categories': self.fetch_categories
         }
-
-
-class SenseLogsNewAPI(ProtectedRequestHandler):
-    @property
-    def query(self):
-        q = self.request.get("query", default_value="all:1")
-        if q.strip() in ["text:", "device_id:", "date:"]:
-            return "all:1"
-        return q
-
-    @property
-    def categories(self):
-        categories = self.request.get("categories", None)
-        if categories:
-            return json.loads(categories)
-        return None
-    @property
-    def start_ts(self):
-        start_ts = self.request.get("start")
-        return int(start_ts)/1000 if start_ts else None
-
-    @property
-    def end_ts(self):
-        end_ts = self.request.get("end")
-        return int(end_ts)/1000 if end_ts else None
-
-    @property
-    def limit(self):
-        return int(self.request.get("limit", default_value=10))
-
-    @property
-    def order(self):
-        return int(self.request.get("order", default_value=0))
-
-    @property
-    def searchify_request(self):
-        return {
-            "query": self.query,
-            "fetch_fields": self.request.get("fetch_fields", default_value=["text", "device_id"]),
-            "category_filters": self.categories,
-            "docvar_filters": {0: [[self.start_ts, self.end_ts]]},
-            "scoring_function": self.order,
-            "length": self.limit,
-            "fetch_variables": self.request.get("fetch_variables", default_value=True),
-            "fetch_categories": self.request.get("fetch_categories", default_value=False),
-        }
-
-    def search_within_index(self, index_name):
-        output = {'results': [], 'error': {}}
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(index_name)
-        log.info("searchify request {}".format(self.searchify_request))
-        try:
-            if "1" not in index.list_functions().keys():
-                index.add_function(1, "-doc.var[0]")
-            output.update(index.search(**self.searchify_request))
-        except Exception as e:
-            output['error'] = {index_name: display_error(e)}
-
-        log.info("Searching in {}".format(index_name))
-        return output
-
-    def get(self):
-        urlfetch.set_default_fetch_deadline(60)
-        aggregate_output = {'results': [], 'error': {}}
-
-        latest_date = datetime.datetime.utcnow()
-        earliest_date = latest_date - datetime.timedelta(days=7)
-
-        if self.end_ts:
-            latest_date = min(latest_date, datetime.datetime.utcfromtimestamp(self.end_ts))
-
-        index_date = latest_date
-
-        if self.start_ts:
-            earliest_date = max(earliest_date, datetime.datetime.utcfromtimestamp(self.start_ts))
-            if not self.end_ts:
-                index_date = earliest_date
-
-        count = 0
-        while self.limit > len(aggregate_output['results']):
-            count += 1
-            if count > 7:
-                break
-            log.info("Lacking {} results, will look into older index".format(self.limit - len(aggregate_output['results'])))
-            index_name = settings.SENSE_LOGS_INDEX_PREFIX + index_date.strftime("%Y-%m-%d")
-            if index_date.strftime("%Y-%m-%d") == "2015-05-26":
-                log.warn("Querying backup index on searchify")
-                index_name = settings.SENSE_LOGS_INDEX_BACKUP
-            aggregate_output = self.concat_output(
-                aggregate_output,
-                self.search_within_index(index_name)
-            )
-            if self.order == 0:
-                if index_date.strftime("%Y-%m-%d") == earliest_date.strftime("%Y-%m-%d"):
-                    break
-                index_date -= datetime.timedelta(days=1)
-            elif self.order == 1:
-                if index_date.strftime("%Y-%m-%d") == latest_date.strftime("%Y-%m-%d"):
-                    break
-                index_date += datetime.timedelta(days=1)
-
-        self.response.write(json.dumps(aggregate_output))
-
-    def concat_output(self, log1, log2):
-        aggregate_error = {}
-        aggregate_error.update(log1["error"])
-        aggregate_error.update(log2["error"])
-
-        aggregate_results = sorted(log1["results"] + log2["results"], key=lambda d: d.get("variable_0", 0))
-        if len(aggregate_results) > self.limit:
-            print "overflow ZZZ"
-            if self.order == 0:
-                aggregate_results = aggregate_results[-1 - self.limit:-1]
-            elif self.order == 1:
-                aggregate_results = aggregate_results[:self.limit]
-        return {
-            "error": aggregate_error,
-            "results": aggregate_results
-        }
-
-
-
-
 

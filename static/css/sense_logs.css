@@ -1,7 +1,30 @@
-.docs-count {text-align: right; text-decoration: underline;}
-.showLineBreaks {white-space: pre;}
-table.table-bordered>thead>tr>th, table.table-bordered>tbody>tr>td {border: 1px dashed brown;}
-#start-time, #end-time  {font-size: 86%;}
-#content {font-size: 75%;}
-#colorpickContainer{margin-left: 100px;}
-#select-timezone {font-size: 8px;}
+.span-upload-ts {
+    font-weight: bold;
+}
+.center-wrapper {
+    text-align: center;
+}
+
+.time-window {
+    border: none;
+}
+
+#start, #end {
+    padding-left: 40px;
+}
+
+.highlight {
+    color: red;
+}
+
+.zero-padding-right {
+    padding-right: 0;
+}
+
+.zero-padding-left {
+    padding-left: 0;
+}
+
+.borderless {
+    border: none;
+}

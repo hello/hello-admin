@@ -1,395 +1,233 @@
-/** @jsx React.DOM */
-
-var deviceTimezoneMap = {};
-var LogTable = React.createClass({
+var SenseLogsNew = React.createClass({
     getInitialState: function() {
-        return {timezone: "browser"};
+        return {response: {}, alert: null, resultsSize: 0, loading: null, blackList: []}
     },
 
-    searchAroundByTs: function(e) {
-        clickedTs = new Date($(e.target).text()).getTime();
-        $('#start-time').val(dateTimePickerStringFormat(clickedTs - 5*60*1000));
-        $('#end-time').val(dateTimePickerStringFormat(clickedTs + 5*60*1000));
-        $('#text-input').val("");
-        $('#submit').click().focus();
-    },
-
-    getDeviceTimezone: function(senseId, eventTs) {
-        var deviceTimezone = {
-            timezone_offset: -25200000,
-            timezone_id: "America/Los_Angeles"
-        };
-        $.ajax({
-            url: "/api/timezone",
-            dataType: "json",
-            type: 'GET',
-            async: false,
-            data: {sense_id: senseId, event_ts: eventTs},
-            success: function (response) {
-                if (response.error.isWhiteString()) {
-                    deviceTimezone = response.data;
-                }
-            }
-        });
-        return deviceTimezone;
-    },
-
-    updateDisplayTimeZone: function() {
-        this.setState({timezone: $('#select-timezone').val()});
-    },
-
-    render: function(){
-        var logTableRows = [], that = this;
-
-        that.props.logs.forEach(function(log){
-            var regexList = that.props.showLineBreaks === true ? []
-                : [new RegExp('\r', 'g'), new RegExp('\n', 'g')];
-
-            var currentTextInput = $('#text-input').val();
-            if (currentTextInput !== "") {
-                var textInputRegex = that.props.caseInsensitive === true ?
-                    new RegExp(currentTextInput, 'gi') : new RegExp(currentTextInput, 'g');
-                regexList.push(textInputRegex);
-            }
-
-            highlightedRegex = highlightByRegexForJSX(log.text,
-                regexList,
-                that.props.highlightColor
-            );
-            var msg = highlightedRegex.jsxMix,
-                matchCount = highlightedRegex.matchCount, // number of matches
-                nCount = highlightedRegex.nCount, // number of \n
-                rCount = highlightedRegex.rCount, // number of \r
-                deviceId = log.docid.split('-')[0];
-
-            var displayTimestamp;
-            switch (that.state.timezone) {
-                case "browser": displayTimestamp = new Date(log.variable_0 * 1000).toString();
-                    break;
-                case "user":
-                    if (Object.keys(deviceTimezoneMap).indexOf(deviceId) > -1) {
-                        displayTimestamp = displayDateTimeByTimeZoneOffset(
-                            log.variable_0 * 1000,
-                            deviceTimezoneMap[deviceId].timezone_offset,
-                            deviceTimezoneMap[deviceId].timezone_id
-                        )
-                    }
-                    else {
-                        var deviceTimezoneFromServer = that.getDeviceTimezone(deviceId, log.variable_0);
-                        displayTimestamp = displayDateTimeByTimeZoneOffset(
-                            log.variable_0 * 1000,
-                            deviceTimezoneFromServer.timezone_offset,
-                            deviceTimezoneFromServer.timezone_id
-                        );
-                        deviceTimezoneMap[deviceId] = deviceTimezoneFromServer;
-                    }
-                    break;
-                case "gmt": displayTimestamp = new Date(log.variable_0 * 1000).toUTCString();
-                    break;
-                default: displayTimestamp = new Date(log.variable_0 * 1000).toString();
-            }
-            var ts = [
-                <a href={"/account_profile/?type=sense_id&input=" + deviceId}><span className="label label-success">{deviceId}</span></a>, <br/>, <br/>,
-                <a className="cursor-hand" onClick={that.searchAroundByTs}>{displayTimestamp}</a>, <br/>, <br/>,
-                <span>Keyword Count: {matchCount}</span>, <br/>
-            ];
-            var msgClasses = React.addons.classSet({
-                'col-lg-11': true,
-                'col-md-11': true,
-                'col-xs-11': true,
-                'col-sm-11': true,
-                'showLineBreaks': that.props.showLineBreaks
-            });
-            logTableRows.push(<tr>
-                <td className="col-lg-1 col-md-1 col-xs-1 col-sm-1">{ts}</td>
-                <td className={msgClasses}>{msg}</td>
-            </tr>);
-        });
-        return (
-            <table className="table table-condensed table-striped table-bordered">
-                <thead><tr>
-                    <th className="alert alert-success"><Input onChange={that.updateDisplayTimeZone} id="select-timezone" type="select">
-                        <option value="browser">Browser Timezone</option>
-                        <option value="user">User Timezone</option>
-                        <option value="gmt">GMT</option>
-                    </Input></th>
-                    <th className="alert alert-warning"><Glyphicon glyph="paperclip"/> Messages</th>
-                </tr></thead>
-                <tbody>{logTableRows}</tbody>
-            </table>
-            )
-    }
-});
-var DebugLog = React.createClass({
-    getInitialState: function(){
-        return {
-            logs: [],
-            searchAlert: "",
-            highlightColor: '#FF0000',
-            caseInsensitive: true,
-            showLineBreaks: true
-        };
-    },
     componentDidMount: function() {
-        var that = this;
-        var maxDocsFromURL = getParameterByName('max_docs');
-        var textInputFromURL = getParameterByName('text');
-        var devicesInputFromURL = getParameterByName('devices');
-        var startFromURL = getParameterByName('start');
-        var endFromURL = getParameterByName('end');
+        this.retrieveBlackList();
+        var fieldFromURL = getParameterByName("field"),
+            keywordFromURL = getParameterByName("keyword"),
+            senseIdFromURL = getParameterByName("sense_id"),
+            limitFromURL = getParameterByName("limit"),
+            startFromURL = getParameterByName("start"),
+            endFromURL = getParameterByName("end");
 
+        if (fieldFromURL) {
+            $("#field").val(fieldFromURL);
+        }
+        if (senseIdFromURL) {
+            $("#sense-id").val(senseIdFromURL);
+        }
+        if (limitFromURL) {
+            $("#limit").val(limitFromURL);
+        }
         if (startFromURL) {
-            $('#start-time').val(startFromURL);
+            $("#start").val(startFromURL);
         }
-
         if (endFromURL) {
-            $('#end-time').val(endFromURL);
+            $("#end").val(endFromURL);
         }
 
-        if (maxDocsFromURL) {
-            $('#sliderValue').text(maxDocsFromURL);
+        if (keywordFromURL.isWhiteString()) {
+            return false;
         }
         else {
-            maxDocsFromURL = 100;
-        }
-        if (devicesInputFromURL) {
-            $('#devices-input').val(devicesInputFromURL);
-        }
-        if (textInputFromURL) {
-            $('#text-input').val(textInputFromURL);
+            $("#keyword").val(keywordFromURL);
         }
 
-        if (!(textInputFromURL.isWhiteString() && devicesInputFromURL.isWhiteString())) {
-            that.handleSubmit();
+        this.loadSenseLogs();
+    },
+
+    retrieveBlackList: function() {
+        $.ajax({
+            url: '/api/sense_black_list',
+            dataType: 'json',
+            type: 'GET',
+            success: function (response) {
+                this.setState({blackList: response.data});
+            }.bind(this)
+        });
+    },
+
+    loadSenseLogs: function(order) {
+        this.setState({alert: null, loading: <img src="/static/image/loading.gif" />, resultsSize: 0, response: {}});
+        var field = $("#field").val().trim(),
+            keyword = $("#keyword").val().trim(),
+            senseId = $("#sense-id").val().trim(),
+            limit = $("#limit").val().trim(),
+            start = $("#start").val().trim(),
+            end = $("#end").val().trim();
+
+        if (Number(limit) > 5000) {
+            this.setState({alert: <Alert bsStyle="danger">
+                Invalid request because ceiling limit is 5000
+            </Alert>, loading: null});
+            return false;
         }
 
-        $('.slider').slider({value: Number(maxDocsFromURL)}).on('slide', function(slideEvt){
-            $('#sliderValue').text(slideEvt.value);
-        });
+        if (start && end && new Date(start).getTime() > new Date(end).getTime()) {
+            this.setState({alert: <Alert bsStyle="danger">
+                Invalid request because start time cannot be less than end time
+            </Alert>, loading: null});
+            return false;
+        }
 
-        $('#case-check').attr('checked', true);
-        $('#whitespace-check').attr('checked', true);
-        $('#colorpick').spectrum({
-            color: "#FF0000",
-            clickoutFiresChange: true,
-            showPalette: true,
-            palette: [
-                ['red', 'pink', 'brown'],
-                ['orange', 'violet', 'purple'],
-                ['indigo', 'teal', 'blue']
-            ],
-            showAlpha: true,
-            change: function(color) {
-                that.setState({highlightColor: color.toHexString()});
-            }
-        });
-    },
-    handleCaseChange: function() {
-        this.setState({caseInsensitive: $('#case-check').is(':checked')});
-    },
-    handleWhiteSpaceChange: function() {
-        this.setState({showLineBreaks: $('#whitespace-check').is(':checked')});
-    },
-    handleSubmit: function(){
-        this.setState({
-            logs: [],
-            searchAlert: <img src="/static/image/loading.gif" />
-        });
-        var textInput = $('#text-input').val().trim(),
-            devicesInput = $('#devices-input').val().trim(),
-            startInputHuman = $('#start-time').val().trim(),
-            endInputHuman = $('#end-time').val().trim(),
-            startInput = startInputHuman.isWhiteString() ? "": new Date(startInputHuman + " GMT").getTime()/1000,
-            endInput = endInputHuman.isWhiteString() ? "": new Date(endInputHuman + " GMT").getTime()/1000;
+        if (!keyword) {
+            this.setState({alert: <Alert bsStyle="warning">
+                Looking up ALL documents because no field keyword is entered. <br/>
+                This is very inefficient and not to be abused. Failure happens when index size reaches critical number.
+            </Alert>, loading: <img src="/static/image/loading.gif" />});
+        }
+
+        history.pushState({}, '', '/sense_logs_new/?field=' + field + '&keyword=' + keyword + '&sense_id=' + senseId + '&limit=' + limit + "&start=" + start + "&end=" + end);
+        var sendingData = {
+                query: field + ":" + keyword,
+                categories: senseId ? JSON.stringify({device_id: senseId.split(",").map(function(s){return s.trim();})}) : null,
+                limit: limit ? limit : 20,
+                start: start ? new Date(start + " GMT").getTime() : null,
+                end: end ? new Date(end + " GMT").getTime() : null,
+                order: order
+            };
+        console.log("sending", sendingData);
         $.ajax({
             url: "/api/sense_logs",
             dataType: 'json',
             type: 'GET',
-            data: {
-                devices: devicesInput,
-                text: textInput,
-                max_results: $('#sliderValue').text(),
-                start_time: startInput,
-                end_time: endInput
-            },
-            success: function(response) {
-                console.log(response);
-                history.pushState({}, '', '/sense_logs/?text=' + textInput + '&devices=' + devicesInput + '&max_docs=' + $('#sliderValue').text() + '&start=' + startInputHuman + '&end=' + endInputHuman);
-                if (!response.error.isWhiteString()) {
-                    this.setState({
-                        logs: [],
-                        searchAlert: "☹ " + response.error
-                    });
+            data: sendingData,
+            success: function (response) {
+                console.log("getting", response);
+                var errorAlert = response.results && response.results.length === 0 ?
+                    <Alert>No matches found!</Alert> : null;
+
+                console.log("errorAlert", errorAlert);
+                var resultsSize = response.results ? response.results.length : 0;
+                var newState = {
+                    response: response,
+                    alert: errorAlert,
+                    resultsSize: resultsSize,
+                    loading: null
+                };
+                if (resultsSize > 0) {
+                    newState.oldestTimestamp = response.results[0].variable_1;
+                    newState.newestTimestamp = response.results[resultsSize-1].variable_1;
                 }
-                else {
-                    var refinedLogs = logsFilter(response.data, startInput, endInput);
-                    this.setState({
-                        logs: refinedLogs,
-                        searchAlert: "found " + refinedLogs.length + " documents"
-                    });
-                }
-            }.bind(this),
-            error: function(xhr, status, err) {
-                this.setState({
-                    logs: [],
-                    searchAlert: "☹ Query failed"
-                });
-                console.error(this.props.url, status, err);
+                this.setState(newState);
             }.bind(this)
         });
         return false;
     },
-    render: function(){
-        var result = this.state.logs.length === 0 ?
-            <div className="docs-count">{this.state.searchAlert}</div>: [
-            <div className="docs-count">{this.state.searchAlert}</div>,
-            <LogTable
-            logs={this.state.logs}
-            caseInsensitive={this.state.caseInsensitive}
-            showLineBreaks={this.state.showLineBreaks}
-            highlightColor={this.state.highlightColor}
-            />
-        ];
-
-        return (<div>
-            <form onSubmit={this.handleSubmit}>
-                <Row>
-                    <LongDatetimePicker placeHolder="start time(GMT)" id="start-time" size="2" />
-                    <LongDatetimePicker placeHolder="end time(GMT)" id="end-time" size="2" />
-                    <Col xs={3} sm={3} md={3} lg={3}>
-                        <input className="form-control" id="text-input" placeholder='Text e.g UART' />
-                    </Col>
-                    <Col xs={4} sm={4} md={4} lg={4}>
-                        <LongTagsInput id="devices-input" tagClass="label label-info" placeHolder="Devices/Emails (multiple)" />
-                    </Col>
-                    <Col xs={1} sm={1} md={1} lg={1}>
-                        <Button id="submit" bsStyle="success" type="submit"><Glyphicon glyph="search"/></Button>
-                    </Col>
+    loadOlderLogs: function() {
+        $("#start").val("");
+        $("#end").val(formatUTCDateFromEpoch(this.state.oldestTimestamp));
+        this.loadSenseLogs(0);  // grab latest till time
+    },
+    loadNewerLogs: function() {
+        $("#start").val(formatUTCDateFromEpoch(this.state.newestTimestamp));
+        $("#end").val("");
+        this.loadSenseLogs(1);  // grab earliest after time
+    },
+    focusWindow: function(senseId, ts) {
+        $("#field").val("device_id");
+        $("#keyword").val(senseId);
+        $("#sense-id").val("");
+        $("#start").val(d3.time.format.utc("%Y-%m-%d %H:%M:%S")(new Date(ts - 5*60*1000)));
+        $("#end").val(d3.time.format.utc("%Y-%m-%d %H:%M:%S")(new Date(ts + 5*60*1000)));
+        this.refs.submit.getDOMNode().focus();
+        this.loadSenseLogs();
+    },
+	render: function(){
+        var response = this.state.response;
+        var keyword = $("#keyword").val();
+        var resultsTable = !$.isEmptyObject(response) && response.results && response.results.length > 0 ?
+            <div>
+                <Table striped>
+                    <thead><tr>
+                        <th className="alert-success">{this.state.resultsSize} documents</th>
+                    </tr></thead>
+                    <tbody>
+                        {response.results.map(function(r){
+                            return <tr><td>
+                                <div className="center-wrapper">
+                                    <Button className="borderless" disabled>
+                                        <span className="span-upload-ts">{new Date(r.variable_1).toUTCString()}</span>
+                                    </Button>
+                                    - Sense ID: <a target="_blank" href={"/account_profile/?type=sense_id&input=" + r.device_id}>{r.device_id}</a>
+                                    &nbsp;<Button onClick={this.focusWindow.bind(this, r.device_id, r.variable_1)}>See all logs of this sense around this time</Button>
+                                </div><br/>
+                                <div dangerouslySetInnerHTML={{__html: formatLogText(r.text, keyword)}}/>
+                            </td></tr>;
+                        }.bind(this))}
+                    </tbody>
+                </Table>
+                <br/><Row>
+                    <Col xs={2} xsOffset={10}><ButtonGroup>
+                        <Button onClick={this.loadOlderLogs} className="previous-time-window">Prev</Button>
+                            <Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button>
+                    </ButtonGroup></Col>
                 </Row>
+            </div>
+            : null;
 
+		return(<div>
+            <form onSubmit={this.loadSenseLogs.bind(this, 0)}>
                 <Row>
-                    <Col xs={4} sm={4} md={4} lg={4}>
-                        <input type="text" id="colorpick"/>
-                    </Col>
-                    <Col xs={2} sm={2} md={2} lg={2}>
-                        <input id="case-check" type="checkbox" onChange={this.handleCaseChange} /> Case Insensitive
-                    </Col>
-                    <Col xs={2} sm={2} md={2} lg={2}>
-                        <input id="whitespace-check" type="checkbox" onChange={this.handleWhiteSpaceChange} /> Show Linebreaks
-                    </Col>
-                    <Col xs={4} sm={4} md={4} lg={4}>
-                    Max docs per index-field: <span id="sliderValue">100</span>&nbsp;&nbsp;&nbsp;
-                        <input type="text" className="span2 slider" value="" data-slider-min="1" data-slider-max="150" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square" />
-                    </Col>
+                    <Col xs={3} className="zero-padding-right"><Input id="field" type="select" addonBefore="Field">
+                        <option value="text">Text</option>
+                        <option value="device_id">Sense ID</option>
+                        <option value="date">Date</option>
+                    </Input></Col>
+                    <Col xs={3} className="zero-padding-left"><Input id="keyword" type="text" placeholder="Keyword <optional>"/></Col>
+                    <Col xs={1}><Button className="time-window" disabled>From</Button></Col>
+                    <LongDatetimePicker glyphicon="time" placeHolder="start (GMT) <optional>" id="start" size="3" />
+                    <Col xs={2}><Input id="limit" type="number" placeholder="20" addonBefore="Limit"/></Col>
                 </Row>
-
-            </form><br/>
-            <p><em>Leaving all inputs blank will query latest documents. Query start and end timestamps are in GMT</em></p>
-            {result}
+                <Row>
+                    <Col xs={3} className="zero-padding-right"><Input id="category" type="select" addonBefore="Category">
+                        <option value="device_id">Sense ID</option>
+                    </Input></Col>
+                    <Col xs={3} className="zero-padding-left"><Input id="sense-id" type="text" placeholder="Filter Value <optional>"/></Col>
+                    <Col xs={1}><Button className="time-window" disabled>To</Button></Col>
+                    <LongDatetimePicker glyphicon="time" placeHolder="end (GMT) <optional>" id="end" size="3" />
+                    <Col xs={1}><Button ref="submit" type="submit">&nbsp;<Glyphicon glyph="search"/>&nbsp;</Button></Col>
+                    <Col xs={1}>{this.state.loading}</Col>
+                </Row>
+            </form>
+            <Row>
+                <Col xs={10}><a href="/black_list" target="_blank">Sense Black List:</a> {
+                    this.state.blackList.map(function(s){return <span><Button bsSize="xsmall" disabled>{s}</Button>&nbsp;</span>})
+                }</Col>
+                <Col xs={2}><ButtonGroup>
+                    <Button onClick={this.loadOlderLogs} className="previous-time-window">Prev</Button>
+                    <Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button>
+                </ButtonGroup></Col>
+            </Row><br/>
+            {this.state.alert}
+            {resultsTable}
         </div>)
-    }
+	}
 });
 
-React.renderComponent(<DebugLog />, document.getElementById('debug-log'));
+React.render(<SenseLogsNew/>, document.getElementById("sense-logs"));
 
-
-function highlightByRegexForJSX(text, regexList, color) {
-    // this function return a mix of strings and spans
-    // where the spans replace the substrings matching the regex list
-    var matchCount = 0;
-    var rCount = 0;
-    var nCount = 0;
-    regexList.forEach(function(r){
-        text = text.replace(r, function (matchString) {
-            // ^_^ is chosen as a dummy delimiter
-            if (r.exec('\n') !== null) {
-                return '^_^<b>\\n</b>^_^';
-            }
-            else if (r.exec('\r') !== null) {
-                return '^_^<b>\\r</b>^_^';
-            }
-            else {
-                return '^_^<b>' + matchString + '</b>^_^';
-            }
-        });
-    });
-    var mixedArray = [];
-    text.split('^_^').forEach(function (t) {
-        if (t.slice(0, 3) !== '<b>') {
-            mixedArray.push(t);
-        }
-        else if (t === '<b>\\n</b>') {
-            mixedArray.push(<span style={{color: 'blue'}} dangerouslySetInnerHTML={{__html: t}}></span>);
-            nCount += 1;
-        }
-        else if (t === '<b>\\r</b>') {
-            mixedArray.push(<span style={{color: '#71A412'}} dangerouslySetInnerHTML={{__html: t}}></span>);
-            rCount += 1;
-        }
-        else if (!new RegExp('<b>\\s*</b>').test(t)){
-            mixedArray.push(<span style={{color: color}} dangerouslySetInnerHTML={{__html: t}}></span>);
-            matchCount += 1;
-        }
-    });
-    return {
-        jsxMix:  mixedArray,
-        matchCount: matchCount,
-        nCount: nCount,
-        rCount: rCount
-    };
-}
-
-function logsFilter(data, start, end) {
-    var filteredAndSortedByTs = data.filter(function(log){
-        if (start && end) {
-            return Number(log.variable_0) >= start && Number(log.variable_0) <= end;
-        }
-        else if(start) {
-            return Number(log.variable_0) >= start;
-        }
-        else if(end) {
-            return Number(log.variable_0) <= end;
-        }
-        else {
-            return log;
-        }
-    }).sort(compareTimestamp);
-
-    return _.uniq(filteredAndSortedByTs, "docid");
-
-}
-
-function compareTimestamp(log1, log2) {
-    if (log1.variable_0 < log2.variable_0) {
-        return -1;
+function formatLogText(text, keyword){
+    if (keyword.isWhiteString()) {
+        return text.replace(/\n/g, "<br>");
     }
-    if (log1.variable_0 > log2.variable_0) {
-        return 1;
-    }
-    return 0;
+    return text.replace(/\n/g, "<br>")
+        .replace(new RegExp(keyword, "gi"), function(m){return '<span class="highlight">' + m + '</span>';});
 }
 
-function displayDateTimeByTimeZoneOffset(ts, tzOffsetMillis, tzId) {
-    var omniTimeFormat = d3.time.format('%a %d %b %H:%M %Z');
-    var omniTimeFormatWithoutTz = d3.time.format('%a %d %b %H:%M');
-    if (tzOffsetMillis && tzId) {
-        var adjustedDateTimeString = new Date(ts + tzOffsetMillis).toUTCString().split("GMT")[0];
-        var tzOffsetHours =  tzOffsetMillis / 3600000, adjustTimezoneString;
-        if (tzOffsetHours >= 0 && tzOffsetHours < 10 ) {
-            adjustTimezoneString = "0" + tzOffsetHours.toString() + "00 " + tzId;
-        }
-        else if (tzOffsetHours < 0 && tzOffsetHours > -10) {
-            adjustTimezoneString = "-0" + Math.abs(tzOffsetHours).toString() + "00 " + tzId;
-        }
-        else {
-            adjustTimezoneString = tzOffsetHours.toString() + "00 " + tzId;
-        }
-        return omniTimeFormatWithoutTz(new Date(adjustedDateTimeString)) +  " " + adjustTimezoneString;
-    }
-
-    return omniTimeFormat(new Date(ts));
-}
-
-function dateTimePickerStringFormat(ts) {
-    return d3.time.format("%m-%d-%Y %H:%M:%S")(new Date(new Date(ts).toUTCString().split(" GMT")[0]));
+function formatUTCDateFromEpoch(ts) {
+    var dt = new Date(ts);
+    var convertedMonth = (dt.getUTCMonth() + 1).toString().length > 1 ? (dt.getUTCMonth() + 1) : "0" + (dt.getUTCMonth() + 1);
+    var convertedDate = dt.getUTCDate().toString().length > 1 ? dt.getUTCDate() : "0" + dt.getUTCDate();
+    var convertedHours = dt.getUTCHours().toString().length > 1 ? dt.getUTCHours() : "0" + dt.getUTCHours();
+    var convertedMinutes = dt.getUTCMinutes().toString().length > 1 ? dt.getUTCMinutes() : "0" + dt.getUTCMinutes();
+    var convertedSeconds = dt.getUTCSeconds().toString().length > 1 ? dt.getUTCSeconds() : "0" + dt.getUTCSeconds();
+    return convertedMonth +
+        "/" + convertedDate +
+        "/" + dt.getUTCFullYear() +
+        " " + convertedHours +
+        ":" + convertedMinutes +
+        ":" + convertedSeconds;
 }
