@@ -5,7 +5,10 @@ from handlers.helpers import BaseRequestHandler
 from handlers.helpers import ProtectedRequestHandler
 from handlers.helpers import CustomerExperienceRequestHandler
 from handlers.helpers import FirmwareRequestHandler
+from handlers.helpers import SuperFirmwareRequestHandler
 from handlers.helpers import SuperEngineerRequestHandler
+from handlers.helpers import SettingsModeratorRequestHandler
+from handlers.helpers import TokenMakerRequestHandler
 from models.setup import AccessToken
 
 this_file_path = os.path.dirname(__file__)
@@ -42,7 +45,7 @@ class ZendeskView(CustomerExperienceRequestHandler):
          self.render_to_response(template_file='templates/zendesk.html',
                                 context={'title': 'Zendesk'})
 
-class SettingsView(SuperEngineerRequestHandler):
+class SettingsView(SettingsModeratorRequestHandler):
     """Returns a panel for manipulating apps, accounts"""
     def get(self):
         self.render_to_response(template_file='templates/settings.html',
@@ -69,13 +72,13 @@ class FirmwareView(FirmwareRequestHandler):
         self.render_to_response(template_file='templates/firmware.html',
                                 context={'title': 'Firmware'})
 
-class ConfigurationView(SuperEngineerRequestHandler):
+class ConfigurationView(FirmwareRequestHandler):
     """Returns a panel for monitoring team device IDs and groups (teams) by feature."""
     def get(self):
         self.render_to_response(template_file='templates/configuration.html',
                                 context={'title': 'Configuration'})
 
-class TeamsView(ProtectedRequestHandler):
+class TeamsView(FirmwareRequestHandler):
     """Returns a panel for monitoring groups of devices & users"""
     def get(self):
         self.render_to_response(template_file='templates/teams.html',
@@ -239,12 +242,12 @@ class AlarmRingsHistoryView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/alarm_rings_history.html',
                                 context={'title': "Alarms, Ringtime & Timezone"})
 
-class TokenGeneratorView(ProtectedRequestHandler):
+class TokenGeneratorView(TokenMakerRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/token_generator.html',
                                 context={'title': "Token Generator"})
 
-class FirmwarePathView(ProtectedRequestHandler):
+class FirmwarePathView(SuperFirmwareRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/firmware_path.html',
                                 context={'title': "Firmware Upgrade Path"})

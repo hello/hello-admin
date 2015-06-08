@@ -1,6 +1,7 @@
 import json
 import settings
 from handlers.helpers import FirmwareRequestHandler
+from handlers.helpers import SuperFirmwareRequestHandler
 from handlers.helpers import ProtectedRequestHandler
 
 
@@ -83,7 +84,7 @@ class FirmwareUnhashAPI(ProtectedRequestHandler):
             app_info=settings.ADMIN_APP_INFO
         )
 
-class FirmwareGroupStatusAPI(ProtectedRequestHandler):
+class FirmwareGroupStatusAPI(SuperFirmwareRequestHandler):
     def get(self):
         self.hello_request(
             api_url="firmware/{}/status".format(self.request.get("group")),
@@ -93,11 +94,28 @@ class FirmwareGroupStatusAPI(ProtectedRequestHandler):
         )
 
 
-class FirmwareGroupPathAPI(ProtectedRequestHandler):
+class FirmwareGroupPathAPI(SuperFirmwareRequestHandler):
     def get(self):
         self.hello_request(
             api_url="firmware/{}/upgrade_nodes".format(self.request.get("group")),
             type="GET",
+            access_token=settings.ADMIN_APP_INFO.access_token,
+            app_info=settings.ADMIN_APP_INFO
+        )
+
+    def put(self):
+        self.hello_request(
+            api_url="firmware/upgrades/add_node",
+            type="PUT",
+            body_data=self.request.body,
+            access_token=settings.ADMIN_APP_INFO.access_token,
+            app_info=settings.ADMIN_APP_INFO
+        )
+
+    def delete(self):
+        self.hello_request(
+            api_url="firmware/upgrades/{}/{}".format(self.request.get("group_name"), self.request.get("from_fw_version")),
+            type="DELETE",
             access_token=settings.ADMIN_APP_INFO.access_token,
             app_info=settings.ADMIN_APP_INFO
         )
