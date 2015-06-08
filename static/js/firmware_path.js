@@ -113,7 +113,6 @@ var FirmwareGroupPath = React.createClass({
         return {group: "", groupPath: []}
     },
     loadFirmwareGroupPath: function(group) {
-        console.log("groupy", group);
         if (group.isWhiteString()) {
             return [];
         }
@@ -141,6 +140,7 @@ var FirmwareGroupPath = React.createClass({
             type: 'DELETE',
             success: function(response) {
                 console.log(response);
+                this.loadFirmwareGroupPath(groupName);
             }.bind(this)
         });
     },
