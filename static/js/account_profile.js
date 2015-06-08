@@ -437,7 +437,7 @@ var UptimeTile = React.createClass({
         var upTimeProportion = <span>&nbsp;</span>;
         if (this.state.uptime.length > 0) {
             
-            var cleanUptime = this.state.uptime.slice(1, this.state.uptime.length-1) // remove last hour because incomplete
+            var cleanUptime = this.state.uptime.slice(1, this.state.uptime.length-1); // remove last hour because incomplete
 
             var then = cleanUptime[0].ts;
             var age = (new Date().getTime() - then) / 1000 / 60;
@@ -450,7 +450,10 @@ var UptimeTile = React.createClass({
             <thead/>
             <tbody>
                 <tr><td>Proportion</td><td>{upTimeProportion}</td></tr>
-                <tr><td>10-day-history</td><td><SparkLine xAttr="ts" yAttr="count" data={this.state.uptime.slice(1, this.state.uptime.length -1)}/></td></tr>
+                <tr><td>10-day-history</td><td>
+                    <SparkLine xAttr="ts" yAttr="count" yUpperBound={58} yLowerBound={0}
+                        data={this.state.uptime.slice(1, this.state.uptime.length -1)}/>
+                </td></tr>
                 <tr><td/><td/></tr>
             </tbody>
         </Table>
