@@ -13,79 +13,171 @@ var Tile = React.createClass({
 });
 
 
-var FirmwareGroupStatus = React.createClass({
-    getInitialState: function() {
-        return {groupStatus: []}
-    },
-    loadFirmwareGroupStatus: function(group) {
-        $.ajax({
-            url: '/api/firmware_group_status',
-            dataType: 'json',
-            contentType: 'application/json',
-            data: {group: group},
-            type: 'GET',
-            success: function(response) {
-                console.log("group status", response);
-                this.setState({groupStatus: response.data});
-            }.bind(this)
-        });
-    },
-    componentWillReceiveProps: function() {
-        this.loadFirmwareGroupStatus(this.props.parent.refs.group.getDOMNode().value);
-    },
-    render: function() {
-        return <Table>
-            <thead>
-                <th>Version</th><th>Device ID</th><th>Timestamp</th>
-            </thead>
-            <tbody>{
-                this.state.groupStatus.map(function(gs){
-                    return <tr>
-                        <td>{gs.version}</td>
-                        <td>{gs.device_id}</td>
-                        <td>{d3.time.format.utc("%b %d %H:%M")(new Date(gs.timestamp))}</td>
-                    </tr>
-                })
-            }</tbody>
-        </Table>
-    }
-});
-
-var FirmwareGroupPath = React.createClass({
-    getInitialState: function() {
-        return {groupPath: [], updateIter: 0}
-    },
-    loadFirmwareGroupPath: function(group) {
+var AddFirmwareUpgradeNodeModal = React.createClass({
+    addFirmwareUpgradeNode: function() {
         $.ajax({
             url: '/api/firmware_group_path',
             dataType: 'json',
             contentType: 'application/json',
-            data: {group: group},
+            data: JSON.stringify({
+                group_name: this.refs.groupName.getDOMNode().value,
+                from_fw_version: this.refs.fromFWVersion.getDOMNode().value,
+                to_fw_version: this.refs.toFWVersion.getDOMNode().value,
+                rollout_percent: this.refs.rolloutPercent.getDOMNode().value
+            }),
+            type: 'PUT',
+            success: function(response) {
+                console.log(response);
+            }.bind(this)
+        });
+        this.props.onRequestHide();
+    },
+    saveNewFirmwareUpgradeNode: function() {
+        this.addFirmwareUpgradeNode();
+    },
+    render: function() {
+        return (
+            <Modal animation={false}>
+                <div className='modal-header'>
+                    Add a new firmware upgrade node
+                </div>
+                <div className='modal-body'>
+                    <input className="form-control" ref="groupName" type="text" placeholder="group name"/><br/>
+                    <input className="form-control" ref="fromFWVersion" type="text" placeholder="from firmware version (int)"/><br/>
+                    <input className="form-control" ref="toFWVersion" type="text" placeholder="to firmware version (int)"/><br/>
+                    <input className="form-control" ref="rolloutPercent" type="text" placeholder="rollout percent"/>
+                </div>
+                <div className='modal-footer'>
+                    <Button onClick={this.saveNewFirmwareUpgradeNode}>Save</Button>
+                    <Button onClick={this.props.onRequestHide}>Close</Button>
+                </div>
+            </Modal>
+        );
+    }
+});
+
+
+var FirmwareGroupStatus = React.createClass({
+    mixins: [React.addons.LinkedStateMixin],
+    getInitialState: function() {
+        return {group: "", groupStatus: []}
+    },
+    loadFirmwareGroupStatus: function(group) {
+        if (group.isWhiteString()) {
+            return [];
+        }
+        var groupStatus = [];
+        $.ajax({
+            url: '/api/firmware_group_status',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: {group: group.trim()},
             type: 'GET',
+            async: false,
+            success: function(response) {
+                console.log("group status", response);
+                groupStatus = response.data;
+            }.bind(this)
+        });
+        return groupStatus;
+    },
+    render: function() {
+        return <div>
+            <Col xs={8} xsOffset={2}>
+                <select className="form-control" valueLink={this.linkState("group")}>
+                    <option value="">Select a Group</option>
+                    {this.props.groups.reverse().map(function(g){return <option value={g.name}>{g.name}</option>;})}
+                </select>
+            </Col>
+            <Table>
+                <thead>
+                    <th>Version</th><th>Device ID</th><th>Timestamp</th>
+                </thead>
+                <tbody>{
+                    this.loadFirmwareGroupStatus(this.state.group).map(function(gs){
+                        return <tr>
+                            <td>{gs.version}</td>
+                            <td>{gs.device_id}</td>
+                            <td>{d3.time.format.utc("%b %d %H:%M")(new Date(gs.timestamp))}</td>
+                        </tr>
+                    })
+                    }</tbody>
+            </Table>
+        </div>
+    }
+});
+
+var FirmwareGroupPath = React.createClass({
+    mixins: [React.addons.LinkedStateMixin],
+    getInitialState: function() {
+        return {group: "", groupPath: []}
+    },
+    loadFirmwareGroupPath: function(group) {
+        console.log("groupy", group);
+        if (group.isWhiteString()) {
+            return [];
+        }
+        var groupPath = [];
+        $.ajax({
+            url: '/api/firmware_group_path',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: {group: group.trim()},
+            type: 'GET',
+            async: false,
             success: function(response) {
                 console.log("group path", response);
-                this.setState({groupPath: response.data});
+                groupPath = response.data;
+            }.bind(this)
+        });
+        return groupPath;
+    },
+    removeFirmwareUpgradeNode: function(groupName, fromFWVersion) {
+        $.ajax({
+            url: '/api/firmware_group_path',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: {group_name: groupName, from_fw_version: fromFWVersion},
+            type: 'DELETE',
+            success: function(response) {
+                console.log(response);
             }.bind(this)
         });
     },
-    componentWillReceiveProps: function() {
-        this.loadFirmwareGroupPath(this.props.parent.refs.group.getDOMNode().value);
-    },
     render: function() {
-        return <Table>
-            <thead>
-                <th>From Firmware</th><th>To Firmware</th><th>Rollout Percentage</th>
-            </thead>
-            <tbody>{
-                this.state.groupPath.map(function(gp){
-                    return <tr>
-                        <td>{gp.fromFWVersion}</td>
-                        <td>{gp.toFWVersion}</td>
-                        <td>{gp.rolloutPercent}</td>
-                    </tr>
-                })
-            }</tbody>
-        </Table>
+        return <div>
+
+            <Row>
+                <Col xs={1}>
+                    <ModalTrigger modal={<AddFirmwareUpgradeNodeModal />}>
+                        <Button><Glyphicon glyph="plus" /></Button>
+                    </ModalTrigger>
+                </Col>
+                <Col xs={6} xsOffset={2}>
+                    <select className="form-control" valueLink={this.linkState("group")}>
+                        <option value="">Select a Group</option>
+                        <option value="release">Release</option>
+                        {this.props.groups.reverse().map(function(g){return <option value={g.name}>{g.name}</option>;})}
+                    </select>
+                </Col>
+            </Row>
+
+            <Table>
+                <thead>
+                    <th>From Firmware</th><th>To Firmware</th><th>Rollout Percentage</th>
+                </thead>
+                <tbody>{
+                    this.loadFirmwareGroupPath(this.state.group).map(function(gp){
+                        return <tr>
+                            <td>{gp.fromFWVersion}</td>
+                            <td>{gp.toFWVersion}</td>
+                            <td>{gp.rolloutPercent}</td>
+                            <td><Button onClick={this.removeFirmwareUpgradeNode.bind(this, gp.groupName, gp.fromFWVersion)}><Glyphicon glyph="trash"/></Button></td>
+                        </tr>
+                    })
+                    }</tbody>
+            </Table>
+        </div>
     }
 });
 
@@ -102,38 +194,22 @@ var FirmwarePathMaster = React.createClass({
             type: 'GET',
             success: function(response) {
                 console.log(response);
-                this.setState({groups: response.data.reverse().map(function(g){return <option value={g.name}>{g.name}</option>;})});
+                this.setState({groups: response.data});
             }.bind(this)
         });
     },
-
-    handleChange: function() {
-        this.setState({updateIter: this.state.updateIter + 1});
-    },
-
     componentDidMount: function() {
         this.loadFirmwareGroups();
     },
-
     render: function() {
-        return <div>
-            <Row>
-                <Col xs={6} xsOffset={3}><form>
-                    <select className="form-control" id="group" ref="group" onChange={this.handleChange}>
-                        <option value="">Select a Group</option>
-                        {this.state.groups}
-                    </select>
-                </form></Col>
-            </Row>
-            <Row>
-                <Col xs={6}>
-                    <Tile title="Firmware Status" content={<FirmwareGroupStatus parent={this} updateIter={this.state.updateIter} />} />
-                </Col>
-                <Col xs={6}>
-                    <Tile title="Firmware Path" content={<FirmwareGroupPath parent={this} updateIter={this.state.updateIter} />} />
-                </Col>
-            </Row>
-        </div>
+        return <Row>
+            <Col xs={6}>
+                <Tile title="Firmware Status" content={<FirmwareGroupStatus groups={this.state.groups} />} />
+            </Col>
+            <Col xs={6}>
+                <Tile title="Firmware Path" content={<FirmwareGroupPath groups={this.state.groups} />} />
+            </Col>
+        </Row>
     }
 });
 
