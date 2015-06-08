@@ -96,14 +96,14 @@ var SenseLogsNew = React.createClass({
             data: sendingData,
             success: function (response) {
                 console.log("getting", response);
-                var errorAlert = response.results && response.results.length === 0 ?
-                    <Alert>No matches found!</Alert> : null;
-
-                console.log("errorAlert", errorAlert);
+//                var errorAlert = response.results && response.results.length === 0 ?
+//                    <Alert>No matches found!</Alert> : null;
+                if (!$.isEmptyObject(response.error)) {
+                    console.log("error", response.error);
+                }
                 var resultsSize = response.results ? response.results.length : 0;
                 var newState = {
                     response: response,
-                    alert: errorAlert,
                     resultsSize: resultsSize,
                     loading: null
                 };
@@ -138,57 +138,56 @@ var SenseLogsNew = React.createClass({
 	render: function(){
         var response = this.state.response;
         var keyword = $("#keyword").val();
-        var resultsTable = !$.isEmptyObject(response) && response.results && response.results.length > 0 ?
-            <div>
-                <Table striped>
-                    <thead><tr>
-                        <th className="alert-success">{this.state.resultsSize} documents</th>
-                    </tr></thead>
-                    <tbody>
-                        {response.results.map(function(r){
-                            return <tr><td>
-                                <div className="center-wrapper">
-                                    <Button className="borderless" disabled>
-                                        <span className="span-upload-ts">{new Date(r.variable_1).toUTCString()}</span>
-                                    </Button>
-                                    - Sense ID: <a target="_blank" href={"/account_profile/?type=sense_id&input=" + r.device_id}>{r.device_id}</a>
-                                    &nbsp;<Button onClick={this.focusWindow.bind(this, r.device_id, r.variable_1)}>See all logs of this sense around this time</Button>
-                                </div><br/>
-                                <div dangerouslySetInnerHTML={{__html: formatLogText(r.text, keyword)}}/>
-                            </td></tr>;
-                        }.bind(this))}
-                    </tbody>
-                </Table>
-                <br/><Row>
-                    <Col xs={2} xsOffset={10}><ButtonGroup>
-                        <Button onClick={this.loadOlderLogs} className="previous-time-window">Prev</Button>
-                            <Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button>
-                    </ButtonGroup></Col>
-                </Row>
-            </div>
+        var resultsTable = !$.isEmptyObject(response) && response.results ?
+            <Table striped>
+                <thead><tr><th className="alert-success">
+                    <Col xs={2}><Button onClick={this.loadOlderLogs} className="previous-time-window">Prev</Button></Col>
+                    <Col xs={8}>{this.state.resultsSize} documents</Col>
+                    <Col xs={2}><Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button></Col>
+                </th></tr></thead>
+                <tbody>
+                    {response.results.map(function(r){
+                        return <tr><td>
+                            <div className="center-wrapper">
+                                <Button className="borderless" disabled>
+                                    <span className="span-upload-ts">{new Date(r.variable_1).toUTCString()}</span>
+                                </Button>
+                                - Sense ID: <a target="_blank" href={"/account_profile/?type=sense_id&input=" + r.device_id}>{r.device_id}</a>
+                                &nbsp;<Button onClick={this.focusWindow.bind(this, r.device_id, r.variable_1)}>See all logs of this sense around this time</Button>
+                            </div><br/>
+                            <div dangerouslySetInnerHTML={{__html: formatLogText(r.text, keyword)}}/>
+                        </td></tr>;
+                    }.bind(this))}
+                </tbody>
+                {response.results.length === 0 ? null :  <thead><tr><th className="alert-success">
+                    <Col xs={2}><Button onClick={this.loadOlderLogs} className="previous-time-window">Prev</Button></Col>
+                    <Col xs={8}>{this.state.resultsSize} documents</Col>
+                    <Col xs={2}><Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button></Col>
+                </th></tr></thead>}
+            </Table>
             : null;
 
 		return(<div>
             <form onSubmit={this.loadSenseLogs.bind(this, 0)}>
                 <Row>
-                    <Col xs={3} className="zero-padding-right"><Input id="field" type="select" addonBefore="Field">
+                    <Col xs={3} className="zero-padding-right"><Input id="field" type="select" addonBefore="Search By">
                         <option value="text">Text</option>
                         <option value="device_id">Sense ID</option>
                         <option value="date">Date</option>
                     </Input></Col>
-                    <Col xs={3} className="zero-padding-left"><Input id="keyword" type="text" placeholder="Keyword <optional>"/></Col>
+                    <Col xs={3} className="zero-padding-left"><Input id="keyword" type="text" placeholder="search phrase <optional>"/></Col>
                     <Col xs={1}><Button className="time-window" disabled>From</Button></Col>
                     <LongDatetimePicker glyphicon="time" placeHolder="start (GMT) <optional>" id="start" size="3" />
                     <Col xs={2}><Input id="limit" type="number" placeholder="20" addonBefore="Limit"/></Col>
                 </Row>
                 <Row>
-                    <Col xs={3} className="zero-padding-right"><Input id="category" type="select" addonBefore="Category">
+                    <Col xs={3} className="zero-padding-right"><Input id="category" type="select" addonBefore="Filter By">
                         <option value="device_id">Sense ID</option>
                     </Input></Col>
-                    <Col xs={3} className="zero-padding-left"><Input id="sense-id" type="text" placeholder="Filter Value <optional>"/></Col>
+                    <Col xs={3} className="zero-padding-left"><Input id="sense-id" type="text" placeholder="filter value <optional>"/></Col>
                     <Col xs={1}><Button className="time-window" disabled>To</Button></Col>
                     <LongDatetimePicker glyphicon="time" placeHolder="end (GMT) <optional>" id="end" size="3" />
-                    <Col xs={1}><Button ref="submit" type="submit">&nbsp;<Glyphicon glyph="search"/>&nbsp;</Button></Col>
+                    <Col xs={1}><Button bsStyle="success" ref="submit" type="submit">&nbsp;<Glyphicon glyph="search"/>&nbsp;</Button></Col>
                     <Col xs={1}>{this.state.loading}</Col>
                 </Row>
             </form>
@@ -196,10 +195,6 @@ var SenseLogsNew = React.createClass({
                 <Col xs={10}><a href="/black_list" target="_blank">Sense Black List:</a> {
                     this.state.blackList.map(function(s){return <span><Button bsSize="xsmall" disabled>{s}</Button>&nbsp;</span>})
                 }</Col>
-                <Col xs={2}><ButtonGroup>
-                    <Button onClick={this.loadOlderLogs} className="previous-time-window">Prev</Button>
-                    <Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button>
-                </ButtonGroup></Col>
             </Row><br/>
             {this.state.alert}
             {resultsTable}
@@ -218,16 +213,5 @@ function formatLogText(text, keyword){
 }
 
 function formatUTCDateFromEpoch(ts) {
-    var dt = new Date(ts);
-    var convertedMonth = (dt.getUTCMonth() + 1).toString().length > 1 ? (dt.getUTCMonth() + 1) : "0" + (dt.getUTCMonth() + 1);
-    var convertedDate = dt.getUTCDate().toString().length > 1 ? dt.getUTCDate() : "0" + dt.getUTCDate();
-    var convertedHours = dt.getUTCHours().toString().length > 1 ? dt.getUTCHours() : "0" + dt.getUTCHours();
-    var convertedMinutes = dt.getUTCMinutes().toString().length > 1 ? dt.getUTCMinutes() : "0" + dt.getUTCMinutes();
-    var convertedSeconds = dt.getUTCSeconds().toString().length > 1 ? dt.getUTCSeconds() : "0" + dt.getUTCSeconds();
-    return convertedMonth +
-        "/" + convertedDate +
-        "/" + dt.getUTCFullYear() +
-        " " + convertedHours +
-        ":" + convertedMinutes +
-        ":" + convertedSeconds;
+    return d3.time.format.utc("%m/%d/%Y %H:%M:%S")(new Date(ts));
 }
