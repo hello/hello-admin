@@ -112,9 +112,12 @@ class FirmwareGroupPathAPI(SuperFirmwareRequestHandler):
             app_info=settings.ADMIN_APP_INFO
         )
 
-    def delete(self):
+    def post(self):
+        body = json.loads(self.request.body)
+        group_name = body.get("group_name")
+        from_fw_version = body.get("from_fw_version")
         self.hello_request(
-            api_url="firmware/upgrades/{}/{}".format(self.request.get("group_name"), self.request.get("from_fw_version")),
+            api_url="firmware/upgrades/delete_node/{}/{}".format(group_name, from_fw_version),
             type="DELETE",
             access_token=settings.ADMIN_APP_INFO.access_token,
             app_info=settings.ADMIN_APP_INFO
