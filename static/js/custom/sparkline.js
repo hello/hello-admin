@@ -5,6 +5,8 @@ var SparkLine = React.createClass({
         return {
             xAttr: "x",
             yAttr: "y",
+            yUpperBound: 100,
+            yLowerBound: 0,
             width: 140,
             height: 50,
             strokeColor: 'black',
@@ -28,7 +30,7 @@ var SparkLine = React.createClass({
         while (thisDOMNode.firstChild) {
             thisDOMNode.removeChild(thisDOMNode.firstChild);
         }
-        var data = this.props.data.slice();
+        var data = this.props.data;
         if (data.length === 0) {
             return false;
         }
@@ -74,7 +76,10 @@ var SparkLine = React.createClass({
             .attr('class', 'd3-tip')
             .offset([-10, 10])
             .html(function(d) {
-                return "<span class='label label-default label-uptime-terminal'>" +  (d[this.props.yAttr] || d) + "</span>";
+                var xHumanDateTip = d[this.props.xAttr] ? d3.time.format.utc("%b %d %H:%M")(new Date(d[this.props.xAttr])) : d;
+                var yValueTip = d[this.props.yAttr] || d;
+                return "<span class='label label-default label-uptime-terminal'>" +
+                    xHumanDateTip + " -- " + yValueTip + "</span>";
             }.bind(this));
 
         var svg = d3.select(this.getDOMNode())
@@ -86,14 +91,28 @@ var SparkLine = React.createClass({
         svg.call(tip);
 
         svg.append('circle')
-            .data(data)
+            .data(data.slice(0,1))
             .attr('class', 'sparkcircle')
             .attr('cx', firstX).attr('cy', firstY)
-            .attr('fill', 'red')
+            .attr('fill', 'indigo   ')
             .attr('stroke', 'none')
             .attr('r', this.props.circleDiameter)
             .on('mouseover', tip.show)
             .on('mouseout', tip.hide);
+
+        data.forEach(function(d){
+            if (d[this.props.yAttr] <= this.props.yUpperBound && d[this.props.yAttr] >= this.props.yLowerBound) {
+                svg.append('circle')
+                    .data([d])
+                    .attr('class', 'sparkcircle')
+                    .attr('cx', x(d[this.props.xAttr])).attr('cy', y(d[this.props.yAttr]))
+                    .attr('fill', 'red')
+                    .attr('stroke', 'none')
+                    .attr('r', this.props.circleDiameter)
+                    .on('mouseover', tip.show)
+                    .on('mouseout', tip.hide);
+            }
+        }.bind(this));
 
         svg.append('path')
             .datum(data)
@@ -104,10 +123,10 @@ var SparkLine = React.createClass({
             .attr('d', line);
 
         svg.append('circle')
-            .data(data.reverse())
+            .data(data.reverse().slice(0,1))
             .attr('class', 'sparkcircle')
             .attr('cx', lastX).attr('cy', lastY)
-            .attr('fill', 'red')
+            .attr('fill', 'indigo')
             .attr('stroke', 'none')
             .attr('r', this.props.circleDiameter)
             .on('mouseover', tip.show)
