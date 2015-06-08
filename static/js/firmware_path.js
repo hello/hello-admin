@@ -174,8 +174,8 @@ var FirmwareGroupPath = React.createClass({
                             <td>{gp.rolloutPercent}</td>
                             <td><Button onClick={this.removeFirmwareUpgradeNode.bind(this, gp.groupName, gp.fromFWVersion)}><Glyphicon glyph="trash"/></Button></td>
                         </tr>
-                    })
-                    }</tbody>
+                    }.bind(this))
+                }</tbody>
             </Table>
         </div>
     }
