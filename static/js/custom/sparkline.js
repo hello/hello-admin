@@ -12,7 +12,10 @@ var SparkLine = React.createClass({
             strokeColor: 'black',
             strokeWidth: '0.6px',
             interpolate: 'none',
-            circleDiameter: 2,
+            terminalCircleDiameter: 2.1,
+            terminalColor: "rgba(75, 0, 130, 0.6)",
+            flagCircleDiameter: 1.8,
+            flagColor: "rgba(255, 0, 0, 0.5)",
             data: [9, 3, 2, 0, 1, 3] //Lukas's birthday :)
         };
     },
@@ -94,9 +97,9 @@ var SparkLine = React.createClass({
             .data(data.slice(0,1))
             .attr('class', 'sparkcircle')
             .attr('cx', firstX).attr('cy', firstY)
-            .attr('fill', 'indigo   ')
+            .attr('fill', this.props.terminalColor)
             .attr('stroke', 'none')
-            .attr('r', this.props.circleDiameter)
+            .attr('r', this.props.terminalCircleDiameter)
             .on('mouseover', tip.show)
             .on('mouseout', tip.hide);
 
@@ -106,9 +109,9 @@ var SparkLine = React.createClass({
                     .data([d])
                     .attr('class', 'sparkcircle')
                     .attr('cx', x(d[this.props.xAttr])).attr('cy', y(d[this.props.yAttr]))
-                    .attr('fill', 'red')
+                    .attr('fill', this.props.flagColor)
                     .attr('stroke', 'none')
-                    .attr('r', this.props.circleDiameter)
+                    .attr('r', this.props.flagCircleDiameter)
                     .on('mouseover', tip.show)
                     .on('mouseout', tip.hide);
             }
@@ -126,9 +129,9 @@ var SparkLine = React.createClass({
             .data(data.reverse().slice(0,1))
             .attr('class', 'sparkcircle')
             .attr('cx', lastX).attr('cy', lastY)
-            .attr('fill', 'indigo')
+            .attr('fill', this.props.terminalColor)
             .attr('stroke', 'none')
-            .attr('r', this.props.circleDiameter)
+            .attr('r', this.props.terminalCircleDiameter)
             .on('mouseover', tip.show)
             .on('mouseout', tip.hide);
 
