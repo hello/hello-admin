@@ -1,10 +1,10 @@
 import json
 import logging as log
 import settings
-from handlers.helpers import ProtectedRequestHandler
+from handlers.helpers import FirmwareRequestHandler
 
 
-class FeaturesAPI(ProtectedRequestHandler):
+class FeaturesAPI(FirmwareRequestHandler):
     def get(self):
         self.hello_request(
             api_url="features",

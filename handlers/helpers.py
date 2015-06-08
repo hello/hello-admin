@@ -282,7 +282,7 @@ class ProtectedRequestHandler(BaseRequestHandler):
     ## Retrieve groups grom DataStore
     @property
     def groups_entity(self):
-        return UserGroup.query().get()
+        return UserGroup.query().order(-UserGroup.created).get()
 
     def super_engineer(self):
         return stripStringToList(self.groups_entity.super_engineer)
@@ -298,6 +298,12 @@ class ProtectedRequestHandler(BaseRequestHandler):
 
     def hardware(self):
         return stripStringToList(self.groups_entity.hardware)
+
+    def settings_moderator(self):
+        return stripStringToList(self.groups_entity.settings_moderator)
+
+    def token_maker(self):
+        return stripStringToList(self.groups_entity.token_maker)
 
     def super_firmware(self):
         return stripStringToList(self.groups_entity.super_firmware)
@@ -333,6 +339,26 @@ class HardwareRequestHandler(ProtectedRequestHandler):
     def is_restricted_secondary(self):
         return not self.current_user.email() in super(HardwareRequestHandler, self).hardware()
 
+class SettingsModeratorRequestHandler(ProtectedRequestHandler):
+    """
+    Grant access to only hardware team members
+    """
+    def is_restricted_secondary(self):
+        return not self.current_user.email() in super(SettingsModeratorRequestHandler, self).settings_moderator()
+
+class SuperFirmwareRequestHandler(ProtectedRequestHandler):
+    """
+    Grant access to only super engineers
+    """
+    def is_restricted_secondary(self):
+        return not self.current_user.email() in super(SuperFirmwareRequestHandler, self).super_firmware()
+
+class TokenMakerRequestHandler(ProtectedRequestHandler):
+    """
+    Grant access to only hardware team members
+    """
+    def is_restricted_secondary(self):
+        return not self.current_user.email() in super(TokenMakerRequestHandler, self).token_maker()
 
 class SuperEngineerRequestHandler(ProtectedRequestHandler):
     """
