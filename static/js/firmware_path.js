@@ -136,8 +136,8 @@ var FirmwareGroupPath = React.createClass({
             url: '/api/firmware_group_path',
             dataType: 'json',
             contentType: 'application/json',
-            data: {group_name: groupName, from_fw_version: fromFWVersion},
-            type: 'DELETE',
+            data: JSON.stringify({group_name: groupName, from_fw_version: fromFWVersion}),
+            type: 'POST',
             success: function(response) {
                 console.log(response);
                 this.loadFirmwareGroupPath(groupName);
