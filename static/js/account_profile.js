@@ -451,7 +451,7 @@ var UptimeTile = React.createClass({
             <tbody>
                 <tr><td>Proportion</td><td>{upTimeProportion}</td></tr>
                 <tr><td>10-day-history</td><td>
-                    <SparkLine xAttr="ts" yAttr="count" yUpperBound={59} yLowerBound={1}
+                    <SparkLine xAttr="ts" yAttr="count" yUpperBound={58} yLowerBound={0}
                         data={this.state.uptime.slice(1, this.state.uptime.length -1)}/>
                 </td></tr>
                 <tr><td/><td/></tr>

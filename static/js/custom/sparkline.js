@@ -14,8 +14,8 @@ var SparkLine = React.createClass({
             interpolate: 'none',
             terminalCircleDiameter: 2.1,
             terminalColor: "rgba(75, 0, 130, 0.6)",
-            flagCircleDiameter: 1.8,
-            flagColor: "rgba(255, 0, 0, 0.5)",
+            flagCircleDiameter: 3,
+            flagColor: "rgba(255, 0, 0, 0.4)",
             data: [9, 3, 2, 0, 1, 3] //Lukas's birthday :)
         };
     },
