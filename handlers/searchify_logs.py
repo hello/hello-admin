@@ -117,7 +117,6 @@ class SenseLogsAPI(ProtectedRequestHandler):
 
         aggregate_results = sorted(log1["results"] + log2["results"], key=lambda d: d.get("variable_0", 0))
         if len(aggregate_results) > self.limit:
-            print "overflow ZZZ"
             if self.order == 0:
                 aggregate_results = aggregate_results[-1 - self.limit:-1]
             elif self.order == 1:
