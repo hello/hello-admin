@@ -139,8 +139,13 @@ var TimelineMaestro = React.createClass({
     submitWithInputsfromURL: function() {
         var emailInputFromURL = getParameterByName('email');
         var dateInputFromURL = getParameterByName('date');
-        if (emailInputFromURL.isWhiteString() || dateInputFromURL.isWhiteString()) {
+        if (emailInputFromURL.isWhiteString()) {
             return false;
+        }
+        if (dateInputFromURL.isWhiteString()) {
+            var yesterday = new Date();
+            yesterday.setDate(yesterday.getDate()-1);
+            dateInputFromURL = d3.time.format("%m-%d-%Y")(yesterday);
         }
         $('#email-input').val(emailInputFromURL);
         $('#date-input').val(dateInputFromURL);
