@@ -410,57 +410,6 @@ var PillSummary = React.createClass({
     }
 });
 
-var UptimeTile = React.createClass({
-    getInitialState : function() {
-        return {"uptime" : []}
-    },
-    loadUptimeByEmail : function(email) {
-        if (email) {
-            $.ajax({
-                url: "/api/diagnostic",
-                dataType: "json",
-                type: 'GET',
-                data: {email: email},
-                success: function (response) {
-                    this.setState({uptime : response.data})
-                }.bind(this)
-            });
-        }
-        else {
-            this.setState({uptime: []});
-        }
-    },
-    componentWillReceiveProps : function() {
-        this.loadUptimeByEmail(this.props.email);
-    },
-    render: function() {
-        var upTimeProportion = <span>&nbsp;</span>;
-        if (this.state.uptime.length > 0) {
-            
-            var cleanUptime = this.state.uptime.slice(1, this.state.uptime.length-1); // remove last hour because incomplete
-
-            var then = cleanUptime[0].ts;
-            var age = (new Date().getTime() - then) / 1000 / 60;
-        
-            var totalUpTime = cleanUptime.map(function(i){return i.count}).reduce(function(x, y){return x+y;}, 0);
-            upTimeProportion = Math.min((totalUpTime / age * 100), 100).toFixed(2) + " %";
-        }
-        
-        return <Table>
-            <thead/>
-            <tbody>
-                <tr><td>Proportion</td><td>{upTimeProportion}</td></tr>
-                <tr><td>10-day-history</td><td>
-                    <SparkLine xAttr="ts" yAttr="count" yUpperBound={58} yLowerBound={0}
-                        data={this.state.uptime.slice(1, this.state.uptime.length -1)}/>
-                </td></tr>
-                <tr><td/><td/></tr>
-            </tbody>
-        </Table>
-    }
-});
-
-
 var AccountProfile = React.createClass({
     getInitialState: function() {
         return {
