@@ -50,13 +50,13 @@ var OnboardingLogs = React.createClass({
     loadOnboardingLogsBySenseIdOrEmail: function() {
         var senseId = $("#sense-id").val();
         var count = $("#count").val();
-        console.log(senseId, count);
         if (senseId.indexOf("@") > -1){
             this.loadOnboardingLogsByEmail(senseId, count);
         }
         else {
-            this.loadOnboardingLogsBySenseId(senseId, email);
+            this.loadOnboardingLogsBySenseId(senseId, count);
         }
+        return false;
     },
 
     loadOnboardingLogsBySenseId: function(senseId, count) {
@@ -87,10 +87,9 @@ var OnboardingLogs = React.createClass({
 
     loadOnboardingLogsByEmail: function(email, count) {
         this.setState({loading: true, data: [], filteredData: [], error: ""});
-        console.log(senseId, count);
         history.pushState({}, '', '/onboarding_logs/?email=' + email + '&count=' + count);
         $.ajax({
-            url: "/api/onboarding_logs_by_sense_id",
+            url: "/api/onboarding_logs_by_email",
             dataType: 'json',
             type: 'GET',
             async: false,
