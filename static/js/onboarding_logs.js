@@ -47,11 +47,20 @@ var OnboardingLogs = React.createClass({
         return false;
     },
 
-    loadOnboardingLogsBySenseId: function() {
-        this.setState({loading: true, data: [], filteredData: [], error: ""});
+    loadOnboardingLogsBySenseIdOrEmail: function() {
         var senseId = $("#sense-id").val();
         var count = $("#count").val();
         console.log(senseId, count);
+        if (senseId.indexOf("@") > -1){
+            this.loadOnboardingLogsByEmail(senseId, count);
+        }
+        else {
+            this.loadOnboardingLogsBySenseId(senseId, email);
+        }
+    },
+
+    loadOnboardingLogsBySenseId: function(senseId, count) {
+        this.setState({loading: true, data: [], filteredData: [], error: ""});
         history.pushState({}, '', '/onboarding_logs/?sense_id=' + senseId + '&count=' + count);
         $.ajax({
             url: "/api/onboarding_logs_by_sense_id",
@@ -76,12 +85,40 @@ var OnboardingLogs = React.createClass({
         return false;
     },
 
+    loadOnboardingLogsByEmail: function(email, count) {
+        this.setState({loading: true, data: [], filteredData: [], error: ""});
+        console.log(senseId, count);
+        history.pushState({}, '', '/onboarding_logs/?email=' + email + '&count=' + count);
+        $.ajax({
+            url: "/api/onboarding_logs_by_sense_id",
+            dataType: 'json',
+            type: 'GET',
+            async: false,
+            data: {
+                email: email,
+                count: count
+            },
+            success: function(response) {
+                console.log(response);
+                if (response.error.isWhiteString()) {
+                    var mappedData = manipulateData(response.data);
+                    this.setState({error: "", data: mappedData, filteredData: mappedData, loading: false});
+                }
+                else {
+                    this.setState({data: [], filteredData: [], error: response.error, loading: false});
+                }
+            }.bind(this)
+        });
+        return false;
+    },
+
     submitWithInputsFromURL: function() {
         var resultFromURL = getParameterByName("result");
         var startTimeFromURL = getParameterByName("start");
         var endTimeFromURL = getParameterByName("end");
 
         var senseIdFromURL = getParameterByName("sense_id");
+        var emailFromURL = getParameterByName("email");
         var countFromURL = getParameterByName("count");
 
         if (resultFromURL) {
@@ -93,7 +130,12 @@ var OnboardingLogs = React.createClass({
         else if (senseIdFromURL) {
             $("#sense-id").val(senseIdFromURL);
             $("#count").val(countFromURL);
-            this.loadOnboardingLogsBySenseId();
+            this.loadOnboardingLogsBySenseIdOrEmail();
+        }
+        else if (emailFromURL) {
+            $("#sense-id").val(emailFromURL);
+            $("#count").val(countFromURL);
+            this.loadOnboardingLogsBySenseIdOrEmail();
         }
         else {
             return false;
@@ -171,8 +213,8 @@ var OnboardingLogs = React.createClass({
                 <LongDatetimePicker placeHolder="end (now)" id="end-time" size="3" />
                 <Col xs={1}><Button type="submit"><Glyphicon glyph="search"/></Button></Col>
             </form>
-            <form className="row" onSubmit={this.loadOnboardingLogsBySenseId}>
-                <Col xs={3}><Input type="text" id="sense-id" placeholder="Sense ID" /></Col>
+            <form className="row" onSubmit={this.loadOnboardingLogsBySenseIdOrEmail}>
+                <Col xs={3}><Input type="text" id="sense-id" placeholder="Sense ID / Email" /></Col>
                 <Col xs={1}><Input type="number" id="count" placeholder="limit" /></Col>
                 <Col xs={1}><Button type="submit"><Glyphicon glyph="search"/></Button></Col>
                 <Col xs={7}>{this.state.onboardingInfo}</Col>
