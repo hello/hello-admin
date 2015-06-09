@@ -42,6 +42,7 @@ from handlers.motion import MotionAPI
 from handlers.notification import NotificationAPI
 from handlers.onboarding import OnboardingLogsByResultAPI
 from handlers.onboarding import OnboardingLogsBySenseIdAPI
+from handlers.onboarding import OnboardingLogsByEmailAPI
 from handlers.orders import OrdersAPI
 from handlers.papertrail import PaperTrailEventsAPI
 from handlers.papertrail import PaperTrailSystemsAPI
@@ -176,6 +177,7 @@ api_routes = [
     ('/api/omni_search/?$', OmniSearchAPI),
     ('/api/onboarding_logs_by_result/?$', OnboardingLogsByResultAPI),
     ('/api/onboarding_logs_by_sense_id/?$', OnboardingLogsBySenseIdAPI),
+    ('/api/onboarding_logs_by_email/?$', OnboardingLogsByEmailAPI),
     ('/api/orders/?$', OrdersAPI),
     ('/api/papertrail_events/?$', PaperTrailEventsAPI),
     ('/api/papertrail_systems/?$', PaperTrailSystemsAPI),
