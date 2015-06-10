@@ -79,7 +79,7 @@ var SparkLine = React.createClass({
             .offset([-10, 10])
             .html(function(d) {
                 var xHumanDateTip = d[this.props.xAttr] ? d3.time.format.utc("%b %d %H:%M")(new Date(d[this.props.xAttr])) : d;
-                var yValueTip = d[this.props.yAttr] || d;
+                var yValueTip = d[this.props.yAttr] === null || d[this.props.yAttr] === undefined ? d : d[this.props.yAttr];
                 return "<span class='label label-default label-uptime-terminal'>" +
                     xHumanDateTip + " -- " + yValueTip + "</span>";
             }.bind(this));
