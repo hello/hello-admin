@@ -207,16 +207,14 @@ var SenseUptimeMaster = React.createClass({
             url: "/api/sense_uptime",
             dataType: "json",
             type: 'GET',
-            data: {email: email},
+            data: {email: email, padded: 1},
             success: function (response) {
                 var newUptimeProportionState = this.state.uptimeProportion;
                 var newUptimeHistoryState = this.state.uptimeHistory;
                 if (response.error.isWhiteString() && response.data.length > 1){
                     var cleanUptime = response.data.slice(1, response.data.length-1); // remove last hour because incomplete
-                    var then = cleanUptime[0].ts;
-                    var age = (new Date().getTime() - then) / 1000 / 60;
                     var totalUpTime = cleanUptime.map(function(i){return i.count}).reduce(function(x, y){return x+y;}, 0);
-                    newUptimeProportionState[senseId] = Math.min((totalUpTime / age * 100), 100).toFixed(2);
+                    newUptimeProportionState[senseId] = (totalUpTime /(cleanUptime.length*60)*100).toFixed(2) + " %";
                     newUptimeHistoryState[senseId] = cleanUptime;
                     this.setState({uptimeProportion : newUptimeProportionState, uptimeHistory: newUptimeHistoryState});
                 }
