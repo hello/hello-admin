@@ -153,12 +153,15 @@ var SideBar = React.createClass({
            <ListGroupItem bsStyle="info" className="sidebar-group">Home</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/account_profile">&#x029D0; Account Profile</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/recent_accounts">&#x029D0; Recent Accounts</ListGroupItem>
-           <ListGroupItem bsStyle="default" href="/users_inspection">&#x029D0; Users Inspection</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/password_reset">&#x029D0; Password Reset</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/troubleshoot">&#x029D0; Inactive Devices</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/active_devices_history">&#x029D0; Devices Count</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/pch_serial_number_check">&#x029D0; Serial Check</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/users">&#x029D0; Users(Deprecated)</ListGroupItem>
+
+           <ListGroupItem bsStyle="info" className="sidebar-group">Metrics &amp; Diagnostics</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/users_inspection">&#x029D0; Users Inspection</ListGroupItem>
+           <ListGroupItem bsStyle="default" href="/sense_uptime">&#x029D0; Sense Uptime</ListGroupItem>
 
            <ListGroupItem bsStyle="info" className="sidebar-group">Data</ListGroupItem>
            <ListGroupItem bsStyle="default" href="/timeline">&#x029D0; Timeline</ListGroupItem>
