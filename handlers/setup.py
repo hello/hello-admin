@@ -433,7 +433,8 @@ class CreateGroupsAPI(ProtectedRequestHandler):
             'hardware': 'scott@sayhello.com, ben@sayhello.com',
             'firmware': 'chris@sayhello.com, josef@sayhello.com, tim@sayhello.com, pang@sayhello.com, jchen@sayhello.com',
             'super_firmware': 'chris@sayhello.com, josef@sayhello.com, tim@sayhello.com',
-            'shipping': 'marina@sayhello.com, chrisl@sayhello.com, bryan@sayhello.com, natalya@sayhello.com, tim@sayhello.com, kingshy@sayhello.com'
+            'shipping': 'marina@sayhello.com, chrisl@sayhello.com, bryan@sayhello.com, natalya@sayhello.com, tim@sayhello.com, kingshy@sayhello.com',
+            'contractor': 'customersupport@sayhello.com'
         }
         groups_entity = UserGroup(**groups_data)
         groups_entity.put()
