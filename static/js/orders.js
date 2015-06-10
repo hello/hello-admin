@@ -2,7 +2,7 @@
 
 var OrdersMaestro = React.createClass({
     getInitialState: function() {
-        return {alert: "", confirmCancelOrder: false}
+        return {alert: "", confirmCancelOrder: false, confirmUncancelOrder: false}
     },
 
     submitWithInputsfromURL: function() {
@@ -57,8 +57,16 @@ var OrdersMaestro = React.createClass({
         this.setState({confirmCancelOrder: true});
     },
 
-    neverMind: function() {
+    neverMindCancel: function() {
         this.setState({confirmCancelOrder: false});
+    },
+
+    uncancelOrder: function() {
+        this.setState({confirmUncancelOrder: true});
+    },
+
+    neverMindUncancel: function() {
+        this.setState({confirmUncancelOrder: false});
     },
 
     render: function() {
@@ -67,14 +75,31 @@ var OrdersMaestro = React.createClass({
             <p><Button onClick={this.cancelOrder}>Proceed to Reveal <Glyphicon glyph="arrow-right"/></Button></p></div>
             :
             <div>
-                <p>Be careful, there is no going back after you hit the following link</p><br/>
+                <p>Be careful, you are about to cancel an order</p><br/>
+                <p>There is no going back after you hit the following link</p><br/>
                 <p>
                   <a href={"https://order.hello.is/cancel/" + this.state.alert} target="_blank">
                     {"https://order.hello.is/cancel/" + this.state.alert}
                   </a>
                 </p><br/>
-                <p><Button onClick={this.neverMind}>Never mind <Glyphicon glyph="arrow-left"/></Button></p>
+                <p><Button onClick={this.neverMindCancel}>Never mind <Glyphicon glyph="arrow-left"/></Button></p>
             </div>;
+        
+        var uncancelBlock = this.state.confirmUncancelOrder === false ?
+            <div><p>Click the button to see next step</p><br/>
+            <p><Button onClick={this.uncancelOrder}>Proceed to Reveal <Glyphicon glyph="arrow-right"/></Button></p></div>
+            :
+            <div>
+                <p>Be careful, you are about to uncancel an order</p><br/>
+                <p>There is no going back after you hit the following link</p><br/>
+                <p>
+                  <a href={"https://order.hello.is/uncancel/" + this.state.alert} target="_blank">
+                    {"https://order.hello.is/uncancel/" + this.state.alert}
+                  </a>
+                </p><br/>
+                <p><Button onClick={this.neverMindUncancel}>Never mind <Glyphicon glyph="arrow-left"/></Button></p>
+            </div>;
+        
         var alert = (this.state.alert === "") ? null:
             <div><Alert bsStyle="info">
                 <p>Order Details:</p><br/>
@@ -82,9 +107,13 @@ var OrdersMaestro = React.createClass({
                     {"https://order.hello.is/details/" + this.state.alert}
                 </a></p>
             </Alert>
-            <Alert bsStyle="info">
+            <Alert bsStyle="danger">
                 <p>Cancel Order:</p><br/>
                 {cancelBlock}
+            </Alert>
+            <Alert bsStyle="warning">
+                <p>Uncancel Order (if applicable):</p><br/>
+                {uncancelBlock}
             </Alert></div>;
         return (<Col xs={6} sm={6} md={6} xsOffset={3} smOffset={3} mdOffset={3}><form onSubmit={this.handleSubmit}>
             <h3>Order Info</h3>
