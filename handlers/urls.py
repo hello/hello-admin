@@ -24,7 +24,7 @@ from handlers.devices import DeviceKeyStoreHint
 from handlers.devices import DeviceOwnersAPI
 from handlers.devices import SenseBlackListAPI
 from handlers.devices import SenseColorAPI
-from handlers.diagnostic import DiagnosticAPI
+from handlers.diagnostic import SenseUptimeAPI
 from handlers.events import SenseEventsAPI
 from handlers.firmware import FirmwareAPI
 from handlers.firmware import FirmwareHistoryAPI
@@ -118,6 +118,7 @@ from handlers.views import UserView
 from handlers.views import ZendeskHistoryView
 from handlers.views import ZendeskNowView
 from handlers.views import ZendeskView
+from handlers.views import SenseUptimeView
 from handlers.zendesk import ZendeskAPI
 from handlers.zendesk import ZendeskHistoryAPI
 from handlers.zendesk import ZendeskNowAPI
@@ -159,7 +160,7 @@ api_routes = [
     ('/api/devices/inactive/?$', DeviceInactiveAPI),
     ('/api/devices/key_store/?$', DeviceKeyStoreHint),
     ('/api/devices/owners/?$', DeviceOwnersAPI),
-    ('/api/diagnostic/?$', DiagnosticAPI),
+    ('/api/sense_uptime/?$', SenseUptimeAPI),
     ('/api/dust_stats/?$', DustStatsAPI),
     ('/api/features/?$', FeaturesAPI),
     ('/api/firmware/?$', FirmwareAPI),
@@ -259,6 +260,7 @@ page_routes = [
     ('/zendesk/?$', ZendeskView),
     ('/zendesk_history/?$', ZendeskHistoryView),
     ('/zendesk_now/?$', ZendeskNowView),
+    ('/sense_uptime/?$', SenseUptimeView),
 ]
 
 file_upload_routes = [
