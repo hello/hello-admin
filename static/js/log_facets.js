@@ -7,28 +7,24 @@ var LogFacets = React.createClass({
         if (patternFromURL.isWhiteString()) {
             return false;
         }
-        var startTimeFromURL = getParameterByName("start");
-        var endTimeFromURL = getParameterByName("end");
+        var dateFromURL = getParameterByName("date");
 
         $("#pattern").val(patternFromURL);
-        $("#start-time").val(startTimeFromURL);
-        $("#end-time").val(endTimeFromURL);
+        $("#date-input").val(dateFromURL);
 
         this.handleSubmit();
     },
     handleSubmit: function() {
         this.setState({loading: true});
         var pattern = $("#pattern").val().trim();
-        var startTime = $("#start-time").val();
-        var endTime = $("#end-time").val();
-        history.pushState({}, '', '/log_facets/?pattern=' + pattern + "&start=" + startTime + "&end=" + endTime);
+        var date = $("#date-input").val();
+        history.pushState({}, '', '/log_facets/?pattern=' + pattern + "&date=" + date);
         $.ajax({
             url: '/api/log_facets',
             dataType: 'json',
             data: {
                 pattern: pattern,
-                start_ts: !startTime.isWhiteString() ? new Date(startTime).getTime()/1000 : "",
-                end_ts: !startTime.isWhiteString() ? new Date(endTime).getTime()/1000 : ""
+                date: date
             },
             type: 'GET',
             success: function(response) {
@@ -72,8 +68,7 @@ var LogFacets = React.createClass({
         return (<div>
             <form className="row" onSubmit={this.handleSubmit}>
                 <Col xs={3}><Input type="text" id="pattern" placeholder="alphabetical string" /></Col>
-                <LongDatetimePicker glyphicon="clock" placeHolder="start, default: May 15 noon PDT" id="start-time" size="4" />
-                <LongDatetimePicker glyphicon="clock" placeHolder="end, default: now PDT" id="end-time" size="4" />
+                <LongDatetimePicker glyphicon="clock" placeHolder="pick a date" id="date-input" pickTime={false} format="MM-DD-YYYY" size="4" />
                 <Col xs={1}><Button type="submit">{submitIcon}</Button></Col>
             </form>
             {alert}
