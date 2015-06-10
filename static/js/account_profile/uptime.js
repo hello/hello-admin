@@ -147,7 +147,7 @@ var UptimeTile = React.createClass({
     loadUptimeByEmail : function(email) {
         if (email) {
             $.ajax({
-                url: "/api/diagnostic",
+                url: "/api/sense_uptime",
                 dataType: "json",
                 type: 'GET',
                 data: {email: email},
