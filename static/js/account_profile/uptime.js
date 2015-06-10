@@ -52,7 +52,7 @@ var SparkLine = React.createClass({
                 .y(function(d) {return y(d[this.props.yAttr]);}.bind(this));
 
             x.domain(d3.extent(data, function(d) {return d[this.props.xAttr];}.bind(this)));
-            y.domain(d3.extent(data, function(d) {return d[this.props.yAttr];}.bind(this)));
+            y.domain([0,  Math.max.apply(Math, data.map(function(d){return d[this.props.yAttr];}.bind(this)))]);
 
             firstX = x(data[0][this.props.xAttr]);
             firstY = y(data[0][this.props.yAttr]);
@@ -147,7 +147,7 @@ var UptimeTile = React.createClass({
     loadUptimeByEmail : function(email) {
         if (email) {
             $.ajax({
-                url: "/api/diagnostic",
+                url: "/api/sense_uptime",
                 dataType: "json",
                 type: 'GET',
                 data: {email: email},
