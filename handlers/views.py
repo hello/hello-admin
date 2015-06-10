@@ -6,7 +6,7 @@ from handlers.helpers import ProtectedRequestHandler
 from handlers.helpers import CustomerExperienceRequestHandler
 from handlers.helpers import FirmwareRequestHandler
 from handlers.helpers import SuperFirmwareRequestHandler
-from handlers.helpers import SuperEngineerRequestHandler
+from handlers.helpers import ShippingRequestHandler
 from handlers.helpers import SettingsModeratorRequestHandler
 from handlers.helpers import TokenMakerRequestHandler
 from models.setup import AccessToken
@@ -176,7 +176,7 @@ class PasswordResetView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/password_reset.html',
                                 context={'title': 'Password Reset'})
 
-class OrdersView(BaseRequestHandler):
+class OrdersView(ShippingRequestHandler):
     """Search for order by order ID"""
     def get(self):
         self.render_to_response(template_file='templates/orders.html',
@@ -251,3 +251,8 @@ class FirmwarePathView(SuperFirmwareRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/firmware_path.html',
                                 context={'title': "Firmware Upgrade Path"})
+
+class SenseUptimeView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/sense_uptime.html',
+                                context={'title': "Sense Uptime"})

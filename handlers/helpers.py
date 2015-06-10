@@ -305,6 +305,9 @@ class ProtectedRequestHandler(BaseRequestHandler):
     def token_maker(self):
         return stripStringToList(self.groups_entity.token_maker)
 
+    def shipping(self):
+        return stripStringToList(self.groups_entity.shipping)
+
     def super_firmware(self):
         return stripStringToList(self.groups_entity.super_firmware)
 
@@ -359,6 +362,13 @@ class TokenMakerRequestHandler(ProtectedRequestHandler):
     """
     def is_restricted_secondary(self):
         return not self.current_user.email() in super(TokenMakerRequestHandler, self).token_maker()
+
+class ShippingRequestHandler(ProtectedRequestHandler):
+    """
+    Grant access to only hardware team members
+    """
+    def is_restricted_secondary(self):
+        return not self.current_user.email() in super(ShippingRequestHandler, self).shipping()
 
 class SuperEngineerRequestHandler(ProtectedRequestHandler):
     """
