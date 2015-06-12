@@ -121,7 +121,7 @@ var SenseEventsMaestro = React.createClass({
 //                        return <p style={senseColor}>{event.replace(event.split(": ")[1], convertChrisHex('#' + event.split(": ")[1]))}</p>
                         return <p>color: <span style={senseColor}>{convertChrisHex('#' + event.split(":")[1])}</span></p>;
                     }
-                    return <p>{event}</p>
+                    return <p>{event.split(":")[0]}: {event.split(":")[1]}</p>
                 })}</td>
             </tr>
         });
