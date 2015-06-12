@@ -111,10 +111,9 @@ class FirmwareGroupPathAPI(SuperFirmwareRequestHandler):
             access_token=settings.ADMIN_APP_INFO.access_token,
             app_info=settings.ADMIN_APP_INFO
         )
-        request_context = self._extra_context({})
         body_data=json.loads(self.request.body)
         message_text = "%s added/updated Upgrade Path for Group '%s' from FW Version: %s to FW Version: %s @ %s%% rollout." % (
-            request_context['user'],
+            self.current_user_email,
             body_data['group_name'],
             body_data['from_fw_version'],
             body_data['to_fw_version'],
@@ -131,9 +130,8 @@ class FirmwareGroupPathAPI(SuperFirmwareRequestHandler):
             access_token=settings.ADMIN_APP_INFO.access_token,
             app_info=settings.ADMIN_APP_INFO
         )
-        request_context = self._extra_context({})
         message_text = "%s deleted Upgrade Path for Group '%s' from FW Version: %s." % (
-            request_context['user'],
+            self.current_user_email,
             body.get("group_name"),
             body.get("from_fw_version"))
         self.send_to_slack_deploys_channel(message_text)
