@@ -112,13 +112,14 @@ var SenseEventsMaestro = React.createClass({
                 <td>{d3.time.format('%a %d %b %H:%M:%S %Z')(new Date(senseEvent.createdAt))}</td>
                 <td>{senseEvent.events.map(function(event){
                     if (event.indexOf("color") > -1){
-                        var correctedHex = convertChrisHex('#' + event.split(": ")[1]);
+                        event = event.replace(/\s+/g, '');
+                        var correctedHex = convertChrisHex('#' + event.split(":")[1]);
                         var senseColor = {
                             color: luminate(correctedHex, -0.3),
                             "background-color": correctedHex
                         };
 //                        return <p style={senseColor}>{event.replace(event.split(": ")[1], convertChrisHex('#' + event.split(": ")[1]))}</p>
-                        return <p>color:<span style={senseColor}> {convertChrisHex('#' + event.split(": ")[1])}</span></p>;
+                        return <p>color: <span style={senseColor}>{convertChrisHex('#' + event.split(":")[1])}</span></p>;
                     }
                     return <p>{event}</p>
                 })}</td>
