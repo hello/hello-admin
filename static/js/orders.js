@@ -147,12 +147,18 @@ var QueryOrdersOmni = React.createClass({
         return false;
     },
     handleSubmit: function() {
+        this.setState({error: null, filteredResult: []});
         $("#order-id-input").val("");
         history.pushState({}, '', '/orders/');
         $("#order-specs").hide();
 
         var omniInput = this.refs.omniInput.getDOMNode().value.trim();
-         var filteredResult = this.state.ordersMap.filter(function(d){
+        if (omniInput.trim().length < 3) {
+            this.setState({error: <Alert bsStyle="danger">Input string length must be at least 3 characters</Alert>});
+            return false;
+        }
+
+        var filteredResult = this.state.ordersMap.filter(function(d){
             return d.name.toLowerCase().indexOf(omniInput.toLowerCase()) > -1 || d.email.toLowerCase().indexOf(omniInput.toLowerCase()) > -1;
         });
         this.setState({filteredResult: filteredResult});
