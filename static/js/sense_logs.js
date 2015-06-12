@@ -96,20 +96,23 @@ var SenseLogsNew = React.createClass({
             data: sendingData,
             success: function (response) {
                 console.log("getting", response);
-//                var errorAlert = response.results && response.results.length === 0 ?
+//                var errorAlert = responseResults && responseResults.length === 0 ?
 //                    <Alert>No matches found!</Alert> : null;
                 if (!$.isEmptyObject(response.error)) {
                     console.log("error", response.error);
                 }
-                var resultsSize = response.results ? response.results.length : 0;
+
+                var responseResults = response.results.sort(function(r1, r2){return r1.variable_1 - r2.variable_1;});
+
+                var resultsSize = responseResults ? responseResults.length : 0;
                 var newState = {
                     response: response,
                     resultsSize: resultsSize,
                     loading: null
                 };
                 if (resultsSize > 0) {
-                    newState.oldestTimestamp = response.results[0].variable_1;
-                    newState.newestTimestamp = response.results[resultsSize-1].variable_1;
+                    newState.oldestTimestamp = responseResults[0].variable_1;
+                    newState.newestTimestamp = responseResults[resultsSize-1].variable_1;
                 }
                 this.setState(newState);
             }.bind(this)
@@ -146,7 +149,7 @@ var SenseLogsNew = React.createClass({
                     <Col xs={2}><Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button></Col>
                 </th></tr></thead>
                 <tbody>
-                    {response.results.map(function(r){
+                    {response.results.sort(function(r1, r2){return r1.variable_1 - r2.variable_1;}).map(function(r){
                         return <tr><td>
                             <div className="center-wrapper">
                                 <Button className="borderless" disabled>
