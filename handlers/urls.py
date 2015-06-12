@@ -125,6 +125,7 @@ from handlers.zendesk import ZendeskNowAPI
 from handlers.zendesk import ZendeskStatsAPI
 import settings
 import webapp2
+from handlers.orders import OrdersMapAPI
 
 
 cron_routes = [
@@ -208,6 +209,7 @@ api_routes = [
     ('/api/zendesk_history/?$', ZendeskHistoryAPI),
     ('/api/zendesk_now/?$', ZendeskNowAPI),
     ('/api/zendesk_stats/?$', ZendeskStatsAPI),
+    ('/api/orders_map/?$', OrdersMapAPI),
 ]
 
 page_routes = [
