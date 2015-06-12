@@ -200,8 +200,8 @@ var QueryOrdersOmni = React.createClass({
 var OrdersMaestro = React.createClass({
     render: function() {
         return <Row>
-            <QueryOrdersById />
             <QueryOrdersOmni />
+            <QueryOrdersById />
         </Row>;
     }
 });
