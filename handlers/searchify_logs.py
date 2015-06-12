@@ -117,7 +117,6 @@ class SenseLogsAPI(ProtectedRequestHandler):
 
         aggregate_results = sorted(log1["results"] + log2["results"], key=lambda d: d.get("variable_0", 0))
         if len(aggregate_results) > self.limit:
-            print "overflow ZZZ"
             if self.order == 0:
                 aggregate_results = aggregate_results[-1 - self.limit:-1]
             elif self.order == 1:
@@ -281,8 +280,10 @@ class LogsPatternFacetsAPI(ProtectedRequestHandler):
 
     def get(self):
         urlfetch.set_default_fetch_deadline(30)
-        may_facets = self.get_facets(settings.SENSE_LOGS_INDEX_MAY)
-        self.response.write(json.dumps(may_facets))
+        date_components = self.request.get("date", default_value=datetime.datetime.now().strftime("%m-%d-%Y")).split("-")
+        date = "-".join([date_components[2], date_components[0], date_components[1]])
+        facets = self.get_facets(settings.SENSE_LOGS_INDEX_PREFIX + date)
+        self.response.write(json.dumps(facets))
 
 
 class SearchifyQuery():

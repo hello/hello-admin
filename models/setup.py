@@ -46,5 +46,7 @@ class UserGroup(ndb.Model):
     super_firmware = ndb.StringProperty(required=True)
     token_maker=ndb.StringProperty(required=True)
     settings_moderator=ndb.StringProperty(required=True)
+    shipping=ndb.StringProperty(required=True)
+    contractor=ndb.StringProperty(required=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
 

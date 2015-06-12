@@ -20,3 +20,10 @@ class OnboardingLogsBySenseIdAPI(ProtectedRequestHandler):
             api_url="onboarding_log/sense/{}/{}".format(self.request.get("sense_id"), self.request.get("count") or 1000),
             app_info=settings.ADMIN_APP_INFO
         )
+
+class OnboardingLogsByEmailAPI(ProtectedRequestHandler):
+    def get(self):
+        self.hello_request(
+            api_url="onboarding_log/account/{}/{}".format(self.request.get("email"), self.request.get("count") or 1000),
+            app_info=settings.ADMIN_APP_INFO
+        )

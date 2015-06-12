@@ -156,7 +156,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         if url_params:
             request_detail['params'] = url_params
 
-        
+
         response = getattr(OAuth2Session, type.lower())(session, api_url, **request_detail)
         output.set_status(response.status_code)
         if response.status_code == 200:
@@ -264,7 +264,7 @@ class ProtectedRequestHandler(BaseRequestHandler):
 
     def restrict(self):
         if self.current_user.email() == "customersupport@sayhello.com":
-             self.redirect('/error')
+            self.redirect('/error')
         elif not self.is_restricted_primary():
             return
         elif self.is_restricted_secondary():
@@ -304,6 +304,12 @@ class ProtectedRequestHandler(BaseRequestHandler):
 
     def token_maker(self):
         return stripStringToList(self.groups_entity.token_maker)
+
+    def shipping(self):
+        return stripStringToList(self.groups_entity.shipping)
+
+    def contractor(self):
+        return stripStringToList(self.groups_entity.contractor)
 
     def super_firmware(self):
         return stripStringToList(self.groups_entity.super_firmware)
@@ -360,6 +366,21 @@ class TokenMakerRequestHandler(ProtectedRequestHandler):
     def is_restricted_secondary(self):
         return not self.current_user.email() in super(TokenMakerRequestHandler, self).token_maker()
 
+class ShippingRequestHandler(ProtectedRequestHandler):
+    """
+    Grant access to only shipping team members plus contractor
+    """
+    def restrict(self):
+        if not self.is_restricted_primary() or self.current_user_email in self.contractor():
+            return
+        elif self.is_restricted_secondary():
+            self.redirect('/error')
+            return
+
+    def is_restricted_secondary(self):
+        return not self.current_user.email() in super(ShippingRequestHandler, self).shipping()
+
+
 class SuperEngineerRequestHandler(ProtectedRequestHandler):
     """
     Grant access to only super engineers
@@ -402,3 +423,6 @@ class ResponseOutput():
             'status': self.status,
             'viewer': self.viewer
         })
+
+
+

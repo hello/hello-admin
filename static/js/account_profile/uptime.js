@@ -52,7 +52,7 @@ var SparkLine = React.createClass({
                 .y(function(d) {return y(d[this.props.yAttr]);}.bind(this));
 
             x.domain(d3.extent(data, function(d) {return d[this.props.xAttr];}.bind(this)));
-            y.domain(d3.extent(data, function(d) {return d[this.props.yAttr];}.bind(this)));
+            y.domain([0,  Math.max.apply(Math, data.map(function(d){return d[this.props.yAttr];}.bind(this)))]);
 
             firstX = x(data[0][this.props.xAttr]);
             firstY = y(data[0][this.props.yAttr]);
@@ -147,10 +147,10 @@ var UptimeTile = React.createClass({
     loadUptimeByEmail : function(email) {
         if (email) {
             $.ajax({
-                url: "/api/diagnostic",
+                url: "/api/sense_uptime/",
                 dataType: "json",
                 type: 'GET',
-                data: {email: email},
+                data: {email: email, padded: 1},
                 success: function (response) {
                     this.setState({uptime : response.data})
                 }.bind(this)
@@ -169,13 +169,9 @@ var UptimeTile = React.createClass({
             
             var cleanUptime = this.state.uptime.slice(1, this.state.uptime.length-1); // remove last hour because incomplete
 
-            var then = cleanUptime[0].ts;
-            var age = (new Date().getTime() - then) / 1000 / 60;
-        
             var totalUpTime = cleanUptime.map(function(i){return i.count}).reduce(function(x, y){return x+y;}, 0);
-            upTimeProportion = Math.min((totalUpTime / age * 100), 100).toFixed(2) + " %";
+            upTimeProportion = (totalUpTime /(cleanUptime.length*60)*100).toFixed(2) + " %";
         }
-        
         return <Table>
             <thead/>
             <tbody>

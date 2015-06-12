@@ -24,7 +24,7 @@ from handlers.devices import DeviceKeyStoreHint
 from handlers.devices import DeviceOwnersAPI
 from handlers.devices import SenseBlackListAPI
 from handlers.devices import SenseColorAPI
-from handlers.diagnostic import DiagnosticAPI
+from handlers.diagnostic import SenseUptimeAPI
 from handlers.events import SenseEventsAPI
 from handlers.firmware import FirmwareAPI
 from handlers.firmware import FirmwareHistoryAPI
@@ -42,6 +42,7 @@ from handlers.motion import MotionAPI
 from handlers.notification import NotificationAPI
 from handlers.onboarding import OnboardingLogsByResultAPI
 from handlers.onboarding import OnboardingLogsBySenseIdAPI
+from handlers.onboarding import OnboardingLogsByEmailAPI
 from handlers.orders import OrdersAPI
 from handlers.papertrail import PaperTrailEventsAPI
 from handlers.papertrail import PaperTrailSystemsAPI
@@ -117,12 +118,14 @@ from handlers.views import UserView
 from handlers.views import ZendeskHistoryView
 from handlers.views import ZendeskNowView
 from handlers.views import ZendeskView
+from handlers.views import SenseUptimeView
 from handlers.zendesk import ZendeskAPI
 from handlers.zendesk import ZendeskHistoryAPI
 from handlers.zendesk import ZendeskNowAPI
 from handlers.zendesk import ZendeskStatsAPI
 import settings
 import webapp2
+from handlers.orders import OrdersMapAPI
 
 
 cron_routes = [
@@ -158,7 +161,7 @@ api_routes = [
     ('/api/devices/inactive/?$', DeviceInactiveAPI),
     ('/api/devices/key_store/?$', DeviceKeyStoreHint),
     ('/api/devices/owners/?$', DeviceOwnersAPI),
-    ('/api/diagnostic/?$', DiagnosticAPI),
+    ('/api/sense_uptime/?$', SenseUptimeAPI),
     ('/api/dust_stats/?$', DustStatsAPI),
     ('/api/features/?$', FeaturesAPI),
     ('/api/firmware/?$', FirmwareAPI),
@@ -176,6 +179,7 @@ api_routes = [
     ('/api/omni_search/?$', OmniSearchAPI),
     ('/api/onboarding_logs_by_result/?$', OnboardingLogsByResultAPI),
     ('/api/onboarding_logs_by_sense_id/?$', OnboardingLogsBySenseIdAPI),
+    ('/api/onboarding_logs_by_email/?$', OnboardingLogsByEmailAPI),
     ('/api/orders/?$', OrdersAPI),
     ('/api/papertrail_events/?$', PaperTrailEventsAPI),
     ('/api/papertrail_systems/?$', PaperTrailSystemsAPI),
@@ -205,6 +209,7 @@ api_routes = [
     ('/api/zendesk_history/?$', ZendeskHistoryAPI),
     ('/api/zendesk_now/?$', ZendeskNowAPI),
     ('/api/zendesk_stats/?$', ZendeskStatsAPI),
+    ('/api/orders_map/?$', OrdersMapAPI),
 ]
 
 page_routes = [
@@ -257,6 +262,7 @@ page_routes = [
     ('/zendesk/?$', ZendeskView),
     ('/zendesk_history/?$', ZendeskHistoryView),
     ('/zendesk_now/?$', ZendeskNowView),
+    ('/sense_uptime/?$', SenseUptimeView),
 ]
 
 file_upload_routes = [
