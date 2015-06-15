@@ -1,8 +1,11 @@
+import logging as log
 import json
 import settings
 from handlers.helpers import FirmwareRequestHandler
 from handlers.helpers import SuperFirmwareRequestHandler
 from handlers.helpers import ProtectedRequestHandler
+from handlers.helpers import ResponseOutput
+from google.appengine.api import memcache
 
 
 class FirmwareAPI(FirmwareRequestHandler):
@@ -72,17 +75,34 @@ class FirmwareHistoryAPI(FirmwareRequestHandler):
             app_info=settings.ADMIN_APP_INFO
         )
 
-class FirmwareUnhashAPI(ProtectedRequestHandler):
 
+class FirmwareUnhashAPI(ProtectedRequestHandler):
     def get(self):
         hashed_firmware = self.request.get('version', default_value="")
+        cached_hashed_firmware = memcache.get(hashed_firmware)
 
-        self.hello_request(
-            api_url="firmware/names/{}".format(hashed_firmware),
-            type="GET",
-            access_token=settings.ADMIN_APP_INFO.access_token,
-            app_info=settings.ADMIN_APP_INFO
-        )
+        if cached_hashed_firmware is None:
+            output = self.hello_request(
+                api_url="firmware/names/{}".format(hashed_firmware),
+                type="GET",
+                access_token=settings.ADMIN_APP_INFO.access_token,
+                app_info=settings.ADMIN_APP_INFO,
+                raw_output=True
+            )
+            stringified_unhashed_firmware = json.dumps(output.data)
+            log.info("caching firmware {} - {}".format(hashed_firmware, stringified_unhashed_firmware))
+            memcache.add(
+                key=hashed_firmware,
+                value=stringified_unhashed_firmware,
+                time=7776000
+            )
+        else:
+            output = ResponseOutput()
+            output.set_data(json.loads(cached_hashed_firmware))
+            output.set_status(200)
+
+        self.response.write(output.get_serialized_output())
+
 
 class FirmwareGroupStatusAPI(SuperFirmwareRequestHandler):
     def get(self):
