@@ -44,7 +44,7 @@ var PCHSerialNumberCheckForSense = React.createClass({
             dataType: 'json',
             type: 'POST',
             data: {
-                sn: JSON.stringify(that.refs.sn.getDOMNode().value.split("\n").map(function(ssn){return ssn.trim()})),
+                sn: JSON.stringify(that.refs.sn.getDOMNode().value.split("\n").map(function(ssn){return ssn.trim().toUpperCase()})),
                 device_type: "sense"
             },
             success: function (response) {
@@ -105,7 +105,7 @@ var PCHSerialNumberCheckForPill = React.createClass({
             dataType: 'json',
             type: 'POST',
             data: {
-                sn: JSON.stringify(that.refs.sn.getDOMNode().value),
+                sn: JSON.stringify(that.refs.sn.getDOMNode().value.trim().toUpperCase()),
                 device_type: "pill"
             },
             success: function (response) {
