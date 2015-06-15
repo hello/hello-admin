@@ -311,6 +311,7 @@ var SenseSummary = React.createClass({
 
         if (senseResponse.data.length > 0) {
             var senseId = senseResponse.data[0].device_account_pair ? senseResponse.data[0].device_account_pair.externalDeviceId : undefined;
+            var senseInternalId = senseResponse.data[0].device_account_pair ? " (" + senseResponse.data[0].device_account_pair.internalDeviceId + ")" : undefined;
             var firmwareVersion = senseResponse.data[0].device_status ? senseResponse.data[0].device_status.firmwareVersion : undefined;
 
             if (senseResponse.data[0].device_status){
@@ -333,7 +334,7 @@ var SenseSummary = React.createClass({
             result = <div>
                 <Table>
                     <tbody>
-                        <tr><td>ID</td><td>{senseId}</td></tr>
+                        <tr><td>ID</td><td>{senseId + senseInternalId}</td></tr>
                         <tr><td>Keystore</td><td>{keyStore}</td></tr>
                         <tr><td>Firmware</td><td>{this.loadUnhashedFirmware(firmwareVersion, senseId)}</td></tr>
                         <tr><td>Timezone</td><td>{timezone}</td></tr>
@@ -388,11 +389,12 @@ var PillSummary = React.createClass({
 
         if (pillResponse.data.length > 0) {
             var pillId = pillResponse.data[0].device_account_pair ? pillResponse.data[0].device_account_pair.externalDeviceId : undefined;
+            var pillInternalId = pillResponse.data[0].device_account_pair ? " (" + pillResponse.data[0].device_account_pair.internalDeviceId + ")" : undefined;
             var lastNightDate =  d3.time.format("%m-%d-%Y")(new Date(new Date().getTime() - 24*3600*1000));
             result = <div><Table>
                 <thead/>
                 <tbody>
-                    <tr><td>ID</td><td>{pillId}</td></tr>
+                    <tr><td>ID</td><td>{pillId + pillInternalId}</td></tr>
                     <tr><td>Keystore</td><td>{keyStore}</td></tr>
                     <tr><td>Battery</td><td>{batteryLevel}</td></tr>
                     <tr><td>Uptime</td><td>{uptime}</td></tr>
