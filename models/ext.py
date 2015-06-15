@@ -106,3 +106,6 @@ class SearchifyPurgeStats(ndb.Model):
     @classmethod
     def query_keys_by_created(cls, end_ts):
         return cls.query(cls.created_at < end_ts).order(-cls.created_at).fetch(keys_only=True)
+
+class OrdersMap(ndb.Model):
+    url = ndb.StringProperty(required=True)

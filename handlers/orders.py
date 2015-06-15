@@ -5,6 +5,7 @@ import json
 from Crypto.Cipher import AES
 from handlers.helpers import ResponseOutput
 from handlers.helpers import ShippingRequestHandler
+from models.ext  import OrdersMap
 
 
 ALPHABET="123456789abcdefghijkmnopqrstuvwxyz"
@@ -46,15 +47,13 @@ class OrdersMapAPI(ShippingRequestHandler):
     def get(self):
         output = {"data": [], "error": ""}
         try:
-            response = requests.get("https://hello-data.s3.amazonaws.com/preorders-exports/search-orders.json?"
-                                    "AWSAccessKeyId=AKIAJNI44NR75TIPJLJA&Expires=1434232844"
-                                    "&Signature=BmOfA/U4vyZzK8SyjmogtWLoTeg%3D")
+            response = requests.get(OrdersMap.query().get().url)
             data = response.json()
             output["data"] = data
-            # memcache.add(key="orders_map", value=json.dumps(data), time=8640000000)
         except Exception as e:
             error_message = "Failed to get orders map because {}. We may need to refresh s3 link".format(e.message)
             log.error(error_message)
             output["error"] = error_message
+            self.send_to_slack_admin_logs_channel(error_message)
 
         self.response.write(json.dumps(output))
