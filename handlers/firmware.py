@@ -94,7 +94,7 @@ class FirmwareUnhashAPI(ProtectedRequestHandler):
             memcache.add(
                 key=hashed_firmware,
                 value=stringified_unhashed_firmware,
-                time=7776000
+                time=24*3600
             )
         else:
             output = ResponseOutput()
