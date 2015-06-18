@@ -4,9 +4,13 @@ var today = new Date();
 var datepickerFormat = d3.time.format("%m/%d/%Y %H:%M:%S");
 var todayInDatepickerFormat = datepickerFormat(today);
 
-var sensorList = ['temperature', 'humidity', 'particulates', 'light', 'sound'];
+var sensorList = ['wave_count', 'temperature', 'humidity', 'particulates', 'light', 'sound'];
 var resolutionList = ['day'];
 var colorChoice = {
+    wave_count: {
+        day: 'green',
+        week: 'violet'
+    },
     temperature: {
         day: '#E30B5C',
         week: 'violet'
@@ -40,7 +44,43 @@ var vizCanvas = React.createClass({
     render: function() {
 //        d3.selectAll("svg > *").remove();
         var that = this;
-        var temperatureChart, humidityChart, particulatesChart, lightChart, soundChart;
+        var wave_countChart, temperatureChart, humidityChart, particulatesChart, lightChart, soundChart;
+
+        if (that.props.temperature.length > 0) {
+            nv.addGraph(function () {
+                wave_countChart = nv.models.lineChart()
+                    .margin({left: 75, right: 50})
+                    .useInteractiveGuideline(true)
+                    .transitionDuration(350)
+                    .showLegend(false)
+                    .showYAxis(true)
+                    .showXAxis(true);
+
+                wave_countChart.xAxis
+                    .axisLabel('Time')
+                    .tickFormat(function (d) {
+                        return d3.time.format('%b %d %H:%M')(new Date(d));
+                    });
+
+                wave_countChart.yAxis
+                    .axisLabel('Wave Count (times)')
+                    .tickFormat(function (d) {
+                        return d.toFixed(2);
+                    });
+
+
+                d3.select('#wave_count')
+                    .datum(that.props.wave_count)
+                    .call(wave_countChart);
+
+
+                nv.utils.windowResize(function () {
+                    wave_countChart.update()
+                });
+                return wave_countChart;
+            });
+        }
+
         if (that.props.temperature.length > 0) {
             nv.addGraph(function () {
                 temperatureChart = nv.models.lineChart()
@@ -222,6 +262,7 @@ var vizCanvas = React.createClass({
 var vizForm = React.createClass({
     getInitialState: function() {
         return {
+            wave_count: [],
             temperature: [],
             humidity: [],
             particulates: [],
@@ -254,7 +295,7 @@ var vizForm = React.createClass({
         var that = this;
         var email = $('#email-input').val().trim();
         var until = $('#end-time').val().trim();
-        that.setState({alert: "Loading ...", temperature: [], humidity: [], particulates: [], light: [], sound: []});
+        that.setState({alert: "Loading ...", wave_count: [],  temperature: [], humidity: [], particulates: [], light: [], sound: []});
         sensorList.forEach(function(sensor){
             resolutionList.forEach(function(resolution){
                 var request_params = {
@@ -322,6 +363,7 @@ var vizForm = React.createClass({
             </form>
             {alert}
             <vizCanvas
+            wave_count={this.state.wave_count}
             temperature={this.state.temperature}
             humidity={this.state.humidity}
             particulates={this.state.particulates}
