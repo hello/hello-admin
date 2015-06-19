@@ -6,6 +6,7 @@ from Crypto.Cipher import AES
 from handlers.helpers import ResponseOutput
 from handlers.helpers import ShippingRequestHandler
 from models.ext  import OrdersMap
+from google.appengine.api import urlfetch
 
 
 ALPHABET="123456789abcdefghijkmnopqrstuvwxyz"
@@ -45,6 +46,7 @@ class OrdersAPI(ShippingRequestHandler):
 
 class OrdersMapAPI(ShippingRequestHandler):
     def get(self):
+        urlfetch.set_default_fetch_deadline(30)
         output = {"data": [], "error": ""}
         try:
             response = requests.get(OrdersMap.query().get().url)
