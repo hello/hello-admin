@@ -222,7 +222,8 @@ function manipulateData(rawData, sensor, resolution) {
     return {
         values: rawData.filter(function(point){return point.value !== -1}).map(function(point){return {x: point.datetime, y: point.value};}),
         key: legends[resolution],
-        color: colorChoice[sensor][resolution]
+        color: colorChoice[sensor][resolution],
+        disabled: resolution !== "day"
     }
 }
 
