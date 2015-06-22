@@ -4,9 +4,9 @@ var today = new Date();
 var datepickerFormat = d3.time.format("%m/%d/%Y %H:%M:%S");
 var todayInDatepickerFormat = datepickerFormat(today);
 
-var hardwareSensorList = ['wave_count', 'hold_count', 'background', 'num_disturb', 'peak_disturb', 'light_variance', 'light_peakiness', 'dust_min', 'dust_max', 'dust_variance', 'temperature', 'humidity', 'particulates', 'light', 'sound'];
-var basicSensorList = ['temperature', 'humidity', 'particulates', 'light', 'sound'];
-var sensorList = basicSensorList;
+var allSensors = ['wave_count', 'hold_count', 'background', 'num_disturb', 'peak_disturb', 'light_variance', 'light_peakiness', 'dust_min', 'dust_max', 'dust_variance', 'temperature', 'humidity', 'particulates', 'light', 'sound'];
+var basicSensors = ['temperature', 'humidity', 'particulates', 'light', 'sound'];
+var sensors = basicSensors;
 
 var resolutionList = ['day', 'week'];
 var colorChoice = {
@@ -50,12 +50,11 @@ var legends = {
     week: 'every hour'
 };
 
-
 var vizCanvas = React.createClass({
     render: function() {
 //        d3.selectAll("svg > *").remove();
         return <div>{
-            sensorList.map(function(s) {
+            sensors.map(function(s) {
                 var sensorData = this.props.data[s];
                 if (sensorData.length > 0) {
                     nv.addGraph(function () {
@@ -100,7 +99,7 @@ var vizCanvas = React.createClass({
 
 var vizForm = React.createClass({
     getInitialState: function() {
-        return sensorList.reduce(function(obj, k){obj[k] = [];return obj}, {alert: ""});
+        return sensors.reduce(function(obj, k){obj[k] = [];return obj}, {alert: "", allSensors: false});
     },
 
     componentDidMount: function() {
@@ -110,23 +109,33 @@ var vizForm = React.createClass({
     submitWithInputsfromURL: function() {
         var emailInputFromURL = getParameterByName('email');
         var until = getParameterByName('until');
+        this.setState({allSensors: getParameterByName("all_sensors") === 'true'});
+
         if (emailInputFromURL.isWhiteString()) {
             return false;
         }
         $('#email-input').val(emailInputFromURL);
         $('#end-time').val(until);
-        this.handleBasicSubmit();
+
+        if (this.state.allSensors === true) {
+            this.handleHardwareSubmit();
+        }
+        else {
+            this.handleBasicSubmit();
+        }
     },
 
-    pushHistory: function(email, until) {
-        history.pushState({}, '', '/room_conditions/?email=' + email + '&until=' + until);
+    pushHistory: function(email, until, allSensors) {
+        history.pushState({}, '', '/room_conditions/?email=' + email + '&until=' + until + "&all_sensors=" + allSensors);
     },
 
-    loadData: function() {
+    loadData: function(allSensors) {
         var email = $('#email-input').val().trim();
         var until = $('#end-time').val().trim();
-        this.setState(sensorList.reduce(function(obj, k){obj[k] = [];return obj}, {alert: "Loading ..."}));
-        sensorList.forEach(function(sensor){
+        this.setState(sensors.reduce(function(obj, k){obj[k] = [];return obj}, {alert: "Loading ..."}));
+        this.pushHistory(email, until, allSensors);
+
+        sensors.forEach(function(sensor){
             resolutionList.forEach(function(resolution){
                 var request_params = {
                     email: email,
@@ -135,7 +144,6 @@ var vizForm = React.createClass({
                     ts: new Date(until).getTime()
                 };
                 console.log('sending', request_params);
-                this.pushHistory(email, until);
                 $.ajax({
                     url: '/api/room_conditions',
                     dataType: 'json',
@@ -166,20 +174,20 @@ var vizForm = React.createClass({
     },
 
     handleBasicSubmit: function() {
-        sensorList = basicSensorList;
-        this.loadData();
+        sensors = basicSensors;
+        this.loadData(false);
         return false;
     },
 
     handleHardwareSubmit: function() {
-        sensorList = hardwareSensorList;
-        this.loadData();
+        sensors = allSensors;
+        this.loadData(true);
         return false;
     },
 
     render: function() {
         var alert = this.state.alert === "" ? null : <div><br/><Alert>{this.state.alert}</Alert></div>;
-        var fileExporters = sensorList.map(function(sensor, i){
+        var fileExporters = sensors.map(function(sensor, i){
             return <MenuItem eventKey={i.toString()}>
                 <FileExporter fileContent={this.state[sensor]} fileName={sensor} buttonName={sensor.capitalize()}/>
             </MenuItem>;
