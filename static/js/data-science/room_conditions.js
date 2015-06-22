@@ -4,272 +4,102 @@ var today = new Date();
 var datepickerFormat = d3.time.format("%m/%d/%Y %H:%M:%S");
 var todayInDatepickerFormat = datepickerFormat(today);
 
-var sensorList = ['wave_count', 'temperature', 'humidity', 'particulates', 'light', 'sound'];
-var resolutionList = ['day'];
+var allSensors = ['wave_count', 'hold_count', 'background', 'num_disturb', 'peak_disturb', 'light_variance', 'light_peakiness', 'dust_min', 'dust_max', 'dust_variance', 'temperature', 'humidity', 'particulates', 'light', 'sound'];
+var basicSensors = ['temperature', 'humidity', 'particulates', 'light', 'sound'];
+var sensors = basicSensors;
+
+var resolutionList = ['day', 'week'];
 var colorChoice = {
-    wave_count: {
-        day: 'green',
-        week: 'violet'
-    },
-    temperature: {
-        day: '#E30B5C',
-        week: 'violet'
-    },
-    humidity: {
-        day: '#8db600',
-        week: 'teal'
-    },
-    particulates: {
-        day: '#00ffff',
-        week: 'blue'
-    },
-    light: {
-        day: 'orange',
-        week: 'brown'
-    },
-    sound: {
-        day: 'teal',
-        week: 'indigo'
-    }
+    temperature: {day: '#E30B5C', week: 'pink'},
+    humidity: {day: '#8db600', week: 'teal'},
+    particulates: {day: '#00ffff', week: 'blue'},
+    light: {day: 'orange', week: 'brown'},
+    sound: {day: 'teal', week: 'indigo'},
+    wave_count: {day: 'red', red: 'violet'},
+    hold_count: {day: 'red', week: 'violet'},
+    background: {day: 'red', week: 'violet'},
+    num_disturb: {day: 'red', week: 'violet'},
+    peak_disturb: {day: 'red', week: 'violet'},
+    light_variance: {day: 'red', week: 'violet'},
+    light_peakiness: {day: 'red', week: 'violet'},
+    dust_min: {day: 'red', week: 'violet'},
+    dust_max: {day: 'red', week: 'violet'},
+    dust_variance: {day: 'red', week: 'violet'}
 };
+
+var yAxisLabel = {
+    temperature: "Temperature ( °C )",
+    humidity: "Humidity ( % )",
+    particulates: "Particulates ( µg/m³ )",
+    light: "Light ( lx )",
+    sound: "Sound ( dB )",
+    wave_count: "Wave Count ( times )",
+    hold_count: "Hold Count ( times )",
+    background: "Background ( times )",
+    num_disturb: "Number of Disturbances ( times )",
+    peak_disturb: "Peak Disturbances ( times )",
+    light_variance: "Light Variance",
+    light_peakiness: "Light Peakiness",
+    dust_min: "Dust Min",
+    dust_max: "Dust Max",
+    dust_variance: "Dust Variance"
+};
+
 var legends = {
     day: 'every 5 minutes',
     week: 'every hour'
 };
-var vizCanvas = React.createClass({
-    componentDidMount: function() {
-        console.log('sketch me up!')
-    },
 
+var vizCanvas = React.createClass({
     render: function() {
 //        d3.selectAll("svg > *").remove();
-        var that = this;
-        var wave_countChart, temperatureChart, humidityChart, particulatesChart, lightChart, soundChart;
+        return <div>{
+            sensors.map(function(s) {
+                var sensorData = this.props.data[s];
+                if (sensorData.length > 0) {
+                    nv.addGraph(function () {
+                        var chart = nv.models.lineChart()
+                            .margin({left: 75, right: 50})
+                            .useInteractiveGuideline(true)
+                            .transitionDuration(350)
+                            .showLegend(true)
+                            .showYAxis(true)
+                            .showXAxis(true);
 
-        if (that.props.temperature.length > 0) {
-            nv.addGraph(function () {
-                wave_countChart = nv.models.lineChart()
-                    .margin({left: 75, right: 50})
-                    .useInteractiveGuideline(true)
-                    .transitionDuration(350)
-                    .showLegend(false)
-                    .showYAxis(true)
-                    .showXAxis(true);
+                        chart.xAxis
+                            .axisLabel('Time')
+                            .tickFormat(function (d) {
+                                return d3.time.format('%b %d %H:%M')(new Date(d));
+                            });
 
-                wave_countChart.xAxis
-                    .axisLabel('Time')
-                    .tickFormat(function (d) {
-                        return d3.time.format('%b %d %H:%M')(new Date(d));
+                        chart.yAxis
+                            .axisLabel(yAxisLabel[s])
+                            .tickFormat(function (d) {
+                                return d.toFixed(2);
+                            });
+
+                        d3.select('#' + s)
+                            .datum(sensorData)
+                            .call(chart);
+
+                        nv.utils.windowResize(function () {
+                            chart.update()
+                        });
+                        return chart;
                     });
-
-                wave_countChart.yAxis
-                    .axisLabel('Wave Count (times)')
-                    .tickFormat(function (d) {
-                        return d.toFixed(2);
-                    });
-
-
-                d3.select('#wave_count')
-                    .datum(that.props.wave_count)
-                    .call(wave_countChart);
-
-
-                nv.utils.windowResize(function () {
-                    wave_countChart.update()
-                });
-                return wave_countChart;
-            });
-        }
-
-        if (that.props.temperature.length > 0) {
-            nv.addGraph(function () {
-                temperatureChart = nv.models.lineChart()
-                    .margin({left: 75, right: 50})
-                    .useInteractiveGuideline(true)
-                    .transitionDuration(350)
-                    .showLegend(false)
-                    .showYAxis(true)
-                    .showXAxis(true);
-
-                temperatureChart.xAxis
-                    .axisLabel('Time')
-                    .tickFormat(function (d) {
-                        return d3.time.format('%b %d %H:%M')(new Date(d));
-                    });
-
-                temperatureChart.yAxis
-                    .axisLabel('Temperature (°C )')
-                    .tickFormat(function (d) {
-                        return d.toFixed(2);
-                    });
-
-
-                d3.select('#temperature')
-                    .datum(that.props.temperature)
-                    .call(temperatureChart);
-
-
-                nv.utils.windowResize(function () {
-                    temperatureChart.update()
-                });
-                return temperatureChart;
-            });
-        }
-
-        if (that.props.humidity.length > 0) {
-            nv.addGraph(function () {
-                humidityChart = nv.models.lineChart()
-                    .margin({left: 75, right: 50})
-                    .useInteractiveGuideline(true)
-                    .transitionDuration(350)
-                    .showLegend(false)
-                    .showYAxis(true)
-                    .showXAxis(true);
-
-                humidityChart.xAxis
-                    .axisLabel('Time')
-                    .tickFormat(function (d) {
-                        return d3.time.format('%b %d %H:%M')(new Date(d));
-                    });
-
-                humidityChart.yAxis
-                    .axisLabel('Humidity (%)')
-                    .tickFormat(function (d) {
-                        return d.toFixed(2);
-                    });
-
-                d3.select('#humidity')
-                    .datum(that.props.humidity)
-                    .call(humidityChart);
-                nv.utils.windowResize(function () {
-                    humidityChart.update()
-                });
-
-                return humidityChart;
-            });
-        }
-
-        if (that.props.particulates.length > 0) {
-            nv.addGraph(function () {
-                particulatesChart = nv.models.lineChart()
-                    .margin({left: 75, right: 50})
-                    .useInteractiveGuideline(true)
-                    .transitionDuration(350)
-                    .showLegend(false)
-                    .showYAxis(true)
-                    .showXAxis(true);
-
-                particulatesChart.xAxis
-                    .axisLabel('Time')
-                    .tickFormat(function (d) {
-                        return d3.time.format('%b %d %H:%M')(new Date(d));
-                    });
-
-                particulatesChart.yAxis
-                    .axisLabel('Particulates (µg/m³)')
-                    .tickFormat(function (d) {
-                        return d.toFixed(2);
-                    });
-
-                d3.select('#particulates')
-                    .datum(that.props.particulates)
-                    .call(particulatesChart);
-                nv.utils.windowResize(function () {
-                    particulatesChart.update()
-                });
-
-                return particulatesChart;
-            });
-        }
-
-        if (that.props.light.length > 0) {
-            nv.addGraph(function () {
-                lightChart = nv.models.lineChart()
-                    .margin({left: 75, right: 50})
-                    .useInteractiveGuideline(true)
-                    .transitionDuration(350)
-                    .showLegend(false)
-                    .showYAxis(true)
-                    .showXAxis(true);
-
-                lightChart.xAxis
-                    .axisLabel('Time')
-                    .tickFormat(function (d) {
-                        return d3.time.format('%b %d %H:%M')(new Date(d));
-                    });
-
-                lightChart.yAxis
-                    .axisLabel('Light (lm)')
-                    .tickFormat(function (d) {
-                        return d.toFixed(2);
-                    });
-
-                d3.select('#light')
-                    .datum(that.props.light)
-                    .call(lightChart);
-                nv.utils.windowResize(function () {
-                    lightChart.update()
-                });
-
-                return lightChart;
-            });
-        }
-
-        if (that.props.sound.length > 0) {
-            nv.addGraph(function () {
-                soundChart = nv.models.lineChart()
-                    .margin({left: 75, right: 50})
-                    .useInteractiveGuideline(true)
-                    .transitionDuration(350)
-                    .showLegend(false)
-                    .showYAxis(true)
-                    .showXAxis(true);
-
-                soundChart.xAxis
-                    .axisLabel('Time')
-                    .tickFormat(function (d) {
-                        return d3.time.format('%b %d %H:%M')(new Date(d));
-                    });
-
-                soundChart.yAxis
-                    .axisLabel('Sound (dB)')
-                    .tickFormat(function (d) {
-                        return d.toFixed(2);
-                    });
-
-                d3.select('#sound')
-                    .datum(that.props.sound)
-                    .call(soundChart);
-                nv.utils.windowResize(function () {
-                    soundChart.update()
-                });
-                return soundChart;
-            });
-        }
-
-        var graphs = [];
-
-        sensorList.forEach(function (s) {
-            if (that.props[s].length > 0 && ((that.props[s][0] && that.props[s][0].values.length) || (that.props[s][1] && that.props[s][1].values.length > 0))) {
-                graphs.push(<h4 className="chart-title">{s.capitalize()}</h4>);
-                graphs.push(<svg id={s} />);
-            }
-        });
-        return (<div>{graphs}</div>)
+                    return <div id={s + "-wrapper"}>
+                        <h4 className="chart-title">{s.split("_").map(function(c){return c.capitalize()}).join(" ")}</h4>
+                        <svg id={s} />
+                    </div>;
+                }
+            }.bind(this))
+        }</div>;
     }
 });
 
 var vizForm = React.createClass({
     getInitialState: function() {
-        return {
-            wave_count: [],
-            temperature: [],
-            humidity: [],
-            particulates: [],
-            light: [],
-            sound: [],
-            alert: ""
-        }
+        return sensors.reduce(function(obj, k){obj[k] = [];return obj}, {alert: "", allSensors: false});
     },
 
     componentDidMount: function() {
@@ -279,24 +109,33 @@ var vizForm = React.createClass({
     submitWithInputsfromURL: function() {
         var emailInputFromURL = getParameterByName('email');
         var until = getParameterByName('until');
+        this.setState({allSensors: getParameterByName("all_sensors") === 'true'});
+
         if (emailInputFromURL.isWhiteString()) {
             return false;
         }
         $('#email-input').val(emailInputFromURL);
         $('#end-time').val(until);
-        this.handleSubmit();
+
+        if (this.state.allSensors === true) {
+            this.handleHardwareSubmit();
+        }
+        else {
+            this.handleBasicSubmit();
+        }
     },
 
-    pushHistory: function(email, until) {
-        history.pushState({}, '', '/room_conditions/?email=' + email + '&until=' + until);
+    pushHistory: function(email, until, allSensors) {
+        history.pushState({}, '', '/room_conditions/?email=' + email + '&until=' + until + "&all_sensors=" + allSensors);
     },
 
-    handleSubmit: function() {
-        var that = this;
+    loadData: function(allSensors) {
         var email = $('#email-input').val().trim();
         var until = $('#end-time').val().trim();
-        that.setState({alert: "Loading ...", wave_count: [],  temperature: [], humidity: [], particulates: [], light: [], sound: []});
-        sensorList.forEach(function(sensor){
+        this.setState(sensors.reduce(function(obj, k){obj[k] = [];return obj}, {alert: "Loading ..."}));
+        this.pushHistory(email, until, allSensors);
+
+        sensors.forEach(function(sensor){
             resolutionList.forEach(function(resolution){
                 var request_params = {
                     email: email,
@@ -305,7 +144,6 @@ var vizForm = React.createClass({
                     ts: new Date(until).getTime()
                 };
                 console.log('sending', request_params);
-                that.pushHistory(email, until);
                 $.ajax({
                     url: '/api/room_conditions',
                     dataType: 'json',
@@ -326,27 +164,36 @@ var vizForm = React.createClass({
                         else {
                             this.setState({alert: response.error});
                         }
-
-                    }.bind(that),
+                    }.bind(this),
                     error: function(xhr, status, err) {
-                        console.error(that.props.url, status, err);
-                    }.bind(that)
+                        console.error(status, err);
+                    }.bind(this)
                 });
-            });
-        });
+            }.bind(this));
+        }.bind(this));
+    },
+
+    handleBasicSubmit: function() {
+        sensors = basicSensors;
+        this.loadData(false);
+        return false;
+    },
+
+    handleHardwareSubmit: function() {
+        sensors = allSensors;
+        this.loadData(true);
         return false;
     },
 
     render: function() {
-        var that = this;
         var alert = this.state.alert === "" ? null : <div><br/><Alert>{this.state.alert}</Alert></div>;
-        var fileExporters = sensorList.map(function(sensor, i){
+        var fileExporters = sensors.map(function(sensor, i){
             return <MenuItem eventKey={i.toString()}>
-                <FileExporter fileContent={that.state[sensor]} fileName={sensor} buttonName={sensor.capitalize()}/>
+                <FileExporter fileContent={this.state[sensor]} fileName={sensor} buttonName={sensor.capitalize()}/>
             </MenuItem>;
-        });
+        }.bind(this));
         return (<div>
-            <form onSubmit={this.handleSubmit} className="row">
+            <form onSubmit={this.handleBasicSubmit} className="row">
                 <Col xs={3}>
                     <p className="icon-addon addon-xs">
                         <input id="email-input" className="form-control" placeholder="email"/>
@@ -357,19 +204,15 @@ var vizForm = React.createClass({
                 <Col xs={1}>
                     <Button type="submit" bsStyle="success"><Glyphicon glyph="search"/></Button>
                 </Col>
+                <Col xs={2}>
+                    <Button bsStyle="warning" onClick={this.handleHardwareSubmit}><Glyphicon glyph="search"/> for hardware</Button>
+                </Col>
                 <Col xs={1}>
                     <DropdownButton bsStyle="info" title="&darr; JSON">{fileExporters}</DropdownButton>
                 </Col>
             </form>
             {alert}
-            <vizCanvas
-            wave_count={this.state.wave_count}
-            temperature={this.state.temperature}
-            humidity={this.state.humidity}
-            particulates={this.state.particulates}
-            sound={this.state.sound}
-            light={this.state.light}
-            />
+            <vizCanvas data={this.state}/>
         </div>)
     }
 });
@@ -387,7 +230,8 @@ function manipulateData(rawData, sensor, resolution) {
     return {
         values: rawData.filter(function(point){return point.value !== -1}).map(function(point){return {x: point.datetime, y: point.value};}),
         key: legends[resolution],
-        color: colorChoice[sensor][resolution]
+        color: colorChoice[sensor][resolution],
+        disabled: resolution !== "day"
     }
 }
 
