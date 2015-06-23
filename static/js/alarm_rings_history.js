@@ -1,3 +1,6 @@
+var DEFAULT_START_TIME = new Date().getTime() - 150*24*3600*1000;
+var DEFAULT_END_TIME = new Date().getTime();
+
 var Tile = React.createClass({
     render: function() {
         return <div className="tile">
@@ -159,8 +162,8 @@ var RingTimeHistoryMaster = React.createClass({
             start = this.refs.start.refs.start.getDOMNode().value.trim(),
             end = this.refs.end.refs.end.getDOMNode().value.trim();
 
-        var startEpoch = start ? new Date(start + " GMT").getTime() : new Date().getTime() - 8*24*3600*1000,
-            endEpoch = end ? new Date(end + " GMT").getTime() : new Date().getTime();
+        var startEpoch = start ? new Date(start + " GMT").getTime() : DEFAULT_START_TIME,
+            endEpoch = end ? new Date(end + " GMT").getTime() : DEFAULT_END_TIME;
 
         history.pushState({}, '', '/alarm_rings_history/?email=' + email);
 
