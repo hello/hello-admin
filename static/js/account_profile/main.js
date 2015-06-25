@@ -93,7 +93,7 @@ var TimezoneHistoryTile = React.createClass({
                 <th className="center-wrapper">Offset (ms)</th>
             </tr></thead>
             <tbody>{
-                Object.keys(data).map(function(updatedAt){
+                Object.keys(data).sort(function(x1, x2){return new Date(x2).getTime() - new Date(x1).getTime()}).map(function(updatedAt){
                     return <tr>
                         <td className="center-wrapper">{d3.time.format.utc("%b %d %H:%M")(new Date(updatedAt))}</td>
                         <td className="center-wrapper">{data[updatedAt].timezone_id}</td>
