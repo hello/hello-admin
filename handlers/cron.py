@@ -110,7 +110,7 @@ class AlarmsCountPush(GeckoboardPush):
         alarms_count = -1
 
         try:
-            now_date = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+            now_date = datetime.datetime.now().strftime("%Y-%m-%d")
             index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_PREFIX + now_date)
             alarms_count = index.search(query=alarm_pattern)['matches']
 

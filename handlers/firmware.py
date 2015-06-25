@@ -104,7 +104,7 @@ class FirmwareUnhashAPI(ProtectedRequestHandler):
         self.response.write(output.get_serialized_output())
 
 
-class FirmwareGroupStatusAPI(SuperFirmwareRequestHandler):
+class FirmwareGroupStatusAPI(FirmwareRequestHandler):
     def get(self):
         self.hello_request(
             api_url="firmware/{}/status".format(self.request.get("group")),
