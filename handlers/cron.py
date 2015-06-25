@@ -14,7 +14,7 @@ from models.ext import RecentlyActiveDevicesStatsDaily
 from models.ext import RecentlyActiveDevicesStats15Minutes
 from indextank import ApiClient
 from google.appengine.ext import ndb
-from handlers.helpers import ProtectedRequestHandler
+from google.appengine.api import urlfetch
 
 class ZendeskCronHandler(BaseRequestHandler):
     def get(self):
@@ -109,13 +109,13 @@ class AlarmsCountPush(GeckoboardPush):
         alarm_pattern = "ALARM RINGING"
         alarms_count = -1
 
-        now_date = datetime.datetime.now().strftime("%Y-%m-%d")
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_PREFIX + now_date)
-
         try:
+            now_date = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+            index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_PREFIX + now_date)
             alarms_count = index.search(query=alarm_pattern)['matches']
 
         except Exception as e:
+            log.error(e.message)
             self.error(e.message)
 
         self.response.write(json.dumps({
@@ -301,5 +301,3 @@ class DropOldSenseLogsSearchifyIndex(BaseRequestHandler):
         log.info(dumped_output)
         self.send_to_slack_stats_channel(dumped_output)
         self.response.write(dumped_output)
-
-
