@@ -76,7 +76,8 @@ var TimelineMaestro = React.createClass({
                 insights: [],
                 statistics: {},
                 date: "",
-                segments: []
+                segments: [],
+                algorithm: ""
             }],
             filterStatus: "key_events",
             alert: ""
@@ -132,6 +133,36 @@ var TimelineMaestro = React.createClass({
         return false;
     },
 
+    getTimelineAlgorithm: function() {
+        var emailInput = $('#email-input').val();
+        var dateInput = $('#date-input').val();
+        var requestData = {
+            email: emailInput,
+            date: reformatDate(dateInput)
+        };
+
+        if (requestData.email.isWhiteString() || requestData.date.isWhiteString()) {
+            return false;
+        }
+
+        $.ajax({
+            url: "/api/timeline_algorithm",
+            type: 'GET',
+            data: requestData,
+            dataType: 'json',
+            success: function(response) {
+                console.log("algo", response);
+                if (response.error.isWhiteString()) {
+                    this.setState({algorithm: response.data.algorithm});
+                }
+            }.bind(this),
+            error: function(e) {
+                console.log(e);
+            }.bind(this)
+        });
+        return false;
+    },
+
     updateScore: function() {
         $(".dial").val(27).trigger('change');
     },
@@ -174,6 +205,7 @@ var TimelineMaestro = React.createClass({
     handleSubmit: function() {
         if (this.isAuthorized() === true) {
             this.retrieveTimelineData();
+            this.getTimelineAlgorithm();
         }
         return false;
     },
@@ -285,6 +317,7 @@ var TimelineMaestro = React.createClass({
                 </Col>
             </form>
             {alertPanel}
+            <div>Algorithm: {this.state.algorithm}</div>
             <Row id="insights-info">
                 <Col xs={3} sm={3} md={3} lg={3} xl={3} xsOffset={2} mdOffset={2} smOffset={2} lgOffset={2} xlOffset={2}>{statsPanel}</Col>
                 {scoreBar}

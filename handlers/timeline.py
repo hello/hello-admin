@@ -21,3 +21,12 @@ class TimelineAPI(ProtectedRequestHandler):
             api_url="timeline/admin/invalidate/{}/{}".format(email, date),
             type="GET",
         )
+
+class TimelineAlgorithmAPI(ProtectedRequestHandler):
+    def get(self):
+        email = self.request.get('email')
+        date = self.request.get('date')
+        self.hello_request(
+            api_url="timeline/admin/algo/{}/{}".format(email, date),
+            type="GET",
+        )

@@ -126,7 +126,7 @@ from handlers.zendesk import ZendeskStatsAPI
 import settings
 import webapp2
 from handlers.orders import OrdersMapAPI
-
+from handlers.timeline import TimelineAlgorithmAPI
 
 cron_routes = [
     ('/cron/active_devices_history_15_minutes_purge', ActiveDevicesHistory15MinutesPurge),
@@ -197,6 +197,7 @@ api_routes = [
     ('/api/sense_logs/?$', SenseLogsAPI),
     ('/api/teams/?$', TeamsAPI),
     ('/api/timeline/?$', TimelineAPI),
+    ('/api/timeline_algorithm/?$', TimelineAlgorithmAPI),
     ('/api/timezone/?$', TimezoneAPI),
     ('/api/timezone_history/?$', TimezoneHistoryAPI),
     ('/api/tokens/?$', TokenAPI),
