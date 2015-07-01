@@ -11,21 +11,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     {% block static %}
-    <script type="text/javascript" src="/static/js/third-party/jquery-2.1.1.min.js"></script>
-    <script type="text/javascript" src="/static/js/third-party/react-with-addons-0.11.2.min.js"></script>
-    <script type="text/javascript" src="/static/js/third-party/JSXTransformer-0.11.2.js"></script>
-    <script type="text/javascript" src="/static/js/third-party/react-bootstrap-0.12.0.min.js"></script>
-    <script type="text/javascript" src="/static/js/third-party/underscore.min.js"></script>
-    <script type="text/javascript" src="/static/js/third-party/typeahead.js"></script>
-    <script type="text/jsx" src="/static/js/base.js"></script>
+        <script type="text/javascript" src="/static/js/third-party/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="/static/js/third-party/react-with-addons-0.11.2.min.js"></script>
+        <script type="text/javascript" src="/static/js/third-party/JSXTransformer-0.11.2.js"></script>
+        <script type="text/javascript" src="/static/js/third-party/react-bootstrap-0.12.0.min.js"></script>
+        <script type="text/javascript" src="/static/js/third-party/underscore.min.js"></script>
+        <script type="text/javascript" src="/static/js/third-party/typeahead.js"></script>
+        <script type="text/jsx" src="/static/js/base.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-xl.css"/>
-    <link rel="stylesheet" type="text/css" href="/static/css/third-party/glyphicon-control.css"/>
-    <link rel="stylesheet" type="text/css" href="/static/css/third-party/tablesorter-control.css"/>
+        <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap.min.css"/>
+        <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-xl.css"/>
+        <link rel="stylesheet" type="text/css" href="/static/css/third-party/glyphicon-control.css"/>
+        <link rel="stylesheet" type="text/css" href="/static/css/third-party/tablesorter-control.css"/>
 
-    <link rel="stylesheet" href="/static/css/reset.css">
-    <link rel="stylesheet" type="text/css" href="/static/css/base.css" />
+        <link rel="stylesheet" href="/static/css/reset.css">
+        <link rel="stylesheet" type="text/css" href="/static/css/base.css" />
     {% endblock %}
 
     {% block extrastatic %}
@@ -33,22 +33,73 @@
 
 </head>
 <body>
-    <div id="header" class="row">
-        <div id="env-switcher"></div>
-        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xs-offset-7 col-sm-offset-7 col-md-offset-7 col-lg-offset-7 col-xl-offset-7">
-            <span>Hi {{user}}! <a href="{{logout_url}}"> Logout</a></span>
+<div id="header" class="row">
+    <div id="env-switcher"></div>
+    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xs-offset-7 col-sm-offset-7 col-md-offset-7 col-lg-offset-7 col-xl-offset-7">
+        <span>Hi {{user}}! <a href="{{logout_url}}"> Logout</a></span>
+    </div>
+</div>
+<div class="row">
+    <input type="hidden" id="viewer" value="{{user}}">
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2" id="sidebar">
+        <div class="list-group">
+            <span class="sidebar-group list-group-item"></span>
+            <span class="sidebar-group list-group-item">Home</span>
+            <a href="/account_profile" class="list-group-item">Account Profile</a>
+            <a href="/recent_accounts" class="list-group-item">Recent Accounts</a>
+            <a href="/password_reset" class="list-group-item">Password Reset</a>
+            <a href="/troubleshoot" class="list-group-item">Inactive Devices</a>
+            <a href="/active_devices_history" class="list-group-item">Devices Count</a>
+            <a href="/pch_serial_number_check" class="list-group-item">Serial Check</a>
+            <a href="/users" class="list-group-item">Users(Deperecated)</a>
+            <div class="list-group-separator list-group-item"><hr></div>
+            <span class="sidebar-group list-group-item">Metrics &amp; Diagnostics</span>
+            <a href="/users_inspection" class="list-group-item">Users Inspection</a>
+            <a href="/sense_uptime" class="list-group-item">Sense Uptime</a>
+            <span class="sidebar-group list-group-item">Data</span>
+            <a href="/timeline" {% if title == "Timeline"%} class="sidebar-group list-group-item active-list-group-item"{% endif %} class="sidebar-group list-group-item">Timeline</a>
+            <a href="/room_conditions" class="list-group-item">Room Conditions</a>
+            <a href="/battery" class="list-group-item">Pill Status</a>
+            <a href="/motion" class="list-group-item">Motion</a>
+            <a href="/sense_events" class="list-group-item">Sense Events</a>
+            <a href="/dust_stats" class="list-group-item">Dust Statistics</a>
+            <a href="/alarm_rings_history" class="list-group-item">Rings History</a>
+            <span class="sidebar-group list-group-item">Logs</span>
+            <a href="/sense_logs" class="list-group-item">Sense</a>
+            <a href="/onboarding_logs" class="list-group-item">Onboarding</a>
+            <a href="/log_facets" class="list-group-item">Facets Breakdown</a>
+            <a href="/black_list" class="list-group-item">Black List</a>
+            <a href="/searchify_stats" class="list-group-item">Statistics</a>
+            <span class="sidebar-group list-group-item">Data Science</span>
+            <a href="/label" class="list-group-item">Label</a>
+            <span class="sidebar-group list-group-item">Keystore</span>
+            <a href="/key_store" class="list-group-item">Keystore Hints</a>
+            <a href="/keys" class="list-group-item">Keystore Provision</a>
+            <span class="sidebar-group list-group-item">Zendesk</span>
+            <a href="/zendesk_now" class="list-group-item">Zendesk Now</a>
+            <a href="/zendesk_history" class="list-group-item">Zendesk History</a>
+            <span class="sidebar-group list-group-item">Operation</span>
+            <a href="/teams" class="list-group-item">Teams</a>
+            <a href="/configuration" class="list-group-item">Configuration</a>
+            <a href="/firmware" class="list-group-item">Firmware</a>
+            <a href="/pairing" class="list-group-item">Pairing</a>
+            <a href="/notification" class="list-group-item">Notification</a>
+            <a href="/alarms" class="list-group-item">Alarms</a>
+            <span class="sidebar-group list-group-item">Admin only</span>
+            <a href="/token_generator" class="list-group-item">Token Generator</a>
+            <a href="/settings" class="list-group-item">Settings</a>
+            <a href="/orders" class="list-group-item">Orders</a>
         </div>
     </div>
-    <div class="row">
-        <input type="hidden" id="viewer" value="{{user}}">
-        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2" id="sidebar"></div>
-        <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 col-xl-10" id="content">
-            {% block content %}
-            {% endblock %}
-        </div>
+
+    <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 col-xl-10" id="content">
+
+        {% block content %}
+        {% endblock %}
     </div>
-    <div id="footer">
-        hello-admin app version: {{version}}
-    </div>
+</div>
+<div id="footer">
+    hello-admin app version: {{version}}
+</div>
 </body>
 <div class="preloader" style="display:none;"></div>

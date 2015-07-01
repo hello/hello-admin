@@ -9,7 +9,7 @@ html * {
   box-sizing: border-box;
 }
 
-body {font-size: 100%; color: rgb(32, 32, 32);;}
+body {font-family: "proxima-nova" sans-serif; background-color: #E8E9ED;}
 
 #header {background: #475F78 url(/static/image/menu-pattern.png); padding: 10px 0; margin: 0 auto; color: #F2F7FB; width: 100%; position: fixed; top: 0; z-index: 999; -moz-box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); -webkit-box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); font-family: "Century Gothic",CenturyGothic,AppleGothic,sans-serif;}
 #header>div{text-align: center;}
@@ -22,11 +22,15 @@ a.env:hover {text-decoration: none; -webkit-stroke-width: 7px;-webkit-stroke-col
 a.activeEnv {color: #B0FC23; text-decoration: none; -webkit-stroke-width: 7px;-webkit-stroke-color: #B0FC23; -webkit-fill-color: #B0FC23; text-shadow: 1px 0 20px #B0FC23;}
 #menu>a>span.glyphicon {margin: 0 7px;}
 
-#sidebar {margin: 3px 0 0 0; max-width: 200px; font-family: Menlo,Monaco,Consolas,"Courier New",monospace; font-size: 85%;}
-.sidebar-group {font-weight: bold;}
-.list-group-item {background: #F9FAFD; -moz-box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); -webkit-box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); box-shadow: 0 3px 3px rgba(0, 0, 0, 0.3); font-family: "Century Gothic",CenturyGothic,AppleGothic,sans-serif;}
-#content {margin: 40px 0 30px 0; font-family: Menlo,Monaco,Consolas,"Courier New",monospace; font-size: 85%;}
+/* For Sidebar */
+#sidebar {margin: 32px 0 0 1px; max-width: 200px;}
+.list-group-item {background-color: #FFFFFF; border-top-style: none; border-bottom-style: none; font-size: 14px; font-weight: 200; color: #666666;}
+.sidebar-group {font-weight: 500; font-size: 12px; text-transform: uppercase;}
+a.active-list-group-item, a.list-group-item:hover {color: #42B5FF; background-color: #FFFFFF;}
+div.list-group-separator {height: 40px; padding-top: 1px;}
 
+
+#content {margin: 40px 0 30px 0; font-size: 85%;}
 #footer {background: #F2F7FB url(/static/image/menu-pattern.png); padding: 6px; color: gray; text-align: center; opacity: 0.5; width: 100%; position: fixed; bottom: 0;}
 
 
@@ -42,7 +46,7 @@ table.table>tbody>tr>td {display: table-cell; vertical-align: middle;}
 table.table>thead>tr>th {display: table-cell; vertical-align: middle; text-align: center;}
 button.btn-circle {border-radius: 100%; width: 32px; height: 32px; margin: 10px auto; display: table; color: #ffffff; background-color: rgba(45, 193, 205, 0.34);}
 span.label {font: 75% lighter "Lucida Grande", Verdana, Arial, sans-serif}
-body h3 {text-align: center; font: 20px "Century Gothic",CenturyGothic,AppleGothic,sans-serif}
+body h3 {text-align: center; font-size: 20px;}
 
 div.bootstrap-tagsinput {min-width: 100%;}
 div.bootstrap-tagsinput>span.label {font-size: 12px;}

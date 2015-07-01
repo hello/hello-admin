@@ -1,53 +1,21 @@
-<!DOCTYPE HTML>
-<html lang="en">
-<head>
-    <title>
-        Admin &#10148;
-        {% block title %}
-        {% endblock %}
-    </title>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+{% extends "templates/base.html" %}
 
-    {% block static %}
-    <script type="text/javascript" src="/static/js/third-party/jquery-2.1.1.min.js"></script>
+{% block static %}
+<script type="text/javascript" src="/static/js/third-party/jquery-2.1.1.min.js"></script>
 {#    <script type="text/javascript" src="/static/js/third-party/react-with-addons-0.13.2.min.js"></script>#}
-    <script src="https://fb.me/react-with-addons-0.13.3.js"></script>
-    <script type="text/javascript" src="/static/js/third-party/JSXTransformer-0.13.2.js"></script>
-    <script type="text/javascript" src="/static/js/third-party/react-bootstrap-0.21.2.min.js"></script>
-    <script type="text/jsx" src="/static/js/base_latest_react.js"></script>
+<script src="https://fb.me/react-with-addons-0.13.3.js"></script>
+<script type="text/javascript" src="/static/js/third-party/JSXTransformer-0.13.2.js"></script>
+<script type="text/javascript" src="/static/js/third-party/react-bootstrap-0.21.2.min.js"></script>
+<script type="text/jsx" src="/static/js/base_latest_react.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-xl.css"/>
-    <link rel="stylesheet" type="text/css" href="/static/css/third-party/glyphicon-control.css"/>
-    <link rel="stylesheet" type="text/css" href="/static/css/third-party/tablesorter-control.css"/>
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"/>
+<link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-xl.css"/>
+<link rel="stylesheet" type="text/css" href="/static/css/third-party/glyphicon-control.css"/>
+<link rel="stylesheet" type="text/css" href="/static/css/third-party/tablesorter-control.css"/>
 
-    <link rel="stylesheet" href="/static/css/reset.css">
-    <link rel="stylesheet" type="text/css" href="/static/css/base.css" />
-    {% endblock %}
+<link rel="stylesheet" href="/static/css/reset.css">
+<link rel="stylesheet" type="text/css" href="/static/css/base.css" />
+{% endblock %}
 
-    {% block extrastatic %}
-    {% endblock %}
-
-</head>
-<body>
-    <div id="header" class="row">
-        <div id="env-switcher"></div>
-        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xs-offset-7 col-sm-offset-7 col-md-offset-7 col-lg-offset-7 col-xl-offset-7">
-            <span>Hi {{user}}! <a href="{{logout_url}}"> Logout</a></span>
-        </div>
-    </div>
-    <div class="row">
-        <input type="hidden" id="viewer" value="{{user}}">
-        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 col-xl-2" id="sidebar"></div>
-        <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 col-xl-10" id="content">
-            {% block content %}
-            {% endblock %}
-        </div>
-    </div>
-    <div id="footer">
-        hello-admin app version: {{version}}
-    </div>
-</body>
-<div class="preloader" style="display:none;"></div>
+{% block extrastatic %}
+{% endblock %}
