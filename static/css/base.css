@@ -24,9 +24,10 @@ a.activeEnv {color: #B0FC23; text-decoration: none; -webkit-stroke-width: 7px;-w
 
 /* For Sidebar */
 #sidebar {margin: 32px 0 0 1px; max-width: 200px;}
-.list-group-item {background-color: #FFFFFF; border-top-style: none; border-bottom-style: none; font-size: 14px; font-weight: 200; color: #666666;}
-.sidebar-group {font-weight: 500; font-size: 12px; text-transform: uppercase;}
-a.active-list-group-item, a.list-group-item:hover {color: #42B5FF; background-color: #FFFFFF;}
+.list-group-item {background-color: #FFFFFF; border-top-style: none; border-bottom-style: none; font-size: 14px; font-weight: 200; color: #666666; border-radius: 0 !important;}
+span.sidebar-group {font-weight: 500; font-size: 12px; text-transform: uppercase;}
+span.list-group-item-active>a, a.list-group-item:hover {color: #42B5FF; background-color: #FFFFFF;}
+a.list-group-item-deprecated {text-decoration: line-through; font-weight: 100;}
 div.list-group-separator {height: 40px; padding-top: 1px;}
 
 

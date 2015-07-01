@@ -118,7 +118,7 @@ class KeyStoreView(ProtectedRequestHandler):
     """Returns a panel for monitoring potential timeline viewing"""
     def get(self):
         self.render_to_response(template_file='templates/key_store.html',
-                                context={'title': 'Key Store'})
+                                context={'title': 'Keystore'})
 
 class MotionView(ProtectedRequestHandler):
     """Returns a panel for monitoring potential timeline viewing"""
@@ -134,7 +134,7 @@ class ErrorView(BaseRequestHandler):
 class KeysView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/keys.html',
-                                context={'title': 'Keys'})
+                                context={'title': 'Provision'})
 
 class ZendeskHistoryView(ProtectedRequestHandler):
     def get(self):
@@ -200,7 +200,7 @@ class DustStatsView(ProtectedRequestHandler):
 class UsersInpsectionView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/users_inspection.html',
-                                context={'title': 'Inspect Recent Users To Detect Trouble'})
+                                context={'title': 'Inspector'})
 
 class AccountProfileView(ProtectedRequestHandler):
     def get(self):
@@ -230,12 +230,12 @@ class LogsPatternFacetsView(ProtectedRequestHandler):
 class SearchifyStatsView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/searchify_stats.html',
-                                context={'title': "Searchify Statistics"})
+                                context={'title': "Index Statistics"})
 
 class BlackListView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/black_list.html',
-                                context={'title': "Devices Whose Logs Do Not Matter"})
+                                context={'title': "Black List"})
 
 class AlarmRingsHistoryView(ProtectedRequestHandler):
     def get(self):
