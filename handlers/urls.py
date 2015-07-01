@@ -127,6 +127,9 @@ import settings
 import webapp2
 from handlers.orders import OrdersMapAPI
 from handlers.timeline import TimelineAlgorithmAPI
+from handlers.devices import ColorlessSensesAPI
+from handlers.cron import SenseColorUpdate
+from handlers.cron import SenseColorUpdateQueue
 
 cron_routes = [
     ('/cron/active_devices_history_15_minutes_purge', ActiveDevicesHistory15MinutesPurge),
@@ -140,6 +143,9 @@ cron_routes = [
     ('/cron/store_recently_active_devices_stats_minute', StoreRecentlyActiveDevicesStatsMinute),
     ('/cron/waves_count_push', WavesCountPush),
     ('/cron/zendesk_daily_stats', ZendeskCronHandler),
+    ('/cron/sense_color_update', SenseColorUpdate),
+    ('/cron/sense_color_update_queue', SenseColorUpdateQueue),
+
 ]
 
 api_routes = [
@@ -211,6 +217,7 @@ api_routes = [
     ('/api/zendesk_now/?$', ZendeskNowAPI),
     ('/api/zendesk_stats/?$', ZendeskStatsAPI),
     ('/api/orders_map/?$', OrdersMapAPI),
+    ('/api/colorless_senses/?$', ColorlessSensesAPI),
 ]
 
 page_routes = [

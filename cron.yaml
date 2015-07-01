@@ -26,3 +26,6 @@ cron:
 - description: drop old sense logs searchify index
   url: /cron/drop_old_sense_logs_searchify_index
   schedule: every day 23:55
+- description: sense color update queue
+  url: /cron/sense_color_update_queue
+  schedule: every 60 mins
