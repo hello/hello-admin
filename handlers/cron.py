@@ -15,6 +15,7 @@ from models.ext import RecentlyActiveDevicesStats15Minutes
 from indextank import ApiClient
 from google.appengine.ext import ndb
 from google.appengine.api import urlfetch
+from google.appengine.api import taskqueue
 
 class ZendeskCronHandler(BaseRequestHandler):
     def get(self):
@@ -301,3 +302,34 @@ class DropOldSenseLogsSearchifyIndex(BaseRequestHandler):
         log.info(dumped_output)
         self.send_to_slack_stats_channel(dumped_output)
         self.response.write(dumped_output)
+
+
+class SenseColorUpdate(BaseRequestHandler):
+    def get(self):
+        log.info("Update sense color for {}".format(self.request.get("sense_id")))
+        self.hello_request(
+            api_url="devices/color/{}".format(self.request.get("sense_id")),
+            type="POST",
+            app_info=settings.ADMIN_APP_INFO
+        )
+
+
+class SenseColorUpdateQueue(BaseRequestHandler):
+    def get(self):
+        colorless_senses_response = self.hello_request(
+            api_url="devices/color/missing",
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO,
+            raw_output=True
+        )
+        log.info("There are {} colorless senses".format(colorless_senses_response.data))
+        for sense_id in colorless_senses_response.data:
+            taskqueue.add(
+                url="/cron/sense_color_update",
+                params={
+                    "sense_id": sense_id
+                },
+                method="GET",
+                queue_name="sense-color-update"
+            )
+
