@@ -130,6 +130,7 @@ from handlers.timeline import TimelineAlgorithmAPI
 from handlers.devices import ColorlessSensesAPI
 from handlers.cron import SenseColorUpdate
 from handlers.cron import SenseColorUpdateQueue
+from handlers.clearbit import ClearbitAPI
 
 cron_routes = [
     ('/cron/active_devices_history_15_minutes_purge', ActiveDevicesHistory15MinutesPurge),
@@ -218,6 +219,7 @@ api_routes = [
     ('/api/zendesk_stats/?$', ZendeskStatsAPI),
     ('/api/orders_map/?$', OrdersMapAPI),
     ('/api/colorless_senses/?$', ColorlessSensesAPI),
+    ('/api/clearbit/?$', ClearbitAPI),
 ]
 
 page_routes = [
