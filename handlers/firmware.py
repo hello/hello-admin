@@ -103,6 +103,14 @@ class FirmwareUnhashAPI(ProtectedRequestHandler):
 
         self.response.write(output.get_serialized_output())
 
+    def post(self):  # batch query
+        self.hello_request(
+            api_url="firmware/names",
+            type="POST",
+            body_data=self.request.body,
+            app_info=settings.ADMIN_APP_INFO,
+        )
+
 
 class FirmwareGroupStatusAPI(FirmwareRequestHandler):
     def get(self):
