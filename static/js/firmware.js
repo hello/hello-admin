@@ -20,13 +20,16 @@ var headerStyle = {
     'sd_card_path': 'alert-danger'
 };
 
+
 var LinkToFWSearch = React.createClass({
     populateFirmwareVersion: function(){
         $('#firmware_version').focus().val(this.props.firmware_version);
         $("#firmware_version_search").click();
     },
     render: function() {
-        return <span className="cursor-custom" onClick={this.populateFirmwareVersion}>{this.props.firmware_version}</span>
+        return <span className="cursor-custom" onClick={this.populateFirmwareVersion}>
+            {this.props.firmware_version} | {parseInt(this.props.firmware_version, 10).toString(16)} | {this.props.fwHexToHuman[parseInt(this.props.firmware_version, 10).toString(16)] || "unknown"}
+        </span>
     }
 });
 
@@ -159,17 +162,18 @@ var DeviceListRows = React.createClass({
 
 var HistoryListRows = React.createClass({
     render: function() {
-        var historyListRows = Object.keys(this.props.firmwareHistory).sort().reverse().map(function(key){
+        console.log(this.props.fwHistory);
+        var historyListRows = Object.keys(this.props.fwHistory).sort().reverse().map(function(key){
             var timestamp = new Date(Number(key));
             return(
                 <tr>
                     <td>{timestamp.toLocaleString()}</td>
                     <td>
-                    <LinkToFWSearch firmware_version={this[key]} />
+                    <LinkToFWSearch firmware_version={this.props.fwHistory[key]} fwHexToHuman={this.props.fwHexToHuman} />
                     </td>
                 </tr>
             );
-        }, this.props.firmwareHistory);
+        }.bind(this));
         
         return (<tbody>
             {historyListRows}
@@ -230,7 +234,7 @@ var HistoryList = React.createClass({
         return (
             <Table id="history-table" responsive condensed bordered>
                 <HistoryListHeaders device_id={this.props.device_id}/>
-                <HistoryListRows firmwareHistory={this.props.fwHistory}/>
+                <HistoryListRows fwHexToHuman={this.props.fwHexToHuman} fwHistory={this.props.fwHistory} />
             </Table>
             )
     }
@@ -250,7 +254,8 @@ var FirmwareMaestro = React.createClass({
             rangeStart: 0,
             rangeEnd: 14,
             files: [],
-            viewDeviceError: ""
+            viewDeviceError: "",
+            fwHexToHuman: {}
         }
     },
     componentDidMount: function(e) {
@@ -264,7 +269,6 @@ var FirmwareMaestro = React.createClass({
           $('#device_id').val(device_id);
           this.fwHistoryList(e);
         }
-
     },
     retrieve: function() {
         console.log("retrieving");
@@ -341,8 +345,20 @@ var FirmwareMaestro = React.createClass({
                 if (response.error !== "") {
                     this.setState({fwHistory: Object});
                     this.setState({getError: response.error});
+                    this.setState({fwHexToHuman: {}});
                 }
                 else {
+                    $.ajax({
+                        url: '/api/firmware_unhash',
+                        dataType: 'json',
+                        data: JSON.stringify(Object.keys(response.data).map(function(k){return parseInt(response.data[k], 10).toString(16);})),
+                        type: "POST",
+                        success: function(response) {
+                            fwHexToHuman = response.data;
+                            console.log("post result", response.data);
+                            this.setState({fwHexToHuman: response.data});
+                        }.bind(this)
+                    });
                     this.setState({fwHistory: response.data});
                     this.setState({device_id: device_id});
                     this.setState({getError: ""});
@@ -496,7 +512,7 @@ var FirmwareMaestro = React.createClass({
             <FirmwareList fwList={this.state.fwList}/>;
         var historyResult = (typeof this.state.fwHistory == "undefined") ?
             <Alert bsStyle="default">{this.state.error}</Alert> :
-            <HistoryList fwHistory={this.state.fwHistory} device_id={this.state.device_id}/>;
+            <HistoryList fwHistory={this.state.fwHistory} fwHexToHuman={this.state.fwHexToHuman} device_id={this.state.device_id}/>;
         var edit = this.state.s3Keys.length === 0 ?
             null:
             <div className="row">
