@@ -313,16 +313,14 @@ class SenseColorUpdate(BaseRequestHandler):
             app_info=settings.ADMIN_APP_INFO,
             raw_output=True
         ).data
-        cached_log = memcache.get("sense_color_update")
-        new_cached_log = {
-            "key": "sense_color_update",
-            "value": "{}|{}".format(int(cached_log.split("|")[0]) + int(acknowledge), cached_log.split("|")[1]),
-            "time": 24*3600
-        }
-        memcache.set(**new_cached_log)
-        log.info("Updated color for sense {}, acknowledge : {}".format(self.request.get("sense_id"), acknowledge))
-        log.info("Updated color stats: {}".format(new_cached_log.get("value", "...")))
 
+        log.info("Updated color for sense {}, acknowledge : {}".format(self.request.get("sense_id"), acknowledge))
+
+        colorless_size = self.request.get("total")
+
+        memcache.incr(key="{}".format(colorless_size), delta=1)
+        colored_size = memcache.get(key="{}".format(colorless_size))
+        log.info("Updated color for {} out of {} senses".format(colored_size, colorless_size))
 
 class SenseColorUpdateQueue(BaseRequestHandler):
     def get(self):
@@ -334,8 +332,8 @@ class SenseColorUpdateQueue(BaseRequestHandler):
         ).data
         log.info("There are {} colorless senses".format(len(colorless_senses)))
         cached_log = {
-            "key": "sense_color_update",
-            "value": "0|{}".format(len(colorless_senses)),
+            "key": "{}".format(len(colorless_senses)),
+            "value": 0,
             "time": 24*3600
         }
         if memcache.get("sense_color_update") is None:
@@ -346,7 +344,8 @@ class SenseColorUpdateQueue(BaseRequestHandler):
             taskqueue.add(
                 url="/cron/sense_color_update",
                 params={
-                    "sense_id": sense_id
+                    "sense_id": sense_id,
+                    "total": len(colorless_senses)
                 },
                 method="GET",
                 queue_name="sense-color-update"
