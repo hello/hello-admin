@@ -11,7 +11,9 @@ var c3Chart = React.createClass({
         that.props.data.forEach(function(d, i){
             var sumBattery = 0, sumBatteryMod3Arr = [];
             d = d.map(function(o, j) {
-                sumBattery += o.batteryLevel;
+                if (o.batteryLevel <= 100) {
+                    sumBattery += o.batteryLevel;
+                }
                 if (sumBatteryMod3Arr.length > 24) { // For now have N = 5 as a constant, later make it a url param
                     sumBatteryMod3Arr.shift();
                 }
