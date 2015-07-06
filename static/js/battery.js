@@ -17,15 +17,23 @@ var c3Chart = React.createClass({
                 if (sumBatteryMod3Arr.length > 24) { // For now have N = 5 as a constant, later make it a url param
                     sumBatteryMod3Arr.shift();
                 }
-                sumBatteryMod3Arr.push(o.batteryLevel % 3);
+                if (o.batteryLevel >= 100) {
+                    o.batteryMod3  = 0;
+                }
+                else if (o.batteryLevel < 10) {
+                    o.batteryMod3  = 2;
+                }
+                else {
+                    o.batteryMod3 = o.batteryLevel % 3;
+                }
 
-                o.batteryMod3 = o.batteryLevel % 3;
                 o.batteryCumAvg = (sumBattery / (j+1)).toFixed(2);
+                sumBatteryMod3Arr.push(o.batteryMod3);
 
                 switch(sumBatteryMod3Arr.length) {
-                    case 0: o.batteryMod3CumAvg = 0; break;
-                    case 1: o.batteryMod3CumAvg = sumBatteryMod3Arr[0]; break;
-                    default: o.batteryMod3CumAvg = (sumBatteryMod3Arr.reduce(function(x, y){return x + y}) / sumBatteryMod3Arr.length).toFixed(2);
+                    case 0: o.batteryMod3MovingAvg = 0; break;
+                    case 1: o.batteryMod3MovingAvg = sumBatteryMod3Arr[0]; break;
+                    default: o.batteryMod3MovingAvg = (sumBatteryMod3Arr.reduce(function(x, y){return x + y}) / sumBatteryMod3Arr.length).toFixed(2);
                 }
                 return o;
             });
@@ -39,7 +47,7 @@ var c3Chart = React.createClass({
             ]);
 
             if (d && d !== [] && d.last()) {
-                categories = ['uptime', 'batteryLevel', 'batteryCumAvg', 'batteryMod3', 'batteryMod3CumAvg'];
+                categories = ['uptime', 'batteryLevel', 'batteryCumAvg', 'batteryMod3', 'batteryMod3MovingAvg'];
                 stackingGroups = that.props.stackable === true ? [categories] : [];
             }
 
@@ -61,7 +69,7 @@ var c3Chart = React.createClass({
                         batteryLevel: "#0D98BA",
                         batteryMod3: "green",
                         batteryCumAvg: "orange",
-                        batteryMod3CumAvg: "purple"
+                        batteryMod3MovingAvg: "purple"
                     }
                 },
                 axis: {
