@@ -134,7 +134,6 @@ var FirmwareListRows = React.createClass({
                     <td>{fw.count}</td>
                 </tr>
             );
-
         }.bind(this));
         return (<tbody>
             {firmwareListRows}
@@ -311,11 +310,15 @@ var FirmwareMaestro = React.createClass({
                 console.log("listing firmwares");
                 var sourceInput = $('#sourceInput').val();
                 history.pushState({}, '', '/firmware/');
+                var timestamp = Date.now();
+                var pastTimestamp = timestamp - 86400000;
 
                 $.ajax({ //nested ajax to avoid race condition
                   url: '/api/firmware/info',
                   dataType: 'json',
                   type: 'GET',
+                  data: {'range_start': pastTimestamp,
+                        'range_end': timestamp},
                   success: function(response) {
                     if (response.error !== "") {
                         this.setState({fwList: []});
@@ -572,7 +575,7 @@ var FirmwareMaestro = React.createClass({
                     </Col>
                     {remove}
                <Col xs={6} md={6}>
-                <Panel header="Firmware Seen">
+                <Panel header="Firmware Seen In Past 24hrs">
                     {this.state.fwList.length === 0  ? null : <div id="fw_seen">
                         {countResult}
                     </div>}
