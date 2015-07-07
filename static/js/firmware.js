@@ -575,7 +575,7 @@ var FirmwareMaestro = React.createClass({
                     </Col>
                     {remove}
                <Col xs={6} md={6}>
-                <Panel header="Firmware Seen">
+                <Panel header="Firmware Seen In Past 24hrs">
                     {this.state.fwList.length === 0  ? null : <div id="fw_seen">
                         {countResult}
                     </div>}
