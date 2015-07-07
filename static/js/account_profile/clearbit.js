@@ -99,6 +99,16 @@ var ClearbitTile = React.createClass({
                     </tbody>
                 </Table>);
             }
+            if (clearbit.geo.city !== null) {
+                clearbitDetail.push(<Table>
+                    <thead><tr><th/><th/></tr></thead>
+                    <tbody>
+                        {clearbit.geo.lat && clearbit.geo.lng ? <tr><td>Location</td><td><a target="_blank" href={"https://www.google.com/maps/@" + clearbit.geo.lat + "," + clearbit.geo.lng}>{clearbit.geo.lat + "," + clearbit.geo.lng}</a></td></tr> : null}
+                        {clearbit.geo.city ? <tr><td>City</td><td>{clearbit.geo.city}</td></tr> : null}
+                        {clearbit.geo.state ? <tr><td>State</td><td>{clearbit.geo.state}</td></tr> : null}
+                    </tbody>
+                </Table>);
+            }
         }
         return <div>
             {clearbitDetail}
