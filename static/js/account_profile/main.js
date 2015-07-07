@@ -845,6 +845,7 @@ var AccountProfile = React.createClass({
                     <Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary pillResponse={this.state.pillResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} email={this.state.email} />} />
                     <Tile img="svg/uptime.svg" title="Sense Online Uptime" content={<UptimeTile email={this.state.email} />} />
                     <Tile img="svg/wifi.svg" title="Wifi Info" content={<WifiTile wifiResponse={this.state.wifiResponse} />} />
+                    <Tile title="Clearbit Info" content={<ClearbitTile email={this.state.email} />} />
                 </Col>
             </Row>
         </div>;
