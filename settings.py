@@ -1,7 +1,5 @@
 import os
 from models.setup import AppInfo
-from models.setup import AdminUser
-from models.setup import UserGroup
 from models.ext import SearchifyCredentials
 from models.ext import ZendeskCredentials
 from models.ext import GeckoboardCredentials
@@ -9,6 +7,7 @@ from models.ext import GeckoboardCredentials
 DEBUG = False
 ENVIRONMENT = "prod"
 ADMIN_APP_INFO = AppInfo.get_by_id("admin")
+CANARY_APP_INFO_ID  = "canary"
 
 DEFAULT_LOCAL_DEV_CLIENT_ID = "gae_admin"
 DEFAULT_LOCAL_AGAINST_PROD_API_URL = "http://localhost:9999/v1/"

@@ -153,7 +153,7 @@ var TimelineMaestro = React.createClass({
             success: function(response) {
                 console.log("algo", response);
                 if (response.error.isWhiteString()) {
-                    this.setState({algorithm: response.data.algorithm});
+                    this.setState({algorithm: "Algorithm: " + response.data.algorithm});
                 }
             }.bind(this),
             error: function(e) {
@@ -170,6 +170,7 @@ var TimelineMaestro = React.createClass({
     submitWithInputsfromURL: function() {
         var emailInputFromURL = getParameterByName('email');
         var dateInputFromURL = getParameterByName('date');
+        var canaryInputFromURL = getParameterByName('canary');
         if (emailInputFromURL.isWhiteString()) {
             return false;
         }
@@ -180,6 +181,8 @@ var TimelineMaestro = React.createClass({
         }
         $('#email-input').val(emailInputFromURL);
         $('#date-input').val(dateInputFromURL);
+        $("#isCanary").prop("checked", canaryInputFromURL === 'true');
+
         this.handleSubmit();
     },
 
@@ -198,8 +201,8 @@ var TimelineMaestro = React.createClass({
         );
     },
 
-    pushHistory: function(email, date) {
-        history.pushState({}, '', '/timeline/?email=' + email + '&date=' + date);
+    pushHistory: function(email, date, canary) {
+        history.pushState({}, '', '/timeline/?email=' + email + '&date=' + date + '&canary=' + canary);
     },
 
     handleSubmit: function() {
@@ -224,11 +227,14 @@ var TimelineMaestro = React.createClass({
         var that = this;
         var emailInput = $('#email-input').val().trim();
         var dateInput = $('#date-input').val();
+        var canaryInput = $('#isCanary').is(":checked");
+
         var requestData = {
             email: emailInput,
-            date: reformatDate(dateInput)
+            date: reformatDate(dateInput),
+            canary: canaryInput
         };
-
+        console.log('requestData', requestData);
         if (requestData.email.isWhiteString() || requestData.date.isWhiteString()) {
             return false;
         }
@@ -246,7 +252,7 @@ var TimelineMaestro = React.createClass({
                 if (response.error.isWhiteString()) {
                     that.setState({data: response.data, alert: ""});
                     $('.dial').val(response.data[0].score).trigger('change');
-                    that.pushHistory(emailInput, dateInput);
+                    that.pushHistory(emailInput, dateInput, canaryInput);
                 }
                 else {
                     that.setState({
@@ -271,6 +277,10 @@ var TimelineMaestro = React.createClass({
 
     handleFilter: function() {
         this.setState({filterStatus: $('#filter-input').val()});
+    },
+
+    handleCanary: function() {
+        this.retrieveTimelineData();
     },
 
     render: function() {
@@ -317,7 +327,10 @@ var TimelineMaestro = React.createClass({
                 </Col>
             </form>
             {alertPanel}
-            <div>Algorithm: {this.state.algorithm}</div>
+            <div>
+                Canary <input id='isCanary' type="checkbox" onChange={this.handleCanary} />&nbsp;&nbsp;
+                {this.state.algorithm}
+            </div>
             <Row id="insights-info">
                 <Col xs={3} sm={3} md={3} lg={3} xl={3} xsOffset={2} mdOffset={2} smOffset={2} lgOffset={2} xlOffset={2}>{statsPanel}</Col>
                 {scoreBar}
