@@ -1,48 +1,14 @@
 /** @jsx React.DOM */
 
-var ClearbitTile = React.createClass({
-    getInitialState: function() {
-        return {
-            clearbit: {}
-        }
-    },
-    loadClearbitProfileByEmail : function(email) {
-        console.log("email is ", email);
-        if (email) {
-            $.ajax({
-                url: "/api/clearbit/",
-                dataType: "json",
-                type: 'GET',
-                data: {email: email},
-                success: function (response) {
-                    this.setState({clearbit : response.data});
-                    console.log('clearbit', response.data);
-                }.bind(this)
-            });
-        }
-        else {
-            this.setState({clearbit: {}});
-        }
-    },
-    componentDidMount: function() {
-        this.loadClearbitProfileByEmail(this.props.email);
-    },
+var ClearbitInfo = React.createClass({
     render: function() {
-        var clearbit = this.state.clearbit;
-        var clearbitDetail = [];
+        var clearbit = this.props.clearbit;
+        var clearbitDetail = null;
         if (!$.isEmptyObject(clearbit) && clearbit.error) {
-            clearbitDetail = clearbit.error;
+            clearbitDetail = JSON.stringify(clearbit.error);
         }
         else if (clearbit !== [] && !$.isEmptyObject(clearbit)) {
-            if (clearbit.aboutme.bio !== null) {
-                clearbitDetail.push(<Table>
-                    <thead><tr><th/><th/></tr></thead>
-                    <tbody>
-                        {clearbit.employment.bio ? <tr><td>Bio</td><td>{clearbit.employment.domain}</td></tr> : null}
-                        <tr><td/><td/></tr>
-                    </tbody>
-                </Table>);
-            }
+            clearbitDetail = [];
             if (clearbit.employment.domain !== null) {
                 clearbitDetail.push(<Table>
                     <thead><tr><th/><th/></tr></thead>
@@ -111,7 +77,46 @@ var ClearbitTile = React.createClass({
             }
         }
         return <div>
-            {clearbitDetail}
+            {clearbitDetail !== null && clearbitDetail.length === 0 ? "not found" : clearbitDetail}
+        </div>
+    }
+});
+
+var ClearbitTile = React.createClass({
+    getInitialState: function() {
+        return {
+            clearbit: {}
+        }
+    },
+    loadClearbitProfileByEmail : function() {
+        var email = this.props.email;
+        console.log("email is ", email);
+        if (email) {
+            $.ajax({
+                url: "/api/clearbit/",
+                dataType: "json",
+                type: 'GET',
+                data: {email: email},
+                success: function (response) {
+                    if (response.error.isWhiteString() || response.error == 'OK'){
+                        this.setState({clearbit : response.data});
+                        console.log('clearbit', response.data);
+                    }
+                    else {
+                        this.setState({clearbit: {}});
+                    }
+                }.bind(this)
+            });
+        }
+        else {
+            this.setState({clearbit: {}});
+        }
+    },
+
+    render: function() {
+        return <div>
+            <Button bsSize="xsmall" onClick={this.loadClearbitProfileByEmail}>Reveal</Button><br/>
+            <ClearbitInfo clearbit={this.state.clearbit} />
         </div>
     }
 });
