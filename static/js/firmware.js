@@ -20,13 +20,18 @@ var headerStyle = {
     'sd_card_path': 'alert-danger'
 };
 
+
 var LinkToFWSearch = React.createClass({
     populateFirmwareVersion: function(){
         $('#firmware_version').focus().val(this.props.firmware_version);
         $("#firmware_version_search").click();
     },
     render: function() {
-        return <span className="cursor-custom" onClick={this.populateFirmwareVersion}>{this.props.firmware_version}</span>
+        return <span className="cursor-custom" onClick={this.populateFirmwareVersion}>
+            {this.props.firmware_version} |
+            {parseInt(this.props.firmware_version, 10).toString(16)} |
+            {!$.isEmptyObject(this.props.fwHexToHuman) ? (this.props.fwHexToHuman[parseInt(this.props.firmware_version, 10).toString(16)] || "unknown") : null}
+        </span>
     }
 });
 
@@ -124,14 +129,12 @@ var FirmwareListRows = React.createClass({
                         {timestamp.toLocaleString()}
                     </td>
                     <td>
-                    <LinkToFWSearch firmware_version={fw.version} />
-                    {" (" + parseInt(fw.version, 10).toString(16) + ")"}
+                        <LinkToFWSearch firmware_version={fw.version} fwHexToHuman={this.props.fwHexToHuman} />
                     </td>
                     <td>{fw.count}</td>
                 </tr>
             );
-
-        });
+        }.bind(this));
         return (<tbody>
             {firmwareListRows}
         </tbody>)
@@ -159,17 +162,18 @@ var DeviceListRows = React.createClass({
 
 var HistoryListRows = React.createClass({
     render: function() {
-        var historyListRows = Object.keys(this.props.firmwareHistory).sort().reverse().map(function(key){
+        console.log(this.props.fwHistory);
+        var historyListRows = Object.keys(this.props.fwHistory).sort().reverse().map(function(key){
             var timestamp = new Date(Number(key));
             return(
                 <tr>
                     <td>{timestamp.toLocaleString()}</td>
                     <td>
-                    <LinkToFWSearch firmware_version={this[key]} />
+                    <LinkToFWSearch firmware_version={this.props.fwHistory[key]} fwHexToHuman={this.props.fwHexToHuman} />
                     </td>
                 </tr>
             );
-        }, this.props.firmwareHistory);
+        }.bind(this));
         
         return (<tbody>
             {historyListRows}
@@ -193,7 +197,7 @@ var FirmwareList = React.createClass({
         return (
             <Table responsive condensed bordered>
               <FirmwareListHeaders/>
-              <FirmwareListRows fwList={this.props.fwList}/>
+              <FirmwareListRows fwList={this.props.fwList} fwHexToHuman={this.props.fwHexToHuman} />
             </Table>
         )
    }
@@ -230,7 +234,7 @@ var HistoryList = React.createClass({
         return (
             <Table id="history-table" responsive condensed bordered>
                 <HistoryListHeaders device_id={this.props.device_id}/>
-                <HistoryListRows firmwareHistory={this.props.fwHistory}/>
+                <HistoryListRows fwHexToHuman={this.props.fwHexToHuman} fwHistory={this.props.fwHistory} />
             </Table>
             )
     }
@@ -250,7 +254,8 @@ var FirmwareMaestro = React.createClass({
             rangeStart: 0,
             rangeEnd: 14,
             files: [],
-            viewDeviceError: ""
+            viewDeviceError: "",
+            fwHexToHuman: {}
         }
     },
     componentDidMount: function(e) {
@@ -264,7 +269,6 @@ var FirmwareMaestro = React.createClass({
           $('#device_id').val(device_id);
           this.fwHistoryList(e);
         }
-
     },
     retrieve: function() {
         console.log("retrieving");
@@ -306,20 +310,25 @@ var FirmwareMaestro = React.createClass({
                 console.log("listing firmwares");
                 var sourceInput = $('#sourceInput').val();
                 history.pushState({}, '', '/firmware/');
+                var timestamp = Date.now();
+                var pastTimestamp = timestamp - 86400000;
 
                 $.ajax({ //nested ajax to avoid race condition
                   url: '/api/firmware/info',
                   dataType: 'json',
                   type: 'GET',
+                  data: {'range_start': pastTimestamp,
+                        'range_end': timestamp},
                   success: function(response) {
                     if (response.error !== "") {
                         this.setState({fwList: []});
                         this.setState({getError: response.error});
+                        this.setState({fwHexToHuman: {}});
                     }
                     else {
+                        this.translateFWNames(JSON.stringify(response.data.map(function(o){return parseInt(o.version, 10).toString(16);})));
                         this.setState({fwList: response.data});
                         this.setState({getError: ""});
-                        // Type ahead some default values:
                     }
                   }.bind(this),
                   error: function(xhr, status, err) {
@@ -341,8 +350,10 @@ var FirmwareMaestro = React.createClass({
                 if (response.error !== "") {
                     this.setState({fwHistory: Object});
                     this.setState({getError: response.error});
+                    this.setState({fwHexToHuman: {}});
                 }
                 else {
+                    this.translateFWNames(JSON.stringify(Object.keys(response.data).map(function(k){return parseInt(response.data[k], 10).toString(16);})));
                     this.setState({fwHistory: response.data});
                     this.setState({device_id: device_id});
                     this.setState({getError: ""});
@@ -353,6 +364,17 @@ var FirmwareMaestro = React.createClass({
               }.bind(this)
             });
         },
+    translateFWNames: function(unhashedFW) {
+        $.ajax({
+            url: '/api/firmware_unhash',
+            dataType: 'json',
+            data: unhashedFW,
+            type: "POST",
+            success: function(response) {
+                this.setState({fwHexToHuman: response.data});
+            }.bind(this)
+        });
+    },
     deviceList: function() {
             console.log("listing");
             var firmware_version = $('#firmware_version').val();
@@ -493,10 +515,10 @@ var FirmwareMaestro = React.createClass({
             <DeviceList fwDevices={this.state.fwDevices} fwVersion={this.state.fwVersion}/>;
         var countResult = this.state.fwList.length === 0 ?
             <Alert bsStyle="default">{this.state.error}</Alert> :
-            <FirmwareList fwList={this.state.fwList}/>;
+            <FirmwareList fwList={this.state.fwList} fwHexToHuman={this.state.fwHexToHuman}/>;
         var historyResult = (typeof this.state.fwHistory == "undefined") ?
             <Alert bsStyle="default">{this.state.error}</Alert> :
-            <HistoryList fwHistory={this.state.fwHistory} device_id={this.state.device_id}/>;
+            <HistoryList fwHistory={this.state.fwHistory} fwHexToHuman={this.state.fwHexToHuman} device_id={this.state.device_id}/>;
         var edit = this.state.s3Keys.length === 0 ?
             null:
             <div className="row">
@@ -553,7 +575,7 @@ var FirmwareMaestro = React.createClass({
                     </Col>
                     {remove}
                <Col xs={6} md={6}>
-                <Panel header="Firmware Seen">
+                <Panel header="Firmware Seen In Past 24hrs">
                     {this.state.fwList.length === 0  ? null : <div id="fw_seen">
                         {countResult}
                     </div>}

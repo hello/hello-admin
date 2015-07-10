@@ -109,3 +109,6 @@ class SearchifyPurgeStats(ndb.Model):
 
 class OrdersMap(ndb.Model):
     url = ndb.StringProperty(required=True)
+
+class Clearbit(ndb.Model):
+    token = ndb.StringProperty(required=True, indexed=True)

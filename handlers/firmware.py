@@ -56,9 +56,13 @@ class FirmwareAPI(FirmwareRequestHandler):
 class FirmwareInfoAPI(FirmwareRequestHandler):
 
     def get(self):
+        range_start = self.request.get('range_start', default_value="0")
+        range_end = self.request.get('range_end', default_value="100")
+
         self.hello_request(
-            api_url="firmware/list/",
+            api_url="firmware/list_by_time",
             type="GET",
+            url_params={'range_start': range_start, 'range_end': range_end},
             access_token=settings.ADMIN_APP_INFO.access_token,
             app_info=settings.ADMIN_APP_INFO
         )
@@ -102,6 +106,14 @@ class FirmwareUnhashAPI(ProtectedRequestHandler):
             output.set_status(200)
 
         self.response.write(output.get_serialized_output())
+
+    def post(self):  # batch query
+        self.hello_request(
+            api_url="firmware/names",
+            type="POST",
+            body_data=self.request.body,
+            app_info=settings.ADMIN_APP_INFO,
+        )
 
 
 class FirmwareGroupStatusAPI(FirmwareRequestHandler):

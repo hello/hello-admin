@@ -182,6 +182,14 @@ class SenseColorAPI(ProtectedRequestHandler):
             app_info=settings.ADMIN_APP_INFO
         )
 
+class ColorlessSensesAPI(ProtectedRequestHandler):
+    def get(self):
+        self.hello_request(
+            api_url="devices/color/missing",
+            type="GET",
+            app_info=settings.ADMIN_APP_INFO
+        )
+
 
 class SenseBlackListAPI(ProtectedRequestHandler):
     def get(self):
