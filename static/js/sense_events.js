@@ -170,6 +170,9 @@ function getDocHeight() {
 }
 
 function convertChrisHex(hexString) {
+    if (hexString.length < 7) {
+        hexString = "#00" + hexString.split("#")[1];
+    }
     var rgb = hexToRgb(hexString);
     if (rgb === null) {
         return hexString;
