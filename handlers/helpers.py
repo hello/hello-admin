@@ -68,7 +68,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         """
         extras = {
             "logout_url": users.create_logout_url('/'),
-            "user": self.current_user.email(),
+            "user": self.current_user_email,
             "version": os.environ['CURRENT_VERSION_ID'],
             "env": settings.ENVIRONMENT
         }
@@ -136,7 +136,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
             app_info = self.get_app_info()
 
         output = ResponseOutput()
-        output.set_viewer(self.current_user.email() if self.current_user is not None else "cron-bot")
+        output.set_viewer(self.current_user_email if self.current_user is not None else "cron-bot")
 
         session = self.authorize_session(app_info, access_token)
 
@@ -219,7 +219,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
 
     def send_to_slack_admin_logs_channel(self, message_text=''):
         self.send_to_slack(webhook=settings.SLACK_ADMIN_LOGS_WEBHOOK_URL,
-                           payload={'text': message_text, "icon_emoji": ":snake:", "username": "admin-logs-bot"})
+                           payload={'text': message_text, "icon_emoji": ":snake:", "username": "admin-logs-bot", "link_names": 1})
 
 def make_oauth2_service(app_info_model):
     """
@@ -263,7 +263,7 @@ class ProtectedRequestHandler(BaseRequestHandler):
             self.restrict()
 
     def restrict(self):
-        if self.current_user.email() == "customersupport@sayhello.com":
+        if self.current_user_email == "customersupport@sayhello.com":
             self.redirect('/error')
         elif not self.is_restricted_primary():
             return
@@ -271,7 +271,7 @@ class ProtectedRequestHandler(BaseRequestHandler):
             self.redirect('/error')
 
     def is_restricted_primary(self):
-        return not self.current_user.email() in self.super_engineer()
+        return not self.current_user_email in self.super_engineer()
 
     def is_restricted_secondary(self):
         """
@@ -319,7 +319,7 @@ class CustomerExperienceRequestHandler(ProtectedRequestHandler):
     Grant access to only customer experience team members
     """
     def is_restricted_secondary(self):
-        return not self.current_user.email() in super(CustomerExperienceRequestHandler, self).customer_experience()
+        return not self.current_user_email in super(CustomerExperienceRequestHandler, self).customer_experience()
 
 
 class SoftwareRequestHandler(ProtectedRequestHandler):
@@ -327,7 +327,7 @@ class SoftwareRequestHandler(ProtectedRequestHandler):
     Grant access to only software team members
     """
     def is_restricted_secondary(self):
-        return not self.current_user.email() in super(SoftwareRequestHandler, self).software()
+        return not self.current_user_email in super(SoftwareRequestHandler, self).software()
 
 
 class FirmwareRequestHandler(ProtectedRequestHandler):
@@ -335,7 +335,7 @@ class FirmwareRequestHandler(ProtectedRequestHandler):
     Grant access to only firmware team members
     """
     def is_restricted_secondary(self):
-        return not self.current_user.email() in super(FirmwareRequestHandler, self).firmware()
+        return not self.current_user_email in super(FirmwareRequestHandler, self).firmware()
 
 
 class HardwareRequestHandler(ProtectedRequestHandler):
@@ -343,28 +343,28 @@ class HardwareRequestHandler(ProtectedRequestHandler):
     Grant access to only hardware team members
     """
     def is_restricted_secondary(self):
-        return not self.current_user.email() in super(HardwareRequestHandler, self).hardware()
+        return not self.current_user_email in super(HardwareRequestHandler, self).hardware()
 
 class SettingsModeratorRequestHandler(ProtectedRequestHandler):
     """
     Grant access to only hardware team members
     """
     def is_restricted_secondary(self):
-        return not self.current_user.email() in super(SettingsModeratorRequestHandler, self).settings_moderator()
+        return not self.current_user_email in super(SettingsModeratorRequestHandler, self).settings_moderator()
 
 class SuperFirmwareRequestHandler(ProtectedRequestHandler):
     """
     Grant access to only super engineers
     """
     def is_restricted_secondary(self):
-        return not self.current_user.email() in super(SuperFirmwareRequestHandler, self).super_firmware()
+        return not self.current_user_email in super(SuperFirmwareRequestHandler, self).super_firmware()
 
 class TokenMakerRequestHandler(ProtectedRequestHandler):
     """
     Grant access to only hardware team members
     """
     def is_restricted_secondary(self):
-        return not self.current_user.email() in super(TokenMakerRequestHandler, self).token_maker()
+        return not self.current_user_email in super(TokenMakerRequestHandler, self).token_maker()
 
 class ShippingRequestHandler(ProtectedRequestHandler):
     """
@@ -378,7 +378,7 @@ class ShippingRequestHandler(ProtectedRequestHandler):
             return
 
     def is_restricted_secondary(self):
-        return not self.current_user.email() in super(ShippingRequestHandler, self).shipping()
+        return not self.current_user_email in super(ShippingRequestHandler, self).shipping()
 
 
 class SuperEngineerRequestHandler(ProtectedRequestHandler):
@@ -386,7 +386,7 @@ class SuperEngineerRequestHandler(ProtectedRequestHandler):
     Grant access to only super engineers
     """
     def is_restricted_secondary(self):
-        return not self.current_user.email() in super(SuperEngineerRequestHandler, self).super_engineer()
+        return not self.current_user_email in super(SuperEngineerRequestHandler, self).super_engineer()
 
 
 class ResponseOutput():

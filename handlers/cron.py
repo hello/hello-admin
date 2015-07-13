@@ -17,6 +17,8 @@ from google.appengine.ext import ndb
 from google.appengine.api import urlfetch
 from google.appengine.api import taskqueue
 from google.appengine.api import memcache
+from handlers.helpers import ProtectedRequestHandler
+from searchify_logs import  SearchifyQuery
 
 class ZendeskCronHandler(BaseRequestHandler):
     def get(self):
@@ -351,3 +353,28 @@ class SenseColorUpdateQueue(BaseRequestHandler):
                 queue_name="sense-color-update"
             )
 
+
+class FirmwareCrashLogsRetain(ProtectedRequestHandler):
+    def get(self):
+        output = {}
+        utc_now = datetime.datetime.utcnow()
+        utc_now_date = utc_now.strftime("%Y-%m-%d")
+        utc_now_secs = int(utc_now.strftime("%s"))
+        utc_last_hour = utc_now - datetime.timedelta(hours=1)
+
+        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_PREFIX + utc_now_date)
+
+        for keyword in ["ASSERT", "fault"]:
+            searchify_query = SearchifyQuery()
+            searchify_query.set_query("text:{}".format(keyword))
+            searchify_query.set_docvar_filters({0: [[utc_now_secs - 1*3600, utc_now_secs]]})
+            output[keyword] = index.search(**searchify_query.mapping()).get('matches', 0)
+
+            if output[keyword] > 0:
+                start_ts = "%20".join([utc_last_hour.strftime("%m/%d/%Y"), utc_last_hour.strftime("%H:%M:%S")])
+                end_ts = "%20".join([utc_now.strftime("%m/%d/%Y"), utc_now.strftime("%H:%M:%S")])
+                sense_logs_link = "view logs <https://hello-admin.appspot.com/sense_logs/?field=text&keyword=fault&sense_id=&limit=2000&start={}&end={}| here>".format(start_ts, end_ts)
+                message = "@chris, @kevintwohy: {} FW crash logs with keyword `{}` over last hour, {}".format(output[keyword], keyword, sense_logs_link)
+                self.send_to_slack_admin_logs_channel(message)
+
+        self.response.write(json.dumps(output))

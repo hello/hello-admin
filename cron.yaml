@@ -29,3 +29,6 @@ cron:
 - description: sense color update queue
   url: /cron/sense_color_update_queue
   schedule: every 60 mins
+- description: crash logs retain
+  url: /cron/firmware_crash_logs_retain
+  schedule: every 60 mins
