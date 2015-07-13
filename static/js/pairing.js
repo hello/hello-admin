@@ -119,7 +119,8 @@ var UnpairSenseTile = React.createClass({
             data: {
                 email: that.refs.emailInput.getDOMNode().value.trim(),
                 device_id: that.refs.deviceIdInput.getDOMNode().value.trim(),
-                device_type: "sense"
+                device_type: "sense",
+                unlink_all: $("#unlink-all").is(":checked")
             },
             success: function (response) {
                 console.log(response);
@@ -134,7 +135,7 @@ var UnpairSenseTile = React.createClass({
             <form onSubmit={this.handleSubmit}>
                 <div><input className="form-control" ref="emailInput" type="text" placeholder="Email" /></div><br/>
                 <div><input className="form-control" ref="deviceIdInput" type="text" placeholder="Sense ID" /></div><br/>
-                <div><input className="form-control input-hidden"/></div><br/>
+                <div>Unlink All Accounts <input id='unlink-all' type="checkbox"/></div><br/><br/>
                 <div><Button className="submit" type="submit">Submit</Button></div><br/>
             </form>
         {this.state.alert}

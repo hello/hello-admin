@@ -55,11 +55,13 @@ class DeviceAPI(ProtectedRequestHandler):
         device_id = self.request.get('device_id', default_value="")
         device_type = self.request.get('device_type', default_value="")
         email = self.request.get('email', default_value="")
+        unlink_all= self.request.get("unlink_all", default_value="false")
 
         self.hello_request(
             api_url="devices/{}/{}/{}".format(device_type, email, device_id),
             type="DELETE",
-            app_info=settings.ADMIN_APP_INFO
+            app_info=settings.ADMIN_APP_INFO,
+            url_params={"unlink_all": unlink_all}
         )
 
 
