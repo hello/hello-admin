@@ -7,7 +7,8 @@ var SenseLogsNew = React.createClass({
         this.retrieveBlackList();
         var fieldFromURL = getParameterByName("field"),
             keywordFromURL = getParameterByName("keyword"),
-            senseIdFromURL = getParameterByName("sense_id"),
+            categoryFromURL = getParameterByName("category"),
+            categoryInputFromURL = getParameterByName("category_input"),
             limitFromURL = getParameterByName("limit"),
             startFromURL = getParameterByName("start"),
             endFromURL = getParameterByName("end");
@@ -15,8 +16,11 @@ var SenseLogsNew = React.createClass({
         if (fieldFromURL) {
             $("#field").val(fieldFromURL);
         }
-        if (senseIdFromURL) {
-            $("#sense-id").val(senseIdFromURL);
+        if (categoryFromURL) {
+            $("#category").val(categoryFromURL);
+        }
+        if (categoryInputFromURL) {
+            $("#category-input").val(categoryInputFromURL);
         }
         if (limitFromURL) {
             $("#limit").val(limitFromURL);
@@ -53,10 +57,12 @@ var SenseLogsNew = React.createClass({
         this.setState({alert: null, loading: <img src="/static/image/loading.gif" />, resultsSize: 0, response: {}});
         var field = $("#field").val().trim(),
             keyword = $("#keyword").val().trim(),
-            senseId = $("#sense-id").val().trim(),
+            category = $("#category").val(),
+            categoryInput = $("#category-input").val().trim(),
             limit = $("#limit").val().trim(),
             start = $("#start").val().trim(),
             end = $("#end").val().trim();
+
 
         if (Number(limit) > 5000) {
             this.setState({alert: <Alert bsStyle="danger">
@@ -79,10 +85,18 @@ var SenseLogsNew = React.createClass({
             </Alert>, loading: <img src="/static/image/loading.gif" />});
         }
 
-        history.pushState({}, '', '/sense_logs/?field=' + field + '&keyword=' + keyword + '&sense_id=' + senseId + '&limit=' + limit + "&start=" + start + "&end=" + end);
+        history.pushState({}, '', '/sense_logs/?field=' + field + '&keyword=' + keyword + '&category=' + category + '&category_input=' + categoryInput + '&limit=' + limit + "&start=" + start + "&end=" + end);
+        var categories = null;
+
+        if (categoryInput) {
+            var o = {};
+            o[category] = categoryInput.split(",").map(function(s){return s.trim();});
+            categories = JSON.stringify(o);
+        }
+
         var sendingData = {
                 query: field + ":" + keyword,
-                categories: senseId ? JSON.stringify({device_id: senseId.split(",").map(function(s){return s.trim();})}) : null,
+                categories: categories,
                 limit: limit ? limit : 20,
                 start: start ? new Date(start + " GMT").getTime() : null,
                 end: end ? new Date(end + " GMT").getTime() : null,
@@ -132,7 +146,7 @@ var SenseLogsNew = React.createClass({
     focusWindow: function(senseId, ts) {
         $("#field").val("device_id");
         $("#keyword").val(senseId);
-        $("#sense-id").val("");
+        $("#category-input").val("");
         $("#start").val(d3.time.format.utc("%Y-%m-%d %H:%M:%S")(new Date(ts - 5*60*1000)));
         $("#end").val(d3.time.format.utc("%Y-%m-%d %H:%M:%S")(new Date(ts + 5*60*1000)));
         this.refs.submit.getDOMNode().focus();
@@ -155,8 +169,10 @@ var SenseLogsNew = React.createClass({
                                 <Button className="borderless" disabled>
                                     <span className="span-upload-ts">{new Date(r.variable_1).toUTCString()}</span>
                                 </Button>
-                                - Sense ID: <a target="_blank" href={"/account_profile/?type=sense_id&input=" + r.device_id}>{r.device_id}</a>
-                                &nbsp;<Button onClick={this.focusWindow.bind(this, r.device_id, r.variable_1)}>See all logs of this sense around this time</Button>
+                                - Sense: <a target="_blank" href={"/account_profile/?type=sense_id&input=" + r.device_id}>{r.device_id}</a>&nbsp;
+                                - Top FW: {r.top_fw_version}&nbsp;
+                                - Middle FW: <a target="_blank" href={"/firmware/?firmware_version=" + parseInt(r.middle_fw_version, 16)}>{r.middle_fw_version}</a>&nbsp;
+                                <Button onClick={this.focusWindow.bind(this, r.device_id, r.variable_1)}>Logs around this time</Button>
                             </div><br/>
                             <div dangerouslySetInnerHTML={{__html: formatLogText(r.text, keyword)}}/>
                         </td></tr>;
@@ -177,6 +193,8 @@ var SenseLogsNew = React.createClass({
                         <option value="text">Text</option>
                         <option value="device_id">Sense ID</option>
                         <option value="date">Date</option>
+                        <option value="top_fw_version">Top Firmware Version</option>
+                        <option value="middle_fw_version">Middle Firmware Version</option>
                     </Input></Col>
                     <Col xs={3} className="zero-padding-left"><Input id="keyword" type="text" placeholder="search phrase <optional>"/></Col>
                     <Col xs={1}><Button className="time-window" disabled>From</Button></Col>
@@ -186,8 +204,10 @@ var SenseLogsNew = React.createClass({
                 <Row>
                     <Col xs={3} className="zero-padding-right"><Input id="category" type="select" addonBefore="Filter By">
                         <option value="device_id">Sense ID</option>
+                        <option value="top_fw_version">Top Firmware Version</option>
+                        <option value="middle_fw_version">Middle Firmware Version</option>
                     </Input></Col>
-                    <Col xs={3} className="zero-padding-left"><Input id="sense-id" type="text" placeholder="filter value <optional>"/></Col>
+                    <Col xs={3} className="zero-padding-left"><Input id="category-input" type="text" placeholder="filter value <optional>"/></Col>
                     <Col xs={1}><Button className="time-window" disabled>To</Button></Col>
                     <LongDatetimePicker glyphicon="time" placeHolder="end (GMT) <optional>" id="end" size="3" />
                     <Col xs={1}><Button bsStyle="success" ref="submit" type="submit">&nbsp;<Glyphicon glyph="search"/>&nbsp;</Button></Col>
