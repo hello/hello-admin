@@ -155,8 +155,9 @@ var SenseLogsNew = React.createClass({
                                 <Button className="borderless" disabled>
                                     <span className="span-upload-ts">{new Date(r.variable_1).toUTCString()}</span>
                                 </Button>
-                                - Sense ID: <a target="_blank" href={"/account_profile/?type=sense_id&input=" + r.device_id}>{r.device_id}</a>
-                                &nbsp;<Button onClick={this.focusWindow.bind(this, r.device_id, r.variable_1)}>See all logs of this sense around this time</Button>
+                                - Sense: <a target="_blank" href={"/account_profile/?type=sense_id&input=" + r.device_id}>{r.device_id}</a>&nbsp;
+                                - <a target="_blank" href={"/firmware/?firmware_version=" + parseInt(r.middle_fw_version, 16)}>{r.middle_fw_version}</a>&nbsp;
+                                <Button onClick={this.focusWindow.bind(this, r.device_id, r.variable_1)}>Logs around this time</Button>
                             </div><br/>
                             <div dangerouslySetInnerHTML={{__html: formatLogText(r.text, keyword)}}/>
                         </td></tr>;
@@ -177,6 +178,8 @@ var SenseLogsNew = React.createClass({
                         <option value="text">Text</option>
                         <option value="device_id">Sense ID</option>
                         <option value="date">Date</option>
+                        <option value="top_fw_version">Top Firmware Version</option>
+                        <option value="middle_fw_version">Middle Firmware Version</option>
                     </Input></Col>
                     <Col xs={3} className="zero-padding-left"><Input id="keyword" type="text" placeholder="search phrase <optional>"/></Col>
                     <Col xs={1}><Button className="time-window" disabled>From</Button></Col>

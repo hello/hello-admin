@@ -45,7 +45,7 @@ class SenseLogsAPI(ProtectedRequestHandler):
     def searchify_request(self):
         return {
             "query": self.query,
-            "fetch_fields": self.request.get("fetch_fields", default_value=["text", "device_id"]),
+            "fetch_fields": self.request.get("fetch_fields", default_value=["text", "device_id", "top_fw_version", "middle_fw_version"]),
             "category_filters": self.categories,
             "docvar_filters": {0: [[self.start_ts, self.end_ts]]},
             "scoring_function": self.order,
