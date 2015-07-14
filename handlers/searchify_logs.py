@@ -19,6 +19,7 @@ class SenseLogsAPI(ProtectedRequestHandler):
 
     @property
     def categories(self):
+        print "cate", self.request.get("categories")
         categories = self.request.get("categories", None)
         if categories:
             return json.loads(categories)
