@@ -368,13 +368,19 @@ class FirmwareCrashLogsRetain(ProtectedRequestHandler):
             searchify_query = SearchifyQuery()
             searchify_query.set_query("text:{}".format(keyword))
             searchify_query.set_docvar_filters({0: [[utc_now_secs - 1*3600, utc_now_secs]]})
-            output[keyword] = index.search(**searchify_query.mapping()).get('matches', 0)
+            response = index.search(**searchify_query.mapping())
+            output[keyword] = response.get('matches', 0)
 
             if output[keyword] > 0:
                 start_ts = "%20".join([utc_last_hour.strftime("%m/%d/%Y"), utc_last_hour.strftime("%H:%M:%S")])
                 end_ts = "%20".join([utc_now.strftime("%m/%d/%Y"), utc_now.strftime("%H:%M:%S")])
-                sense_logs_link = "view logs <https://hello-admin.appspot.com/sense_logs/?field=text&keyword=fault&sense_id=&limit=2000&start={}&end={}| here>".format(start_ts, end_ts)
-                message = "@chris, @kevintwohy: {} FW crash logs with keyword `{}` over last hour, {}".format(output[keyword], keyword, sense_logs_link)
+                sense_logs_link = "<https://hello-admin.appspot.com/sense_logs/?field=text&keyword=fault&sense_id=&limit=2000&start={}&end={}| here>".format(start_ts, end_ts)
+                message = "@chris, @kevintwohy: {} FW crash logs with keyword `{}` over last hour, view logs {}".format(output[keyword], keyword, sense_logs_link)
+
+                for category, breakdown in response.get("facets", {}).items():
+                    if category in ["device_id", "top_fw_version", "middle_fw_version"]:
+                        message += "\nBreakdown by {}: {}".format(category, breakdown)
+                        output["message"] = message
                 self.send_to_slack_admin_logs_channel(message)
 
         self.response.write(json.dumps(output))
