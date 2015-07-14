@@ -170,7 +170,8 @@ var SenseLogsNew = React.createClass({
                                     <span className="span-upload-ts">{new Date(r.variable_1).toUTCString()}</span>
                                 </Button>
                                 - Sense: <a target="_blank" href={"/account_profile/?type=sense_id&input=" + r.device_id}>{r.device_id}</a>&nbsp;
-                                - <a target="_blank" href={"/firmware/?firmware_version=" + parseInt(r.middle_fw_version, 16)}>{r.middle_fw_version}</a>&nbsp;
+                                - Top FW: {r.top_fw_version}&nbsp;
+                                - Middle FW: <a target="_blank" href={"/firmware/?firmware_version=" + parseInt(r.middle_fw_version, 16)}>{r.middle_fw_version}</a>&nbsp;
                                 <Button onClick={this.focusWindow.bind(this, r.device_id, r.variable_1)}>Logs around this time</Button>
                             </div><br/>
                             <div dangerouslySetInnerHTML={{__html: formatLogText(r.text, keyword)}}/>
