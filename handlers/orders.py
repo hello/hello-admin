@@ -53,7 +53,7 @@ class OrdersMapAPI(ShippingRequestHandler):
             data = response.json()
             output["data"] = data
         except Exception as e:
-            error_message = "Failed to get orders map because {}. We may need to refresh s3 link".format(e.message)
+            error_message = "@long Failed to get orders map because {}. We may need to refresh s3 link".format(e.message)
             log.error(error_message)
             output["error"] = error_message
             self.send_to_slack_admin_logs_channel(error_message)
