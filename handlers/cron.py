@@ -1,4 +1,5 @@
 import datetime
+import operator
 import time
 import json
 import logging as log
@@ -324,6 +325,7 @@ class SenseColorUpdate(BaseRequestHandler):
         colored_size = memcache.get(key="{}".format(colorless_size))
         log.info("Updated color for {} out of {} senses".format(colored_size, colorless_size))
 
+
 class SenseColorUpdateQueue(BaseRequestHandler):
     def get(self):
         colorless_senses = self.hello_request(
@@ -379,7 +381,9 @@ class FirmwareCrashLogsRetain(ProtectedRequestHandler):
 
                 for category, breakdown in response.get("facets", {}).items():
                     if category in ["device_id", "top_fw_version", "middle_fw_version"]:
-                        message += "\nBreakdown by {}: {}".format(category, breakdown)
+                        message += "\n\nBreakdown by {}:".format(str(category))
+                        for x in sorted(breakdown.items(), key=operator.itemgetter(1), reverse=True):
+                            message += "\n {}\t{}".format(x[0], x[1])
                         output["message"] = message
                 self.send_to_slack_admin_logs_channel(message)
 
