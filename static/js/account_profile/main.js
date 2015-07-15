@@ -380,7 +380,7 @@ var PillSummary = React.createClass({
 
         if (pillKeyStoreResponse.error.isWhiteString()) {
             if(!$.isEmptyObject(pillKeyStoreResponse) && pillKeyStoreResponse.data.key) {
-                keyStore = pillKeyStoreResponse.data.key.slice(pillKeyStoreResponse.data.key.length-7, pillKeyStoreResponse.data.key.length);
+                keyStore = pillKeyStoreResponse.data.key.slice(pillKeyStoreResponse.data.key.length-5, pillKeyStoreResponse.data.key.length) + " " + pillKeyStoreResponse.data.created_at;
             }
         }
         else {
