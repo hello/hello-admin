@@ -383,7 +383,7 @@ class FirmwareCrashLogsRetain(ProtectedRequestHandler):
                     if category in ["device_id", "top_fw_version", "middle_fw_version"]:
                         message += "\n\nBreakdown by {}:".format(str(category))
                         for x in sorted(breakdown.items(), key=operator.itemgetter(1), reverse=True):
-                            message += "\n {}\t{}".format(x[0], x[1])
+                            message += "\n {} \t {}".format(x[0], x[1])
                         output["message"] = message
                 self.send_to_slack_admin_logs_channel(message)
 
