@@ -328,12 +328,12 @@ class SenseColorUpdate(BaseRequestHandler):
 
 class SenseColorUpdateQueue(BaseRequestHandler):
     def get(self):
-        colorless_senses = self.hello_request(
+        colorless_senses = list(set(self.hello_request(
             api_url="devices/color/missing",
             type="GET",
             app_info=settings.ADMIN_APP_INFO,
             raw_output=True
-        ).data
+        ).data))
         log.info("There are {} colorless senses".format(len(colorless_senses)))
         cached_log = {
             "key": "{}".format(len(colorless_senses)),
