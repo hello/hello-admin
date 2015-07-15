@@ -46,7 +46,13 @@ var KeyStoreMaestro = React.createClass({
                     that.pushHistory(deviceInput, typeInput);
                     console.log(response);
                     if (response.error === "") {
-                        that.setState({alert: "AES Key: " + capitalizeVisiblePart(response.data.key) + "\n\r Metadata: " + response.data.metadata});
+                        that.setState({
+                            alert: <div>
+                                <p>{"AES Key: " + capitalizeVisiblePart(response.data.key)}</p><br/>
+                                <p>{"Metadata: " + response.data.metadata}</p><br/>
+                                <p>{"Provisioned At: " + response.data.created_at}</p>
+                            </div>
+                        });
                     }
                     else {
                         that.setState({alert: response.error});
@@ -66,7 +72,7 @@ var KeyStoreMaestro = React.createClass({
         var alert = (this.state.alert === "") ? null:
             <Alert bsStyle="info">{this.state.alert}</Alert>;
 
-        return (<Col xs={4} sm={4} md={4} xsOffset={4} smOffset={4} mdOffset={4}><form onSubmit={this.handleSubmit}>
+        return (<Col xs={6} sm={6} md={6} xsOffset={3} smOffset={3} mdOffset={3}><form onSubmit={this.handleSubmit}>
             <Input id="type-input" type="select">
                 <option value="">Select Device Type</option>
                 <option value="sense">Sense</option>

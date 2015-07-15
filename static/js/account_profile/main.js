@@ -302,7 +302,7 @@ var SenseSummary = React.createClass({
 
         if (senseKeyStoreResponse.error.isWhiteString()) {
             if(!$.isEmptyObject(senseKeyStoreResponse) && senseKeyStoreResponse.data.key) {
-                keyStore = senseKeyStoreResponse.data.key.slice(senseKeyStoreResponse.data.key.length-7, senseKeyStoreResponse.data.key.length);
+                keyStore = senseKeyStoreResponse.data.key.slice(senseKeyStoreResponse.data.key.length-5, senseKeyStoreResponse.data.key.length) + " " + senseKeyStoreResponse.data.created_at;
             }
         }
         else {
