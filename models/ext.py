@@ -112,3 +112,8 @@ class OrdersMap(ndb.Model):
 
 class Clearbit(ndb.Model):
     token = ndb.StringProperty(required=True, indexed=True)
+
+class BuggyFirmware(ndb.Model):
+    top_versions = ndb.StringProperty(required=True, indexed=False)
+    middle_versions = ndb.StringProperty(required=True, indexed=False)
+    sense_ids = ndb.StringProperty(required=True, indexed=False)

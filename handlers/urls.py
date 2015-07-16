@@ -132,7 +132,7 @@ from handlers.cron import SenseColorUpdate
 from handlers.cron import SenseColorUpdateQueue
 from handlers.clearbit import ClearbitAPI
 from handlers.cron import FirmwareCrashLogsRetain
-
+from handlers.setup import CreateBuggyFirmwareAPI
 cron_routes = [
     ('/cron/active_devices_history_15_minutes_purge', ActiveDevicesHistory15MinutesPurge),
     ('/cron/active_devices_history_purge', ActiveDevicesHistoryPurge),
@@ -222,6 +222,7 @@ api_routes = [
     ('/api/orders_map/?$', OrdersMapAPI),
     ('/api/colorless_senses/?$', ColorlessSensesAPI),
     ('/api/clearbit/?$', ClearbitAPI),
+    ('/api/create/buggy_firmware/?$', CreateBuggyFirmwareAPI),
 ]
 
 page_routes = [

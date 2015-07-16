@@ -20,6 +20,8 @@ from google.appengine.api import taskqueue
 from google.appengine.api import memcache
 from handlers.helpers import ProtectedRequestHandler
 from searchify_logs import  SearchifyQuery
+from models.ext import BuggyFirmware
+from collections import Counter
 
 class ZendeskCronHandler(BaseRequestHandler):
     def get(self):
@@ -365,26 +367,67 @@ class FirmwareCrashLogsRetain(ProtectedRequestHandler):
         utc_last_hour = utc_now - datetime.timedelta(hours=1)
 
         index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_PREFIX + utc_now_date)
+        buggy_firmware = BuggyFirmware.query().get()
 
+        # messages = "Current FW crash logs black list is\n```top version: {}\nmiddle version: {}\nsense_id: {}```\n\n".format(buggy_firmware.top_versions, buggy_firmware.middle_versions, buggy_firmware.sense_ids)
+        messages = ""
         for keyword in ["ASSERT", "fault"]:
             searchify_query = SearchifyQuery()
             searchify_query.set_query("text:{}".format(keyword))
+            searchify_query.set_fetch_fields(["top_fw_version", "middle_fw_version", "device_id"])
             searchify_query.set_docvar_filters({0: [[utc_now_secs - 1*3600, utc_now_secs]]})
             response = index.search(**searchify_query.mapping())
-            output[keyword] = response.get('matches', 0)
 
-            if output[keyword] > 0:
-                start_ts = "%20".join([utc_last_hour.strftime("%m/%d/%Y"), utc_last_hour.strftime("%H:%M:%S")])
-                end_ts = "%20".join([utc_now.strftime("%m/%d/%Y"), utc_now.strftime("%H:%M:%S")])
-                sense_logs_link = "<https://hello-admin.appspot.com/sense_logs/?field=text&keyword=fault&sense_id=&limit=2000&start={}&end={}| here>".format(start_ts, end_ts)
-                message = "@chris, @kevintwohy: {} FW crash logs with keyword `{}` over last hour, view logs {}".format(output[keyword], keyword, sense_logs_link)
+            if response.get('matches', 0) <= 0:
+                # messages += "No FW crash FW found for keyword {} over last hour\n".format(keyword)
+                continue
 
-                for category, breakdown in response.get("facets", {}).items():
-                    if category in ["device_id", "top_fw_version", "middle_fw_version"]:
-                        message += "\n\nBreakdown by {}:".format(str(category))
-                        for x in sorted(breakdown.items(), key=operator.itemgetter(1), reverse=True):
-                            message += "\n {} \t {}".format(x[0], x[1])
-                        output["message"] = message
-                self.send_to_slack_admin_logs_channel(message)
+            start_ts = "%20".join([utc_last_hour.strftime("%m/%d/%Y"), utc_last_hour.strftime("%H:%M:%S")])
+            end_ts = "%20".join([utc_now.strftime("%m/%d/%Y"), utc_now.strftime("%H:%M:%S")])
+            sense_logs_link = "<https://hello-admin.appspot.com/sense_logs/?field=text&keyword={}&sense_id=&limit=2000&start={}&end={}| here>".format(keyword,start_ts, end_ts)
 
+            top_fw_list = []
+            middle_fw_list = []
+            sense_id_list = []
+            total_legit_crash_logs = 0
+            for r in response.get("results", []):
+                if any([r.get("top_fw_version") in buggy_firmware.top_versions.split(", "),
+                        r.get("middle_fw_version") in buggy_firmware.middle_versions.split(", "),
+                        r.get("device_id") in buggy_firmware.sense_ids.split(", ")]):
+                    continue
+                total_legit_crash_logs += 1
+                if r.get("top_fw_version"):
+                    top_fw_list.append(r.get("top_fw_version"))
+                if r.get("middle_fw_version"):
+                    middle_fw_list.append(r.get("middle_fw_version"))
+                if r.get("device_id"):
+                    sense_id_list.append(r.get("device_id"))
+
+            if total_legit_crash_logs <= 0:
+                continue
+
+            message = "@chris @kevintwohy: {} FW crash logs with keyword `{}` over last hour, view logs {}".format(total_legit_crash_logs, keyword, sense_logs_link)
+
+            if sum(Counter(top_fw_list).values()) > 0:
+                print Counter(top_fw_list)
+                message += "\n\n```Breakdown by top firmware"
+                for x in sorted(Counter(top_fw_list).items(), key=operator.itemgetter(1), reverse=True):
+                    message += "\n {} \t {}".format(x[0], x[1])
+                message += "```"
+
+            if sum(Counter(middle_fw_list).values()) > 0:
+                message += "\n\n```Breakdown by middle firmware"
+                for x in sorted(Counter(middle_fw_list).items(), key=operator.itemgetter(1), reverse=True):
+                    message += "\n {} \t {}".format(x[0], x[1])
+                message += "```"
+            if sum(Counter(sense_id_list).values()) > 0:
+                message += "\n\n```Breakdown by sense external ID"
+                for x in sorted(Counter(sense_id_list).items(), key=operator.itemgetter(1), reverse=True):
+                    message += "\n {} \t {}".format(x[0], x[1])
+                message += "```"
+            messages += message
+
+        output["messages"] = messages
+        if messages:
+            self.send_to_slack_admin_logs_channel(messages)
         self.response.write(json.dumps(output))
