@@ -5,6 +5,7 @@ import settings
 from models.setup import AppInfo, AdminUser, AccessToken, UserGroup
 from handlers.helpers import make_oauth2_service, ProtectedRequestHandler, SuperEngineerRequestHandler, BaseRequestHandler
 from models.ext import ZendeskCredentials, SearchifyCredentials, KeyStoreLocker, GeckoboardCredentials
+from models.ext import BuggyFirmware
 
 class AppAPI(ProtectedRequestHandler):
     def get(self):
@@ -454,3 +455,12 @@ class ViewPermissionAPI(ProtectedRequestHandler):
             "has_access_to_customers_data": viewer in self.customer_experience() or viewer in self.super_engineer()
         }
         self.response.write(json.dumps(output))
+
+
+class CreateBuggyFirmwareAPI(ProtectedRequestHandler):
+    def get(self):
+        BuggyFirmware(
+            top_versions = "0.7.2, 0.7.4, 0.7.5",
+            middle_versions = "",
+            sense_ids = ""
+        ).put()
