@@ -379,7 +379,7 @@ class FirmwareCrashLogsRetain(ProtectedRequestHandler):
             response = index.search(**searchify_query.mapping())
 
             if response.get('matches', 0) <= 0:
-                # messages += "No FW crash FW found for keyword {} over last hour\n".format(keyword)
+                # messages += "No FW crash found for keyword {} over last hour\n".format(keyword)
                 continue
 
             start_ts = "%20".join([utc_last_hour.strftime("%m/%d/%Y"), utc_last_hour.strftime("%H:%M:%S")])
@@ -393,7 +393,10 @@ class FirmwareCrashLogsRetain(ProtectedRequestHandler):
             for r in response.get("results", []):
                 if any([r.get("top_fw_version") in buggy_firmware.top_versions.split(", "),
                         r.get("middle_fw_version") in buggy_firmware.middle_versions.split(", "),
-                        r.get("device_id") in buggy_firmware.sense_ids.split(", ")]):
+                        r.get("device_id") in buggy_firmware.sense_ids.split(", "),
+                        not r.get("top_fw_version"),
+                        not r.get("middle_fw_version"),
+                        not r.get("device_id")]):
                     continue
                 total_legit_crash_logs += 1
                 if r.get("top_fw_version"):
