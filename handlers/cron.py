@@ -444,7 +444,7 @@ class UpdateTimezoneByPartnerQueue(PaperTrailWrapper):
             search_dict={
                 "q": "program:suripu-workers-sense.log No timezone",
                 "max_time": datetime.datetime.now().strftime("%s"),
-                "min_time": (datetime.datetime.now() - datetime.timedelta(minutes=2)).strftime("%s")
+                "min_time": (datetime.datetime.now() - datetime.timedelta(minutes=5)).strftime("%s")
             },
             raw_output=True
         ).data
@@ -462,7 +462,7 @@ class UpdateTimezoneByPartnerQueue(PaperTrailWrapper):
                         "account_id": account_id,
                     },
                     method="GET",
-                    queue_name="sense-color-update"
+                    queue_name="update-timezone-by-partner"
                 )
 
         log.info("Accounts that may need to update timezone by partner: {}".format(timezoneless_account_ids))
