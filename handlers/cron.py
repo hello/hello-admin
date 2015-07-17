@@ -485,5 +485,7 @@ class UpdateTimezoneByPartner(ProtectedRequestHandler):
         )
         if response.status == 204:
             log.info("Successfully updated timezone by partner for account {}".format(account_id))
+            self.send_to_slack_admin_logs_channel("Successfully updated timezone by partner for account <https://hello-admin.appspot.com/account_profile/?input={}&type=account_id| {}>".format(account_id, account_id))
         else:
             log.info("Failed to update timezone by partner for account {}".format(account_id))
+
