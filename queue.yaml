@@ -9,3 +9,8 @@ queue:
   retry_parameters:
     task_retry_limit: 1
     task_age_limit: 120m
+- name: update-timezone-by-partner
+  rate: 1/s
+  retry_parameters:
+    task_retry_limit: 1
+    task_age_limit: 120m
