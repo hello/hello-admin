@@ -32,6 +32,6 @@ cron:
 - description: crash logs retain
   url: /cron/firmware_crash_logs_retain
   schedule: every 60 mins
-#- description: update timezone by partner queue
-#  url: /cron/update_timezone_by_partner_queue
-#  schedule: every 15 mins
+- description: update timezone by partner queue
+  url: /cron/update_timezone_by_partner_queue
+  schedule: every 15 mins

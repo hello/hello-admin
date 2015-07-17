@@ -456,25 +456,36 @@ class UpdateTimezoneByPartnerQueue(PaperTrailWrapper):
             if matches:
                 account_id = int(matches[0][1])
                 timezoneless_account_ids.append(account_id)
-                taskqueue.add(
-                    url="/cron/update_timezone_by_partner_queue",
-                    params={
-                        "account_id": account_id,
-                    },
-                    method="GET",
-                    queue_name="update-timezone-by-partner"
-                )
 
-        log.info("Accounts that may need to update timezone by partner: {}".format(timezoneless_account_ids))
+        timezoneless_account_id_set = sorted(list(set(timezoneless_account_ids)))
 
-        self.response.write(sorted(list(set(timezoneless_account_ids))))
+        for a in timezoneless_account_id_set:
+            taskqueue.add(
+                url="/cron/update_timezone_by_partner",
+                params={
+                    "account_id": a,
+                },
+                method="GET",
+                queue_name="update-timezone-queue"
+            )
+
+        log.info("Accounts that may need to update timezone by partner: {}".format(timezoneless_account_id_set))
+        self.response.write(timezoneless_account_id_set)
 
 
 
 class UpdateTimezoneByPartner(ProtectedRequestHandler):
     def get(self):
-        self.hello_request(
-            api_url="devices/update_timezone_by_partner/{account_id}",
+        account_id = self.request.get("account_id")
+        response = self.hello_request(
+            api_url="devices/update_timezone_by_partner/{}".format(account_id),
             type="POST",
             app_info=settings.ADMIN_APP_INFO,
+            raw_output=True
         )
+        if response.status == 204:
+            log.info("Successfully updated timezone by partner for account {}".format(account_id))
+            self.send_to_slack_admin_logs_channel("Successfully updated timezone by partner for account <https://hello-admin.appspot.com/account_profile/?input={}&type=account_id| {}>".format(account_id, account_id))
+        else:
+            log.info("Failed to update timezone by partner for account {}".format(account_id))
+
