@@ -1,3 +1,4 @@
+import re
 import datetime
 import operator
 import time
@@ -22,6 +23,7 @@ from handlers.helpers import ProtectedRequestHandler
 from searchify_logs import  SearchifyQuery
 from models.ext import BuggyFirmware
 from collections import Counter
+from handlers.papertrail import PaperTrailWrapper
 
 class ZendeskCronHandler(BaseRequestHandler):
     def get(self):
@@ -434,3 +436,45 @@ class FirmwareCrashLogsRetain(ProtectedRequestHandler):
         if messages:
             self.send_to_slack_admin_logs_channel(messages)
         self.response.write(json.dumps(output))
+
+
+class UpdateTimezoneByPartnerQueue(PaperTrailWrapper):
+    def get(self):
+        papertrail_warnings = self.get_events(
+            search_dict={
+                "q": "program:suripu-workers-sense.log No timezone",
+                "max_time": datetime.datetime.now().strftime("%s"),
+                "min_time": (datetime.datetime.now() - datetime.timedelta(minutes=2)).strftime("%s")
+            },
+            raw_output=True
+        ).data
+        regex_pattern = "(No timezone info for account )(\d+)( paired with)(.*)(, account may already unpaired with device but merge table not updated.)"
+
+        timezoneless_account_ids = []
+        for p in papertrail_warnings.get("events", []):
+            matches = re.findall(regex_pattern, p.get("message", ""))
+            if matches:
+                account_id = int(matches[0][1])
+                timezoneless_account_ids.append(account_id)
+                taskqueue.add(
+                    url="/cron/update_timezone_by_partner_queue",
+                    params={
+                        "account_id": account_id,
+                    },
+                    method="GET",
+                    queue_name="sense-color-update"
+                )
+
+        log.info("Accounts that may need to update timezone by partner: {}".format(timezoneless_account_ids))
+
+        self.response.write(sorted(list(set(timezoneless_account_ids))))
+
+
+
+class UpdateTimezoneByPartner(ProtectedRequestHandler):
+    def get(self):
+        self.hello_request(
+            api_url="devices/update_timezone_by_partner/{account_id}",
+            type="POST",
+            app_info=settings.ADMIN_APP_INFO,
+        )
