@@ -135,7 +135,7 @@ var UnpairSenseTile = React.createClass({
             <form onSubmit={this.handleSubmit}>
                 <div><input className="form-control" ref="emailInput" type="text" placeholder="Email" /></div><br/>
                 <div><input className="form-control" ref="deviceIdInput" type="text" placeholder="Sense ID" /></div><br/>
-                <div>Unlink All Accounts <input id='unlink-all' type="checkbox" checked/></div><br/><br/>
+                <div>Unlink All Accounts <input id='unlink-all' type="checkbox"/></div><br/><br/>
                 <div><Button className="submit" type="submit">Submit</Button></div><br/>
             </form>
         {this.state.alert}
