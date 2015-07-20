@@ -1,7 +1,3 @@
 *.pyc
 .idea/
-venv/
-
 local_test.py
-
-index.yaml
