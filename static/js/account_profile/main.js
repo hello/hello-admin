@@ -111,7 +111,7 @@ var TimelineTile = React.createClass({
         var timelinePreview,
             lastNightDate =  d3.time.format("%m-%d-%Y")(new Date(new Date().getTime() - 24*3600*1000));
         if (response.data.length > 0) {
-            var lastNightScore = response.data[0].score && response.data[0].score > 0 ?
+            var lastNightScore = response.data[0].score && response.data[0].score >= 0 ?
                 <Badge className="score-badge">{response.data[0].score}</Badge> : <span className="not-ok">unavailable</span>;
             var lastNightMessage = response.data[0].message ?
                 response.data[0].message : <span className="not-ok">unavailable</span>;
