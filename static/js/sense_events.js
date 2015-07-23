@@ -55,7 +55,6 @@ var SenseEventsMaestro = React.createClass({
                 data: {email: accountInput, device_type: "sense"},
                 async: false,
                 success: function (response) {
-                    console.log(response);
                     accountInput = response.data[0].device_account_pair.externalDeviceId
                 }
             });
@@ -71,7 +70,7 @@ var SenseEventsMaestro = React.createClass({
             },
 //            async: false,
             success: function(response) {
-                console.log(response);
+                console.log("raw events", response);
                 that.setState({loading: ""});
 
                 if (response.error.isWhiteString()) {
@@ -173,6 +172,10 @@ function convertChrisHex(hexString) {
     if (hexString.length < 7) {
         hexString = "#00" + hexString.split("#")[1];
     }
+    else if (hexString.length > 7 && hexString.indexOf("#00") === 0) {
+        hexString = "#" + hexString.split("#00")[1];
+    }
+
     var rgb = hexToRgb(hexString);
     if (rgb === null) {
         return hexString;
