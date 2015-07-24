@@ -65,7 +65,7 @@ class DeviceAPI(ProtectedRequestHandler):
             app_info=settings.ADMIN_APP_INFO,
             url_params={"unlink_all": unlink_all}
         )
-        self.send_to_slack_admin_logs_channel("@long: {} helped unpair {} {}".format(self.current_user_email, email, device_type, device_id))
+        self.send_to_slack_admin_logs_channel("@long: {} helped {} unpair {} {}".format(self.current_user_email, email, device_type, device_id))
 
 class DeviceByEmailAPI(ProtectedRequestHandler):
     def get(self):
