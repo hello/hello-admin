@@ -106,9 +106,15 @@ var SenseEventsMaestro = React.createClass({
     render: function() {
         var loading = this.state.loading === "" ? null : <Alert>{this.state.loading}</Alert>;
         var senseEventsData = this.state.data.map(function(senseEvent){
+            var beforeEventTs = d3.time.format('%m/%d/%Y %H:%M:%S')(new Date(senseEvent.createdAt - 5*60*1000));
+            var afterEventTs = d3.time.format('%m/%d/%Y %H:%M:%S')(new Date(senseEvent.createdAt + 5*60*1000));
             return <tr>
                 <td>{senseEvent.deviceId}</td>
-                <td>{d3.time.format('%a %d %b %H:%M:%S %Z')(new Date(senseEvent.createdAt))}</td>
+                <td>
+                    {d3.time.format('%a %d %b %H:%M:%S %Z')(new Date(senseEvent.createdAt))}
+                    &nbsp;
+                    <a target="_blank" href={"/sense_logs/?field=device_id&keyword=" + senseEvent.deviceId + "&category=device_id&category_input=&limit=&start=" + beforeEventTs + "&end=" + afterEventTs}>see logs</a>
+                </td>
                 <td>{senseEvent.events.map(function(event){
                     if (event.indexOf("color") > -1){
                         event = event.replace(/\s+/g, '');
