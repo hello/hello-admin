@@ -106,8 +106,9 @@ var SenseEventsMaestro = React.createClass({
     render: function() {
         var loading = this.state.loading === "" ? null : <Alert>{this.state.loading}</Alert>;
         var senseEventsData = this.state.data.map(function(senseEvent){
-            var beforeEventTs = d3.time.format('%m/%d/%Y %H:%M:%S')(new Date(senseEvent.createdAt - 5*60*1000));
-            var afterEventTs = d3.time.format('%m/%d/%Y %H:%M:%S')(new Date(senseEvent.createdAt + 5*60*1000));
+            console.log("sense event ts", senseEvent.createdAt);
+            var beforeEventTs = d3.time.format.utc('%m/%d/%Y %H:%M:%S')(new Date(senseEvent.createdAt - 5*60*1000));
+            var afterEventTs = d3.time.format.utc('%m/%d/%Y %H:%M:%S')(new Date(senseEvent.createdAt + 5*60*1000));
             return <tr>
                 <td>{senseEvent.deviceId}</td>
                 <td>
