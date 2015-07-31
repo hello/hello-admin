@@ -1,6 +1,7 @@
 import json
 import logging as log
 import urllib
+from core.models.authentication import AVAILABLE_NAMESPACES
 import settings
 from models.setup import AppInfo, AdminUser, AccessToken, UserGroup
 from handlers.helpers import ProtectedRequestHandler, SuperEngineerRequestHandler, BaseRequestHandler
@@ -420,22 +421,23 @@ class CreateGroupsAPI(ProtectedRequestHandler):
         Populate groups entity
         """
         output = {'data': [], 'error': ''}
-
-        groups_data = {
-            'super_engineer': 'long@sayhello.com, tim@sayhello.com',
-            'settings_moderator': 'pang@sayhello.com, chris@sayhello.com, kingshy@sayhello.com, jimmy@sayhello.com, km@sayhello.com',
-            'token_maker': 'pang@sayhello.com, chris@sayhello.com, kingshy@sayhello.com, josef@sayhello.com, jimmy@sayhello.com, km@sayhello.com, benjo@sayhello.com, jingyun@sayhello.com, kevin@sayhello.com',
-            'customer_experience': 'marina@sayhello.com, tim@sayhello.com, chrisl@sayhello.com, natalya@sayhello.com, kenny@sayhello.com , kevin@sayhello.com',
-            'software': 'pang@sayhello.com, benjo@sayhello.com',
-            'hardware': 'ben@sayhello.com',
-            'firmware': 'chris@sayhello.com, josef@sayhello.com, tim@sayhello.com, pang@sayhello.com, jchen@sayhello.com, jimmy@sayhello.com, benjo@sayhello.com, kevin@sayhello.com',
-            'super_firmware': 'chris@sayhello.com, josef@sayhello.com, tim@sayhello.com',
-            'shipping': 'marina@sayhello.com, chrisl@sayhello.com, bryan@sayhello.com, natalya@sayhello.com, tim@sayhello.com, kingshy@sayhello.com, kenny@sayhello.com',
-            'contractor': 'customersupport@sayhello.com'
-        }
-        groups_entity = UserGroup(**groups_data)
-        groups_entity.put()
-        output['data'] = groups_data
+        for namespace in AVAILABLE_NAMESPACES:
+            self.persist_namespace(namespace)
+            groups_data = {
+                'super_engineer': 'long@sayhello.com, tim@sayhello.com',
+                'settings_moderator': 'pang@sayhello.com, chris@sayhello.com, kingshy@sayhello.com, jimmy@sayhello.com, km@sayhello.com',
+                'token_maker': 'pang@sayhello.com, chris@sayhello.com, kingshy@sayhello.com, josef@sayhello.com, jimmy@sayhello.com, km@sayhello.com, benjo@sayhello.com, jingyun@sayhello.com, kevin@sayhello.com',
+                'customer_experience': 'marina@sayhello.com, tim@sayhello.com, chrisl@sayhello.com, natalya@sayhello.com, kenny@sayhello.com , kevin@sayhello.com',
+                'software': 'pang@sayhello.com, benjo@sayhello.com',
+                'hardware': 'ben@sayhello.com',
+                'firmware': 'chris@sayhello.com, josef@sayhello.com, tim@sayhello.com, pang@sayhello.com, jchen@sayhello.com, jimmy@sayhello.com, benjo@sayhello.com, kevin@sayhello.com',
+                'super_firmware': 'chris@sayhello.com, josef@sayhello.com, tim@sayhello.com',
+                'shipping': 'marina@sayhello.com, chrisl@sayhello.com, bryan@sayhello.com, natalya@sayhello.com, tim@sayhello.com, kingshy@sayhello.com, kenny@sayhello.com',
+                'contractor': 'customersupport@sayhello.com'
+            }
+            groups_entity = UserGroup(**groups_data)
+            groups_entity.put()
+            output['data'] += groups_data
 
         self.response.write(json.dumps(output))
 
