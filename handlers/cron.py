@@ -408,7 +408,6 @@ class FirmwareCrashLogsRetain(ProtectedRequestHandler):
             message = "@chris @kevintwohy: {} FW crash logs with keyword `{}` over last hour, view logs {}".format(total_legit_crash_logs, keyword, sense_logs_link)
 
             if sum(Counter(top_fw_list).values()) > 0:
-                print Counter(top_fw_list)
                 message += "\n\n```Breakdown by top firmware"
                 for x in sorted(Counter(top_fw_list).items(), key=operator.itemgetter(1), reverse=True):
                     message += "\n {} \t {}".format(x[0], x[1])

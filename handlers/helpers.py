@@ -43,7 +43,6 @@ class BaseRequestHandler(webapp2.RequestHandler):
     def persist_namespace(self, forced_namespace=None):
         namespace_from_cookies = self.request.cookies.get("namespace", None)
         namespace = forced_namespace or namespace_from_cookies or "production"
-        print namespace
         namespace_manager.set_namespace(namespace)
 
     def get_admin_user(self):
