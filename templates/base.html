@@ -34,8 +34,12 @@
 </head>
 <body>
     <div id="header" class="row">
-        <div id="env-switcher"></div>
-        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xs-offset-7 col-sm-offset-7 col-md-offset-7 col-lg-offset-7 col-xl-offset-7">
+        <div>
+            {% for nsp in available_namespaces %}
+                <span onclick="location.href='/api/update/namespace/?namespace={{nsp}}'" {% if nsp == namespace %} class="namespace-active" {% endif %}>{{nsp}}</span>&nbsp;&nbsp;
+            {% endfor %}
+        </div>
+        <div>
             <span>Hi {{user}}! <a href="{{logout_url}}"> Logout</a></span>
         </div>
     </div>
