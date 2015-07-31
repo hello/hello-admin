@@ -1,3 +1,4 @@
+from google.appengine.api.namespace_manager import namespace_manager
 import jinja2
 import os
 import json
@@ -30,6 +31,20 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 class BaseRequestHandler(webapp2.RequestHandler):
     def get_app_info(self):
         return AppInfo.get_by_id(settings.ENVIRONMENT)
+    def __init__(self, request, response):
+        super(BaseRequestHandler, self).__init__()
+        self.initialize(request, response)
+        self.persist_namespace()
+
+    @property
+    def namespace(self):
+        return namespace_manager.get_namespace()
+
+    def persist_namespace(self, forced_namespace=None):
+        namespace_from_cookies = self.request.cookies.get("namespace", None)
+        namespace = forced_namespace or namespace_from_cookies or "production"
+        print namespace
+        namespace_manager.set_namespace(namespace)
 
     def get_admin_user(self):
         return AdminUser.get_by_id(settings.ENVIRONMENT)
@@ -259,6 +274,7 @@ class ProtectedRequestHandler(BaseRequestHandler):
     def __init__(self, request, response):
         super(ProtectedRequestHandler, self).__init__()
         self.initialize(request, response)
+        super(ProtectedRequestHandler, self).__init__(request, response)
         if settings.DEBUG is False:
             self.restrict()
 
@@ -313,6 +329,7 @@ class ProtectedRequestHandler(BaseRequestHandler):
 
     def super_firmware(self):
         return stripStringToList(self.groups_entity.super_firmware)
+
 
 class CustomerExperienceRequestHandler(ProtectedRequestHandler):
     """
