@@ -3,7 +3,7 @@ import logging as log
 import urllib
 import settings
 from models.setup import AppInfo, AdminUser, AccessToken, UserGroup
-from handlers.helpers import make_oauth2_service, ProtectedRequestHandler, SuperEngineerRequestHandler, BaseRequestHandler
+from handlers.helpers import ProtectedRequestHandler, SuperEngineerRequestHandler, BaseRequestHandler
 from models.ext import ZendeskCredentials, SearchifyCredentials, KeyStoreLocker, GeckoboardCredentials
 from models.ext import BuggyFirmware
 
@@ -15,15 +15,13 @@ class AppAPI(ProtectedRequestHandler):
         id = self.request.get('id')
         self.hello_request(
             api_url="applications/{}".format(id) if id else "applications",
-            type="GET",
-            app_info=settings.ADMIN_APP_INFO
+            type="GET"
         )
     def post(self):
         self.hello_request(
             api_url="applications",
             type="POST",
-            body_data=json.dumps(json.loads(self.request.body)),
-            app_info=settings.ADMIN_APP_INFO
+            body_data=json.dumps(json.loads(self.request.body))
         )
 
 class AppScopeAPI(ProtectedRequestHandler):
@@ -34,8 +32,7 @@ class AppScopeAPI(ProtectedRequestHandler):
         app_id = self.request.get('app_id', "")
         self.hello_request(
             api_url="applications/{}/scopes".format(app_id) if app_id else "applications/scopes",
-            type="GET",
-            app_info=settings.ADMIN_APP_INFO
+            type="GET"
         )
 
     def put(self):
@@ -47,8 +44,7 @@ class AppScopeAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url='applications/{}/scopes'.format(app_id),
             type="PUT",
-            body_data=json.dumps(scopes),
-            app_info=settings.ADMIN_APP_INFO
+            body_data=json.dumps(scopes)
         )
 
 
@@ -157,15 +153,15 @@ class TokenAPI(ProtectedRequestHandler):
         :type password: str
         :return: dict {'token': <token>}
         """
-        app_info_model = self.get_app_info()
+        api_info = self.suripu_app
 
-        if app_info_model is None:
+        if api_info is None:
             self.error(500)
             self.response.write("Missing AppInfo. Bailing.")
             return
 
-        app_info_model.client_id = app
-        hello = make_oauth2_service(app_info_model)
+        api_info.client_id = app
+        hello = self.make_oauth2_service(api_info)
 
         data = {
             "grant_type": "PASSWORD",
@@ -304,7 +300,8 @@ class UpdateAdminAccessTokenAPI(BaseRequestHandler):
     """
     def get(self):
         admin_user = self.get_admin_user()
-        app_info_model = self.get_app_info()
+        app_api_info = self.suripu_app
+        admin_api_info = self.suripu_admin
 
         if admin_user is None:
             friendly_user_message = "User not found in environment = %s" \
@@ -313,18 +310,18 @@ class UpdateAdminAccessTokenAPI(BaseRequestHandler):
             self.show_handler_error(friendly_user_message)
             return
 
-        if app_info_model is None:
+        if app_api_info is None:
             friendly_user_message = "AppInfo not found for in environment = %s" \
                 % settings.ENVIRONMENT
             log.warn(friendly_user_message)
             self.show_handler_error(friendly_user_message)
             return
 
-        hello = make_oauth2_service(app_info_model)
+        hello = self.make_oauth2_service(app_api_info)
 
         data = {
             "grant_type": "password",
-            "client_id": app_info_model.client_id,
+            "client_id": app_api_info.client_id,
             "client_secret": '',
             "username": admin_user.username,
             "password": admin_user.password
@@ -373,15 +370,14 @@ class UpdateAdminAccessTokenAPI(BaseRequestHandler):
             return
 
         access_token = json_data['access_token']
-        app_info_model.access_token = access_token
-        app_info_model.put()
+        app_api_info.token = access_token
+        app_api_info.put()
 
-        admin_app_info_model = settings.ADMIN_APP_INFO
-        admin_app_info_model.access_token = access_token
-        admin_app_info_model.put()
+        admin_api_info.token = access_token
+        admin_api_info.put()
 
         msg = "updated app client_id = %s successfully." % \
-            app_info_model.client_id
+            app_api_info.client_id
         log.info(msg)
 
         self.redirect("/")

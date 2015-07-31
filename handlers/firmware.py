@@ -1,6 +1,5 @@
 import logging as log
 import json
-import settings
 from handlers.helpers import FirmwareRequestHandler
 from handlers.helpers import SuperFirmwareRequestHandler
 from handlers.helpers import ProtectedRequestHandler
@@ -20,8 +19,6 @@ class FirmwareAPI(FirmwareRequestHandler):
             api_url="firmware/devices/",
             type="GET",
             url_params={'firmware_version': firmware_version, 'range_start': range_start, 'range_end': range_end},
-            access_token=settings.ADMIN_APP_INFO.access_token,
-            app_info=settings.ADMIN_APP_INFO
         )
 
 
@@ -36,8 +33,6 @@ class FirmwareAPI(FirmwareRequestHandler):
             api_url="firmware/{}/{}".format(device_id, firmware_version),
             type="PUT",
             body_data=json.dumps(update_data),
-            access_token=settings.ADMIN_APP_INFO.access_token,
-            app_info=settings.ADMIN_APP_INFO
         )
 
 
@@ -49,8 +44,6 @@ class FirmwareAPI(FirmwareRequestHandler):
         self.hello_request(
             api_url="firmware/{}".format(device_id),
             type="DELETE",
-            access_token=settings.ADMIN_APP_INFO.access_token,
-            app_info=settings.ADMIN_APP_INFO
         )
 
 class FirmwareInfoAPI(FirmwareRequestHandler):
@@ -63,8 +56,6 @@ class FirmwareInfoAPI(FirmwareRequestHandler):
             api_url="firmware/list_by_time",
             type="GET",
             url_params={'range_start': range_start, 'range_end': range_end},
-            access_token=settings.ADMIN_APP_INFO.access_token,
-            app_info=settings.ADMIN_APP_INFO
         )
 
 class FirmwareHistoryAPI(FirmwareRequestHandler):
@@ -74,9 +65,7 @@ class FirmwareHistoryAPI(FirmwareRequestHandler):
 
         self.hello_request(
             api_url="firmware/{}/history".format(device_id),
-            type="GET",
-            access_token=settings.ADMIN_APP_INFO.access_token,
-            app_info=settings.ADMIN_APP_INFO
+            type="GET"
         )
 
 
@@ -89,8 +78,6 @@ class FirmwareUnhashAPI(ProtectedRequestHandler):
             output = self.hello_request(
                 api_url="firmware/names/{}".format(hashed_firmware),
                 type="GET",
-                access_token=settings.ADMIN_APP_INFO.access_token,
-                app_info=settings.ADMIN_APP_INFO,
                 raw_output=True
             )
             stringified_unhashed_firmware = json.dumps(output.data)
@@ -112,7 +99,6 @@ class FirmwareUnhashAPI(ProtectedRequestHandler):
             api_url="firmware/names",
             type="POST",
             body_data=self.request.body,
-            app_info=settings.ADMIN_APP_INFO,
         )
 
 
@@ -121,8 +107,6 @@ class FirmwareGroupStatusAPI(FirmwareRequestHandler):
         self.hello_request(
             api_url="firmware/{}/status".format(self.request.get("group")),
             type="GET",
-            access_token=settings.ADMIN_APP_INFO.access_token,
-            app_info=settings.ADMIN_APP_INFO
         )
 
 
@@ -130,18 +114,14 @@ class FirmwareGroupPathAPI(SuperFirmwareRequestHandler):
     def get(self):
         self.hello_request(
             api_url="firmware/{}/upgrade_nodes".format(self.request.get("group")),
-            type="GET",
-            access_token=settings.ADMIN_APP_INFO.access_token,
-            app_info=settings.ADMIN_APP_INFO
+            type="GET"
         )
 
     def put(self):
         self.hello_request(
             api_url="firmware/upgrades/add_node",
             type="PUT",
-            body_data=self.request.body,
-            access_token=settings.ADMIN_APP_INFO.access_token,
-            app_info=settings.ADMIN_APP_INFO
+            body_data=self.request.body
         )
         body_data=json.loads(self.request.body)
         message_text = "%s added/updated Upgrade Path for Group '%s' from FW Version: %s to FW Version: %s @ %s%% rollout." % (
@@ -158,9 +138,7 @@ class FirmwareGroupPathAPI(SuperFirmwareRequestHandler):
         from_fw_version = body.get("from_fw_version")
         self.hello_request(
             api_url="firmware/upgrades/delete_node/{}/{}".format(group_name, from_fw_version),
-            type="DELETE",
-            access_token=settings.ADMIN_APP_INFO.access_token,
-            app_info=settings.ADMIN_APP_INFO
+            type="DELETE"
         )
         message_text = "%s deleted Upgrade Path for Group '%s' from FW Version: %s." % (
             self.current_user_email,

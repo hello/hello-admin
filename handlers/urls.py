@@ -13,7 +13,6 @@ from handlers.cron import StoreRecentlyActiveDevicesStatsDaily
 from handlers.cron import StoreRecentlyActiveDevicesStatsMinute
 from handlers.cron import WavesCountPush
 from handlers.cron import ZendeskCronHandler
-from handlers.deprecated import InactiveDevicesAPI, PreSleepAPI
 from handlers.devices import ActiveDevices15MinutesHistoryAPI
 from handlers.devices import ActiveDevicesDailyHistoryAPI
 from handlers.devices import ActiveDevicesMinuteHistoryAPI
@@ -200,7 +199,6 @@ api_routes = [
     ('/api/password_reset/?$', PasswordResetAPI),
     ('/api/pch_sn_check/?$', PCHSerialNumberCheckAPI),
     ('/api/pill_key_provision/?$', PillKeyProvision),
-    ('/api/presleep/?$', PreSleepAPI),
     ('/api/recent_users/?$', RecentUsersAPI),
     ('/api/room_conditions/?$', RoomConditionsAPI),
     ('/api/searchify_stats/?$', SearchifyStatsAPI),
@@ -215,7 +213,6 @@ api_routes = [
     ('/api/timezone/?$', TimezoneAPI),
     ('/api/timezone_history/?$', TimezoneHistoryAPI),
     ('/api/tokens/?$', TokenAPI),
-    ('/api/troubleshoot/?$', InactiveDevicesAPI),
     ('/api/update_geckoboard_credentials/?$', UpdateGeckoBoardCredentials),
     ('/api/user_search/?$', UserSearchAPI),
     ('/api/viewer_permission/?$', ViewPermissionAPI),

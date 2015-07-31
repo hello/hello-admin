@@ -88,7 +88,6 @@ class SenseKeyProvision(ProtectedRequestHandler):
                 "public_key": public_key,
                 "device_id": device_id
             }),
-            app_info=settings.ADMIN_APP_INFO
         )
 
 class PillKeyProvision(ProtectedRequestHandler):
@@ -109,7 +108,6 @@ class PillKeyProvision(ProtectedRequestHandler):
                 "public_key": public_key,
                 "device_id": device_id
             }),
-            app_info=settings.ADMIN_APP_INFO
         )
 
 

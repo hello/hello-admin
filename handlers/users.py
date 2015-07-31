@@ -28,7 +28,6 @@ class OmniSearchAPI(ProtectedRequestHandler):
             api_url="account",
             type="GET",
             url_params={'id': int(self.omni_input)} if self.omni_input.isdigit() else {'email': self.omni_input},
-            app_info=settings.ADMIN_APP_INFO,
             raw_output=True
         )
 
@@ -37,7 +36,6 @@ class OmniSearchAPI(ProtectedRequestHandler):
             api_url="account/partial",
             type="GET",
             url_params={'email': self.omni_input} if '@' in self.omni_input else {'name': self.omni_input},
-            app_info=settings.ADMIN_APP_INFO,
             raw_output=True
         )
 
@@ -45,7 +43,6 @@ class OmniSearchAPI(ProtectedRequestHandler):
         return self.hello_request(
             api_url="devices/{}/accounts".format(self.omni_input),
             type="GET",
-            app_info=settings.ADMIN_APP_INFO,
             raw_output=True
         )
 
@@ -54,14 +51,12 @@ class OmniSearchAPI(ProtectedRequestHandler):
             api_url="devices/sense",
             type="GET",
             url_params={'email': email},
-            app_info=settings.ADMIN_APP_INFO,
             raw_output=True
         ).data
         pills = self.hello_request(
             api_url="devices/pill",
             type="GET",
             url_params={'email': email},
-            app_info=settings.ADMIN_APP_INFO,
             raw_output=True
         ).data
 
@@ -94,7 +89,6 @@ class OmniSearchAPI(ProtectedRequestHandler):
                     api_url="devices/pill_status",
                     type="GET",
                     raw_output=True,
-                    app_info=settings.ADMIN_APP_INFO,
                     url_params={'end_ts': int(time.time() * 1000), 'pill_id_partial': status['deviceId']}
                 ).data
                 if pill_status_data:
@@ -166,7 +160,6 @@ class RecentUsersAPI(ProtectedRequestHandler):
         while max_id > 1 and len(output.data) < limit:
             raw_output = self.hello_request(
                 type="GET",
-                app_info=settings.ADMIN_APP_INFO,
                 api_url="account/paginate",
                 raw_output=True,
                 url_params={"limit": limit, "max_id": max_id} if limit else {}
@@ -229,7 +222,6 @@ class UserSearchAPI(ProtectedRequestHandler):
             api_url="account",
             type="GET",
             url_params={'id': self.input},
-            app_info=settings.ADMIN_APP_INFO,
             raw_output=True
         )
         if raw_response.data:
@@ -241,7 +233,6 @@ class UserSearchAPI(ProtectedRequestHandler):
             api_url="account",
             type="GET",
             url_params={'email': self.input},
-            app_info=settings.ADMIN_APP_INFO,
             raw_output=True
         )
         if raw_response.data:
@@ -253,7 +244,6 @@ class UserSearchAPI(ProtectedRequestHandler):
             api_url="account/partial",
             type="GET",
             url_params={'email': self.input},
-            app_info=settings.ADMIN_APP_INFO,
         )
 
     def get_by_name_partial(self):
@@ -261,21 +251,18 @@ class UserSearchAPI(ProtectedRequestHandler):
             api_url="account/partial",
             type="GET",
             url_params={'name': self.input},
-            app_info=settings.ADMIN_APP_INFO,
         )
 
     def get_by_device_id(self):
         self.hello_request(
             api_url="devices/{}/accounts".format(self.input),
             type="GET",
-            app_info=settings.ADMIN_APP_INFO,
         )
 
     def get_by_partner(self):
         self.hello_request(
             api_url="account/{}/partner".format(self.input),
             type="GET",
-            app_info=settings.ADMIN_APP_INFO,
         )
 
     def get(self):
@@ -292,7 +279,7 @@ class PasswordResetAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="password_reset",
             type="POST",
-            body_data=json.dumps({"email": email})
+            body_data=json.dumps({"email": email}),
         )
         self.send_to_slack_admin_logs_channel("Employee {} sent a link to reset password to customer {}".format(self.current_user.email(), email))
 
@@ -309,7 +296,6 @@ class ForcePasswordUpdateAPI(CustomerExperienceRequestHandler):
             api_url="account/update_password",
             type="POST",
             body_data=json.dumps({"email": email, "password": password}),
-            app_info=settings.ADMIN_APP_INFO
         )
         self.send_to_slack_admin_logs_channel("Employee {} hard-reseted password for customer {}".format(self.current_user.email(), email))
 
@@ -319,5 +305,4 @@ class AccountCountsBreakdownByCreatedDateAPI(ProtectedRequestHandler):
          self.hello_request(
             api_url="account/count_by_created",
             type="GET",
-            app_info=settings.ADMIN_APP_INFO
         )

@@ -13,6 +13,5 @@ class SenseEventsAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="events/{}".format(device_id),
             type="GET",
-            app_info=settings.ADMIN_APP_INFO,
             url_params={"start_ts": start_ts} if limit == 0 else {"start_ts": start_ts, "limit": limit}
         )

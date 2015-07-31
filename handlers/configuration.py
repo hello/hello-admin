@@ -9,7 +9,6 @@ class FeaturesAPI(FirmwareRequestHandler):
         self.hello_request(
             api_url="features",
             type="GET",
-            app_info=settings.ADMIN_APP_INFO
         )
 
     def put(self):
@@ -37,7 +36,6 @@ class FeaturesAPI(FirmwareRequestHandler):
                 api_url="features",
                 type="PUT",
                 body_data=json.dumps(body_data),
-                app_info=settings.ADMIN_APP_INFO
             )
 
             request_context = self._extra_context({})

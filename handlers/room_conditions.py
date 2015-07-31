@@ -16,7 +16,6 @@ class RoomConditionsAPI(ProtectedRequestHandler):
             api_url="data/{}/{}/{}".format(email, sensor, resolution),
             url_params={'from': ts},
             type="GET",
-            app_info=settings.ADMIN_APP_INFO
         )
 
 
@@ -28,6 +27,5 @@ class LastRoomConditionsAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="data/current_room_conditions/{}".format(self.request.get("sense_id")),
             type="GET",
-            app_info=settings.ADMIN_APP_INFO
         )
 

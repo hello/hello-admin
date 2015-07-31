@@ -25,7 +25,6 @@ class PCHSerialNumberCheckAPI(ProtectedRequestHandler):
             api_url="pch/check/{}".format(self.device_type),
             type="POST",
             body_data=self.request.get("sn"),
-            app_info=settings.ADMIN_APP_INFO,
             content_type="text/plain" if self.device_type == "pill" else "application/json"
         )
 

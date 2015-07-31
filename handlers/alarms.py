@@ -10,7 +10,8 @@ class AlarmsAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="alarms",
             type="GET",
-            access_token=impersonatee_token
+            access_token=impersonatee_token,
+            api_info=self.suripu_app
         )
     def post(self):
         ''' Set an alarm '''
@@ -19,7 +20,8 @@ class AlarmsAPI(ProtectedRequestHandler):
             api_url="alarms/{}".format(body['client_time_utc']),
             type="POST",
             access_token=body['impersonatee_token'],
-            body_data=json.dumps(body['data'])
+            body_data=json.dumps(body['data']),
+            api_info=self.suripu_app
         )
 
 
@@ -28,7 +30,6 @@ class AlarmsByEmailAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="alarms/{}".format(self.request.get("email")),
             type="GET",
-            app_info=settings.ADMIN_APP_INFO
         )
 
 class AlarmRingsHistoryAPI(ProtectedRequestHandler):
@@ -36,7 +37,6 @@ class AlarmRingsHistoryAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="account/ring_history",
             type="GET",
-            app_info=settings.ADMIN_APP_INFO,
             url_params={
                 "email": self.request.get("email"),
                 "start_time_millis": self.request.get("start"),

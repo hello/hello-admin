@@ -17,7 +17,7 @@ class TimelineAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="timeline/admin/{}/{}".format(email, date),
             type="GET",
-            app_info=app_info
+            api_info=self.suripu_app
         )
 
     def post(self):
@@ -29,7 +29,7 @@ class TimelineAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="timeline/admin/invalidate/{}/{}".format(email, date),
             type="GET",
-            app_info=app_info
+            api_info=self.suripu_app
         )
 
 class TimelineAlgorithmAPI(ProtectedRequestHandler):
@@ -41,5 +41,5 @@ class TimelineAlgorithmAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="timeline/admin/algo/{}/{}".format(email, date),
             type="GET",
-            app_info=app_info
+            api_info=self.suripu_app
         )

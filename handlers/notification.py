@@ -13,5 +13,6 @@ class NotificationAPI(ProtectedRequestHandler):
             api_url="notifications/send/{}".format(receiver),
             type="POST",
             body_data=json.dumps({'body': body_messages, 'target': target, 'details': details}),
+            api_info=self.suripu_app
         )
 

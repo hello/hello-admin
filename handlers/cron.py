@@ -95,7 +95,6 @@ class DevicesCountPush(GeckoboardPush):
             type="GET",
             api_url="devices/status_breakdown",
             raw_output=True,
-            app_info=settings.ADMIN_APP_INFO,
             url_params={'start_ts': int(time.time()*1000) - 24*3600*1000, 'end_ts': int(time.time()*1000)}
         ).data
 
@@ -185,7 +184,6 @@ class StoreRecentlyActiveDevicesStatsMinute(BaseRequestHandler):
             type="GET",
             api_url="devices/status_breakdown",
             raw_output=True,
-            app_info=settings.ADMIN_APP_INFO,
             url_params={'start_ts': int(time.time()*1000) - 60*1000, 'end_ts': int(time.time()*1000)}
         ).data
 
@@ -203,7 +201,6 @@ class StoreRecentlyActiveDevicesStats15Minutes(BaseRequestHandler):
             type="GET",
             api_url="devices/status_breakdown",
             raw_output=True,
-            app_info=settings.ADMIN_APP_INFO,
             url_params={'start_ts': int(time.time()*1000) - 15*60*1000, 'end_ts': int(time.time()*1000)}
         ).data
 
@@ -221,7 +218,6 @@ class StoreRecentlyActiveDevicesStatsDaily(BaseRequestHandler):
             type="GET",
             api_url="devices/status_breakdown",
             raw_output=True,
-            app_info=settings.ADMIN_APP_INFO,
             url_params={'start_ts': int(time.time()*1000) - 24*3600*1000, 'end_ts': int(time.time()*1000)}
         ).data
 
@@ -317,7 +313,6 @@ class SenseColorUpdate(BaseRequestHandler):
         acknowledge = self.hello_request(
             api_url="devices/color/{}".format(self.request.get("sense_id")),
             type="POST",
-            app_info=settings.ADMIN_APP_INFO,
             raw_output=True
         ).data
 
@@ -335,7 +330,6 @@ class SenseColorUpdateQueue(BaseRequestHandler):
         colorless_senses = list(set(self.hello_request(
             api_url="devices/color/missing",
             type="GET",
-            app_info=settings.ADMIN_APP_INFO,
             raw_output=True
         ).data))
         log.info("There are {} colorless senses".format(len(colorless_senses)))
@@ -480,7 +474,6 @@ class UpdateTimezoneByPartner(ProtectedRequestHandler):
         response = self.hello_request(
             api_url="devices/update_timezone_by_partner/{}".format(account_id),
             type="POST",
-            app_info=settings.ADMIN_APP_INFO,
             raw_output=True
         )
         if response.status == 204:

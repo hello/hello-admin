@@ -9,6 +9,5 @@ class MotionAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="data/pill/{}/{}".format(email, date),
             type="GET",
-            app_info=settings.ADMIN_APP_INFO
         )
 
