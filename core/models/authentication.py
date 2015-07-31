@@ -11,6 +11,9 @@ DEFAULT_SURIPU_ADMIN_DOMAIN = "http://localhost:3333/v1/"
 DEFAULT_CLIENT_ID = "gae_admin"
 DEFAULT_TOKEN = ""
 
+LOCAL_AVAILABLE_NAMESPACES = ["dev", "staging", "canary", "production", "stand-alone"]
+AVAILABLE_NAMESPACES = ["staging", "canary", "production", "stand-alone"]
+
 class ApiInfo(ndb.Model):
     domain = ndb.StringProperty(required=True)
     client_id = ndb.StringProperty(required=True, default=DEFAULT_CLIENT_ID)

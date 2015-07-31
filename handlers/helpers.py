@@ -20,7 +20,8 @@ from models.setup import AppInfo
 from models.setup import AdminUser
 from models.setup import UserGroup
 
-from core.models.authentication import ApiInfo, SURIPU_APP_ID, SURIPU_ADMIN_ID
+from core.models.authentication import ApiInfo, SURIPU_APP_ID, SURIPU_ADMIN_ID, AVAILABLE_NAMESPACES, \
+    LOCAL_AVAILABLE_NAMESPACES
 
 this_file_path = os.path.dirname(__file__)
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -85,7 +86,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
             "user": self.current_user_email,
             "version": os.environ['CURRENT_VERSION_ID'],
             "env": settings.ENVIRONMENT,
-            "available_namespaces": ["dev", "staging", "canary", "production"] if settings.DEBUG is True else ["staging", "canary", "production"],
+            "available_namespaces": LOCAL_AVAILABLE_NAMESPACES if settings.DEBUG is True else AVAILABLE_NAMESPACES,
             "namespace": self.namespace
         }
 

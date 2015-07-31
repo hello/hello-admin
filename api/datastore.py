@@ -1,5 +1,5 @@
 import logging as log
-from core.models.authentication import ApiInfo
+from core.models.authentication import ApiInfo, AVAILABLE_NAMESPACES
 from handlers.helpers import ProtectedRequestHandler
 
 
@@ -8,7 +8,7 @@ class InitializeDataStore(ProtectedRequestHandler):
         if not self.request.get("all"):
             self.init_per_namespace(self.namespace)  # init datastore for current active namespace
         else:
-            for namespace in ["dev", "staging", "canary", "production"]:
+            for namespace in AVAILABLE_NAMESPACES:
                 self.init_per_namespace(namespace)
 
     def init_per_namespace(self, namespace):
