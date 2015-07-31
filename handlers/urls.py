@@ -135,6 +135,7 @@ from handlers.cron import FirmwareCrashLogsRetain
 from handlers.setup import CreateBuggyFirmwareAPI
 from handlers.cron import UpdateTimezoneByPartner
 from handlers.cron import UpdateTimezoneByPartnerQueue
+from api.datastore import InitializeDataStore
 
 cron_routes = [
     ('/cron/active_devices_history_15_minutes_purge', ActiveDevicesHistory15MinutesPurge),
@@ -227,6 +228,7 @@ api_routes = [
     ('/api/colorless_senses/?$', ColorlessSensesAPI),
     ('/api/clearbit/?$', ClearbitAPI),
     ('/api/create/buggy_firmware/?$', CreateBuggyFirmwareAPI),
+    ("/api/init/?$", InitializeDataStore),
 ]
 
 page_routes = [
