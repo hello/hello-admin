@@ -1,3 +1,4 @@
+from api.namespace import NamespaceAPI
 from handlers.alarms import AlarmRingsHistoryAPI
 from handlers.alarms import AlarmsAPI
 from handlers.alarms import AlarmsByEmailAPI
@@ -226,6 +227,7 @@ api_routes = [
     ('/api/clearbit/?$', ClearbitAPI),
     ('/api/create/buggy_firmware/?$', CreateBuggyFirmwareAPI),
     ("/api/init/?$", InitializeDataStore),
+    ("/api/namespace/?$", NamespaceAPI),
 ]
 
 page_routes = [

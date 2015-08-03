@@ -19,6 +19,7 @@ from utils import extract_dicts_by_fields
 from models.setup import AppInfo
 from models.setup import AdminUser
 from models.setup import UserGroup
+import datetime
 
 from core.models.authentication import ApiInfo, SURIPU_APP_ID, SURIPU_ADMIN_ID, AVAILABLE_NAMESPACES, \
     LOCAL_AVAILABLE_NAMESPACES
@@ -41,12 +42,14 @@ class BaseRequestHandler(webapp2.RequestHandler):
     def namespace(self):
         return namespace_manager.get_namespace()
 
-    def persist_namespace(self, forced_namespace=None):
+    def persist_namespace(self):
         namespace_from_cookies = self.request.cookies.get("namespace", None)
-        namespace = forced_namespace or namespace_from_cookies or "production"
+        log.info('cookie namespace'.format(namespace_from_cookies))
+        namespace = namespace_from_cookies or "production"
         namespace_manager.set_namespace(namespace)
 
-    def get_admin_user(self):
+    @staticmethod
+    def get_admin_user():
         return AdminUser.get_by_id(settings.ENVIRONMENT)
 
     def get_default_access_token(self):
@@ -81,6 +84,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         :param context: a dictionary of extra value to be displayed
         :type context: dict
         """
+        print "namespace in context", self.namespace
         extras = {
             "logout_url": users.create_logout_url('/'),
             "user": self.current_user_email,

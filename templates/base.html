@@ -34,9 +34,17 @@
 </head>
 <body>
     <div id="header" class="row">
-        <div>
+       <div class="col-xs-6">
             {% for nsp in available_namespaces %}
-                <span onclick="location.href='/api/update/namespace/?namespace={{nsp}}'" {% if nsp == namespace %} class="namespace-active" {% endif %}>{{nsp}}</span>&nbsp;&nbsp;
+                <span
+{#                        onclick="if('{{nsp}}' !== '{{namespace}}') {#}
+{#                                  document.cookie ='namespace={{nsp}}';#}
+{#                                  location.reload();#}
+{#                              }"#}
+                    onclick="window.location='/api/namespace/?namespace={{nsp}}'"
+                {% if nsp == namespace %}class="namespace-active" {% endif %}>
+                    {{nsp}}
+                </span>&nbsp;&nbsp;
             {% endfor %}
         </div>
         <div>
@@ -51,6 +59,7 @@
             {% endblock %}
         </div>
     </div>
+
     <div id="footer">
         hello-admin app version: {{version}}
     </div>
