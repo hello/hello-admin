@@ -33,11 +33,10 @@ class OrdersAPI(ShippingRequestHandler):
     def get(self):
         order_id = self.request.get('order_id', default_value='')
         output = ResponseOutput()
-        output.set_viewer(self.current_user.email())
+        output.set_viewer(self.current_user_email)
         try:
             output.set_data({'order_link': encrypt_order(order_id)})
             output.set_status(200)
-            output.set_viewer(self.current_user.email())
         except Exception as e:
             output.set_status(500)
             output.set_error(e.message)

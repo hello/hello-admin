@@ -23,7 +23,7 @@ class LabelDataAPI(ProtectedRequestHandler):
         ''' batch label '''
         body = json.loads(self.request.body)
         for b in body:
-            b['note'] += "- created by {} at {}".format(self.current_user.email(), get_current_pacific_datetime())
+            b['note'] += "- created by {} at {}".format(self.current_user_email, get_current_pacific_datetime())
         self.hello_request(
             api_url="data/batch_label",
             type="POST",
