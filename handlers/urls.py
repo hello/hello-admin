@@ -1,3 +1,4 @@
+from api.namespace import NamespaceAPI
 from handlers.alarms import AlarmRingsHistoryAPI
 from handlers.alarms import AlarmsAPI
 from handlers.alarms import AlarmsByEmailAPI
@@ -13,7 +14,6 @@ from handlers.cron import StoreRecentlyActiveDevicesStatsDaily
 from handlers.cron import StoreRecentlyActiveDevicesStatsMinute
 from handlers.cron import WavesCountPush
 from handlers.cron import ZendeskCronHandler
-from handlers.deprecated import InactiveDevicesAPI, PreSleepAPI
 from handlers.devices import ActiveDevices15MinutesHistoryAPI
 from handlers.devices import ActiveDevicesDailyHistoryAPI
 from handlers.devices import ActiveDevicesMinuteHistoryAPI
@@ -135,6 +135,7 @@ from handlers.cron import FirmwareCrashLogsRetain
 from handlers.setup import CreateBuggyFirmwareAPI
 from handlers.cron import UpdateTimezoneByPartner
 from handlers.cron import UpdateTimezoneByPartnerQueue
+from api.datastore import InitializeDataStore
 
 cron_routes = [
     ('/cron/active_devices_history_15_minutes_purge', ActiveDevicesHistory15MinutesPurge),
@@ -199,7 +200,6 @@ api_routes = [
     ('/api/password_reset/?$', PasswordResetAPI),
     ('/api/pch_sn_check/?$', PCHSerialNumberCheckAPI),
     ('/api/pill_key_provision/?$', PillKeyProvision),
-    ('/api/presleep/?$', PreSleepAPI),
     ('/api/recent_users/?$', RecentUsersAPI),
     ('/api/room_conditions/?$', RoomConditionsAPI),
     ('/api/searchify_stats/?$', SearchifyStatsAPI),
@@ -214,7 +214,6 @@ api_routes = [
     ('/api/timezone/?$', TimezoneAPI),
     ('/api/timezone_history/?$', TimezoneHistoryAPI),
     ('/api/tokens/?$', TokenAPI),
-    ('/api/troubleshoot/?$', InactiveDevicesAPI),
     ('/api/update_geckoboard_credentials/?$', UpdateGeckoBoardCredentials),
     ('/api/user_search/?$', UserSearchAPI),
     ('/api/viewer_permission/?$', ViewPermissionAPI),
@@ -227,6 +226,8 @@ api_routes = [
     ('/api/colorless_senses/?$', ColorlessSensesAPI),
     ('/api/clearbit/?$', ClearbitAPI),
     ('/api/create/buggy_firmware/?$', CreateBuggyFirmwareAPI),
+    ("/api/init/?$", InitializeDataStore),
+    ("/api/namespace/?$", NamespaceAPI),
 ]
 
 page_routes = [

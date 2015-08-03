@@ -10,7 +10,6 @@ class LabelDataAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="data/label/{}/{}".format(email, night),
             type="GET",
-            app_info=settings.ADMIN_APP_INFO
         )
     def put(self):
         ''' single label '''
@@ -19,7 +18,6 @@ class LabelDataAPI(ProtectedRequestHandler):
             api_url="data/label",
             type="POST",
             body_data=json.dumps(body),
-            app_info=settings.ADMIN_APP_INFO
         )
     def post(self):
         ''' batch label '''
@@ -30,5 +28,4 @@ class LabelDataAPI(ProtectedRequestHandler):
             api_url="data/batch_label",
             type="POST",
             body_data=json.dumps(body),
-            app_info=settings.ADMIN_APP_INFO
         )

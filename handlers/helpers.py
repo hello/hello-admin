@@ -1,3 +1,4 @@
+from google.appengine.api.namespace_manager import namespace_manager
 import jinja2
 import os
 import json
@@ -18,6 +19,10 @@ from utils import extract_dicts_by_fields
 from models.setup import AppInfo
 from models.setup import AdminUser
 from models.setup import UserGroup
+import datetime
+
+from core.models.authentication import ApiInfo, SURIPU_APP_ID, SURIPU_ADMIN_ID, AVAILABLE_NAMESPACES, \
+    LOCAL_AVAILABLE_NAMESPACES
 
 this_file_path = os.path.dirname(__file__)
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -28,18 +33,31 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 
 class BaseRequestHandler(webapp2.RequestHandler):
-    def get_app_info(self):
-        return AppInfo.get_by_id(settings.ENVIRONMENT)
+    def __init__(self, request, response):
+        super(BaseRequestHandler, self).__init__()
+        self.initialize(request, response)
+        self.persist_namespace()
 
-    def get_admin_user(self):
+    @property
+    def namespace(self):
+        return namespace_manager.get_namespace()
+
+    def persist_namespace(self):
+        namespace_from_cookies = self.request.cookies.get("namespace", None)
+        log.info('cookie namespace'.format(namespace_from_cookies))
+        namespace = namespace_from_cookies or "production"
+        namespace_manager.set_namespace(namespace)
+
+    @staticmethod
+    def get_admin_user():
         return AdminUser.get_by_id(settings.ENVIRONMENT)
 
     def get_default_access_token(self):
-        app_info = self.get_app_info()
-        if app_info is None:
+        api_info = self.suripu_admin
+        if api_info is None:
             self.error(500)
         else:
-            return app_info.access_token
+            return api_info.token
 
     def log_and_redirect(self, redirect_path, redirect_message):
         pass
@@ -66,15 +84,27 @@ class BaseRequestHandler(webapp2.RequestHandler):
         :param context: a dictionary of extra value to be displayed
         :type context: dict
         """
+        print "namespace in context", self.namespace
         extras = {
             "logout_url": users.create_logout_url('/'),
             "user": self.current_user_email,
             "version": os.environ['CURRENT_VERSION_ID'],
-            "env": settings.ENVIRONMENT
+            "env": settings.ENVIRONMENT,
+            "available_namespaces": LOCAL_AVAILABLE_NAMESPACES if settings.DEBUG is True else AVAILABLE_NAMESPACES,
+            "namespace": self.namespace
         }
 
         context.update(extras)
         return context
+
+    @property
+    def suripu_app(cls):
+        return ApiInfo.get_by_id(SURIPU_APP_ID)
+
+    @property
+    def suripu_admin(cls):
+        return ApiInfo.get_by_id(SURIPU_ADMIN_ID)
+
 
     def render(self, template_file, template_values=None):
         """
@@ -97,14 +127,14 @@ class BaseRequestHandler(webapp2.RequestHandler):
         s = self.render(template_file, template_values=context)
         self.response.write(s)
 
-    def authorize_session(self, app_info, token):
+    def authorize_session(self, api_info, token):
         """
         :param token: token issued to user to use an specific app
         :type token: str
         """
-        if app_info is None:
-            log.error("Missing App Info")
-        hello = make_oauth2_service(app_info)
+        if api_info is None:
+            log.error("Missing API Info")
+        hello = self.make_oauth2_service(api_info)
 
         if token is None:
             log.error("Missing Access Token")
@@ -112,7 +142,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         return hello.get_session(token)
 
     def hello_request(self, api_url, body_data="", url_params={}, type="GET", raw_output=False, filter_fields=[]
-                          , access_token=None, app_info=None, content_type='application/json'):
+                          , access_token=None, api_info=None, content_type='application/json'):
         """
         :param api_url: api URL
         :type api_url: str
@@ -132,13 +162,13 @@ class BaseRequestHandler(webapp2.RequestHandler):
         """
         if access_token is None:
             access_token = self.get_default_access_token()
-        if app_info is None:
-            app_info = self.get_app_info()
+        if api_info is None:
+            api_info = self.suripu_admin
 
         output = ResponseOutput()
         output.set_viewer(self.current_user_email if self.current_user is not None else "cron-bot")
 
-        session = self.authorize_session(app_info, access_token)
+        session = self.authorize_session(api_info, access_token)
 
         request_detail = {
             "headers": {
@@ -221,44 +251,28 @@ class BaseRequestHandler(webapp2.RequestHandler):
         self.send_to_slack(webhook=settings.SLACK_ADMIN_LOGS_WEBHOOK_URL,
                            payload={'text': message_text, "icon_emoji": ":snake:", "username": "admin-logs-bot", "link_names": 1})
 
-def make_oauth2_service(app_info_model):
-    """
-    :param app_info_model: an instance of AppInfo that store auth data for a certain app
-    :type app_info_model: :class:`AppInfo`
-    """
-    service = OAuth2Service(
-        client_id=app_info_model.client_id,
-        client_secret='',
-        name='hello',
-        authorize_url=app_info_model.endpoint + 'oauth2/authorize',
-        access_token_url=app_info_model.endpoint + 'oauth2/token',
-        base_url=app_info_model.endpoint
-    )
-    return service
+    def make_oauth2_service(self, api_info):
+        """
+        :param app_info_model: an instance of AppInfo that store auth data for a certain app
+        :type app_info_model: :class:`AppInfo`
+        """
+        service = OAuth2Service(
+            client_id=api_info.client_id,
+            client_secret='',
+            name='hello',
+            authorize_url=self.suripu_app.domain + 'oauth2/authorize',
+            access_token_url=self.suripu_app.domain + 'oauth2/token',
+            base_url=api_info.domain
+        )
+        return service
 
-
-def get_user(app_info_model):
-    """
-    :param app_info_model: description
-    :type app_info_model: :class:`AppInfo`
-    """
-    service = OAuth2Service(
-        client_id=app_info_model.client_id,
-        client_secret='',
-        name='hello',
-        authorize_url=app_info_model.endpoint + 'oauth2/authorize',
-        access_token_url=app_info_model.endpoint + 'oauth2/token',
-        base_url=app_info_model.endpoint
-    )
-    return service
 
 class ProtectedRequestHandler(BaseRequestHandler):
     """
     Restrict general access and define priviedge users lists
     """
     def __init__(self, request, response):
-        super(ProtectedRequestHandler, self).__init__()
-        self.initialize(request, response)
+        super(ProtectedRequestHandler, self).__init__(request, response)
         if settings.DEBUG is False:
             self.restrict()
 
@@ -313,6 +327,7 @@ class ProtectedRequestHandler(BaseRequestHandler):
 
     def super_firmware(self):
         return stripStringToList(self.groups_entity.super_firmware)
+
 
 class CustomerExperienceRequestHandler(ProtectedRequestHandler):
     """

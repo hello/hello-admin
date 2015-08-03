@@ -17,7 +17,6 @@ class PillStatusAPI(ProtectedRequestHandler):
             api_url="devices/pill_status",
             type="GET",
             raw_output=True,
-            app_info=settings.ADMIN_APP_INFO,
             url_params=url_params,
         ).data
 
@@ -29,7 +28,6 @@ class PillStatusAPI(ProtectedRequestHandler):
                 api_url="devices/pill_status",
                 type="GET",
                 raw_output=True,
-                app_info=settings.ADMIN_APP_INFO,
                 url_params=url_params,
             ).data
 

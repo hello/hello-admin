@@ -10,7 +10,6 @@ class TeamsAPI(FirmwareRequestHandler):
         self.hello_request(
             api_url="teams/{}".format(mode),
             type="GET",
-            app_info=settings.ADMIN_APP_INFO
         )
 
     def put(self):
@@ -41,7 +40,6 @@ class TeamsAPI(FirmwareRequestHandler):
             "api_url": "teams/{}/{}".format(mode, group) if action == "delete-group" else "teams/{}".format(mode),
             "type": request_type_map[action],
             "body_data": json.dumps(body_data),
-            "app_info": settings.ADMIN_APP_INFO,
             "raw_output": True
         }
 

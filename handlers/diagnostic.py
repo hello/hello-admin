@@ -13,5 +13,4 @@ class SenseUptimeAPI(ProtectedRequestHandler):
             api_url="diagnostic/uptime/{}".format(email),
             type="GET",
             url_params={"padded": padded},
-            app_info=settings.ADMIN_APP_INFO
         )

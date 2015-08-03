@@ -170,7 +170,6 @@ var TimelineMaestro = React.createClass({
     submitWithInputsfromURL: function() {
         var emailInputFromURL = getParameterByName('email');
         var dateInputFromURL = getParameterByName('date');
-        var canaryInputFromURL = getParameterByName('canary');
         if (emailInputFromURL.isWhiteString()) {
             return false;
         }
@@ -181,7 +180,6 @@ var TimelineMaestro = React.createClass({
         }
         $('#email-input').val(emailInputFromURL);
         $('#date-input').val(dateInputFromURL);
-        $("#isCanary").prop("checked", canaryInputFromURL === 'true');
 
         this.handleSubmit();
     },
@@ -201,8 +199,8 @@ var TimelineMaestro = React.createClass({
         );
     },
 
-    pushHistory: function(email, date, canary) {
-        history.pushState({}, '', '/timeline/?email=' + email + '&date=' + date + '&canary=' + canary);
+    pushHistory: function(email, date) {
+        history.pushState({}, '', '/timeline/?email=' + email + '&date=' + date);
     },
 
     handleSubmit: function() {
@@ -227,12 +225,10 @@ var TimelineMaestro = React.createClass({
         var that = this;
         var emailInput = $('#email-input').val().trim();
         var dateInput = $('#date-input').val();
-        var canaryInput = $('#isCanary').is(":checked");
 
         var requestData = {
             email: emailInput,
-            date: reformatDate(dateInput),
-            canary: canaryInput
+            date: reformatDate(dateInput)
         };
         console.log('requestData', requestData);
         if (requestData.email.isWhiteString() || requestData.date.isWhiteString()) {
@@ -252,7 +248,7 @@ var TimelineMaestro = React.createClass({
                 if (response.error.isWhiteString()) {
                     that.setState({data: response.data, alert: ""});
                     $('.dial').val(response.data[0].score).trigger('change');
-                    that.pushHistory(emailInput, dateInput, canaryInput);
+                    that.pushHistory(emailInput, dateInput);
                 }
                 else {
                     that.setState({

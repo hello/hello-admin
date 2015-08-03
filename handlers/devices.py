@@ -18,14 +18,12 @@ class DeviceAPI(ProtectedRequestHandler):
                 api_url="devices/sense",
                 type="GET",
                 url_params={'email': email},
-                app_info=settings.ADMIN_APP_INFO,
                 raw_output=True
             ).data,
             "pills": self.hello_request(
                 api_url="devices/pill",
                 type="GET",
                 url_params={'email': email},
-                app_info=settings.ADMIN_APP_INFO,
                 raw_output=True
             ).data
         }))
@@ -48,7 +46,6 @@ class DeviceAPI(ProtectedRequestHandler):
             api_url="devices/register/{}".format(device_type),
             type="POST",
             body_data=json.dumps(post_data),
-            app_info=settings.ADMIN_APP_INFO
         )
         self.send_to_slack_admin_logs_channel("@long: {} helped {} pair {} {}".format(self.current_user_email, email, device_type, device_id))
 
@@ -62,7 +59,6 @@ class DeviceAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="devices/{}/{}/{}".format(device_type, email, device_id),
             type="DELETE",
-            app_info=settings.ADMIN_APP_INFO,
             url_params={"unlink_all": unlink_all}
         )
         self.send_to_slack_admin_logs_channel("@long: {} helped {} unpair {} {}".format(self.current_user_email, email, device_type, device_id))
@@ -73,7 +69,6 @@ class DeviceByEmailAPI(ProtectedRequestHandler):
             api_url="devices/{}".format(self.request.get("device_type")),
             type="GET",
             url_params={'email': self.request.get("email")},
-            app_info=settings.ADMIN_APP_INFO,
         )
 
 
@@ -87,7 +82,6 @@ class DeviceOwnersAPI(ProtectedRequestHandler):
             api_url="devices/{}/accounts".format(device_id),
             type="GET",
             filter_fields=['email'],
-            app_info=settings.ADMIN_APP_INFO
         )
 
 class DeviceInactiveAPI(ProtectedRequestHandler):
@@ -106,7 +100,6 @@ class DeviceInactiveAPI(ProtectedRequestHandler):
                 'before': before,
                 'limit': 10000
             },
-            app_info=settings.ADMIN_APP_INFO
         )
 
 class DeviceKeyStoreHint(ProtectedRequestHandler):
@@ -119,7 +112,6 @@ class DeviceKeyStoreHint(ProtectedRequestHandler):
         self.hello_request(
             api_url="devices/key_store_hints/{}/{}".format(device_type, device_id),
             type="GET",
-            app_info=settings.ADMIN_APP_INFO
         )
 
 class ActiveDevicesMinuteHistoryAPI(ProtectedRequestHandler):
@@ -176,14 +168,12 @@ class SenseColorAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="devices/color/{}".format(self.request.get("sense_id")),
             type="GET",
-            app_info=settings.ADMIN_APP_INFO
         )
 
     def put(self):
         self.hello_request(
             api_url="devices/color/{}/{}".format(self.request.get("sense_id"), self.request.get("color")),
             type="PUT",
-            app_info=settings.ADMIN_APP_INFO
         )
 
 class ColorlessSensesAPI(ProtectedRequestHandler):
@@ -191,7 +181,6 @@ class ColorlessSensesAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="devices/color/missing",
             type="GET",
-            app_info=settings.ADMIN_APP_INFO
         )
 
 
@@ -200,14 +189,12 @@ class SenseBlackListAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="devices/sense_black_list",
             type="GET",
-            app_info=settings.ADMIN_APP_INFO
         )
 
     def put(self):
         self.hello_request(
             api_url="devices/sense_black_list",
             type="PUT",
-            app_info=settings.ADMIN_APP_INFO,
             body_data=self.request.body
         )
 
@@ -215,7 +202,6 @@ class SenseBlackListAPI(ProtectedRequestHandler):
         current_sense_black_list = self.hello_request(
             api_url="devices/sense_black_list",
             type="GET",
-            app_info=settings.ADMIN_APP_INFO,
             raw_output=True
         ).data
 
@@ -225,6 +211,5 @@ class SenseBlackListAPI(ProtectedRequestHandler):
         self.hello_request(
             api_url="devices/sense_black_list",
             type="PUT",
-            app_info=settings.ADMIN_APP_INFO,
             body_data=json.dumps(aggregate_black_list)
         )

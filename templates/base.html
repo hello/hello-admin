@@ -34,8 +34,20 @@
 </head>
 <body>
     <div id="header" class="row">
-        <div id="env-switcher"></div>
-        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xs-offset-7 col-sm-offset-7 col-md-offset-7 col-lg-offset-7 col-xl-offset-7">
+       <div class="col-xs-6">
+            {% for nsp in available_namespaces %}
+                <span
+{#                        onclick="if('{{nsp}}' !== '{{namespace}}') {#}
+{#                                  document.cookie ='namespace={{nsp}}';#}
+{#                                  location.reload();#}
+{#                              }"#}
+                    onclick="window.location='/api/namespace/?namespace={{nsp}}'"
+                {% if nsp == namespace %}class="namespace-active" {% endif %}>
+                    {{nsp}}
+                </span>&nbsp;&nbsp;
+            {% endfor %}
+        </div>
+        <div>
             <span>Hi {{user}}! <a href="{{logout_url}}"> Logout</a></span>
         </div>
     </div>
@@ -47,6 +59,7 @@
             {% endblock %}
         </div>
     </div>
+
     <div id="footer">
         hello-admin app version: {{version}}
     </div>
