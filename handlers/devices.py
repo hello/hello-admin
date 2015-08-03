@@ -1,5 +1,6 @@
 import logging as log
 import json
+from google.appengine.api import namespace_manager
 import settings
 
 from handlers.helpers import ProtectedRequestHandler
@@ -116,6 +117,9 @@ class DeviceKeyStoreHint(ProtectedRequestHandler):
 
 class ActiveDevicesMinuteHistoryAPI(ProtectedRequestHandler):
     """Retrieve recently active devices (seen last minute) zcount from redis"""
+    def persist_namespace(self):
+        namespace_manager.set_namespace("production")
+
     def get(self):
         output = {'data': [], 'error': ''}
         try:
@@ -132,6 +136,9 @@ class ActiveDevicesMinuteHistoryAPI(ProtectedRequestHandler):
 
 class ActiveDevices15MinutesHistoryAPI(ProtectedRequestHandler):
     """Retrieve recently active devices (seen last 15 minutes) zcount from redis"""
+    def persist_namespace(self):
+        namespace_manager.set_namespace("production")
+
     def get(self):
         output = {'data': [], 'error': ''}
         try:
@@ -148,6 +155,9 @@ class ActiveDevices15MinutesHistoryAPI(ProtectedRequestHandler):
 
 class ActiveDevicesDailyHistoryAPI(ProtectedRequestHandler):
     """Retrieve recently active devices (seen last 24 hours) zcount from redis"""
+    def persist_namespace(self):
+        namespace_manager.set_namespace("production")
+
     def get(self):
         output = {'data': [], 'error': ''}
         try:

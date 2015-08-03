@@ -7,7 +7,7 @@ import logging as log
 import requests
 import settings
 from handlers.analysis import get_zendesk_stats
-from handlers.helpers import BaseRequestHandler
+from handlers.helpers import CronRequestHandler
 from handlers.utils import display_error
 from handlers.utils import get_current_pacific_datetime
 from models.ext import ZendeskDailyStats
@@ -16,7 +16,6 @@ from models.ext import RecentlyActiveDevicesStatsDaily
 from models.ext import RecentlyActiveDevicesStats15Minutes
 from indextank import ApiClient
 from google.appengine.ext import ndb
-from google.appengine.api import urlfetch
 from google.appengine.api import taskqueue
 from google.appengine.api import memcache
 from handlers.helpers import ProtectedRequestHandler
@@ -24,8 +23,10 @@ from searchify_logs import  SearchifyQuery
 from models.ext import BuggyFirmware
 from collections import Counter
 from handlers.papertrail import PaperTrailWrapper
+from google.appengine.api import namespace_manager
 
-class ZendeskCronHandler(BaseRequestHandler):
+
+class ZendeskCronHandler(CronRequestHandler):
     def get(self):
         output = {'data': []}
         zendesk_cred = settings.ZENDESK
@@ -69,7 +70,7 @@ class ZendeskCronHandler(BaseRequestHandler):
             log.error('ERROR: {}'.format(display_error(e)))
 
 
-class GeckoboardPush(BaseRequestHandler):
+class GeckoboardPush(CronRequestHandler):
     @staticmethod
     def push_to_gecko(count, device_type, widget_id):
         post_data = {
@@ -178,7 +179,7 @@ class HoldsCountPush(GeckoboardPush):
             }))
 
 
-class StoreRecentlyActiveDevicesStatsMinute(BaseRequestHandler):
+class StoreRecentlyActiveDevicesStatsMinute(CronRequestHandler):
     def get(self):
         zstats = self.hello_request(
             type="GET",
@@ -195,7 +196,7 @@ class StoreRecentlyActiveDevicesStatsMinute(BaseRequestHandler):
         recently_active_devices_stats.put()
 
 
-class StoreRecentlyActiveDevicesStats15Minutes(BaseRequestHandler):
+class StoreRecentlyActiveDevicesStats15Minutes(CronRequestHandler):
     def get(self):
         zstats = self.hello_request(
             type="GET",
@@ -212,7 +213,7 @@ class StoreRecentlyActiveDevicesStats15Minutes(BaseRequestHandler):
         recently_active_devices_stats.put()
 
 
-class StoreRecentlyActiveDevicesStatsDaily(BaseRequestHandler):
+class StoreRecentlyActiveDevicesStatsDaily(CronRequestHandler):
     def get(self):
         zstats = self.hello_request(
             type="GET",
@@ -230,7 +231,7 @@ class StoreRecentlyActiveDevicesStatsDaily(BaseRequestHandler):
 
 
 
-class ActiveDevicesHistoryPurge(BaseRequestHandler):
+class ActiveDevicesHistoryPurge(CronRequestHandler):
     def get(self):
         end_ts = datetime.datetime.now() - datetime.timedelta(days=settings.ACTIVE_DEVICES_HISTORY_KEEP_DAYS)
         keys = RecentlyActiveDevicesStats.query_keys_by_created(end_ts)
@@ -253,7 +254,9 @@ class ActiveDevicesHistoryPurge(BaseRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class ActiveDevicesHistory15MinutesPurge(BaseRequestHandler):
+class ActiveDevicesHistory15MinutesPurge(CronRequestHandler):
+    def persist_namespace(self):
+        namespace_manager.set_namespace("production")
     def get(self):
         end_ts = datetime.datetime.now() - datetime.timedelta(days=settings.ACTIVE_DEVICES_HISTORY_KEEP_DAYS)
         keys = RecentlyActiveDevicesStats15Minutes.query_keys_by_created(end_ts)
@@ -276,7 +279,7 @@ class ActiveDevicesHistory15MinutesPurge(BaseRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class DropOldSenseLogsSearchifyIndex(BaseRequestHandler):
+class DropOldSenseLogsSearchifyIndex(CronRequestHandler):
     """
     To be run at the end of GMT day (23:55)
     """
@@ -308,7 +311,7 @@ class DropOldSenseLogsSearchifyIndex(BaseRequestHandler):
         self.response.write(dumped_output)
 
 
-class SenseColorUpdate(BaseRequestHandler):
+class SenseColorUpdate(CronRequestHandler):
     def get(self):
         acknowledge = self.hello_request(
             api_url="devices/color/{}".format(self.request.get("sense_id")),
@@ -325,7 +328,7 @@ class SenseColorUpdate(BaseRequestHandler):
         log.info("Updated color for {} out of {} senses".format(colored_size, colorless_size))
 
 
-class SenseColorUpdateQueue(BaseRequestHandler):
+class SenseColorUpdateQueue(CronRequestHandler):
     def get(self):
         colorless_senses = list(set(self.hello_request(
             api_url="devices/color/missing",
