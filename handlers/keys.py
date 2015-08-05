@@ -6,7 +6,7 @@ import hashlib
 import binascii
 import datetime
 import logging as log
-import settings
+import cloudstorage as gcs
 
 from helpers import ProtectedRequestHandler
 from Crypto.PublicKey import RSA
@@ -145,14 +145,12 @@ class PillKeyDecryptAPI(webapp2.RequestHandler):
         return size
 
     def write_blob(self, data, info):
-        blob = files.blobstore.create(
-            mime_type=info['type'],
-            _blobinfo_uploaded_filename=info['name']
-        )
-        with files.open(blob, 'a') as f:
+        filename = "/bucket/{}".format(info['name'])
+        with gcs.open(filename=filename, content_type=info['type'], mode='w') as f:
             f.write(data)
-        files.finalize(blob)
-        return files.blobstore.get_blob_key(blob)
+            blobstore_filename = '/gs' + filename
+            r = blobstore.create_gs_key(blobstore_filename)
+        return r
 
     def decrypt(self, blobstore_key):
         factory_key = [0x0b, 0x53, 0x55, 0xfb, 0xe8, 0x69, 0x7d, 0x74, 0xf4, 0xe0, 0x45, 0x3c, 0x4a, 0xe7, 0x40, 0xc4]
