@@ -1,4 +1,5 @@
 import json
+from google.appengine.api import namespace_manager
 import requests
 import settings
 from handlers.analysis import get_zendesk_stats
@@ -16,7 +17,7 @@ class ZendeskAPI(ProtectedRequestHandler):
         output = ResponseOutput()
         user_email = self.request.get('email')
 
-        zendesk_cred = settings.ZENDESK
+        zendesk_cred = self.zendesk_credentials
         if not zendesk_cred:
             self.error(500)
 
@@ -55,13 +56,15 @@ class ZendeskAPI(ProtectedRequestHandler):
         self.get_tickets(1)
 
 class ZendeskStatsAPI(ProtectedRequestHandler):
+    def persist_namespace(self):
+        namespace_manager.set_namespace("production")
     def get(self):
         output = {'data': {}, 'error': ''}
         start_date = self.request.get('start_date')  ## yyyy-mm-dd
         end_date = self.request.get('end_date')  ## yyyy-mm-dd
         date_type = self.request.get('date_type', default_value="created")
 
-        zendesk_cred = settings.ZENDESK
+        zendesk_cred = self.zendesk_credentials
         if not zendesk_cred:
             self.error(500)
 
@@ -108,6 +111,8 @@ class ZendeskStatsAPI(ProtectedRequestHandler):
 
 
 class ZendeskHistoryAPI(ProtectedRequestHandler):
+    def persist_namespace(self):
+        namespace_manager.set_namespace("production")
     def get(self):
         output = {'data': [], 'error': ''}
         try:
@@ -129,7 +134,7 @@ class ZendeskNowAPI(ProtectedRequestHandler):
     def get(self):
         output = {'data': {'status': {}, 'recipient': {}}, 'error': ''}
 
-        zendesk_cred = settings.ZENDESK
+        zendesk_cred = self.zendesk_credentials
         if not zendesk_cred:
             self.error(500)
 

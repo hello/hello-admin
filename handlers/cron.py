@@ -7,7 +7,7 @@ import logging as log
 import requests
 import settings
 from handlers.analysis import get_zendesk_stats
-from handlers.helpers import BaseRequestHandler
+from handlers.helpers import CronRequestHandler
 from handlers.utils import display_error
 from handlers.utils import get_current_pacific_datetime
 from models.ext import ZendeskDailyStats
@@ -16,7 +16,6 @@ from models.ext import RecentlyActiveDevicesStatsDaily
 from models.ext import RecentlyActiveDevicesStats15Minutes
 from indextank import ApiClient
 from google.appengine.ext import ndb
-from google.appengine.api import urlfetch
 from google.appengine.api import taskqueue
 from google.appengine.api import memcache
 from handlers.helpers import ProtectedRequestHandler
@@ -24,11 +23,13 @@ from searchify_logs import  SearchifyQuery
 from models.ext import BuggyFirmware
 from collections import Counter
 from handlers.papertrail import PaperTrailWrapper
+from google.appengine.api import namespace_manager
 
-class ZendeskCronHandler(BaseRequestHandler):
+
+class ZendeskCronHandler(CronRequestHandler):
     def get(self):
         output = {'data': []}
-        zendesk_cred = settings.ZENDESK
+        zendesk_cred = self.zendesk_credentials
         tickets = []
 
         zen_api = "{}/api/v2/search.json?query=type:ticket%20".format(zendesk_cred.domain)
@@ -69,11 +70,10 @@ class ZendeskCronHandler(BaseRequestHandler):
             log.error('ERROR: {}'.format(display_error(e)))
 
 
-class GeckoboardPush(BaseRequestHandler):
-    @staticmethod
-    def push_to_gecko(count, device_type, widget_id):
+class GeckoboardPush(CronRequestHandler):
+    def push_to_gecko(self, count, device_type, widget_id):
         post_data = {
-            "api_key": settings.GECKOBOARD.api_key,
+            "api_key": self.geckoboard_credentials.api_key,
             "data": {
                 "item": [
                     {
@@ -98,14 +98,14 @@ class DevicesCountPush(GeckoboardPush):
             url_params={'start_ts': int(time.time()*1000) - 24*3600*1000, 'end_ts': int(time.time()*1000)}
         ).data
 
-        if settings.GECKOBOARD is None:
+        if self.geckoboard_credentials is None:
             self.error("missing Geckoboard credentials!")
         senses_count = devices_status_breakdown.get('senses_count', -1)
         pills_count = devices_status_breakdown.get('pills_count', -1)
 
         self.response.write(json.dumps({
-            "sense": self.push_to_gecko(senses_count, "senses", settings.GECKOBOARD.senses_widget_id),
-            "pill": self.push_to_gecko(pills_count, "pills", settings.GECKOBOARD.pills_widget_id)
+            "sense": self.push_to_gecko(senses_count, "senses", self.geckoboard_credentials.senses_widget_id),
+            "pill": self.push_to_gecko(pills_count, "pills", self.geckoboard_credentials.pills_widget_id)
         }))
 
 
@@ -119,7 +119,7 @@ class AlarmsCountPush(GeckoboardPush):
 
         try:
             now_date = datetime.datetime.now().strftime("%Y-%m-%d")
-            index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_PREFIX + now_date)
+            index = ApiClient(self.searchify_credentials.api_client).get_index(settings.SENSE_LOGS_INDEX_PREFIX + now_date)
             alarms_count = index.search(query=alarm_pattern)['matches']
 
         except Exception as e:
@@ -140,7 +140,7 @@ class WavesCountPush(GeckoboardPush):
         wave_pattern = "Gesture: WAVE"
         waves_count = -1
 
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_MARCH)
+        index = ApiClient(self.searchify_credentials.api_client).get_index(settings.SENSE_LOGS_INDEX_MARCH)
 
         try:
             results = index.search(query=wave_pattern, docvar_filters={0:[[time.time() - 24*3600, None]]}, length=5000, fetch_fields=['text'])['results']
@@ -163,7 +163,7 @@ class HoldsCountPush(GeckoboardPush):
         hold_pattern = "Gesture: HOLD"
         holds_count = -1
 
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_MARCH)
+        index = ApiClient(self.searchify_credentials.api_client).get_index(settings.SENSE_LOGS_INDEX_MARCH)
 
         try:
             results = index.search(query=hold_pattern, docvar_filters={0:[[time.time() - 24*3600, None]]}, length=5000, fetch_fields=['text'])['results']
@@ -178,7 +178,7 @@ class HoldsCountPush(GeckoboardPush):
             }))
 
 
-class StoreRecentlyActiveDevicesStatsMinute(BaseRequestHandler):
+class StoreRecentlyActiveDevicesStatsMinute(CronRequestHandler):
     def get(self):
         zstats = self.hello_request(
             type="GET",
@@ -195,7 +195,7 @@ class StoreRecentlyActiveDevicesStatsMinute(BaseRequestHandler):
         recently_active_devices_stats.put()
 
 
-class StoreRecentlyActiveDevicesStats15Minutes(BaseRequestHandler):
+class StoreRecentlyActiveDevicesStats15Minutes(CronRequestHandler):
     def get(self):
         zstats = self.hello_request(
             type="GET",
@@ -212,7 +212,7 @@ class StoreRecentlyActiveDevicesStats15Minutes(BaseRequestHandler):
         recently_active_devices_stats.put()
 
 
-class StoreRecentlyActiveDevicesStatsDaily(BaseRequestHandler):
+class StoreRecentlyActiveDevicesStatsDaily(CronRequestHandler):
     def get(self):
         zstats = self.hello_request(
             type="GET",
@@ -230,7 +230,7 @@ class StoreRecentlyActiveDevicesStatsDaily(BaseRequestHandler):
 
 
 
-class ActiveDevicesHistoryPurge(BaseRequestHandler):
+class ActiveDevicesHistoryPurge(CronRequestHandler):
     def get(self):
         end_ts = datetime.datetime.now() - datetime.timedelta(days=settings.ACTIVE_DEVICES_HISTORY_KEEP_DAYS)
         keys = RecentlyActiveDevicesStats.query_keys_by_created(end_ts)
@@ -253,7 +253,9 @@ class ActiveDevicesHistoryPurge(BaseRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class ActiveDevicesHistory15MinutesPurge(BaseRequestHandler):
+class ActiveDevicesHistory15MinutesPurge(CronRequestHandler):
+    def persist_namespace(self):
+        namespace_manager.set_namespace("production")
     def get(self):
         end_ts = datetime.datetime.now() - datetime.timedelta(days=settings.ACTIVE_DEVICES_HISTORY_KEEP_DAYS)
         keys = RecentlyActiveDevicesStats15Minutes.query_keys_by_created(end_ts)
@@ -276,13 +278,13 @@ class ActiveDevicesHistory15MinutesPurge(BaseRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class DropOldSenseLogsSearchifyIndex(BaseRequestHandler):
+class DropOldSenseLogsSearchifyIndex(CronRequestHandler):
     """
     To be run at the end of GMT day (23:55)
     """
     def get(self):
         output = {"status": "", "deleted_index_size": 0, "deleted_index_name": ""}
-        searchify_cred = settings.SEARCHIFY
+        searchify_cred = self.searchify_credentials
         searchify_client = ApiClient(searchify_cred.api_client)
         date_of_deleted_index = (datetime.datetime.now() - datetime.timedelta(days=settings.SENSE_LOGS_KEEP_DAYS - 1)).strftime("%Y-%m-%d")
         log.info("Attempting to drop index {}".format(date_of_deleted_index))
@@ -308,7 +310,7 @@ class DropOldSenseLogsSearchifyIndex(BaseRequestHandler):
         self.response.write(dumped_output)
 
 
-class SenseColorUpdate(BaseRequestHandler):
+class SenseColorUpdate(CronRequestHandler):
     def get(self):
         acknowledge = self.hello_request(
             api_url="devices/color/{}".format(self.request.get("sense_id")),
@@ -325,7 +327,7 @@ class SenseColorUpdate(BaseRequestHandler):
         log.info("Updated color for {} out of {} senses".format(colored_size, colorless_size))
 
 
-class SenseColorUpdateQueue(BaseRequestHandler):
+class SenseColorUpdateQueue(CronRequestHandler):
     def get(self):
         colorless_senses = list(set(self.hello_request(
             api_url="devices/color/missing",
@@ -362,7 +364,7 @@ class FirmwareCrashLogsRetain(ProtectedRequestHandler):
         utc_now_secs = int(utc_now.strftime("%s"))
         utc_last_hour = utc_now - datetime.timedelta(hours=1)
 
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_PREFIX + utc_now_date)
+        index = ApiClient(self.searchify_credentials.api_client).get_index(settings.SENSE_LOGS_INDEX_PREFIX + utc_now_date)
         buggy_firmware = BuggyFirmware.query().get()
 
         # messages = "Current FW crash logs black list is\n```top version: {}\nmiddle version: {}\nsense_id: {}```\n\n".format(buggy_firmware.top_versions, buggy_firmware.middle_versions, buggy_firmware.sense_ids)

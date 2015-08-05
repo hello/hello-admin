@@ -49,4 +49,22 @@ class UserGroup(ndb.Model):
     shipping=ndb.StringProperty(required=True)
     contractor=ndb.StringProperty(required=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
+    namespace = ndb.StringProperty(required=True)
+
+    @classmethod
+    def create_defaults(cls, namespace):
+        groups_data = {
+            'super_engineer': 'long@sayhello.com, tim@sayhello.com, james@sayhello.com, kingshy@sayhello.com',
+            'settings_moderator': 'chris@sayhello.com, kingshy@sayhello.com, jimmy@sayhello.com, km@sayhello.com',
+            'token_maker': 'chris@sayhello.com, kingshy@sayhello.com, josef@sayhello.com, jimmy@sayhello.com, km@sayhello.com, benjo@sayhello.com, jingyun@sayhello.com, kevin@sayhello.com',
+            'customer_experience': 'marina@sayhello.com, tim@sayhello.com, chrisl@sayhello.com, natalya@sayhello.com, kenny@sayhello.com, kevin@sayhello.com',
+            'software': 'long@sayhello.com, tim@sayhello.com, james@sayhello.com, kingshy@sayhello.com',
+            'hardware': 'scott@sayhello.com, ben@sayhello.com',
+            'firmware': 'chris@sayhello.com, josef@sayhello.com, tim@sayhello.com, jchen@sayhello.com, jimmy@sayhello.com, benjo@sayhello.com, kevin@sayhello.com, jingyun@sayhello.com',
+            'super_firmware': 'chris@sayhello.com, josef@sayhello.com, tim@sayhello.com',
+            'shipping': 'marina@sayhello.com, chrisl@sayhello.com, bryan@sayhello.com, natalya@sayhello.com, tim@sayhello.com, kingshy@sayhello.com, kenny@sayhello.com',
+            'contractor': 'customersupport@sayhello.com',
+            'namespace': namespace
+        }
+        UserGroup(**groups_data).put()
 

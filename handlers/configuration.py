@@ -28,8 +28,8 @@ class FeaturesAPI(FirmwareRequestHandler):
         }
 
         people_who_can_release = self.super_firmware()
-        if feature == "release" and self.current_user.email() not in people_who_can_release:
-            log.warn("{} not authorized to release".format(self.current_user.email()))
+        if feature == "release" and self.current_user_email not in people_who_can_release:
+            log.warn("{} not authorized to release".format(self.current_user_email))
             self.response.write(json.dumps({'error': 'Unauthorized to release firmware'}))
         else:
             self.hello_request(

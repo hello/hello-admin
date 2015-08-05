@@ -53,7 +53,7 @@ class SenseKeyProvision(ProtectedRequestHandler):
 
         output = ResponseOutput()
         output.set_status(self.response.status_int)
-        output.set_viewer(self.current_user.email())
+        output.set_viewer(self.current_user_email)
 
         try:
             priv = KeyStoreLocker.get_by_id(stage)

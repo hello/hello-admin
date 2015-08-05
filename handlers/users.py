@@ -108,7 +108,7 @@ class OmniSearchAPI(ProtectedRequestHandler):
     def get_zendesk_info_by_email(self, email):
         tickets = []
         try:
-            zendesk_cred = settings.ZENDESK
+            zendesk_cred = self.zendesk_credentials
             search_url = "{}/api/v2/search.json?query=type:ticket%20requester:{}".format(zendesk_cred.domain, email)
             zen_auth = (zendesk_cred.email_account + '/token', zendesk_cred.api_token)
             zen_response = requests.get(search_url, auth=zen_auth)
@@ -277,11 +277,12 @@ class PasswordResetAPI(ProtectedRequestHandler):
         body = json.loads(self.request.body)
         email = body.get("email")
         self.hello_request(
+            api_info=self.suripu_app,
             api_url="password_reset",
             type="POST",
-            body_data=json.dumps({"email": email}),
+            body_data=json.dumps({"email": email})
         )
-        self.send_to_slack_admin_logs_channel("Employee {} sent a link to reset password to customer {}".format(self.current_user.email(), email))
+        self.send_to_slack_admin_logs_channel("Employee {} sent a link to reset password to customer {}".format(self.current_user_email, email))
 
 
 class ForcePasswordUpdateAPI(CustomerExperienceRequestHandler):
@@ -297,7 +298,7 @@ class ForcePasswordUpdateAPI(CustomerExperienceRequestHandler):
             type="POST",
             body_data=json.dumps({"email": email, "password": password}),
         )
-        self.send_to_slack_admin_logs_channel("Employee {} hard-reseted password for customer {}".format(self.current_user.email(), email))
+        self.send_to_slack_admin_logs_channel("Employee {} hard-reseted password for customer {}".format(self.current_user_email, email))
 
 
 class AccountCountsBreakdownByCreatedDateAPI(ProtectedRequestHandler):

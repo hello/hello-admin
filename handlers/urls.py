@@ -58,7 +58,6 @@ from handlers.setup import AppAPI
 from handlers.setup import AppendAppInfo
 from handlers.setup import AppScopeAPI
 from handlers.setup import CreateAccountAPI
-from handlers.setup import CreateGroupsAPI
 from handlers.setup import CreateKeyStoreLockerAPI
 from handlers.setup import ProxyAPI
 from handlers.setup import RegisterPillAPI, SetupAPI
@@ -76,7 +75,6 @@ from handlers.users import OmniSearchAPI
 from handlers.users import PasswordResetAPI
 from handlers.users import RecentUsersAPI
 from handlers.users import UserSearchAPI
-from handlers.views import AccountProfileView
 from handlers.views import ActiveDevicesHistoryView
 from handlers.views import AlarmRingsHistoryView
 from handlers.views import AlarmsView
@@ -168,7 +166,6 @@ api_routes = [
     ('/api/app_scope/?$', AppScopeAPI),
     ('/api/append_app_info/?$', AppendAppInfo),
     ('/api/battery/?$', PillStatusAPI),
-    ('/api/create_groups/?$', CreateGroupsAPI),
     ('/api/create_key_store_locker/?$', CreateKeyStoreLockerAPI),
     ('/api/device_by_email/?$', DeviceByEmailAPI),
     ('/api/devices/?$', DeviceAPI),
