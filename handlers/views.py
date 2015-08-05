@@ -156,6 +156,11 @@ class RoomConditionsView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/room_conditions.html',
                                 context={'title': 'Room Conditions'})
 
+class RoomConditionsMinuteView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='templates/room_conditions_minute.html',
+                                context={'title': 'Room Conditions - Minute Resolution'})
+
 class LabelView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='templates/label.html',
