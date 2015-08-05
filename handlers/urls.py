@@ -75,6 +75,7 @@ from handlers.users import OmniSearchAPI
 from handlers.users import PasswordResetAPI
 from handlers.users import RecentUsersAPI
 from handlers.users import UserSearchAPI
+from handlers.views import AccountProfileView, RoomConditionsMinuteView
 from handlers.views import ActiveDevicesHistoryView
 from handlers.views import AlarmRingsHistoryView
 from handlers.views import AlarmsView
@@ -260,6 +261,7 @@ page_routes = [
     ('/refresh_memcache/?$', RefreshMemcache),
     ('/register_pill', RegisterPillAPI),
     ('/room_conditions/?$', RoomConditionsView),
+    ('/room_conditions_minute/?$', RoomConditionsMinuteView),
     ('/searchify_stats/?$', SearchifyStatsView),
     ('/sense/?$', SenseVisualView),
     ('/sense_events/?$', SenseEventsView),
