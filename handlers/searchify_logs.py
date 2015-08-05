@@ -56,7 +56,7 @@ class SenseLogsAPI(ProtectedRequestHandler):
 
     def search_within_index(self, index_name):
         output = {'results': [], 'error': {}}
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(index_name)
+        index = ApiClient(self.searchify_credentials.api_client).get_index(index_name)
         log.info("searchify request {}".format(self.searchify_request))
         try:
             if "1" not in index.list_functions().keys():
@@ -135,7 +135,7 @@ class SearchifyStatsAPI(ProtectedRequestHandler):
     def get(self):
         output = {'data': [], 'error': ''}
         try:
-            searchify_cred = settings.SEARCHIFY
+            searchify_cred = self.searchify_credentials
             searchify_client = ApiClient(searchify_cred.api_client)
 
             index_stats = [{
@@ -156,7 +156,9 @@ class DustStatsAPI(ProtectedRequestHandler):
         urlfetch.set_default_fetch_deadline(20)
         output = {"data": [], "error": ""}
         now_date = datetime.datetime.now().strftime("%Y-%m-%d")
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(settings.SENSE_LOGS_INDEX_PREFIX + now_date)
+
+        input_date = self.request.get("date", default_value=now_date)
+        index = ApiClient(self.searchify_credentials.api_client).get_index(settings.SENSE_LOGS_INDEX_PREFIX + input_date)
         query = SearchifyQuery()
 
         try:
@@ -197,7 +199,7 @@ class WifiSignalStrengthAPI(ProtectedRequestHandler):
     def get_wifi_from_index(self, index_name):
         urlfetch.set_default_fetch_deadline(30)
         output = {"data": {}, "error": ""}
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(index_name)
+        index = ApiClient(self.searchify_credentials.api_client).get_index(index_name)
         query = SearchifyQuery()
 
         try:
@@ -265,7 +267,7 @@ class LogsPatternFacetsAPI(ProtectedRequestHandler):
 
     def get_facets(self, index_name):
         output = {"data": [], "error": "Facets not found!"}
-        index = ApiClient(settings.SEARCHIFY.api_client).get_index(index_name)
+        index = ApiClient(self.searchify_credentials.api_client).get_index(index_name)
         try:
             output['data'] = index.search(
                 query="text:{}".format(self.pattern),

@@ -104,42 +104,36 @@ var DustStatsChart = React.createClass({
 
     submitWithInputsfromURL: function() {
         var deviceIdFromURL = getParameterByName('device_id');
-        var startTsFromURL = getParameterByName('start_ts');
-        var endTsFromURL = getParameterByName('end_ts');
+        var dateFromURL = getParameterByName('date');
         var lengthFromURL = getParameterByName('length') || 100;
 
         $('#length').val(lengthFromURL);
+        $('#date').val(dateFromURL);
 
         if (deviceIdFromURL.isWhiteString()) {
             return false;
         }
 
         $('#device-id-input').val(deviceIdFromURL);
-        $('#start-ts').val(startTsFromURL);
-        $('#end-ts').val(endTsFromURL);
 
         this.handleSubmit();
     },
 
-    pushHistory: function(deviceId, startTs, endTs, length) {
-        history.pushState({}, '', '/dust_stats/?device_id=' + deviceId + "&start_ts=" + startTs + "&end_ts=" + endTs + "&length=" + length);
+    pushHistory: function(deviceId, date, length) {
+        history.pushState({}, '', '/dust_stats/?device_id=' + deviceId  + "&date=" + date + "&length=" + length);
     },
 
     handleSubmit: function() {
         var that = this;
         var deviceIds = $('#device-id-input').val().split(",");
-        var startTs = $('#start-ts').val();
-        var endTs = $('#end-ts').val();
+        var date = $('#date').val();
         var length = $('#length').val();
-        var startEpochMillis = startTs.isWhiteString() ? new Date().getTime()-3*24*3600000 : getUTCEpochFromLocalTime(startTs)*1000;
-        var endEpochMillis = endTs.isWhiteString() ? new Date().getTime() : getUTCEpochFromLocalTime(endTs)*1000;
-        that.pushHistory(deviceIds, startTs, endTs, length);
+        that.pushHistory(deviceIds, date, length);
         var aggData = {};
         deviceIds.forEach(function(deviceId){
             var requestData = {
                 device_id: deviceId.trim(),
-                start_ts: startEpochMillis,
-                end_ts: endEpochMillis,
+                date: reformatDate(date),
                 length: length
             };
             $.ajax({
@@ -149,11 +143,13 @@ var DustStatsChart = React.createClass({
                 async: false,
                 data: requestData,
                 success: function(response) {
-                    aggData[deviceId.trim()] = filterData(response.data, startEpochMillis, endEpochMillis);
+                    aggData[deviceId.trim()] = response.data.sort(compareTimestamp);
+                    console.log("aggData", aggData);
                 }
             });
         });
         that.setState({data: aggData});
+        console.log('this.state.data', that.state.data);
         return false;
     },
 
@@ -163,10 +159,9 @@ var DustStatsChart = React.createClass({
                 <Col xs={4} sm={4} md={4}>
                     <LongTagsInput id="device-id-input" tagClass="label label-info" placeHolder="SenseIDs" />
                 </Col>
-                <LongDatetimePicker placeHolder="start ts" id="start-ts" size="3" />
-                <LongDatetimePicker placeHolder="end ts" id="end-ts" size="3" />
-                <Col xs={1} sm={1} md={1}>
-                    <Input id="length" type="text" placeholder="Length"/>
+                <LongDatetimePicker size="2" placeHolder="date" id="date" pickTime={false} format="MM-DD-YYYY" />
+                <Col xs={2} sm={2} md={2}>
+                    <Input id="length" type="text" placeholder="# data points"/>
                 </Col>
                 <Col xs={1} sm={1} md={1}>
                     <Button bsStyle="info" bsSize="large" className="btn-circle" type="submit"><Glyphicon glyph="search"/></Button>
@@ -174,12 +169,9 @@ var DustStatsChart = React.createClass({
             </form>
             <p className="chart-remark">Notes: <br/>
                 &nbsp;&nbsp;- This chart relies on logging consistency, {'regex_pattern = "collecting time (\d+)\\t.*?dust (\d+) (\d+) (\d+) (\d+)\\t"'}<br/>
-                &nbsp;&nbsp;- Leaving the start_ts and end_ts blank assumes querying for recent logs<br/>
-                &nbsp;&nbsp;- Max data size is 700, however for good performance, less than 200 points is reccommended<br/>
-                &nbsp;&nbsp;- Latest logs show up first, so you want to adjust end timestamp in case you want backtrack in further<br/>
                 &nbsp;&nbsp;- Can display data for up to 3 senses at once.
+                &nbsp;&nbsp;- Always pull latest data first
             </p><br/>
-
             <Row>
                 <Col xs={12} sm={12} md={12}>
                     <c3Chart id="dust-stats-chart" data={this.state.data} zoomable={this.state.zoomable} chartType={this.state.chartType}/>
@@ -188,27 +180,17 @@ var DustStatsChart = React.createClass({
         </div>)
     }
 });
-React.renderComponent(<DustStatsChart />, document.getElementById('dust-stats'));
 
-function filterData(data, startTs, endTs) {
-    console.log(startTs, endTs);
-    return data.filter(function(d){
-        if (startTs && endTs) {
-            return Number(startTs) <= d.timestamp && Number(endTs) >= d.timestamp;
-        }
-        else if (startTs) {
-            return Number(startTs) <= d.timestamp;
-        }
-        else if (endTs) {
-            return Number(endTs) >= d.timestamp;
-        }
-        else {
-            return d;
-        }
-    }).sort(compareTimestamp);
-}
+React.renderComponent(<DustStatsChart />, document.getElementById('dust-stats'));
 
 function compareTimestamp(log1, log2) {
     return log1.timestamp - log2.timestamp;
 }
 
+function reformatDate(dateString) {
+    var dateComponents = dateString.split("-");
+    var year = dateComponents[2];
+    var month = dateComponents[0];
+    var date = dateComponents[1];
+    return [year, month, date].join("-");
+}
