@@ -17,7 +17,7 @@ class ZendeskAPI(ProtectedRequestHandler):
         output = ResponseOutput()
         user_email = self.request.get('email')
 
-        zendesk_cred = settings.ZENDESK
+        zendesk_cred = self.zendesk_credentials
         if not zendesk_cred:
             self.error(500)
 
@@ -64,7 +64,7 @@ class ZendeskStatsAPI(ProtectedRequestHandler):
         end_date = self.request.get('end_date')  ## yyyy-mm-dd
         date_type = self.request.get('date_type', default_value="created")
 
-        zendesk_cred = settings.ZENDESK
+        zendesk_cred = self.zendesk_credentials
         if not zendesk_cred:
             self.error(500)
 
@@ -134,7 +134,7 @@ class ZendeskNowAPI(ProtectedRequestHandler):
     def get(self):
         output = {'data': {'status': {}, 'recipient': {}}, 'error': ''}
 
-        zendesk_cred = settings.ZENDESK
+        zendesk_cred = self.zendesk_credentials
         if not zendesk_cred:
             self.error(500)
 

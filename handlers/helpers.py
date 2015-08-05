@@ -9,6 +9,7 @@ import requests
 import webapp2
 from google.appengine.api import users
 from google.appengine.api import memcache
+from models.ext import SearchifyCredentials, ZendeskCredentials, GeckoboardCredentials
 
 from rauth import OAuth2Service
 from rauth.session import OAuth2Session
@@ -40,7 +41,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
 
     @property
     def namespace(self):
-        return namespace_manager.get_namespace()
+        return namespace_manager.get_namespace() or "production"
 
     def persist_namespace(self):
         namespace_from_cookies = self.request.cookies.get("namespace", None)
@@ -84,7 +85,6 @@ class BaseRequestHandler(webapp2.RequestHandler):
         :param context: a dictionary of extra value to be displayed
         :type context: dict
         """
-        print "namespace in context", self.namespace
         extras = {
             "logout_url": users.create_logout_url('/'),
             "user": self.current_user_email,
@@ -105,6 +105,33 @@ class BaseRequestHandler(webapp2.RequestHandler):
     def suripu_admin(cls):
         return ApiInfo.get_by_id(SURIPU_ADMIN_ID)
 
+    @property
+    def searchify_credentials(self):
+        return SearchifyCredentials.query().get()
+
+    @property
+    def zendesk_credentials(self):
+        return ZendeskCredentials.query().get()
+
+    @property
+    def geckoboard_credentials(self):
+        return GeckoboardCredentials.query().get()
+
+    @property
+    def papertrail_credentials(self):
+        return "AllkLtsvxLdFfsneCb3"
+
+    @property
+    def slack_deploys_webhok(self):
+        return 'https://hooks.slack.com/services/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'
+
+    @property
+    def slack_stats_webhook(self):
+        return 'https://hooks.slack.com/services/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'
+
+    @property
+    def slack_admin_webhook(self):
+        return 'https://hooks.slack.com/services/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'
 
     def render(self, template_file, template_values=None):
         """
@@ -240,15 +267,15 @@ class BaseRequestHandler(webapp2.RequestHandler):
             log.error("Slack notification failed: %s", e)
 
     def send_to_slack_deploys_channel(self, message_text=''):
-        self.send_to_slack(webhook=settings.SLACK_DEPLOYS_WEBHOOK_URL,
+        self.send_to_slack(webhook=self.slack_deploys_webhok,
                            payload ={'text': message_text, "icon_emoji": ":ghost:", "username": "deploy-bot"})
 
     def send_to_slack_stats_channel(self, message_text=''):
-        self.send_to_slack(webhook=settings.SLACK_STATS_WEBHOOK_URL,
+        self.send_to_slack(webhook=self.slack_stats_webhook,
                            payload={'text': message_text, "icon_emoji": ":hammer:", "username": "stats-bot"})
 
     def send_to_slack_admin_logs_channel(self, message_text=''):
-        self.send_to_slack(webhook=settings.SLACK_ADMIN_LOGS_WEBHOOK_URL,
+        self.send_to_slack(webhook=self.slack_admin_webhook,
                            payload={'text': message_text, "icon_emoji": ":snake:", "username": "admin-logs-bot", "link_names": 1})
 
     def make_oauth2_service(self, api_info):
@@ -273,8 +300,8 @@ class ProtectedRequestHandler(BaseRequestHandler):
     """
     def __init__(self, request, response):
         super(ProtectedRequestHandler, self).__init__(request, response)
-        if settings.DEBUG is False:
-            self.restrict()
+        # if settings.DEBUG is False:
+        self.restrict()
 
     def restrict(self):
         if self.current_user_email == "customersupport@sayhello.com":

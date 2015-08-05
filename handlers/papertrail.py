@@ -3,7 +3,7 @@ import json
 import settings
 from handlers.helpers import ProtectedRequestHandler, ResponseOutput
 
-PAPERTRAIL_HEADER = {"X-Papertrail-Token": settings.PAPERTRAIL_TOKEN}
+
 PAPERTRAIL_ENDPOINT = "https://papertrailapp.com/api/v1/{}"
 
 
@@ -12,7 +12,7 @@ class PaperTrailWrapper(ProtectedRequestHandler):
         output = ResponseOutput()
         query_string = PAPERTRAIL_ENDPOINT.format(query_params)
 
-        papertrail_response = requests.get(query_string, headers=PAPERTRAIL_HEADER)
+        papertrail_response = requests.get(query_string, headers={"X-Papertrail-Token": self.papertrail_credentials})
 
         output.set_status(papertrail_response.status_code)
         output.set_error(papertrail_response.reason)
