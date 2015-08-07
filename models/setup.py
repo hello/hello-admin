@@ -57,12 +57,12 @@ class UserGroup(ndb.Model):
             'super_engineer': 'long@sayhello.com, tim@sayhello.com, james@sayhello.com, kingshy@sayhello.com',
             'settings_moderator': 'chris@sayhello.com, kingshy@sayhello.com, jimmy@sayhello.com, km@sayhello.com',
             'token_maker': 'chris@sayhello.com, kingshy@sayhello.com, josef@sayhello.com, jimmy@sayhello.com, km@sayhello.com, benjo@sayhello.com, jingyun@sayhello.com, kevin@sayhello.com',
-            'customer_experience': 'marina@sayhello.com, tim@sayhello.com, chrisl@sayhello.com, natalya@sayhello.com, kenny@sayhello.com, kevin@sayhello.com',
+            'customer_experience': 'marina@sayhello.com, tim@sayhello.com, chrisl@sayhello.com, natalya@sayhello.com, kenny@sayhello.com, kevin@sayhello.com, cstemp@sayhello.com',
             'software': 'long@sayhello.com, tim@sayhello.com, james@sayhello.com, kingshy@sayhello.com',
             'hardware': 'scott@sayhello.com, ben@sayhello.com',
             'firmware': 'chris@sayhello.com, josef@sayhello.com, tim@sayhello.com, jchen@sayhello.com, jimmy@sayhello.com, benjo@sayhello.com, kevin@sayhello.com, jingyun@sayhello.com',
             'super_firmware': 'chris@sayhello.com, josef@sayhello.com, tim@sayhello.com',
-            'shipping': 'marina@sayhello.com, chrisl@sayhello.com, bryan@sayhello.com, natalya@sayhello.com, tim@sayhello.com, kingshy@sayhello.com, kenny@sayhello.com',
+            'shipping': 'marina@sayhello.com, chrisl@sayhello.com, bryan@sayhello.com, natalya@sayhello.com, tim@sayhello.com, kingshy@sayhello.com, kenny@sayhello.com, cstemp@sayhello.com',
             'contractor': 'customersupport@sayhello.com',
             'namespace': namespace
         }
