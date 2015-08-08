@@ -263,20 +263,20 @@ class BaseRequestHandler(webapp2.RequestHandler):
     def send_to_slack(webhook, payload):
         try:
             requests.post(webhook, data=json.dumps(payload), headers={"Content-Type": "application/json"})
-        except Exception, e:
+        except Exception as e:
             log.error("Slack notification failed: %s", e)
 
     def send_to_slack_deploys_channel(self, message_text=''):
         self.send_to_slack(webhook=self.slack_deploys_webhok,
-                           payload ={'text': message_text, "icon_emoji": ":ghost:", "username": "deploy-bot"})
+                           payload={'text': "<{}> {}".format(self.namespace, message_text), "icon_emoji": ":ghost:", "username": "deploy-bot"})
 
     def send_to_slack_stats_channel(self, message_text=''):
         self.send_to_slack(webhook=self.slack_stats_webhook,
-                           payload={'text': message_text, "icon_emoji": ":hammer:", "username": "stats-bot"})
+                           payload={'text': "<{}> {}".format(self.namespace, message_text), "icon_emoji": ":hammer:", "username": "stats-bot"})
 
     def send_to_slack_admin_logs_channel(self, message_text=''):
         self.send_to_slack(webhook=self.slack_admin_webhook,
-                           payload={'text': message_text, "icon_emoji": ":snake:", "username": "admin-logs-bot", "link_names": 1})
+                           payload={'text': "<{}> {}".format(self.namespace, message_text), "icon_emoji": ":snake:", "username": "admin-logs-bot", "link_names": 1})
 
     def make_oauth2_service(self, api_info):
         """
