@@ -1,37 +1,37 @@
 cron:
-#- description: zendesk daily stats
-#  url: /cron/zendesk_daily_stats
-#  schedule: every day 08:05
-#- description: devices count push
-#  url: /cron/devices_count_push
-#  schedule: every 2 mins
-#- description: alarms count push
-#  url: /cron/alarms_count_push
-#  schedule: every 2 mins
-#- description: purge active devices history
-#  url: /cron/active_devices_history_purge
-#  schedule: every 10 mins
-#- description: purge active devices 15 mins history every 60 mins
-#  url: /cron/active_devices_history_15_minutes_purge
-#  schedule: every 60 mins
-#- description: store recently active devices stats every minute
-#  url: /cron/store_recently_active_devices_stats_minute
-#  schedule: every 1 mins
-#- description: store recently active devices stats every 15 minutes
-#  url: /cron/store_recently_active_devices_stats_15_minutes
-#  schedule: every 15 mins
-#- description: store recently active devices stats daily
-#  url: /cron/store_recently_active_devices_stats_daily
-#  schedule: every day 08:10
-#- description: drop old sense logs searchify index
-#  url: /cron/drop_old_sense_logs_searchify_index
-#  schedule: every day 23:55
-#- description: sense color update queue
-#  url: /cron/sense_color_update_queue
-#  schedule: every 60 mins
-#- description: crash logs retain
-#  url: /cron/firmware_crash_logs_retain
-#  schedule: every 60 mins
-#- description: update timezone by partner queue
-#  url: /cron/update_timezone_by_partner_queue
-#  schedule: every 15 mins
+- description: zendesk daily stats
+  url: /cron/zendesk_daily_stats
+  schedule: every day 08:05
+- description: devices count push
+  url: /cron/devices_count_push
+  schedule: every 2 mins
+- description: alarms count push
+  url: /cron/alarms_count_push
+  schedule: every 2 mins
+- description: purge active devices history
+  url: /cron/active_devices_history_purge
+  schedule: every 10 mins
+- description: purge active devices 15 mins history every 60 mins
+  url: /cron/active_devices_history_15_minutes_purge
+  schedule: every 60 mins
+- description: store recently active devices stats every minute
+  url: /cron/store_recently_active_devices_stats_minute
+  schedule: every 1 mins
+- description: store recently active devices stats every 15 minutes
+  url: /cron/store_recently_active_devices_stats_15_minutes
+  schedule: every 15 mins
+- description: store recently active devices stats daily
+  url: /cron/store_recently_active_devices_stats_daily
+  schedule: every day 08:10
+- description: drop old sense logs searchify index
+  url: /cron/drop_old_sense_logs_searchify_index
+  schedule: every day 23:55
+- description: sense color update queue
+  url: /cron/sense_color_update_queue
+  schedule: every 60 mins
+- description: crash logs retain
+  url: /cron/firmware_crash_logs_retain
+  schedule: every 60 mins
+- description: update timezone by partner queue
+  url: /cron/update_timezone_by_partner_queue
+  schedule: every 15 mins
