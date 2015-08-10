@@ -53,9 +53,9 @@ class KeyStoreLocker(ndb.Model):
 
     @classmethod
     def create_defaults(cls):
-        KeyStoreLocker(id="dvt", private_key=DVT_PK)
-        KeyStoreLocker(id="mp", private_key="No PK")
-        KeyStoreLocker(id="pvt", private_key=PVT_PK)
+        KeyStoreLocker(id="dvt", private_key=DVT_PK).put()
+        KeyStoreLocker(id="mp", private_key="No PK").put()
+        KeyStoreLocker(id="pvt", private_key=PVT_PK).put()
 
 class ZendeskDailyStats(ndb.Model):
     new_tickets = ndb.IntegerProperty(required=True, indexed=False)
