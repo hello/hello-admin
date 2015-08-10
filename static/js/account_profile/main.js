@@ -302,7 +302,7 @@ var SenseSummary = React.createClass({
 
         if (senseKeyStoreResponse.error.isWhiteString()) {
             if(!$.isEmptyObject(senseKeyStoreResponse) && senseKeyStoreResponse.data.key) {
-                keyStore = senseKeyStoreResponse.data.key.slice(senseKeyStoreResponse.data.key.length-5, senseKeyStoreResponse.data.key.length) + " " + senseKeyStoreResponse.data.created_at;
+                keyStore = senseKeyStoreResponse.data.key.slice(senseKeyStoreResponse.data.key.length-5, senseKeyStoreResponse.data.key.length) + " " + (senseKeyStoreResponse.data.created_at || "");
             }
         }
         else {
@@ -380,7 +380,7 @@ var PillSummary = React.createClass({
 
         if (pillKeyStoreResponse.error.isWhiteString()) {
             if(!$.isEmptyObject(pillKeyStoreResponse) && pillKeyStoreResponse.data.key) {
-                keyStore = pillKeyStoreResponse.data.key.slice(pillKeyStoreResponse.data.key.length-5, pillKeyStoreResponse.data.key.length) + " " + pillKeyStoreResponse.data.created_at;
+                keyStore = pillKeyStoreResponse.data.key.slice(pillKeyStoreResponse.data.key.length-5, pillKeyStoreResponse.data.key.length) + " " + (pillKeyStoreResponse.data.created_at || "");
             }
         }
         else {
