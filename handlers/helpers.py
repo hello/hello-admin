@@ -300,8 +300,8 @@ class ProtectedRequestHandler(BaseRequestHandler):
     """
     def __init__(self, request, response):
         super(ProtectedRequestHandler, self).__init__(request, response)
-        # if settings.DEBUG is False:
-        self.restrict()
+        if settings.DEBUG is False:
+            self.restrict()
 
     def restrict(self):
         if self.current_user_email == "customersupport@sayhello.com":
