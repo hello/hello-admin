@@ -73,7 +73,8 @@ class CreateAccountAPI(ProtectedRequestHandler):
                 "height": height,
                 "weight": weight,
                 "tz": tz
-            })
+            }),
+            api_info=self.suripu_app
         )
 
 
