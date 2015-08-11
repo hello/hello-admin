@@ -4,44 +4,24 @@ var today = new Date();
 var datepickerFormat = d3.time.format("%m/%d/%Y %H:%M:%S");
 var todayInDatepickerFormat = datepickerFormat(today);
 
-var allSensors = ['particulates', 'dust_min', 'dust_max', 'dust_variance'];
+var allSensors = ['particulates', 'dust_min', 'dust_max', 'dust_variance','dust_raw'];
 var sensors = allSensors;
 
 var resolutionList = ['day'];
 var colorChoice = {
-    temperature: {day: '#E30B5C', minute: 'pink'},
-    humidity: {day: '#8db600', minute: 'teal'},
     particulates: {day: '#00ffff', minute: 'blue'},
-    light: {day: 'orange', minute: 'brown'},
-    sound: {day: 'teal', minute: 'indigo'},
-    wave_count: {day: 'red', red: 'violet'},
-    hold_count: {day: 'red', minute: 'violet'},
-    background: {day: 'red', minute: 'violet'},
-    num_disturb: {day: 'red', minute: 'violet'},
-    peak_disturb: {day: 'red', minute: 'violet'},
-    light_variance: {day: 'red', minute: 'violet'},
-    light_peakiness: {day: 'red', minute: 'violet'},
     dust_min: {day: 'red', minute: 'violet'},
     dust_max: {day: 'red', minute: 'violet'},
-    dust_variance: {day: 'red', minute: 'violet'}
+    dust_variance: {day: 'red', minute: 'violet'},
+    dust_raw: {day: 'red', minute: 'pink'}
 };
 
 var yAxisLabel = {
-    temperature: "Temperature ( °C )",
-    humidity: "Humidity ( % )",
     particulates: "Particulates ( µg/m³ )",
-    light: "Light ( lx )",
-    sound: "Sound ( dB )",
-    wave_count: "Wave Count ( times )",
-    hold_count: "Hold Count ( times )",
-    background: "Background ( times )",
-    num_disturb: "Number of Disturbances ( times )",
-    peak_disturb: "Peak Disturbances ( times )",
-    light_variance: "Light Variance",
-    light_peakiness: "Light Peakiness",
     dust_min: "Dust Min",
     dust_max: "Dust Max",
-    dust_variance: "Dust Variance"
+    dust_variance: "Dust Variance",
+    dust_raw : "Raw dust"
 };
 
 var legends = {
