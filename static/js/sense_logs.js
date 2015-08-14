@@ -188,7 +188,7 @@ var SenseLogsNew = React.createClass({
 
 		return(<div>
             <form onSubmit={this.loadSenseLogs.bind(this, 0)}>
-                <Row>
+                <div>
                     <Col xs={3} className="zero-padding-right"><Input id="field" type="select" addonBefore="Search By">
                         <option value="text">Text</option>
                         <option value="device_id">Sense ID</option>
@@ -200,8 +200,8 @@ var SenseLogsNew = React.createClass({
                     <Col xs={1}><Button className="time-window" disabled>From</Button></Col>
                     <LongDatetimePicker glyphicon="time" placeHolder="start (GMT) <optional>" id="start" size="3" />
                     <Col xs={2}><Input id="limit" type="number" placeholder="20" addonBefore="Limit"/></Col>
-                </Row>
-                <Row>
+                </div>
+                <div>
                     <Col xs={3} className="zero-padding-right"><Input id="category" type="select" addonBefore="Filter By">
                         <option value="device_id">Sense ID</option>
                         <option value="top_fw_version">Top Firmware Version</option>
@@ -212,13 +212,13 @@ var SenseLogsNew = React.createClass({
                     <LongDatetimePicker glyphicon="time" placeHolder="end (GMT) <optional>" id="end" size="3" />
                     <Col xs={1}><Button bsStyle="success" ref="submit" type="submit">&nbsp;<Glyphicon glyph="search"/>&nbsp;</Button></Col>
                     <Col xs={1}>{this.state.loading}</Col>
-                </Row>
+                </div>
             </form>
-            <Row>
+            <div>
                 <Col xs={10}><a href="/black_list" target="_blank">Sense Black List:</a> {
                     this.state.blackList.map(function(s){return <span><Button bsSize="xsmall" disabled>{s}</Button>&nbsp;</span>})
                 }</Col>
-            </Row><br/>
+            </div><br/>
             {this.state.alert}
             {resultsTable}
         </div>)
