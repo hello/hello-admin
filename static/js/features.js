@@ -185,29 +185,29 @@ var ConfigMaestro = React.createClass({
         });
         var alert = this.state.alert === "" ? null:<Alert>{this.state.alert}</Alert>;
         return (<div>
-                <Col xs={3} md={3}>
-                    <h4>Feature<em className="remark">Enter a <strong>string</strong> or click to select current &rarr;</em></h4>
-                    <Input id="feature-input" bsStyle="success" type="text" placeholder="e.g alpha-firmware"/>
-                    <h4>IDs<em className="remark">Enter device(s) (<strong>string</strong>), user(s) (<strong>int</strong>) or click to select current &rarr;</em></h4>
-                    <LongTagsInput id="ids-input" tagClass="label label-info" placeHolder="e.g D123, D456" />
-                    <h4>Groups<em className="remark">Hold <strong>Cmd</strong> to select/deselect multiple &darr;</em></h4>
-                    <Input id="groups-input" type="select" multiple>
+            <Col xs={3} md={3}>
+                <h4>Feature<em className="remark">Enter a <strong>string</strong> or click to select current &rarr;</em></h4>
+                <Input id="feature-input" bsStyle="success" type="text" placeholder="e.g alpha-firmware"/>
+                <h4>IDs<em className="remark">Enter device(s) (<strong>string</strong>), user(s) (<strong>int</strong>) or click to select current &rarr;</em></h4>
+                <LongTagsInput id="ids-input" tagClass="label label-info" placeHolder="e.g D123, D456" />
+                <h4>Groups<em className="remark">Hold <strong>Cmd</strong> to select/deselect multiple &darr;</em></h4>
+                <Input id="groups-input" type="select" multiple>
             {groupsOptions}
-                    </Input>
-                    <h4>Percentage: <span>{this.state.sliderValue}</span></h4>
-                    <span>0&nbsp;&nbsp;&nbsp;</span>
-                    <input type="text" className="span2 slider" value="" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square" />
-                    <span>&nbsp;100</span>
-                    <h4>Submit</h4>
-                    <Button bsStyle="danger" onClick={this.handleSubmit}><Glyphicon glyph="send"/> PUT</Button>
-                    <br/>
+                </Input>
+                <h4>Percentage: <span>{this.state.sliderValue}</span></h4>
+                <span>0&nbsp;&nbsp;&nbsp;</span>
+                <input type="text" className="span2 slider" value="" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square" />
+                <span>&nbsp;100</span>
+                <h4>Submit</h4>
+                <Button bsStyle="danger" onClick={this.handleSubmit}><Glyphicon glyph="send"/> PUT</Button>
+                <br/>
           {alert}
-                </Col>
-                <Col xs={9} md={9}>
-                    <h4>Current Configs</h4>
-                    <FeaturesTable data={this.state.data} />
-                    <button id="refresh" onClick={this.getCurrentFeatures}/>
-                </Col>
+            </Col>
+            <Col xs={9} md={9}>
+                <h4>Current Configs</h4>
+                <FeaturesTable data={this.state.data} />
+                <button id="refresh" onClick={this.getCurrentFeatures}/>
+            </Col>
         </div>);
     }
 });
