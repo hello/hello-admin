@@ -1,7 +1,5 @@
 {% extends "templates/base.html" %}
-{% block title %}{{ title }}{% endblock %}
 {% block extrastatic %}
-
 
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-datetimepicker.min.css" />
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/c3.min.css" />
@@ -21,10 +19,6 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row" id="container">
-        <h3 id="page-name">{{ title }}</h3>
-        <hr class="fancy-line"/>
-        <div class="col-xs-12" id="battery"></div>
-    </div>
+    <div class="col-xs-12" id="battery"></div>
 {% endblock %}
 

@@ -1,8 +1,5 @@
-{% extends "templates/base.html" %}
-{% block title %}{{ title }}{% endblock %}
+'{% extends "templates/base.html" %}
 {% block extrastatic %}
-
-
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-datetimepicker.min.css" />
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/c3.min.css" />
     <link rel="stylesheet" href="/static/css/label.css">
@@ -23,8 +20,6 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row" id="container">
-        <div class="col-xs-12" id="label"></div>
-    </div>
+    <div class="col-xs-12" id="label"></div>
 {% endblock %}
 

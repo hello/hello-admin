@@ -1,12 +1,10 @@
 {% extends "templates/base_latest_react.html" %}
-{% block title %}{{ title }}{% endblock %}
+
 {% block extrastatic %}
     <link rel="stylesheet" type="text/css" href="/static/css/pch_serial_number_check.css" />
     <script type="text/jsx" src="/static/js/pch_serial_number_check.js"></script>
 {% endblock %}
 
 {% block content %}
-    <div class="row" id="container">
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="pch-serial-number-check"></div>
-    </div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="pch-serial-number-check"></div>
 {% endblock %}

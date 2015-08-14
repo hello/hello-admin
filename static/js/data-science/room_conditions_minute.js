@@ -194,7 +194,7 @@ var vizBox = React.createClass({
     }
 });
 
-React.renderComponent(<vizBox />, document.getElementById('room-conditions'));
+React.renderComponent(<vizBox />, document.getElementById('room-conditions-minute'));
 
 function manipulateData(rawData, sensor, resolution, email) {
     var offsetScale;

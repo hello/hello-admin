@@ -1,5 +1,4 @@
 {% extends "templates/base_latest_react.html" %}
-{% block title %}{{ title }}{% endblock %}
 {% block extrastatic %}
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-datetimepicker.min.css" />
     <link rel="stylesheet" type="text/css" href="/static/css/sense_logs.css" />
@@ -14,7 +13,5 @@
 {% endblock %}
 
 {% block content %}
-    <h3>{{ title }}</h3>
-    <hr class="fancy-line"/>
     <div id="sense-logs"></div>
 {% endblock %}

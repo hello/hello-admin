@@ -1,5 +1,5 @@
 {% extends "templates/base.html" %}
-{% block title %}{{ title }}{% endblock %}
+
 {% block extrastatic %}
 	<link rel="stylesheet" href="/static/css/timeline.css">
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-datetimepicker.min.css" />
@@ -20,10 +20,6 @@
 {% endblock %}
 
 {% block content %}
-   <div class="row" id="container">
-        <h3 id="page-name">Timeline</h3>
-        <hr class="fancy-line"/>
-        <div class="col-xs-12" id="timeline-canvas"></div>
-    </div>
+    <div class="col-xs-12" id="timeline-canvas"></div>
 {% endblock %}
 

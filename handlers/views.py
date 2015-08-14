@@ -72,11 +72,11 @@ class FirmwareView(FirmwareRequestHandler):
         self.render_to_response(template_file='templates/firmware.html',
                                 context={'title': 'Firmware'})
 
-class ConfigurationView(FirmwareRequestHandler):
-    """Returns a panel for monitoring team device IDs and groups (teams) by feature."""
+class FeaturesView(FirmwareRequestHandler):
+    """Flip features for users/devices."""
     def get(self):
-        self.render_to_response(template_file='templates/configuration.html',
-                                context={'title': 'Configuration'})
+        self.render_to_response(template_file='templates/features.html',
+                                context={'title': 'Features'})
 
 class TeamsView(FirmwareRequestHandler):
     """Returns a panel for monitoring groups of devices & users"""
@@ -84,11 +84,11 @@ class TeamsView(FirmwareRequestHandler):
         self.render_to_response(template_file='templates/teams.html',
                                 context={'title': 'Teams'})
 
-class TroubleshootView(ProtectedRequestHandler):
+class InactiveDevicesView(ProtectedRequestHandler):
     """Returns a panel for monitoring potential in-troube devices"""
     def get(self):
-        self.render_to_response(template_file='templates/troubleshoot.html',
-                                context={'title': 'Troubleshoot'})
+        self.render_to_response(template_file='templates/inactive_devices.html',
+                                context={'title': 'Inactive Devices'})
 
 class TimelineView(ProtectedRequestHandler):
     """Returns a panel for monitoring potential timeline viewing"""
@@ -131,10 +131,10 @@ class ErrorView(BaseRequestHandler):
         self.render_to_response(template_file='templates/error.html',
                                 context={'title': 'Denied'})
 
-class KeysView(ProtectedRequestHandler):
+class ProvisionView(ProtectedRequestHandler):
     def get(self):
-        self.render_to_response(template_file='templates/keys.html',
-                                context={'title': 'Keys'})
+        self.render_to_response(template_file='templates/provision.html',
+                                context={'title': 'Provision'})
 
 class ZendeskHistoryView(ProtectedRequestHandler):
     def get(self):
@@ -146,9 +146,9 @@ class ZendeskNowView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/zendesk_now.html',
                                 context={'title': 'Zendesk Now'})
 
-class CreateKeyView(ProtectedRequestHandler):
+class CreateProvisionKeyView(ProtectedRequestHandler):
     def get(self):
-        self.render_to_response(template_file='templates/create_key.html',
+        self.render_to_response(template_file='templates/create_provision_key.html',
                                 context={'title': 'Create Key'})
 
 class RoomConditionsView(ProtectedRequestHandler):
@@ -202,9 +202,9 @@ class DustStatsView(ProtectedRequestHandler):
         self.render_to_response(template_file='templates/dust_stats.html',
                                 context={'title': 'Dust Statistics'})
 
-class UsersInpsectionView(ProtectedRequestHandler):
+class InspectorView(ProtectedRequestHandler):
     def get(self):
-        self.render_to_response(template_file='templates/users_inspection.html',
+        self.render_to_response(template_file='templates/inspector.html',
                                 context={'title': 'Inspect Recent Users To Detect Trouble'})
 
 class AccountProfileView(ProtectedRequestHandler):

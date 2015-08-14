@@ -1,5 +1,5 @@
 {% extends "templates/base.html" %}
-{% block title %}{{ title }}{% endblock %}
+
 {% block extrastatic %}
     <link rel="stylesheet" href="/static/css/active_devices_history.css">
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-datetimepicker.min.css" />
@@ -17,7 +17,5 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row" id="container">
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="active-devices-history"></div>
-    </div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="active-devices-history"></div>
 {% endblock %}
