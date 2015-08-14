@@ -1,17 +1,11 @@
 {% extends "templates/base.html" %}
-{% block title %}{{ title }}{% endblock %}
-{% block extrastatic %}
 
+{% block extrastatic %}
     <script type="text/jsx" src="/static/js/key_store.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/key_store.css" />
-
 {% endblock %}
 
 {% block content %}
-   <div class="row" id="container">
-        <h3 id="page-name">{{ title }}</h3>
-        <hr class="fancy-line"/>
-        <div class="col-xs-12" id="key-store"></div>
-    </div>
+    <div class="col-xs-12" id="key-store"></div>
 {% endblock %}
 

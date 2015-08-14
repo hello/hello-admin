@@ -1,5 +1,4 @@
 {% extends "templates/base.html" %}
-{% block title %}{{ title }}{% endblock %}
 {% block extrastatic %}
     <link rel="stylesheet" href="/static/css/zendesk_now.css">
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/c3.min.css" />
@@ -11,7 +10,5 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row" id="container">
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="zendesk-now"></div>
-    </div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="zendesk-now"></div>
 {% endblock %}

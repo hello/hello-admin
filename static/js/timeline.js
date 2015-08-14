@@ -324,7 +324,6 @@ var TimelineMaestro = React.createClass({
             </form>
             {alertPanel}
             <div>
-                Canary <input id='isCanary' type="checkbox" onChange={this.handleCanary} />&nbsp;&nbsp;
                 {this.state.algorithm}
             </div>
             <Row id="insights-info">

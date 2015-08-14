@@ -1,5 +1,4 @@
 {% extends "templates/base.html" %}
-{% block title %}{{ title }}{% endblock %}
 {% block extrastatic %}
     <script type="text/javascript" src="/static/js/third-party/moment.js"></script>
     <script type="text/javascript" src="/static/js/third-party/bootstrap.min.js"></script>
@@ -18,9 +17,5 @@
 {% endblock %}
 
 {% block content %}
-   <div class="row" id="container">
-        <h3 id="page-name">{{ title }}</h3>
-        <hr class="fancy-line"/>
-        <div class="col-xs-12" id="room-conditions"></div>
-    </div>
+    <div class="col-xs-12" id="room-conditions-minute"></div>
 {% endblock %}

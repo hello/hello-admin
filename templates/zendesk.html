@@ -1,5 +1,4 @@
 {% extends "templates/base.html" %}
-{% block title %}{{ title }}{% endblock %}
 {% block extrastatic %}
     <script type="text/javascript" src="/static/js/third-party/bootstrap-datepicker.js"></script>
     <script type="text/javascript" src="/static/js/third-party/d3.min.js"></script>
@@ -11,9 +10,5 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row" id="container">
-        <h3 id="page-name">Zendesk Hub</h3>
-        <hr class="fancy-line"/>
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="zendesk"></div>
-    </div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="zendesk"></div>
 {% endblock %}

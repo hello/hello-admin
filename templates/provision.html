@@ -1,7 +1,6 @@
 {% extends "templates/base.html" %}
-{% block title %}{{ title }}{% endblock %}
-{% block extrastatic %}
 
+{% block extrastatic %}
     <link rel="stylesheet" type="text/css" href="/static/css/keys.css" />
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/jquery.fileupload.css" />
 
@@ -11,24 +10,9 @@
 
     <script type="text/jsx" src="/static/js/sense_key_provision.js"></script>
     <script type="text/jsx" src="/static/js/pill_key_provision.js"></script>
-
-
 {% endblock %}
 
 {% block content %}
-{#    <h3>Keys</h3>#}
-{#    <hr class="fancy-line"/>#}
-{#    <form action="/api/keys/" method="POST">#}
-{#        <textarea name="blob" cols=50 rows=20>#}
-{#        </textarea>#}
-{##}
-{#        <p><input type="submit" value="provision" /></p>#}
-{#    </form>#}
-{#    </form>#}
-
-    <div class="row" id="container">
-        <div id="sense-key-provision"></div>
-        <div id="pill-key-provision"></div>
-    </div>
-
+    <div id="sense-key-provision"></div>
+    <div id="pill-key-provision"></div>
 {% endblock %}

@@ -1,5 +1,5 @@
 {% extends "templates/base_latest_react.html" %}
-{% block title %}{{ title }}{% endblock %}
+
 {% block extrastatic %}
     <link rel="stylesheet" type="text/css" href="/static/css/account_profile.css" />
     <script type="text/javascript" src="/static/js/third-party/d3.min.js"></script>
@@ -11,9 +11,5 @@
 {% endblock %}
 
 {% block content %}
-   <div class="row" id="container">
-        <h3 id="page-name"> {{ title }}</h3>
-        <hr class="fancy-line"/>
-        <div class="col-xs-12" id="account-profile"></div>
-    </div>
+    <div class="col-xs-12" id="account-profile"></div>
 {% endblock %}

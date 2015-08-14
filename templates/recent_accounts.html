@@ -1,5 +1,5 @@
 {% extends "templates/base_latest_react.html" %}
-{% block title %}{{ title }}{% endblock %}
+
 {% block extrastatic %}
     <link rel="stylesheet" type="text/css" href="/static/css/react/index.min.css" />
     <link rel="stylesheet" type="text/css" href="/static/css/third-party/c3.min.css" />
@@ -14,10 +14,6 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row" id="container">
-        <div class="row">
-            <div id="recent-accounts"></div>
-            <div id="account-breakdown"></div>
-        </div>
-    </div>
+    <div id="recent-accounts"></div>
+    <div id="account-breakdown"></div>
 {% endblock %}

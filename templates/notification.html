@@ -1,5 +1,4 @@
 {% extends "templates/base.html" %}
-{% block title %}{{ title }}{% endblock %}
 {% block extrastatic %}
 
     <script type="text/jsx" src="/static/js/notification.js"></script>
@@ -8,10 +7,6 @@
 {% endblock %}
 
 {% block content %}
-   <div class="row" id="container">
-        <h3 id="page-name">Push Notification</h3>
-        <hr class="fancy-line"/>
-        <div class="col-xs-12" id="notification"></div>
-    </div>
+    <div class="col-xs-12" id="notification"></div>
 {% endblock %}
 

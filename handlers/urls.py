@@ -2,7 +2,7 @@ from api.namespace import NamespaceAPI
 from handlers.alarms import AlarmRingsHistoryAPI
 from handlers.alarms import AlarmsAPI
 from handlers.alarms import AlarmsByEmailAPI
-from handlers.configuration import FeaturesAPI
+from handlers.features import FeaturesAPI
 from handlers.cron import ActiveDevicesHistory15MinutesPurge
 from handlers.cron import ActiveDevicesHistoryPurge
 from handlers.cron import AlarmsCountPush
@@ -82,14 +82,14 @@ from handlers.views import AlarmsView
 from handlers.views import BatteryView
 from handlers.views import BlackListView
 from handlers.views import ChartHandler
-from handlers.views import ConfigurationView
-from handlers.views import CreateKeyView
+from handlers.views import FeaturesView
+from handlers.views import CreateProvisionKeyView
 from handlers.views import DustStatsView
 from handlers.views import ErrorView
 from handlers.views import FirmwarePathView
 from handlers.views import FirmwareView
 from handlers.views import KeyStoreView
-from handlers.views import KeysView
+from handlers.views import ProvisionView
 from handlers.views import LabelView
 from handlers.views import LogsPatternFacetsView
 from handlers.views import MotionView
@@ -111,8 +111,8 @@ from handlers.views import SetupView
 from handlers.views import TeamsView
 from handlers.views import TimelineView
 from handlers.views import TokenGeneratorView
-from handlers.views import TroubleshootView
-from handlers.views import UsersInpsectionView
+from handlers.views import InactiveDevicesView
+from handlers.views import InspectorView
 from handlers.views import UserView
 from handlers.views import ZendeskHistoryView
 from handlers.views import ZendeskNowView
@@ -238,14 +238,17 @@ page_routes = [
     ('/battery/?$', BatteryView),
     ('/black_list/?$', BlackListView),
     ('/charts', ChartHandler),
-    ('/configuration/?$', ConfigurationView),
+    ('/features/?$', FeaturesView),
+    ('/configuration/?$', FeaturesView),
     ('/create_account', CreateAccountAPI),
     ('/dust_stats/?$', DustStatsView),
     ('/error/?$', ErrorView),
     ('/firmware/?$', FirmwareView),
     ('/firmware_path/?$', FirmwarePathView),
     ('/key_store/?$', KeyStoreView),
-    ('/keys/?$', KeysView),
+    ('/keystore/?$', KeyStoreView),
+    ('/keys/?$', ProvisionView),
+    ('/provision/?$', ProvisionView),
     ('/label/?$', LabelView),
     ('/log_facets/?$', LogsPatternFacetsView),
     ('/motion/?$', MotionView),
@@ -255,7 +258,7 @@ page_routes = [
     ('/pairing/?$', PairingView),
     ('/password_reset/?$', PasswordResetView),
     ('/pch_serial_number_check/?$', PCHSerialNumberCheckView),
-    ('/provision/?$', CreateKeyView),
+    ('/create_provision_key/?$', CreateProvisionKeyView),
     ('/proxy/(.*)', ProxyAPI),
     ('/recent_accounts/?$', RecentAccountsView),
     ('/refresh_memcache/?$', RefreshMemcache),
@@ -272,10 +275,12 @@ page_routes = [
     ('/teams/?$', TeamsView),
     ('/timeline/?$', TimelineView),
     ('/token_generator/?$', TokenGeneratorView),
-    ('/troubleshoot/?$', TroubleshootView),
+    ('/troubleshoot/?$', InactiveDevicesView),
+    ('/inactive_devices/?$', InactiveDevicesView),
     ('/update', UpdateAdminAccessTokenAPI),
     ('/users/?$', UserView),
-    ('/users_inspection/?$', UsersInpsectionView),
+    ('/inspector/?$', InspectorView),
+    ('/users_inspection/?$', InspectorView),
     ('/zendesk/?$', ZendeskView),
     ('/zendesk_history/?$', ZendeskHistoryView),
     ('/zendesk_now/?$', ZendeskNowView),

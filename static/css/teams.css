@@ -7,3 +7,5 @@ table.table td{text-align: center;}
 .ids-val {display: none;}
 .superscript {font-size: 7px; margin-bottom: 5px;}
 button {margin-right: 10px; opacity: 0.9;}
+#mode-input {max-width: 200px;}
+.form-group:first-child {margin-left: 16px;}

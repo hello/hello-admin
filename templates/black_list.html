@@ -1,12 +1,9 @@
 {% extends "templates/base_latest_react.html" %}
-{% block title %}{{ title }}{% endblock %}
 {% block extrastatic %}
     <link rel="stylesheet" type="text/css"  href="/static/css/black_list.css">
     <script type="text/jsx" src="/static/js/black_list.js"></script>
 {% endblock %}
 
 {% block content %}
-    <div class="row" id="container">
-        <div class="col-xs-12" id="black-list"></div>
-    </div>
+    <div class="col-xs-12" id="black-list"></div>
 {% endblock %}

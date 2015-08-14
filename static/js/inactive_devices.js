@@ -11,7 +11,7 @@ function convertEpochToDate(epoch) {
 
 
 
-var TroubleshootTableHeaders = React.createClass({
+var InactiveDevicesTableHeaders = React.createClass({
     render: function() {
         var headers = [];
         if (this.props.data && this.props.data.length > 0) {
@@ -29,7 +29,7 @@ var TroubleshootTableHeaders = React.createClass({
     }
 });
 
-var TroubleshootTableBody = React.createClass({
+var InactiveDevicesTableBody = React.createClass({
     render: function() {
         var rows = [], that = this;
         if (that.props.data && that.props.data.length > 0) {
@@ -76,7 +76,7 @@ var Pagination = React.createClass({
     }
 });
 
-var TroubleshootMaestro = React.createClass({
+var InactiveDevicesMaestro = React.createClass({
     getInitialState: function() {
         return {
             data: [],
@@ -176,10 +176,10 @@ var TroubleshootMaestro = React.createClass({
             <Pagination parent={this} />
             <em id="narration">You are looking at <strong>{$('#device-type').val()}</strong> devices which were last seen after <strong>{new Date($('#start-time').val()).toString()}</strong> and have been inactive for at least <strong>{this.state.sliderValue} hours</strong> by <strong>{new Date($('#end-time').val()).toString()}</strong></em><p/>
             <br/><div>&Sigma; = {this.state.sigma}</div>
-            <TroubleshootTableHeaders data={this.state.data}/>
-            <TroubleshootTableBody parent={this} data={this.state.data}/>
+            <InactiveDevicesTableHeaders data={this.state.data}/>
+            <InactiveDevicesTableBody parent={this} data={this.state.data}/>
         </table></code>)
     }
 });
 
-React.renderComponent(<TroubleshootMaestro />, document.getElementById('troubleshoot'));
+React.renderComponent(<InactiveDevicesMaestro />, document.getElementById('inactive-devices'));

@@ -148,7 +148,7 @@ var FirmwareGroupPath = React.createClass({
         return <div>
 
             <Row>
-                <Col xs={1}>
+                <Col xs={2}>
                     <ModalTrigger modal={<AddFirmwareUpgradeNodeModal />}>
                         <Button><Glyphicon glyph="plus" /></Button>
                     </ModalTrigger>
