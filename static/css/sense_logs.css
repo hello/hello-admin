@@ -28,3 +28,7 @@
 .borderless {
     border: none;
 }
+
+tbody {
+    background-color: #f5f5f5;
+}
