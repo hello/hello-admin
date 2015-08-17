@@ -24,7 +24,14 @@ var Tile = React.createClass({
     render: function() {
         return <div className={"tile tile-" + this.props.title.toLowerCase().replace(/\s/g, "-")}>
             <div className="tile-title">
-                <Row><Col xs={2} className="tile-icon-wrapper"><img className="tile-icon" src={"/static/" + this.props.img}/></Col><Col xs={8}> {this.props.title}</Col></Row>
+                <Row>
+                    <Col xs={2} className="tile-icon-wrapper">
+                        <img className="tile-icon" src={"/static/" + this.props.img}/>
+                    </Col>
+                    <Col xs={8} className="tile-name">
+                        {this.props.title}
+                    </Col>
+                </Row>
             </div>
             <br/>
             <div className="tile-content">
@@ -790,7 +797,9 @@ var AccountProfile = React.createClass({
     },
 
     switchSearchType: function(searchType) {
-        $("#page-name").trigger("click");
+        $("#viewer").trigger("click");
+        this.refs.accountInput.getDOMNode().value = "";
+        this.refs.accountInput.getDOMNode().focus();
         this.setState({searchType: searchType});
     },
 
@@ -806,7 +815,7 @@ var AccountProfile = React.createClass({
     },
 
     render: function() {
-        var searchForm = <Row><Col id="submit" xs={6} xsOffset={3}><form onSubmit={this.handleSubmit}>
+        var searchForm = <Col xs={12} lg={6} className="paddingless"><form id="submit" onSubmit={this.handleSubmit}>
             <div className="icon-addon addon-md">
                 <input className="form-control" type="text" id="account-input" ref="accountInput" placeholder={this.getPlaceholder(this.state.searchType)}/>
                 <Glyphicon className="cursor-hand" id="submit" glyph="search" onClick={this.handleSubmit}/>
@@ -819,40 +828,31 @@ var AccountProfile = React.createClass({
                     <MenuItem onClick={this.switchSearchType.bind(this, "pill_id")}><img className="search-type-icon" src={this.searchTypeIconMap("pill_id")} />External ID</MenuItem>
                 </DropdownButton>
             </div>
-        </form></Col></Row>;
+        </form></Col>;
 
-        var results = <div>
-            {this.state.hits}<br/>
-            <Row>
-                <Col xs={8}>
-                    <Row>
-                        <Col xs={6}>
-                            <Tile img="svg/sleep.svg" title="Basic Info" img="svg/sleep.svg" content={<AccountTile account={this.state.account} partner={this.state.partner} />} />
-                            <Tile img="svg/timeline.svg" title="Timeline" content={<TimelineTile email={this.state.email} response={this.state.timelineResponse} status={this.state.timelineStatus} />} />
-                            <Tile img="svg/alarm.svg" title="Alarms" content={<AlarmsTile alarmsResponse={this.state.alarmsResponse} />} />
-                        </Col>
-                        <Col xs={6}>
-                            <Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseResponse={this.state.senseResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} timezoneResponse={this.state.timezoneResponse} senseColorResponse={this.state.senseColorResponse} />} />
-                            <Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile email={this.state.email} lastRoomConditionsResponse={this.state.lastRoomConditionsResponse} particulatesResponse={this.state.particulatesResponse} senseId={this.state.senseId} />} />
-                            <Tile img="svg/timezone.svg" title="Timezone History" content={<TimezoneHistoryTile timezoneHistoryResponse={this.state.timezoneHistoryResponse} />} />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col md={12}><Tile img="svg/zendesk.svg" title="Zendesk" content={<ZendeskTile zendeskResponse={this.state.zendeskResponse} zendeskStatus={this.props.zendeskStatus} />} /></Col>
-                    </Row>
-                </Col>
-                <Col xs={4}>
-                    <Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary pillResponse={this.state.pillResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} email={this.state.email} />} />
-                    <Tile img="svg/uptime.svg" title="Sense Online Uptime" content={<UptimeTile email={this.state.email} />} />
-                    <Tile img="svg/wifi.svg" title="Wifi Info" content={<WifiTile wifiResponse={this.state.wifiResponse} />} />
-                    <Tile title="Clearbit Info" content={<ClearbitTile email={this.state.email} />} />
-                </Col>
-            </Row>
-        </div>;
-        return <div>
+        var results = [
+            <Col xs={12} className="paddingless-left">{this.state.hits}</Col>,
+            <Col xs={12} lg={4} className="paddingless-left">
+                <Tile img="svg/sleep.svg" title="Basic Info" img="svg/sleep.svg" content={<AccountTile account={this.state.account} partner={this.state.partner} />} />
+                <Tile img="svg/timeline.svg" title="Timeline" content={<TimelineTile email={this.state.email} response={this.state.timelineResponse} status={this.state.timelineStatus} />} />
+                <Tile img="svg/alarm.svg" title="Alarms" content={<AlarmsTile alarmsResponse={this.state.alarmsResponse} />} />
+            </Col>,
+            <Col xs={12} lg={4} className="paddingless-left">
+                <Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseResponse={this.state.senseResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} timezoneResponse={this.state.timezoneResponse} senseColorResponse={this.state.senseColorResponse} />} />
+                <Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile email={this.state.email} lastRoomConditionsResponse={this.state.lastRoomConditionsResponse} particulatesResponse={this.state.particulatesResponse} senseId={this.state.senseId} />} />
+                <Tile img="svg/timezone.svg" title="Timezone History" content={<TimezoneHistoryTile timezoneHistoryResponse={this.state.timezoneHistoryResponse} />} />
+            </Col>,
+            <Col xs={12} lg={4} className="paddingless-left">
+                <Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary pillResponse={this.state.pillResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} email={this.state.email} />} />
+                <Tile img="svg/uptime.svg" title="Sense Online Uptime" content={<UptimeTile email={this.state.email} />} />
+                <Tile img="svg/wifi.svg" title="Wifi Info" content={<WifiTile wifiResponse={this.state.wifiResponse} />} />
+                <Tile title="Clearbit Info" content={<ClearbitTile email={this.state.email} />} />
+            </Col>
+        ];
+        return <Col xs={12} className="paddingless container">
             {searchForm}
             {this.state.accountError === null ? results : this.state.accountError}
-        </div>;
+        </Col>;
     }
 });
 

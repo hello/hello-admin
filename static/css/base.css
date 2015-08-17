@@ -42,7 +42,7 @@ span.sidebar-group-last {padding-bottom: 20px;}
 
 
 #content {margin: 0; padding: 60px 0 60px 205px;}
-#footer {background: rgba(162, 164, 169, 0.09); padding: 6px; color: #707070; text-align: center; width: 100%; position: fixed; bottom: 0; font-size: 13px;}
+#footer {background: rgba(162, 164, 169, 0.09); padding: 6px; color: #999999; text-align: center; width: 100%; position: fixed; bottom: 0; font-size: 13px;}
 
 
 .normal {border: 1px solid #90ADE6; transition: all 2s;}
@@ -94,3 +94,5 @@ html {
 }
 
 .center-wrapper {text-align: center;}
+.paddingless {padding: 0;}
+.btn-group.open {width: 175px;}

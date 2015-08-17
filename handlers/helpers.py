@@ -45,7 +45,6 @@ class BaseRequestHandler(webapp2.RequestHandler):
 
     def persist_namespace(self):
         namespace_from_cookies = self.request.cookies.get("namespace", None)
-        log.info('cookie namespace'.format(namespace_from_cookies))
         namespace = namespace_from_cookies or "production"
         namespace_manager.set_namespace(namespace)
 
