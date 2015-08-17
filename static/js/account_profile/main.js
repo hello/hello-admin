@@ -831,7 +831,7 @@ var AccountProfile = React.createClass({
         </form></Col>;
 
         var results = [
-            <Col xs={12} className="paddingless-left">{this.state.hits}</Col>,
+            <Col xs={12} className="paddingless-left hits">{this.state.hits}</Col>,
             <Col xs={12} lg={4} className="paddingless-left">
                 <Tile img="svg/sleep.svg" title="Basic Info" img="svg/sleep.svg" content={<AccountTile account={this.state.account} partner={this.state.partner} />} />
                 <Tile img="svg/timeline.svg" title="Timeline" content={<TimelineTile email={this.state.email} response={this.state.timelineResponse} status={this.state.timelineStatus} />} />
@@ -851,7 +851,7 @@ var AccountProfile = React.createClass({
         ];
         return <Col xs={12} className="paddingless container">
             {searchForm}
-            {this.state.accountError === null ? results : this.state.accountError}
+            {this.state.accountError === null ? results : <Col xs={12} className="paddingless">{this.state.accountError }</Col>}
         </Col>;
     }
 });
