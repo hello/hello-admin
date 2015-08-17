@@ -37,3 +37,15 @@ input:focus {
 .loading-inline {
     height: 16px;
 }
+
+.submit {
+    width: 100%;
+}
+
+.alert {
+    font-size: 80%;
+}
+
+#start-time, #end-time {
+    margin-bottom: 10px;
+}

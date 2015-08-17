@@ -192,56 +192,60 @@ var OnboardingLogs = React.createClass({
 	},
 
     onSelectionChange: function(newSelectedId, data){
-        this.setState({selectedId: newSelectedId, onboardingInfo: <Alert>{data.info}</Alert>});
+        this.setState({selectedId: newSelectedId, onboardingInfo: <Alert bsSize="xs">{data.info}</Alert>});
         $("#sense-id").val(data.sense_id);
 	},
 
     render: function(){
 		return <div>
-            <h3>Onboarding Logs</h3>
-            <hr className="fancy-line"/>
-            <form className="row" onSubmit={this.loadOnboardingLogsByResult}>
-                <Col xs={2}><Input type="select" id="result">
+            <form className="col-xs-12 in" onSubmit={this.loadOnboardingLogsByResult}>
+                <Col xs={12} sm={6} smOffset={3} lg={3} lgOffset={0}><Input type="select" id="result">
                     <option value="START">START</option>
                     <option value="IN_PROGRESS">IN_PROGRESS</option>
                     <option value="FAILED">FAILED</option>
                     <option value="SUCCESS">SUCCESS</option>
                     <option value="EXIT">EXIT</option>
                 </Input></Col>
-                <LongDatetimePicker placeHolder="start (last week)" id="start-time" size="3" />
-                <LongDatetimePicker placeHolder="end (now)" id="end-time" size="3" />
-                <Col xs={1}><Button type="submit"><Glyphicon glyph="search"/></Button></Col>
-            </form>
-            <form className="row" onSubmit={this.loadOnboardingLogsBySenseIdOrEmail}>
-                <Col xs={3}><Input type="text" id="sense-id" placeholder="Sense ID / Email" /></Col>
-                <Col xs={1}><Input type="number" id="count" placeholder="limit" /></Col>
-                <Col xs={1}><Button type="submit"><Glyphicon glyph="search"/></Button></Col>
-                <Col xs={7}>{this.state.onboardingInfo}</Col>
-            </form>
-            <Row>
-                <Col xs={12}>
-                    <DataGrid
-                        ref="grid"
-                        idProperty='id'
-                        dataSource={this.state.filteredData}
-                        columns={this.state.columns}
-                        style={{height: 500}}
-                        withColumnMenu={true}
-                        onColumnResize={this.handleColumnResize}
-                        onSortChange={this.handleSortChange}
-                        style={{height: "67vh", border: "1px solid rgb(194, 194, 245)"}}
-                        emptyText={this.state.error}
-                        showCellBorders={false}
-                        loading={this.state.loading}
-                        loadMaskOverHeader={false}
-                        onFilter={this.handleFilter}
-                        liveFilter={true}
-                        sortInfo={this.state.sortInfo}
-                        selected={this.state.selectedId}
-                        onSelectionChange={this.onSelectionChange}
-                    />
+
+                <Col xs={12} sm={6} smOffset={3} lg={3} lgOffset={0}>
+                    <LongDatetimePickerWithoutSize placeHolder="start (last week)" id="start-time"/>
                 </Col>
-            </Row>
+
+                <Col xs={12} sm={6} smOffset={3} lg={3} lgOffset={0}>
+                    <LongDatetimePickerWithoutSize placeHolder="end (now)" id="end-time"/>
+                </Col>
+
+                <Col xs={12} sm={6} smOffset={3} lg={3} lgOffset={0}><Button className="submit" type="submit"><Glyphicon glyph="search"/></Button></Col>
+            </form>
+            or
+            <form className="col-xs-12 in" onSubmit={this.loadOnboardingLogsBySenseIdOrEmail}>
+                <Col xs={12} sm={6} smOffset={3} lg={3} lgOffset={0}><Input type="text" id="sense-id" placeholder="Sense ID / Email" /></Col>
+                <Col xs={12} sm={6} smOffset={3} lg={3} lgOffset={0}><Input type="number" id="count" placeholder="limit" /></Col>
+                <Col xs={12} sm={6} smOffset={3} lg={3} lgOffset={0}><Button className="submit" type="submit"><Glyphicon glyph="search"/></Button></Col>
+            </form>
+
+            <Col xs={12}>{this.state.onboardingInfo}</Col>
+
+            <DataGrid
+                ref="grid"
+                idProperty='id'
+                dataSource={this.state.filteredData}
+                columns={this.state.columns}
+                style={{height: 500}}
+                withColumnMenu={true}
+                onColumnResize={this.handleColumnResize}
+                onSortChange={this.handleSortChange}
+                style={{height: "67vh", border: "1px solid rgb(194, 194, 245)"}}
+                emptyText={this.state.error}
+                showCellBorders={false}
+                loading={this.state.loading}
+                loadMaskOverHeader={false}
+                onFilter={this.handleFilter}
+                liveFilter={true}
+                sortInfo={this.state.sortInfo}
+                selected={this.state.selectedId}
+                onSelectionChange={this.onSelectionChange}
+            />
         </div>
 	}
 });
