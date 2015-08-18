@@ -53,8 +53,10 @@ var AccountTile = React.createClass({
                 <tr><td>ID</td><td>{this.props.account.id}</td></tr>
                 <tr><td>Name</td><td>{this.props.account.name}</td></tr>
                 <tr><td>Email</td><td>{this.props.account.email}</td></tr>
+                <tr><td>Gender</td><td>{this.props.account.gender}</td></tr>
                 <tr><td>Partner</td><td>{partnerLink}</td></tr>
                 <tr><td>Last Modified</td><td>{new Date(this.props.account.last_modified).toUTCString()}</td></tr>
+                <tr><td>Created Date</td><td>{new Date(this.props.account.created).toUTCString()}</td></tr>
                 <tr><td/><td/></tr>
             </tbody>
         </Table>;
