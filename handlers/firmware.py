@@ -5,7 +5,7 @@ from handlers.helpers import SuperFirmwareRequestHandler
 from handlers.helpers import ProtectedRequestHandler
 from handlers.helpers import ResponseOutput
 from google.appengine.api import memcache
-
+import time
 
 class FirmwareAPI(FirmwareRequestHandler):
     '''Enables OTA firmware updates'''
@@ -49,8 +49,8 @@ class FirmwareAPI(FirmwareRequestHandler):
 class FirmwareInfoAPI(FirmwareRequestHandler):
 
     def get(self):
-        range_start = self.request.get('range_start', default_value="0")
-        range_end = self.request.get('range_end', default_value="100")
+        range_start = self.request.get('range_start', default_value=int(time.time()*1000) - 7*86400000)
+        range_end = self.request.get('range_end', default_value=int(time.time()*1000))
 
         self.hello_request(
             api_url="firmware/list_by_time",
