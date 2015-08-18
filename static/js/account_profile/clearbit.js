@@ -115,7 +115,8 @@ var ClearbitTile = React.createClass({
 
     render: function() {
         return <div>
-            <Button bsSize="xsmall" onClick={this.loadClearbitProfileByEmail}>Reveal</Button><br/>
+            <Button bsSize="xsmall" onClick={this.loadClearbitProfileByEmail}>Reveal</Button>
+            <br/><br/>
             <ClearbitInfo clearbit={this.state.clearbit} />
         </div>
     }
