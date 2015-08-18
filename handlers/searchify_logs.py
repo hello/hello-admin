@@ -265,12 +265,20 @@ class LogsPatternFacetsAPI(ProtectedRequestHandler):
     def end_ts(self):
         return self.request.get("end_ts", default_value=None) or None
 
+    @property
+    def middle_fw_version_filter(self):
+        middle_fw_version = self.request.get("middle_fw_version", default_value=None)
+        if not middle_fw_version:
+            return None
+        return {"middle_fw_version": middle_fw_version}
+
     def get_facets(self, index_name):
         output = {"data": [], "error": "Facets not found!"}
         index = ApiClient(self.searchify_credentials.api_client).get_index(index_name)
         try:
             output['data'] = index.search(
                 query="text:{}".format(self.pattern),
+                category_filters=self.middle_fw_version_filter,
                 docvar_filters={0: [[self.start_ts, self.end_ts]]}
             ).get("facets", {})
             if output['data']:
