@@ -87,11 +87,11 @@ th {text-align: left !important ;}
 .search-type-icon {height: 18px; margin: 0 11px -3px -6px; opacity: 0.6;}
 #submit {
     left: inherit;
-    top: 0;
+    top: 5px;
     right: 15px;
-    margin: 7px 0;
     padding-right: 15px;
 }
+#submit>div.icon-addon {height: 48px;}
 #account-input {
     font-size: 16px;
     font-weight: lighter;

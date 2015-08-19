@@ -1,5 +1,7 @@
 /** @jsx React.DOM */
 
+var utcFormatter = d3.time.format.utc("%a&nbsp;&nbsp;%d&nbsp;&nbsp;%b&nbsp;&nbsp;%Y<br>%H : %M : %S - GMT");
+
 var UpdateColorModal = React.createClass({
     render: function() {
         return this.transferPropsTo(
@@ -55,8 +57,8 @@ var AccountTile = React.createClass({
                 <tr><td>Email</td><td>{this.props.account.email}</td></tr>
                 <tr><td>Gender</td><td>{this.props.account.gender}</td></tr>
                 <tr><td>Partner</td><td>{partnerLink}</td></tr>
-                <tr><td>Last Modified</td><td>{new Date(this.props.account.last_modified).toUTCString()}</td></tr>
-                <tr><td>Created Date</td><td>{new Date(this.props.account.created).toUTCString()}</td></tr>
+                <tr><td>Last Modified</td><td><span dangerouslySetInnerHTML={{__html: utcFormatter(new Date(this.props.account.last_modified))}}/></td></tr>
+                <tr><td>Created Date</td><td><span dangerouslySetInnerHTML={{__html: utcFormatter(new Date(this.props.account.created))}}/></td></tr>
                 <tr><td/><td/></tr>
             </tbody>
         </Table>;
@@ -269,10 +271,11 @@ var SenseSummary = React.createClass({
             data: {version: version},
             success: function(response) {
                 if (response.error.isWhiteString()) {
-                    version = <a href={"/firmware/?device_id=" + senseId} target="_blank">
-                        {version || <span className="not-ok">unknown-hashed</span>}<span> (</span>
-                        {response.data.join(", ") || <span className="not-ok">unknown-unhashed</span>}<span>)</span>
-                    </a>;
+                    version = <div>
+                        <a href={"/firmware/?device_id=" + senseId} target="_blank">
+                        {version || <span className="not-ok">unknown</span>}</a>
+                        <span>{response.data.join(", ") ? "(" + response.data.join(", ") + ")" : null}</span>
+                    </div>;
                 }
             }
         });
@@ -325,11 +328,10 @@ var SenseSummary = React.createClass({
 
             if (senseResponse.data[0].device_status){
                 var lastSeenEpoch = senseResponse.data[0].device_status.lastSeen;
-                lastSeen = <span className={lastSeenEpoch < new Date().getTime() - 3600*1000 ? "not-ok" : "ok"}>
-                    {new Date(lastSeenEpoch).toUTCString()}</span>;
+                lastSeen = <span className={lastSeenEpoch < new Date().getTime() - 3600*1000 ? "not-ok" : "ok"}  dangerouslySetInnerHTML={{__html:utcFormatter(new Date(lastSeenEpoch))}}/>;
+                var pairedByAdmin = senseResponse.data[0].paired_by_admin === true ? "&nbsp;&nbsp;by admin": "";
             }
-            var lastPairingTs = senseResponse.data[0].pairing_ts ?
-                new Date(senseResponse.data[0].pairing_ts).toUTCString() : null;
+            var lastPairing = <span dangerouslySetInnerHTML={{__html: senseResponse.data[0].pairing_ts ? utcFormatter(new Date(senseResponse.data[0].pairing_ts)) + pairedByAdmin : null}}/>;
 
             var senseColor = senseColorResponse.error.isWhiteString() && senseColorResponse.data ?
                 <OverlayTrigger trigger="click" placement="right" overlay={
@@ -349,7 +351,7 @@ var SenseSummary = React.createClass({
                         <tr><td>Timezone</td><td>{timezone}</td></tr>
                         <tr><td>Color</td><td>{senseColor}</td></tr>
                         <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
-                        <tr><td>Last Pairing</td><td>{lastPairingTs}</td></tr>
+                        <tr><td>Last Pairing</td><td>{lastPairing}</td></tr>
                         <tr><td/><td/></tr>
                     </tbody>
                 </Table>
@@ -375,8 +377,7 @@ var PillSummary = React.createClass({
                 batteryLevel = pillStatusResponse.data[0][0].batteryLevel ?
                     <span>{pillStatusResponse.data[0][0].batteryLevel + " %"}</span> : null;
                 var lastSeenEpoch = pillStatusResponse.data[0][0].lastSeen;
-                lastSeen = <span className={lastSeenEpoch < new Date().getTime() - 4*3600*1000 ? "not-ok" : "ok"}>
-                    {new Date(lastSeenEpoch).toUTCString()}</span>;
+                lastSeen = <span className={lastSeenEpoch < new Date().getTime() - 4*3600*1000 ? "not-ok" : "ok"} dangerouslySetInnerHTML={{__html: utcFormatter(new Date(lastSeenEpoch))}}/>;
                 uptime = millisecondsToHumanReadableString(pillStatusResponse.data[0][0].uptime * 1000);
             }
             else {
@@ -396,10 +397,13 @@ var PillSummary = React.createClass({
             keyStore = <span className="not-ok">unprovisioned</span>;
         }
 
+
         if (pillResponse.data.length > 0) {
             var pillId = pillResponse.data[0].device_account_pair ? pillResponse.data[0].device_account_pair.externalDeviceId : undefined;
             var pillInternalId = pillResponse.data[0].device_account_pair ? " (" + pillResponse.data[0].device_account_pair.internalDeviceId + ")" : undefined;
             var lastNightDate =  d3.time.format("%m-%d-%Y")(new Date(new Date().getTime() - 24*3600*1000));
+            var pairedByAdmin = pillResponse.data[0].paired_by_admin === true ? "&nbsp;&nbsp;by admin": "";
+            var lastPairing =  pillResponse.data[0].pairing_ts ? <span dangerouslySetInnerHTML={{__html: utcFormatter(new Date(pillResponse.data[0].pairing_ts)) + pairedByAdmin}}/> : null;
             result = <div><Table>
                 <thead/>
                 <tbody>
@@ -408,7 +412,7 @@ var PillSummary = React.createClass({
                     <tr><td>Battery</td><td>{batteryLevel}</td></tr>
                     <tr><td>Uptime</td><td>{uptime}</td></tr>
                     <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
-                    <tr><td>Last Pairing</td><td>{new Date(pillResponse.data[0].pairing_ts).toUTCString()}</td></tr>
+                    <tr><td>Last Pairing</td><td>{lastPairing}</td></tr>
                     <tr><td/><td/></tr>
                 </tbody>
             </Table>
@@ -777,7 +781,7 @@ var AccountProfile = React.createClass({
         this.loadTimeline(email);
         this.loadAlarms(email);
         this.loadTimezoneHistory(email);
-        this.loadZendeskTickets(email);
+//        this.loadZendeskTickets(email);
     },
 
     loadData: function() {
