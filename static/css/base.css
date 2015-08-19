@@ -94,5 +94,6 @@ html {
 }
 
 .center-wrapper {text-align: center;}
+.right-wrapper {text-align: right;}
 .paddingless {padding: 0;}
 .btn-group.open {width: 175px;}

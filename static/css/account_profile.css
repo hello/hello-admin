@@ -122,3 +122,5 @@ th {text-align: left !important ;}
 .hits {margin-bottom: 15px;}
 ul.extra>li {display: inline; margin: 0 0 0 8px;}
 .table{margin-bottom: 0;}
+.modal-title {text-transform: uppercase; font-size: 13px;}
+.modal-body {font-size: 14px; color: #666666;}

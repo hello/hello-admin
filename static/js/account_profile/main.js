@@ -3,8 +3,9 @@ var utcFormatter = d3.time.format.utc("%a&nbsp;&nbsp;%d&nbsp;&nbsp;%b&nbsp;&nbsp
 var ZendeskModal = React.createClass({
     render: function() {
         return ( <Modal animation={false}>
-            <div className='modal-header'>
-                ZD
+            <div className='modal-header row'>
+                <Col xs={10} className="modal-title">Recent Zendesk Tickets</Col>
+                <Col xs={2} className="right-wrapper"><Button bsSize="xsmall" class="modal-close" onClick={this.props.onRequestHide}>x</Button></Col>
             </div>
             <div className='modal-body'>
                 <ZendeskTile zendeskResponse={this.props.zendeskResponse} zendeskStatus={this.props.zendeskStatus} />
@@ -65,7 +66,7 @@ var AccountTile = React.createClass({
             <ul className="extra">
                 <li><a target="_blank" href={"https://mixpanel.com/report/544347/explore/#list/chosen_columns:!('$country_code','$last_seen','$city',Platform),filter:(conjunction:and,filters:!((filter:(operand:!('" + this.props.account.id + "'),operator:%3D%3D),property:'Account%20Id',selected_property_type:string,type:string))),sort_order:descending,sort_property:'!''"}>Mixpanel</a></li>
                 <li><ModalTrigger modal={<ZendeskModal zendeskResponse={this.props.zendeskResponse} zendeskStatus={this.props.zendeskStatus} />}>
-                    <a>Zendesk</a>
+                    <a className="cursor-hand">Zendesk</a>
                 </ModalTrigger></li>
             </ul>
         </div>;
