@@ -329,7 +329,6 @@ var SenseSummary = React.createClass({
             if (senseResponse.data[0].device_status){
                 var lastSeenEpoch = senseResponse.data[0].device_status.lastSeen;
                 lastSeen = <span className={lastSeenEpoch < new Date().getTime() - 3600*1000 ? "not-ok" : "ok"}  dangerouslySetInnerHTML={{__html:utcFormatter(new Date(lastSeenEpoch))}}/>;
-                console.log(senseResponse.data[0]);
                 var pairedByAdmin = senseResponse.data[0].paired_by_admin === true ? "&nbsp;&nbsp;by admin": "";
             }
             var lastPairing = <span dangerouslySetInnerHTML={{__html: senseResponse.data[0].pairing_ts ? utcFormatter(new Date(senseResponse.data[0].pairing_ts)) + pairedByAdmin : null}}/>;
@@ -560,7 +559,6 @@ var AccountProfile = React.createClass({
             data: {email: email, device_type: "sense"},
             success: function (response) {
                 this.setState({senseResponse: response});
-                console.log("sense", response);
                 if (response.data.length > 0) {
                     if (response.data[0].device_account_pair) {
                         if (response.data[0].device_account_pair.externalDeviceId) {
