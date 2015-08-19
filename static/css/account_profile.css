@@ -1,7 +1,7 @@
 .tile {
     box-shadow: 2px 2px 13px 0 rgba(1,1,0,.1);
     -webkit-border-radius: 6px;
-    padding: 10px 10px 0 10px;
+    padding: 10px;
     border-radius: 6px;
     display: block;
     line-height: 1.42857143;
@@ -120,3 +120,5 @@ th {text-align: left !important ;}
 .container {max-width: 1300px;}
 ::-webkit-input-placeholder {color: red;}
 .hits {margin-bottom: 15px;}
+ul.extra>li {display: inline; margin: 0 0 0 8px;}
+.table{margin-bottom: 0;}
