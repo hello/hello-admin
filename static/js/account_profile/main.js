@@ -1,23 +1,22 @@
-/** @jsx React.DOM */
-
 var utcFormatter = d3.time.format.utc("%a&nbsp;&nbsp;%d&nbsp;&nbsp;%b&nbsp;&nbsp;%Y<br>%H : %M : %S - GMT");
 
-var UpdateColorModal = React.createClass({
+var ZendeskModal = React.createClass({
     render: function() {
-        return this.transferPropsTo(
-            <Modal pra title="Update Device Color">
-                <div className="modal-body">
-                    <Input type="select">
-                        <option value="BLACK">BLACK</option>
-                        <option value="WHITE">WHITE</option>
-                    </Input>
-                </div>
-                <div className="modal-footer">
-                </div>
-            </Modal>
-        );
+        return ( <Modal animation={false}>
+            <div className='modal-header'>
+                ZD
+            </div>
+            <div className='modal-body'>
+                <ZendeskTile zendeskResponse={this.props.zendeskResponse} zendeskStatus={this.props.zendeskStatus} />
+            </div>
+            <div className='modal-footer'>
+                <Button onClick={this.props.onRequestHide}>Close</Button>
+            </div>
+        </Modal>);
     }
 });
+
+
 
 var Tile = React.createClass({
     getDefaultProps: function() {
@@ -49,19 +48,27 @@ var AccountTile = React.createClass({
                 title={this.props.partner.name} target="_blank"
                 href={"/account_profile/?type=email&input=" + this.props.partner.email}>
             {this.props.partner.email}</a> : "-";
-        return <Table>
-            <thead></thead>
-            <tbody>
-                <tr><td>ID</td><td>{this.props.account.id}</td></tr>
-                <tr><td>Name</td><td>{this.props.account.name}</td></tr>
-                <tr><td>Email</td><td>{this.props.account.email}</td></tr>
-                <tr><td>Gender</td><td>{this.props.account.gender}</td></tr>
-                <tr><td>Partner</td><td>{partnerLink}</td></tr>
-                <tr><td>Last Modified</td><td><span dangerouslySetInnerHTML={{__html: utcFormatter(new Date(this.props.account.last_modified))}}/></td></tr>
-                <tr><td>Created Date</td><td><span dangerouslySetInnerHTML={{__html: utcFormatter(new Date(this.props.account.created))}}/></td></tr>
-                <tr><td/><td/></tr>
-            </tbody>
-        </Table>;
+        return <div>
+            <Table>
+                <thead></thead>
+                <tbody>
+                    <tr><td>ID</td><td>{this.props.account.id}</td></tr>
+                    <tr><td>Name</td><td>{this.props.account.name}</td></tr>
+                    <tr><td>Email</td><td>{this.props.account.email}</td></tr>
+                    <tr><td>Gender</td><td>{this.props.account.gender}</td></tr>
+                    <tr><td>Partner</td><td>{partnerLink}</td></tr>
+                    <tr><td>Last Modified</td><td><span dangerouslySetInnerHTML={{__html: utcFormatter(new Date(this.props.account.last_modified))}}/></td></tr>
+                    <tr><td>Created Date</td><td><span dangerouslySetInnerHTML={{__html: utcFormatter(new Date(this.props.account.created))}}/></td></tr>
+                    <tr><td/><td/></tr>
+                </tbody>
+            </Table>
+            <ul className="extra">
+                <li><a target="_blank" href={"https://mixpanel.com/report/544347/explore/#list/chosen_columns:!('$country_code','$last_seen','$city',Platform),filter:(conjunction:and,filters:!((filter:(operand:!('" + this.props.account.id + "'),operator:%3D%3D),property:'Account%20Id',selected_property_type:string,type:string))),sort_order:descending,sort_property:'!''"}>Mixpanel</a></li>
+                <li><ModalTrigger modal={<ZendeskModal zendeskResponse={this.props.zendeskResponse} zendeskStatus={this.props.zendeskStatus} />}>
+                    <a>Zendesk</a>
+                </ModalTrigger></li>
+            </ul>
+        </div>;
     }
 });
 
@@ -245,7 +252,7 @@ var ZendeskTile = React.createClass({
                                     <tr><td>Tags</td><td>{ticketTags}</td></tr>
                                     <tr><td>Updated</td><td>{new Date(ticket.updated_at).toString()}</td></tr>
                                     <tr><td>Status</td><td>{ticket.status}</td></tr>
-                                    <tr><td>URL</td><td><a target="_blank" href={ticketURL}>{ticketURL}</a></td></tr>
+                                    <tr><td>URL</td><td><a target="_blank" hrf={ticketURL}>{ticketURL}</a></td></tr>
                                     <tr><td/><td/></tr>
                                 </tbody>
                             </Table>
@@ -355,8 +362,10 @@ var SenseSummary = React.createClass({
                         <tr><td/><td/></tr>
                     </tbody>
                 </Table>
-                <p><a target="_blank" href={"/sense_logs/?field=device_id&keyword=" + senseId + "&sense_id=&limit=&start=&end="}>Last 20 sense logs</a></p>
-                <p><a target="_blank" href={"/sense_events/?account_input=" + senseId + "&start_ts=" + new Date().getTime()}>Last 25 events</a></p>
+                <ul className="extra">
+                    <li><a target="_blank" href={"/sense_logs/?field=device_id&keyword=" + senseId + "&sense_id=&limit=&start=&end="}>Logs</a></li>
+                    <li><a target="_blank" href={"/sense_events/?account_input=" + senseId + "&start_ts=" + new Date().getTime()}>Events</a></li>
+                </ul>
             </div>;
         }
 
@@ -371,7 +380,7 @@ var PillSummary = React.createClass({
             pillStatusResponse = this.props.pillStatusResponse,
             pillKeyStoreResponse = this.props.pillKeyStoreResponse,
             result = null, batteryLevel = null, lastSeen = null, keyStore = null, uptime = null;
-
+        console.log(pillResponse);
         if (pillStatusResponse.data.length > 0) {
             if(pillStatusResponse.data[0][0]) {
                 batteryLevel = pillStatusResponse.data[0][0].batteryLevel ?
@@ -397,27 +406,32 @@ var PillSummary = React.createClass({
             keyStore = <span className="not-ok">unprovisioned</span>;
         }
 
-
+        var pillColor = <Button className="device-color" bsSize="xsmall" disabled>BLUE</Button>;
         if (pillResponse.data.length > 0) {
             var pillId = pillResponse.data[0].device_account_pair ? pillResponse.data[0].device_account_pair.externalDeviceId : undefined;
             var pillInternalId = pillResponse.data[0].device_account_pair ? " (" + pillResponse.data[0].device_account_pair.internalDeviceId + ")" : undefined;
             var lastNightDate =  d3.time.format("%m-%d-%Y")(new Date(new Date().getTime() - 24*3600*1000));
             var pairedByAdmin = pillResponse.data[0].paired_by_admin === true ? "&nbsp;&nbsp;by admin": "";
             var lastPairing =  pillResponse.data[0].pairing_ts ? <span dangerouslySetInnerHTML={{__html: utcFormatter(new Date(pillResponse.data[0].pairing_ts)) + pairedByAdmin}}/> : null;
-            result = <div><Table>
-                <thead/>
-                <tbody>
-                    <tr><td>ID</td><td>{pillId + pillInternalId}</td></tr>
-                    <tr><td>Keystore</td><td>{keyStore}</td></tr>
-                    <tr><td>Battery</td><td>{batteryLevel}</td></tr>
-                    <tr><td>Uptime</td><td>{uptime}</td></tr>
-                    <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
-                    <tr><td>Last Pairing</td><td>{lastPairing}</td></tr>
-                    <tr><td/><td/></tr>
-                </tbody>
-            </Table>
-                <p><a target="_blank" href={"/battery/?search=" + pillId + "&end_ts="}>Last 336 pill heartbeats</a></p>
-                <p><a target="_blank" href={"/motion/?email=" + this.props.email + "&date=" + lastNightDate}>Last night motion</a></p></div>;
+            result = <div>
+                <Table>
+                    <thead/>
+                    <tbody>
+                        <tr><td>ID</td><td>{pillId + pillInternalId}</td></tr>
+                        <tr><td>Keystore</td><td>{keyStore}</td></tr>
+                        <tr><td>Battery</td><td>{batteryLevel}</td></tr>
+                        <tr><td>Uptime</td><td>{uptime}</td></tr>
+                        <tr><td>Color</td><td>{pillColor}</td></tr>
+                        <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
+                        <tr><td>Last Pairing</td><td>{lastPairing}</td></tr>
+                        <tr><td/><td/></tr>
+                    </tbody>
+                </Table>
+                <ul className="extra">
+                    <li><a target="_blank" href={"/battery/?search=" + pillId + "&end_ts="}>Heartbeats</a></li>
+                    <li><a target="_blank" href={"/motion/?email=" + this.props.email + "&date=" + lastNightDate}>Motion</a></li>
+                </ul>
+            </div>;
         }
 
         return !pillResponse.error.isWhiteString ?
@@ -781,7 +795,7 @@ var AccountProfile = React.createClass({
         this.loadTimeline(email);
         this.loadAlarms(email);
         this.loadTimezoneHistory(email);
-//        this.loadZendeskTickets(email);
+        this.loadZendeskTickets(email);
     },
 
     loadData: function() {
@@ -839,7 +853,7 @@ var AccountProfile = React.createClass({
         var results = [
             <Col xs={12} className="paddingless-left hits">{this.state.hits}</Col>,
             <Col xs={12} lg={4} className="paddingless-left">
-                <Tile img="svg/sleep.svg" title="Basic Info" img="svg/sleep.svg" content={<AccountTile account={this.state.account} partner={this.state.partner} />} />
+                <Tile img="svg/sleep.svg" title="User Summary" img="svg/sleep.svg" content={<AccountTile account={this.state.account} partner={this.state.partner} zendeskResponse={this.state.zendeskResponse} zendeskStatus={this.state.zendeskStatus} />} />
                 <Tile img="svg/timeline.svg" title="Timeline" content={<TimelineTile email={this.state.email} response={this.state.timelineResponse} status={this.state.timelineStatus} />} />
                 <Tile img="svg/alarm.svg" title="Alarms" content={<AlarmsTile alarmsResponse={this.state.alarmsResponse} />} />
             </Col>,
