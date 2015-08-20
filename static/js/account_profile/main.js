@@ -389,7 +389,7 @@ var PillSummary = React.createClass({
                     <span>{pillStatusResponse.data[0][0].batteryLevel + " %"}</span> : null;
                 var lastSeenEpoch = pillStatusResponse.data[0][0].lastSeen;
                 lastSeen = <span className={lastSeenEpoch < new Date().getTime() - 4*3600*1000 ? "not-ok" : "ok"} dangerouslySetInnerHTML={{__html: utcFormatter(new Date(lastSeenEpoch))}}/>;
-                uptime = millisecondsToHumanReadableString(pillStatusResponse.data[0][0].uptime * 1000);
+                uptime = millisecondsToHumanReadableString(pillStatusResponse.data[0][0].uptime * 1000, true);
             }
             else {
                 batteryLevel = <span className="not-ok">-</span>;
