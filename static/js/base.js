@@ -49,7 +49,7 @@ String.prototype.isWhiteString = function() {
     return (this.trim().length === 0);
 };
 
-function millisecondsToHumanReadableString(milliseconds){
+function millisecondsToHumanReadableString(milliseconds, withoutSeconds){
   var seconds = milliseconds/1000;
   var numyears = Math.floor(seconds / 31536000);
   var numdays = Math.floor((seconds % 31536000) / 86400);
@@ -60,6 +60,9 @@ function millisecondsToHumanReadableString(milliseconds){
   var day = numdays > 0 ? numdays + (numdays === 1 ? " day": " days"): "";
   var hour = numhours > 0 ? numhours + (numhours === 1 ? " hour": " hours"): "";
   var minute = numminutes > 0 ? numminutes + (numminutes === 1 ? " minute": " minutes"): "";
+  if (withoutSeconds) {
+    return [year, day, hour, minute].join(" ");
+  }
   var second = numseconds > 0 ? numseconds + (numseconds === 1 ? " second": " seconds"): "";
   return [year, day, hour, minute, second].join(" ");
 }
