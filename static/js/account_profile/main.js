@@ -1,23 +1,5 @@
 var utcFormatter = d3.time.format.utc("%a&nbsp;&nbsp;%d&nbsp;&nbsp;%b&nbsp;&nbsp;%Y<br>%H : %M : %S - GMT");
 
-var ZendeskModal = React.createClass({
-    render: function() {
-        return ( <Modal animation={false}>
-            <div className='modal-header row'>
-                <Col xs={10} className="modal-title">Recent Zendesk Tickets</Col>
-                <Col xs={2} className="right-wrapper"><Button bsSize="xsmall" class="modal-close" onClick={this.props.onRequestHide}>x</Button></Col>
-            </div>
-            <div className='modal-body'>
-                <ZendeskTile zendeskResponse={this.props.zendeskResponse} zendeskStatus={this.props.zendeskStatus} />
-            </div>
-            <div className='modal-footer'>
-                <Button onClick={this.props.onRequestHide}>Close</Button>
-            </div>
-        </Modal>);
-    }
-});
-
-
 var Tile = React.createClass({
     getDefaultProps: function() {
         return {img: "svg/motion.svg"}
@@ -64,7 +46,7 @@ var AccountTile = React.createClass({
             </Table>
             <ul className="extra">
                 <li><a target="_blank" href={"https://mixpanel.com/report/544347/explore/#list/chosen_columns:!('$country_code','$last_seen','$city',Platform),filter:(conjunction:and,filters:!((filter:(operand:!('" + this.props.account.id + "'),operator:%3D%3D),property:'Account%20Id',selected_property_type:string,type:string))),sort_order:descending,sort_property:'!''"}>Mixpanel</a></li>
-                <li><ModalTrigger modal={<ZendeskModal zendeskResponse={this.props.zendeskResponse} zendeskStatus={this.props.zendeskStatus} />}>
+                <li><ModalTrigger modal={<ZendeskModal email={this.props.account.email} />}>
                     <a className="cursor-hand">Zendesk</a>
                 </ModalTrigger></li>
                 <li><ModalTrigger modal={<ClearbitModal email={this.props.account.email} />}>
@@ -229,44 +211,6 @@ var WifiTile = React.createClass({
         return <div>
             {networksTable}
             <p> Last Scan: {response.data.scan_time ? new Date(Number(response.data.scan_time) * 1000).toUTCString() : null}</p>
-        </div>
-    }
-});
-
-var ZendeskTile = React.createClass({
-    render: function() {
-        var zendeskResponse = this.props.zendeskResponse, ticketsCount = 0;
-        if (zendeskResponse.error.isWhiteString() && !$.isEmptyObject(zendeskResponse.data) && zendeskResponse.data.tickets.length > 0) {
-            ticketsCount = zendeskResponse.data.count;
-            var zendeskTickets = <ReactBootstrap.Carousel index={0} pause="true" interval={Math.pow(10, 10)}>
-                {zendeskResponse.data.tickets.map(function(ticket){
-                    var ticketURL = "https://helloinc.zendesk.com/tickets/" + ticket.id;
-                    var ticketFrom = Object.keys(ticket.via.source.from).map(function(k){return ticket.via.source.from[k]}).join(" | ") || ticket.via.channel;
-                    var ticketTags = <em>{ticket.tags.join(", ")}</em>;
-                    return <ReactBootstrap.CarouselItem>
-                        <div className="zendesk-well">
-                            <Table>
-                                <thead/>
-                                <tbody>
-                                    <tr><td>Created</td><td>{new Date(ticket.created_at).toString()}</td></tr>
-                                    <tr><td>From</td><td>{ticketFrom}</td></tr>
-                                    <tr><td>To</td><td>{ticket.recipient}</td></tr>
-                                    <tr><td>Subject</td><td>{ticket.subject}</td></tr>
-                                    <tr><td>Tags</td><td>{ticketTags}</td></tr>
-                                    <tr><td>Updated</td><td>{new Date(ticket.updated_at).toString()}</td></tr>
-                                    <tr><td>Status</td><td>{ticket.status}</td></tr>
-                                    <tr><td>URL</td><td><a target="_blank" hrf={ticketURL}>{ticketURL}</a></td></tr>
-                                    <tr><td/><td/></tr>
-                                </tbody>
-                            </Table>
-                        </div>
-                    </ReactBootstrap.CarouselItem>;
-                })}</ReactBootstrap.Carousel>;
-        }
-        return <div>
-            <div>&nbsp;&Sigma; = {ticketsCount}</div>
-            {this.props.status}
-            {zendeskTickets}
         </div>
     }
 });
@@ -453,7 +397,6 @@ var AccountProfile = React.createClass({
             timelineResponse: {data: [], error: ""},
             timezoneResponse: {data: {}, error: ""},
             timezoneHistoryResponse: {data: {}, error: ""},
-            zendeskResponse: {data: {}, error: ""},
             temperatureResponse: {data: [], error: ""},
             humidityResponse: {data: [], error: ""},
             particulatesResponse: {data: [], error: ""},
@@ -464,7 +407,6 @@ var AccountProfile = React.createClass({
             senseColorResponse: {data: null, error: ""},
             accountInput: "",
             timelineStatus: null,
-            zendeskStatus: null,
             searchType: "email",
             hits: [],
             email: "",
@@ -694,24 +636,6 @@ var AccountProfile = React.createClass({
         });
     },
 
-    loadZendeskTickets: function(email) {
-        this.setState({zendeskStatus: <div className="loader"><img src="/static/image/loading.gif" /></div>});
-        $.ajax({
-            url: "/api/zendesk",
-            dataType: "json",
-            type: 'GET',
-            data: {email: email},
-            success: function (response) {
-                if (response.error.isWhiteString()) {
-                    this.setState({zendeskResponse: response, zendeskStatus: null});
-                }
-                else {
-                    this.setState({zendeskResponse: response, zendeskStatus: <Well>{response.error}</Well>});
-                }
-            }.bind(this)
-        });
-    },
-
     loadParticulates: function(email) {
         ['particulates'].forEach(function(sensor){
             $.ajax({
@@ -797,7 +721,6 @@ var AccountProfile = React.createClass({
         this.loadTimeline(email);
         this.loadAlarms(email);
         this.loadTimezoneHistory(email);
-        this.loadZendeskTickets(email);
     },
 
     loadData: function() {
