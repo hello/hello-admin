@@ -159,7 +159,8 @@ var SenseLogsNew = React.createClass({
             <Table striped>
                 <thead><tr><th className="alert-success">
                     <Col xs={2}><Button onClick={this.loadOlderLogs} className="previous-time-window">Prev</Button></Col>
-                    <Col xs={8}>{this.state.resultsSize} documents</Col>
+                    <Col xs={6}>{this.state.resultsSize} documents</Col>
+                    <Col xs={2}><Button bsSize="xs"><FileExporter fileContent={response.results} fileName="sense_logs"/></Button></Col>
                     <Col xs={2}><Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button></Col>
                 </th></tr></thead>
                 <tbody>
