@@ -7,15 +7,17 @@ var SparkLine = React.createClass({
             yAttr: "y",
             yUpperBound: 100,
             yLowerBound: 0,
-            width: 140,
-            height: 50,
+            width: 280,
+            height: 207,
             strokeColor: 'black',
             strokeWidth: '0.6px',
             interpolate: 'none',
             terminalCircleDiameter: 2.1,
             terminalColor: "rgba(75, 0, 130, 0.6)",
             flagCircleDiameter: 3,
+            zeroCircleDiameter: 1,
             flagColor: "rgba(255, 0, 0, 0.4)",
+            zeroColor: "gray",
             data: [9, 3, 2, 0, 1, 3] //Lukas's birthday :)
         };
     },
@@ -104,7 +106,7 @@ var SparkLine = React.createClass({
             .on('mouseout', tip.hide);
 
         data.forEach(function(d){
-            if (d[this.props.yAttr] <= this.props.yUpperBound && d[this.props.yAttr] >= this.props.yLowerBound) {
+            if (d[this.props.yAttr] <= this.props.yUpperBound && d[this.props.yAttr] >= this.props.yLowerBound && d[this.props.yAttr] !== 0) {
                 svg.append('circle')
                     .data([d])
                     .attr('class', 'sparkcircle')
@@ -175,8 +177,8 @@ var UptimeTile = React.createClass({
         return <Table>
             <thead/>
             <tbody>
-                <tr><td>Proportion</td><td>{upTimeProportion}</td></tr>
-                <tr><td>10-day-history</td><td>
+                <tr><td>10-day-ratio = {upTimeProportion}</td></tr>
+                <tr><td>
                     <SparkLine xAttr="ts" yAttr="count" yUpperBound={58} yLowerBound={0}
                         data={this.state.uptime.slice(1, this.state.uptime.length -1)}/>
                 </td></tr>
