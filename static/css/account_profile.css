@@ -17,10 +17,6 @@
     margin-bottom: 15px;
 }
 
-body {
-    background-image: url(/static/image/grey.png);
-}
-
 .tile-name {font-size: 13px; text-transform: uppercase; margin-left: 15px;}
 .tile-content {font-size: 14px; color: #666666;}
 .tile-title {margin-top: 5px;}
