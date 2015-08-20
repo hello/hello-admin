@@ -18,7 +18,6 @@ var ZendeskModal = React.createClass({
 });
 
 
-
 var Tile = React.createClass({
     getDefaultProps: function() {
         return {img: "svg/motion.svg"}
@@ -67,6 +66,9 @@ var AccountTile = React.createClass({
                 <li><a target="_blank" href={"https://mixpanel.com/report/544347/explore/#list/chosen_columns:!('$country_code','$last_seen','$city',Platform),filter:(conjunction:and,filters:!((filter:(operand:!('" + this.props.account.id + "'),operator:%3D%3D),property:'Account%20Id',selected_property_type:string,type:string))),sort_order:descending,sort_property:'!''"}>Mixpanel</a></li>
                 <li><ModalTrigger modal={<ZendeskModal zendeskResponse={this.props.zendeskResponse} zendeskStatus={this.props.zendeskStatus} />}>
                     <a className="cursor-hand">Zendesk</a>
+                </ModalTrigger></li>
+                <li><ModalTrigger modal={<ClearbitModal email={this.props.account.email} />}>
+                    <a className="cursor-hand">Clearbit</a>
                 </ModalTrigger></li>
             </ul>
         </div>;
@@ -381,7 +383,6 @@ var PillSummary = React.createClass({
             pillStatusResponse = this.props.pillStatusResponse,
             pillKeyStoreResponse = this.props.pillKeyStoreResponse,
             result = null, batteryLevel = null, lastSeen = null, keyStore = null, uptime = null;
-        console.log(pillResponse);
         if (pillStatusResponse.data.length > 0) {
             if(pillStatusResponse.data[0][0]) {
                 batteryLevel = pillStatusResponse.data[0][0].batteryLevel ?
@@ -867,7 +868,6 @@ var AccountProfile = React.createClass({
                 <Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary pillResponse={this.state.pillResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} email={this.state.email} />} />
                 <Tile img="svg/uptime.svg" title="Sense Online Uptime" content={<UptimeTile email={this.state.email} />} />
                 <Tile img="svg/wifi.svg" title="Wifi Info" content={<WifiTile wifiResponse={this.state.wifiResponse} />} />
-                <Tile title="Clearbit Info" content={<ClearbitTile email={this.state.email} />} />
             </Col>
         ];
         return <Col xs={12} className="paddingless container">
