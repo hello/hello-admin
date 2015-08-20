@@ -369,7 +369,7 @@ class FirmwareCrashLogsRetain(ProtectedRequestHandler):
 
         # messages = "Current FW crash logs black list is\n```top version: {}\nmiddle version: {}\nsense_id: {}```\n\n".format(buggy_firmware.top_versions, buggy_firmware.middle_versions, buggy_firmware.sense_ids)
         messages = ""
-        for keyword in ["ASSERT", "fault"]:
+        for keyword in ["ASSERT", "fault", "i2c recovery", "fail at"]:
             searchify_query = SearchifyQuery()
             searchify_query.set_query("text:{}".format(keyword))
             searchify_query.set_fetch_fields(["top_fw_version", "middle_fw_version", "device_id"])
