@@ -8,19 +8,21 @@ var SparkLine = React.createClass({
             yUpperBound: 100,
             yLowerBound: 0,
             width: 280,
-            height: 167,
-            strokeColor: '#4CB9FF',
-            strokeWidth: '1px',
+            height: 170,
+            areaFillColor: '#E5F5FF',
+            pathStrokeColor: '#4CB9FF',
+            pathStrokeWidth: 1,
             interpolate: 'none',
             terminalCircleDiameter: 3,
             terminalFillColor: "white",
             terminalStrokeColor: "#009BFF",
             flagCircleDiameter: 3,
             flagFillColor: "white",
-            flagStrokeColor: "#FF794C",
+            flagStrokeColor: "#FFA081",
             zeroCircleDiameter: 3,
             zeroFillColor: 'white',
-            zeroStrokeColor: "red",
+            zeroStrokeColor: "#FF794C",
+            padding:{top: 25, right: 1, bottom: 1, left: 1},
             data: [9, 3, 2, 0, 1, 3] //Lukas's birthday :)
         };
     },
@@ -42,38 +44,27 @@ var SparkLine = React.createClass({
         if (data.length === 0) {
             return false;
         }
-        var x = d3.scale.linear().range([5, this.props.width - 5]);
-        var y = d3.scale.linear().range([this.props.height - 5, 5]);
+        var x = d3.scale.linear().range([this.props.padding.left + this.props.terminalCircleDiameter, this.props.width - this.props.padding.right - this.props.terminalCircleDiameter]);
+        var y = d3.scale.linear().range([this.props.height - this.props.padding.bottom - this.props.terminalCircleDiameter, this.props.padding.top]);
 
-        var ref, lastX, lastY, firstX, firstY, line;
-        if (((ref = data[0]) != null ? ref[this.props.xAttr] : void 0) != null) {
-            data.forEach(function(d) {
-                return d[this.props.xAttr] = d3.time.format.iso.parse(d[this.props.xAttr]);
-            }.bind(this));
 
-            line = d3.svg.line()
-                .interpolate(this.props.interpolate)
-                .x(function(d, i) {return x(d[this.props.xAttr]);}.bind(this))
-                .y(function(d) {return y(d[this.props.yAttr]);}.bind(this));
+        data.forEach(function(d) {
+            return d[this.props.xAttr] = d3.time.format.iso.parse(d[this.props.xAttr]);
+        }.bind(this));
+
+        var line = d3.svg.line()
+            .interpolate(this.props.interpolate)
+            .x(function(d, i) {return x(d[this.props.xAttr]);}.bind(this))
+            .y(function(d) {return y(d[this.props.yAttr]);}.bind(this));
+
+        var area = d3.svg.area()
+            .x(function(d, i) {return x(d[this.props.xAttr]);}.bind(this))
+            .y0(function(d) {return y(-this.props.pathStrokeWidth + 0.2);}.bind(this))
+            .y1(function(d) { return y(d[this.props.yAttr]);}.bind(this));
 
             x.domain(d3.extent(data, function(d) {return d[this.props.xAttr];}.bind(this)));
             y.domain([0,  Math.max.apply(Math, data.map(function(d){return d[this.props.yAttr];}.bind(this)))]);
 
-            firstX = x(data[0][this.props.xAttr]);
-            firstY = y(data[0][this.props.yAttr]);
-
-            lastX = x(data[data.length - 1][this.props.xAttr]);
-            lastY = y(data[data.length - 1][this.props.yAttr]);
-        }
-        else {
-            line = d3.svg.line()
-                .interpolate(this.props.interpolate)
-                .x(function(d, i) {return x(i);})
-                .y(function(d) {return y(d);});
-
-            x.domain([0, data.length]);
-            y.domain(d3.extent(data));
-        }
         var tip = d3.tip()
             .attr('class', 'd3-tip')
             .offset([-10, 10])
@@ -84,7 +75,14 @@ var SparkLine = React.createClass({
                     xHumanDateTip + " -- " + yValueTip + "</span>";
             }.bind(this));
 
-        var svg = d3.select(this.getDOMNode())
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient('bottom')
+            .ticks(10)
+            .tickSize(-200, 0, 0)
+            .tickFormat("");
+
+        var svg = d3.select(thisDOMNode)
             .append('svg')
             .attr('width', this.props.width)
             .attr('height', this.props.height)
@@ -94,10 +92,16 @@ var SparkLine = React.createClass({
 
         svg.append('path')
             .datum(data)
+            .attr('class', 'area')
+            .style('fill', this.props.areaFillColor)
+            .attr('d', area);
+
+        svg.append('path')
+            .datum(data)
             .attr('class', 'sparkline')
             .style('fill', 'none')
-            .style('stroke', this.props.strokeColor)
-            .style('stroke-width', this.props.strokeWidth)
+            .style('stroke', this.props.pathStrokeColor)
+            .style('stroke-width', this.props.pathStrokeWidth)
             .attr('d', line);
 
         data.forEach(function(d, i){
@@ -136,6 +140,11 @@ var SparkLine = React.createClass({
             }
         }.bind(this));
 
+        svg.append("g")
+            .attr("class", "grid")
+            .attr("transform", "translate(7," + this.props.height/3 + ")")
+            .call(xAxis);
+
         return svg;
     }
 });
@@ -173,17 +182,13 @@ var UptimeTile = React.createClass({
             var totalUpTime = cleanUptime.map(function(i){return i.count}).reduce(function(x, y){return x+y;}, 0);
             upTimeProportion = (totalUpTime /(cleanUptime.length*60)*100).toFixed(2) + " %";
         }
-        return <Table>
-            <thead/>
-            <tbody>
-                <tr><td>10-day-ratio = {upTimeProportion}</td></tr>
-                <tr><td>
-                    &#35;OnlineMinutesPerHour vs Time<br/><br/>
-                    <SparkLine xAttr="ts" yAttr="count" yUpperBound={58} yLowerBound={0}
-                        data={this.state.uptime.slice(1, this.state.uptime.length -1)}/>
-                </td></tr>
-                <tr><td/></tr>
-            </tbody>
-        </Table>
+        return <div>
+                <div>Last-10-day-ratio = {upTimeProportion}</div>
+                <div className="hippo">
+                    <div className="center-wrapper">&#35;OnlineMinutesPerHour vs Time</div>
+                    <SparkLine xAttr="ts" yAttr="count" yUpperBound={58} yLowerBound={0} width={$(".hippo").width()}
+                        data={this.state.uptime.slice(1, this.state.uptime.length -1)} />
+                </div>
+        </div>
     }
 });

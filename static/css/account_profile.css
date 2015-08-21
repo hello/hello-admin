@@ -121,3 +121,26 @@ ul.extra>li {display: inline; margin: 0 0 0 8px;}
 .modal-title {text-transform: uppercase; font-size: 13px;}
 .modal-body {font-size: 14px; color: #666666;}
 a {color: #4CB9FF;}
+
+.grid .tick>line {
+    stroke: #E5E5E5;
+    opacity: 0.5 !important;
+}
+
+.grid .tick>text {
+    stroke: #4CB9FF;
+}
+
+.grid path {
+    stroke-width: 0;
+}
+
+.hippo {
+    border: 1px solid #E5E5E5;
+    padding: 10px 0 0 0 !important;
+    margin-top: 10px;
+}
+
+svg {
+    margin: 0 -4px -7px -4px;
+}
