@@ -124,7 +124,7 @@ a {color: #4CB9FF;}
 
 .grid .tick>line {
     stroke: #E5E5E5;
-    opacity: 0.5 !important;
+    opacity: 0.7 !important;
 }
 
 .grid .tick>text {
