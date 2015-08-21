@@ -20,7 +20,7 @@
 .tile-name {font-size: 13px; text-transform: uppercase; margin-left: 15px;}
 .tile-content {font-size: 14px; color: #666666;}
 .tile-title {margin-top: 5px;}
-.not-ok {color: #ff0000;}
+.not-ok {color: #FF794C;}
 .tile-content {font-size: 90%;}
 .stress {font-weight: bold;}
 .tile-icon {height: 18px; margin: 0 0 -3px 8px; opacity: 0.6;}
@@ -120,3 +120,4 @@ ul.extra>li {display: inline; margin: 0 0 0 8px;}
 .table{margin-bottom: 0;}
 .modal-title {text-transform: uppercase; font-size: 13px;}
 .modal-body {font-size: 14px; color: #666666;}
+a {color: #4CB9FF;}
