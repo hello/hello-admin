@@ -8,16 +8,19 @@ var SparkLine = React.createClass({
             yUpperBound: 100,
             yLowerBound: 0,
             width: 280,
-            height: 207,
-            strokeColor: 'black',
-            strokeWidth: '0.6px',
+            height: 167,
+            strokeColor: '#4CB9FF',
+            strokeWidth: '1px',
             interpolate: 'none',
-            terminalCircleDiameter: 2.1,
-            terminalColor: "rgba(75, 0, 130, 0.6)",
+            terminalCircleDiameter: 3,
+            terminalFillColor: "white",
+            terminalStrokeColor: "#009BFF",
             flagCircleDiameter: 3,
-            zeroCircleDiameter: 1,
-            flagColor: "rgba(255, 0, 0, 0.4)",
-            zeroColor: "gray",
+            flagFillColor: "white",
+            flagStrokeColor: "#FF794C",
+            zeroCircleDiameter: 3,
+            zeroFillColor: 'white',
+            zeroStrokeColor: "red",
             data: [9, 3, 2, 0, 1, 3] //Lukas's birthday :)
         };
     },
@@ -39,8 +42,8 @@ var SparkLine = React.createClass({
         if (data.length === 0) {
             return false;
         }
-        var x = d3.scale.linear().range([2, this.props.width - 2]);
-        var y = d3.scale.linear().range([this.props.height - 2, 2]);
+        var x = d3.scale.linear().range([5, this.props.width - 5]);
+        var y = d3.scale.linear().range([this.props.height - 5, 5]);
 
         var ref, lastX, lastY, firstX, firstY, line;
         if (((ref = data[0]) != null ? ref[this.props.xAttr] : void 0) != null) {
@@ -70,12 +73,6 @@ var SparkLine = React.createClass({
 
             x.domain([0, data.length]);
             y.domain(d3.extent(data));
-
-            firstX = x(data[0]);
-            firstY = y(data[0]);
-
-            lastX = x(data.length - 1);
-            lastY = y(data[data.length - 1]);
         }
         var tip = d3.tip()
             .attr('class', 'd3-tip')
@@ -95,30 +92,6 @@ var SparkLine = React.createClass({
 
         svg.call(tip);
 
-        svg.append('circle')
-            .data(data.slice(0,1))
-            .attr('class', 'sparkcircle')
-            .attr('cx', firstX).attr('cy', firstY)
-            .attr('fill', this.props.terminalColor)
-            .attr('stroke', 'none')
-            .attr('r', this.props.terminalCircleDiameter)
-            .on('mouseover', tip.show)
-            .on('mouseout', tip.hide);
-
-        data.forEach(function(d){
-            if (d[this.props.yAttr] <= this.props.yUpperBound && d[this.props.yAttr] >= this.props.yLowerBound && d[this.props.yAttr] !== 0) {
-                svg.append('circle')
-                    .data([d])
-                    .attr('class', 'sparkcircle')
-                    .attr('cx', x(d[this.props.xAttr])).attr('cy', y(d[this.props.yAttr]))
-                    .attr('fill', this.props.flagColor)
-                    .attr('stroke', 'none')
-                    .attr('r', this.props.flagCircleDiameter)
-                    .on('mouseover', tip.show)
-                    .on('mouseout', tip.hide);
-            }
-        }.bind(this));
-
         svg.append('path')
             .datum(data)
             .attr('class', 'sparkline')
@@ -127,15 +100,41 @@ var SparkLine = React.createClass({
             .style('stroke-width', this.props.strokeWidth)
             .attr('d', line);
 
-        svg.append('circle')
-            .data(data.reverse().slice(0,1))
-            .attr('class', 'sparkcircle')
-            .attr('cx', lastX).attr('cy', lastY)
-            .attr('fill', this.props.terminalColor)
-            .attr('stroke', 'none')
-            .attr('r', this.props.terminalCircleDiameter)
-            .on('mouseover', tip.show)
-            .on('mouseout', tip.hide);
+        data.forEach(function(d, i){
+            if (i === 0 || i === data.length-1) {
+                svg.append('circle')
+                    .data(data.slice(0,1))
+                    .attr('class', 'sparkcircle')
+                    .attr('cx', x(d[this.props.xAttr])).attr('cy', y(d[this.props.yAttr]))
+                    .attr('fill', this.props.terminalFillColor)
+                    .attr('stroke', this.props.terminalStrokeColor)
+                    .attr('r', this.props.terminalCircleDiameter)
+                    .on('mouseover', tip.show)
+                    .on('mouseout', tip.hide);
+            }
+            else if (d[this.props.yAttr] <= this.props.yUpperBound && d[this.props.yAttr] >= this.props.yLowerBound && d[this.props.yAttr] !== 0) {
+                svg.append('circle')
+                    .data([d])
+                    .attr('class', 'sparkcircle')
+                    .attr('cx', x(d[this.props.xAttr])).attr('cy', y(d[this.props.yAttr]))
+                    .attr('fill', this.props.flagFillColor)
+                    .attr('stroke', this.props.flagStrokeColor)
+                    .attr('r', this.props.flagCircleDiameter)
+                    .on('mouseover', tip.show)
+                    .on('mouseout', tip.hide);
+            }
+            else if (d[this.props.yAttr] === 0 && ((data[i-1] && data[i-1][this.props.yAttr] > 0) || (data[i+1] && data[i+1][this.props.yAttr] > 0))) {
+                svg.append('circle')
+                    .data([d])
+                    .attr('class', 'sparkcircle')
+                    .attr('cx', x(d[this.props.xAttr])).attr('cy', y(d[this.props.yAttr]))
+                    .attr('fill', this.props.zeroFillColor)
+                    .attr('stroke', this.props.zeroStrokeColor)
+                    .attr('r', this.props.zeroCircleDiameter)
+                    .on('mouseover', tip.show)
+                    .on('mouseout', tip.hide);
+            }
+        }.bind(this));
 
         return svg;
     }
@@ -179,10 +178,11 @@ var UptimeTile = React.createClass({
             <tbody>
                 <tr><td>10-day-ratio = {upTimeProportion}</td></tr>
                 <tr><td>
+                    &#35;OnlineMinutesPerHour vs Time<br/><br/>
                     <SparkLine xAttr="ts" yAttr="count" yUpperBound={58} yLowerBound={0}
                         data={this.state.uptime.slice(1, this.state.uptime.length -1)}/>
                 </td></tr>
-                <tr><td/><td/></tr>
+                <tr><td/></tr>
             </tbody>
         </Table>
     }

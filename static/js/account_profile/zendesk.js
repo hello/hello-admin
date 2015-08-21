@@ -64,7 +64,7 @@ var ZendeskTile = React.createClass({
 
 var ZendeskModal = React.createClass({
     render: function() {
-        return ( <Modal animation={false}>
+        return ( <Modal animation={true}>
             <div className='modal-header row'>
                 <Col xs={10} className="modal-title">Recent Zendesk Tickets</Col>
                 <Col xs={2} className="right-wrapper"><Button bsSize="xsmall" class="modal-close" onClick={this.props.onRequestHide}>x</Button></Col>
