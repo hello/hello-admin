@@ -8,7 +8,7 @@ var SparkLine = React.createClass({
             yUpperBound: 100,
             yLowerBound: 0,
             width: 280,
-            height: 170,
+            height: 225,
             areaFillColor: '#E5F5FF',
             pathStrokeColor: '#4CB9FF',
             pathStrokeWidth: 1,
@@ -78,7 +78,7 @@ var SparkLine = React.createClass({
         var xAxis = d3.svg.axis()
             .scale(x)
             .orient('bottom')
-            .ticks(10)
+            .ticks(11)
             .tickSize(-200, 0, 0)
             .tickFormat("");
 
@@ -107,7 +107,7 @@ var SparkLine = React.createClass({
         data.forEach(function(d, i){
             if (i === 0 || i === data.length-1) {
                 svg.append('circle')
-                    .data(data.slice(0,1))
+                    .data([d])
                     .attr('class', 'sparkcircle')
                     .attr('cx', x(d[this.props.xAttr])).attr('cy', y(d[this.props.yAttr]))
                     .attr('fill', this.props.terminalFillColor)
