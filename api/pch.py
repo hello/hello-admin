@@ -1,4 +1,3 @@
-import settings
 import time
 from handlers.helpers import ProtectedRequestHandler, ResponseOutput
 from handlers.utils import epoch_to_human

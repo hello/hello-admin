@@ -1,6 +1,5 @@
 import requests
 import json
-import settings
 from handlers.helpers import ProtectedRequestHandler, ResponseOutput
 
 

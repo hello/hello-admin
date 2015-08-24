@@ -1,7 +1,3 @@
-import logging as log
-import json
-import settings
-
 from handlers.helpers import ProtectedRequestHandler
 
 class SenseEventsAPI(ProtectedRequestHandler):

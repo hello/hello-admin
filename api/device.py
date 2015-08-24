@@ -1,8 +1,6 @@
 import logging as log
 import json
 from google.appengine.api import namespace_manager
-import settings
-
 from handlers.helpers import ProtectedRequestHandler
 from models.ext import RecentlyActiveDevicesStats
 from models.ext import RecentlyActiveDevicesStatsDaily

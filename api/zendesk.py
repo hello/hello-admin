@@ -1,10 +1,8 @@
 import json
 from google.appengine.api import namespace_manager
 import requests
-import settings
-from handlers.analysis import get_zendesk_stats
 from handlers.helpers import ProtectedRequestHandler, ResponseOutput
-from handlers.utils import display_error
+from handlers.utils import display_error, get_zendesk_stats
 from models.ext import ZendeskDailyStats
 
 class ZendeskAPI(ProtectedRequestHandler):

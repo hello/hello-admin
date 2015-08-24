@@ -112,10 +112,10 @@ from handlers.views import ZendeskHistoryView
 from handlers.views import ZendeskNowView
 from handlers.views import ZendeskView
 from handlers.views import SenseUptimeView
-from handlers.zendesk import ZendeskAPI
-from handlers.zendesk import ZendeskHistoryAPI
-from handlers.zendesk import ZendeskNowAPI
-from handlers.zendesk import ZendeskStatsAPI
+from api.zendesk import ZendeskAPI
+from api.zendesk import ZendeskHistoryAPI
+from api.zendesk import ZendeskNowAPI
+from api.zendesk import ZendeskStatsAPI
 import settings
 from api.order import OrdersMapAPI
 from api.timeline import TimelineAlgorithmAPI

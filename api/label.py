@@ -1,5 +1,4 @@
 import json
-import settings
 from handlers.helpers import ProtectedRequestHandler
 from handlers.utils import get_current_pacific_datetime
 

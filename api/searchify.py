@@ -4,8 +4,7 @@ import datetime
 import settings
 import logging as log
 from handlers.helpers import ProtectedRequestHandler
-from handlers.utils import stripStringToList, display_error
-from handlers.utils import get_pacific_time_from_epoch_seconds
+from handlers.utils import display_error
 from indextank import ApiClient
 from google.appengine.api import urlfetch
 

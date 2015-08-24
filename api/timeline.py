@@ -1,7 +1,4 @@
 from handlers.helpers import ProtectedRequestHandler
-from models.setup import AppInfo
-import settings
-import logging as log
 __author__ = 'zet'
 
 
