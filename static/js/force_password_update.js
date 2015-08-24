@@ -18,7 +18,7 @@ var ForcePasswordUpdateMaestro = React.createClass({
         console.log(requestData);
         if (isValidRequest(requestData)) {
             $.ajax({
-                url: "/api/force_password_update",
+                url: "/api/password_force_update",
                 type: "POST",
                 dataType: 'json',
                 contentType: 'application/json',
