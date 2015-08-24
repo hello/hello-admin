@@ -22,7 +22,7 @@ from handlers.devices import ActiveDevicesMinuteHistoryAPI
 from handlers.devices import DeviceAPI
 from handlers.devices import DeviceByEmailAPI
 from handlers.devices import DeviceInactiveAPI
-from handlers.devices import DeviceKeyStoreHint
+from handlers.devices import DeviceKeyStoreAPI
 from handlers.devices import DeviceOwnersAPI
 from handlers.devices import SenseBlackListAPI
 from handlers.devices import SenseColorAPI
@@ -101,7 +101,6 @@ from handlers.views import SearchifyStatsView
 from handlers.views import SenseEventsView
 from handlers.views import SenseLogsNewView
 from handlers.views import SenseLogsView
-from handlers.views import SenseVisualView
 from handlers.views import SettingsView
 from handlers.views import SetupView
 from handlers.views import TeamsView
@@ -166,7 +165,7 @@ api_routes = [
     ('/api/device_by_email/?$', DeviceByEmailAPI),
     ('/api/devices/?$', DeviceAPI),
     ('/api/devices/inactive/?$', DeviceInactiveAPI),
-    ('/api/devices/key_store/?$', DeviceKeyStoreHint),
+    ('/api/devices/key_store/?$', DeviceKeyStoreAPI),
     ('/api/devices/owners/?$', DeviceOwnersAPI),
     ('/api/sense_uptime/?$', SenseUptimeAPI),
     ('/api/dust_stats/?$', DustStatsAPI),
@@ -260,7 +259,6 @@ page_routes = [
     ('/room_conditions/?$', RoomConditionsView),
     ('/room_conditions_minute/?$', RoomConditionsMinuteView),
     ('/searchify_stats/?$', SearchifyStatsView),
-    ('/sense/?$', SenseVisualView),
     ('/sense_events/?$', SenseEventsView),
     ('/sense_logs/?$', SenseLogsView),
     ('/sense_logs_new/?$', SenseLogsNewView),
