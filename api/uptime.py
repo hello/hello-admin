@@ -1,6 +1,5 @@
 import logging as log
-import settings
-from helpers import ProtectedRequestHandler
+from handlers.helpers import ProtectedRequestHandler
 
 
 class SenseUptimeAPI(ProtectedRequestHandler):

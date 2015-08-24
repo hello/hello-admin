@@ -4,7 +4,14 @@ import operator
 import time
 import json
 import logging as log
+from collections import Counter
+
 import requests
+from google.appengine.ext import ndb
+from google.appengine.api import taskqueue
+from google.appengine.api import memcache
+from google.appengine.api import namespace_manager
+
 import settings
 from handlers.analysis import get_zendesk_stats
 from handlers.helpers import CronRequestHandler
@@ -15,15 +22,10 @@ from models.ext import RecentlyActiveDevicesStats
 from models.ext import RecentlyActiveDevicesStatsDaily
 from models.ext import RecentlyActiveDevicesStats15Minutes
 from indextank import ApiClient
-from google.appengine.ext import ndb
-from google.appengine.api import taskqueue
-from google.appengine.api import memcache
 from handlers.helpers import ProtectedRequestHandler
-from searchify_logs import  SearchifyQuery
+from api.searchify import  SearchifyQuery
 from models.ext import BuggyFirmware
-from collections import Counter
-from handlers.papertrail import PaperTrailWrapper
-from google.appengine.api import namespace_manager
+from api.papertrail import PaperTrailWrapper
 
 
 class ZendeskCronHandler(CronRequestHandler):

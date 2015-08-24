@@ -1,6 +1,6 @@
 import json
 import settings
-from helpers import ProtectedRequestHandler
+from handlers.helpers import ProtectedRequestHandler
 from handlers.utils import get_current_pacific_datetime
 
 class LabelDataAPI(ProtectedRequestHandler):

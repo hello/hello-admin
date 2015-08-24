@@ -1,7 +1,7 @@
 import settings
 import time
 from handlers.helpers import ProtectedRequestHandler, ResponseOutput
-from utils import epoch_to_human
+from handlers.utils import epoch_to_human
 from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 import logging as log
