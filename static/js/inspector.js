@@ -56,7 +56,7 @@ var ProblemUsersMaestro = React.createClass({
     getRecentUsers: function() {
         var that = this;
         $.ajax({
-            url: '/api/recent_users',
+            url: '/api/recent_accounts',
             dataType: 'json',
             data: {limit: MAX_INSPECT_POPULATION},
             type: 'GET',

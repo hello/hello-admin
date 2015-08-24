@@ -1,3 +1,4 @@
+from api.account import RecentAccountsAPI, AccountSearchAPI
 from api.namespace import NamespaceAPI
 from handlers.alarms import AlarmRingsHistoryAPI
 from handlers.alarms import AlarmsAPI
@@ -73,8 +74,6 @@ from handlers.users import AccountCountsBreakdownByCreatedDateAPI
 from handlers.users import ForcePasswordUpdateAPI
 from handlers.users import OmniSearchAPI
 from handlers.users import PasswordResetAPI
-from handlers.users import RecentUsersAPI
-from handlers.users import UserSearchAPI
 from handlers.views import AccountProfileView, RoomConditionsMinuteView
 from handlers.views import ActiveDevicesHistoryView
 from handlers.views import AlarmRingsHistoryView
@@ -113,7 +112,6 @@ from handlers.views import TimelineView
 from handlers.views import TokenGeneratorView
 from handlers.views import InactiveDevicesView
 from handlers.views import InspectorView
-from handlers.views import UserView
 from handlers.views import ZendeskHistoryView
 from handlers.views import ZendeskNowView
 from handlers.views import ZendeskView
@@ -198,7 +196,7 @@ api_routes = [
     ('/api/password_reset/?$', PasswordResetAPI),
     ('/api/pch_sn_check/?$', PCHSerialNumberCheckAPI),
     ('/api/pill_key_provision/?$', PillKeyProvision),
-    ('/api/recent_users/?$', RecentUsersAPI),
+    ('/api/recent_accounts/?$', RecentAccountsAPI),
     ('/api/room_conditions/?$', RoomConditionsAPI),
     ('/api/searchify_stats/?$', SearchifyStatsAPI),
     ('/api/sense_black_list/?$', SenseBlackListAPI),
@@ -213,7 +211,7 @@ api_routes = [
     ('/api/timezone_history/?$', TimezoneHistoryAPI),
     ('/api/tokens/?$', TokenAPI),
     ('/api/update_geckoboard_credentials/?$', UpdateGeckoBoardCredentials),
-    ('/api/user_search/?$', UserSearchAPI),
+    ('/api/account_search/?$', AccountSearchAPI),
     ('/api/viewer_permission/?$', ViewPermissionAPI),
     ('/api/wifi_signal_strength/?$', WifiSignalStrengthAPI),
     ('/api/zendesk/?$', ZendeskAPI),
@@ -278,7 +276,6 @@ page_routes = [
     ('/troubleshoot/?$', InactiveDevicesView),
     ('/inactive_devices/?$', InactiveDevicesView),
     ('/update', UpdateAdminAccessTokenAPI),
-    ('/users/?$', UserView),
     ('/inspector/?$', InspectorView),
     ('/users_inspection/?$', InspectorView),
     ('/zendesk/?$', ZendeskView),

@@ -1,7 +1,7 @@
 var RecentAccounts = React.createClass({
     getInitialState: function() {
         return {
-            data: [], filteredData: [], error: "", limit: 10000,
+            data: [], filteredData: [], error: "", limit: 2000,
             columns: [
                 {name: "id", title: <Glyphicon glyph="barcode"/>, width: 90},
                 {name: "accountEmail", title: <Glyphicon glyph="envelope"/>},
@@ -14,7 +14,7 @@ var RecentAccounts = React.createClass({
     loadRecentAccounts: function() {
         this.setState({loading: true, data: [], filteredData: [], error: ""});
         $.ajax({
-            url: '/api/recent_users',
+            url: '/api/recent_accounts',
             dataType: 'json',
             data: {limit: this.state.limit},
             type: 'GET',

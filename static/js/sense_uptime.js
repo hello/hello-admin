@@ -179,7 +179,7 @@ var SenseUptimeMaster = React.createClass({
 
     loadAccountEmail: function(senseId) {
         $.ajax({
-            url: "/api/user_search",
+            url: "/api/account_search",
             dataType: 'json',
             type: "GET",
             data: {input: senseId, type: "sense_id"},
@@ -230,7 +230,7 @@ var SenseUptimeMaster = React.createClass({
             senseId = this.state.groupStatus[i].device_id;
         }
         $.ajax({
-            url: "/api/user_search",
+            url: "/api/account_search",
             dataType: 'json',
             type: "GET",
             data: {input: senseId, type: "sense_id"},

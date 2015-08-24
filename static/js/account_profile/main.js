@@ -473,7 +473,7 @@ var AccountProfile = React.createClass({
             this.clearProfile();
         }
         $.ajax({
-            url: "/api/user_search",
+            url: "/api/account_search",
             dataType: 'json',
             type: "GET",
             data: {input: input, type: type},
@@ -612,7 +612,7 @@ var AccountProfile = React.createClass({
 
     loadPartner: function(email) {
         $.ajax({
-            url: "/api/user_search",
+            url: "/api/account_search",
             dataType: "json",
             type: 'GET',
             data: {input: email, type: "partner"},
