@@ -1,5 +1,4 @@
 import time
-import settings
 from handlers.helpers import ProtectedRequestHandler
 
 

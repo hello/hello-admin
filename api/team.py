@@ -1,5 +1,4 @@
 import json
-import settings
 import logging as log
 from handlers.helpers import FirmwareRequestHandler
 

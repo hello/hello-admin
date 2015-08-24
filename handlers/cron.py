@@ -13,9 +13,8 @@ from google.appengine.api import memcache
 from google.appengine.api import namespace_manager
 
 import settings
-from handlers.analysis import get_zendesk_stats
 from handlers.helpers import CronRequestHandler
-from handlers.utils import display_error
+from handlers.utils import display_error, get_zendesk_stats
 from handlers.utils import get_current_pacific_datetime
 from models.ext import ZendeskDailyStats
 from models.ext import RecentlyActiveDevicesStats
