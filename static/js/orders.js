@@ -205,10 +205,10 @@ var QueryOrdersOmni = React.createClass({
 
 var OrdersMaestro = React.createClass({
     render: function() {
-        return <Row>
+        return <div>
             <QueryOrdersOmni />
             <QueryOrdersById />
-        </Row>;
+        </div>;
     }
 });
 React.renderComponent(<OrdersMaestro />, document.getElementById('orders'));
