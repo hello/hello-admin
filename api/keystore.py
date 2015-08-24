@@ -8,7 +8,7 @@ import datetime
 import logging as log
 import cloudstorage as gcs
 
-from helpers import ProtectedRequestHandler
+from handlers.helpers import ProtectedRequestHandler
 from Crypto.PublicKey import RSA
 from handlers.helpers import ResponseOutput
 from models.ext import KeyStoreLocker
