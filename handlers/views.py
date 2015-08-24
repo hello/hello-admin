@@ -27,12 +27,6 @@ class ChartHandler(ProtectedRequestHandler):
         day = dt.datetime.strftime(dt.datetime.now(), "%Y-%m-%d")
         self.response.write(template.render({'tokens': tokens, 'day': day}))
 
-class UserView(ProtectedRequestHandler):
-    """Returns a portal to quickly look for recent users and search for users."""
-    def get(self):
-        self.render_to_response(template_file='templates/users.html',
-                                context={'title': 'Users'})
-
 class SenseVisualView(ProtectedRequestHandler):
     """Returns graphs of data from Sense (temperature, humidity, particulates, light)"""
     def get(self):

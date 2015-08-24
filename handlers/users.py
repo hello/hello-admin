@@ -1,14 +1,14 @@
-import jinja2
 import os
 import json
-import settings
-import requests
 import time
+
+import jinja2
+import requests
+
 from utils import iso_to_utc_timestamp
 from handlers.helpers import CustomerExperienceRequestHandler
 from handlers.helpers import ProtectedRequestHandler
-from handlers.helpers import ResponseOutput
-from google.appengine.api import memcache
+
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -149,124 +149,6 @@ class OmniSearchAPI(ProtectedRequestHandler):
                                'devices': self.get_devices_info_by_email(account['email'])
                            } for account in accounts.data])
         self.response.write(accounts.get_serialized_output())
-
-
-class RecentUsersAPI(ProtectedRequestHandler):
-    def get(self):
-        limit = int(self.request.get("limit", default_value=10))
-        output = ResponseOutput()
-        max_id = 100000000
-
-        while max_id > 1 and len(output.data) < limit:
-            raw_output = self.hello_request(
-                type="GET",
-                api_url="account/paginate",
-                raw_output=True,
-                url_params={"limit": limit, "max_id": max_id} if limit else {}
-            )
-
-            output.set_error(raw_output.error)
-            output.set_status(raw_output.status)
-            output.set_data(output.data + raw_output.data)
-            max_id = int(raw_output.data[-1]["id"])
-        self.response.write(output.get_serialized_output())
-
-    def get_from_cache(self):
-        """Update cached recently users"""
-        MAX_RECENT_USERS_LENGTH = 60
-        output = ResponseOutput()
-        try:
-            recent_users = json.loads(self.hello_request(
-                api_url="account/recent",
-                type="GET",
-                raw_output=True
-            ).get_serialized_output())['data']
-
-            previously_cached_recent_users = json.loads(memcache.get("recent_users" + settings.ENVIRONMENT) or "[]")
-            previously_cached_recent_ids = [u['id'] for u in previously_cached_recent_users]
-            new_users = [u for u in recent_users if u['id'] not in previously_cached_recent_ids]
-
-            combined_recent_users = (new_users + previously_cached_recent_users)[:MAX_RECENT_USERS_LENGTH]
-
-            self.update_or_create_memcache(key="recent_users", value=json.dumps(combined_recent_users), environment=settings.ENVIRONMENT, time=31536000)
-            output.set_status(200)
-            output.set_data(combined_recent_users)
-
-        except Exception as e:
-            output.set_error(e.message)
-            output.set_status(500)
-
-        self.response.write(output.get_serialized_output())
-
-
-class UserSearchAPI(ProtectedRequestHandler):
-    @property
-    def input(self):
-        return self.request.get('input')
-
-    @property
-    def search(self):
-        types_switch = {
-            "account_id": self.get_by_account_id,
-            "email": self.get_by_email,
-            "email_partial": self.get_by_email_partial,
-            "name": self.get_by_name_partial,
-            "sense_id": self.get_by_device_id,
-            "pill_id": self.get_by_device_id,
-            "partner": self.get_by_partner
-        }
-        return types_switch[self.request.get('type', default_value='email')]
-
-    def get_by_account_id(self):
-        raw_response = self.hello_request(
-            api_url="account",
-            type="GET",
-            url_params={'id': self.input},
-            raw_output=True
-        )
-        if raw_response.data:
-            raw_response.set_data([raw_response.data])
-        self.response.write(raw_response.get_serialized_output())
-
-    def get_by_email(self):
-        raw_response = self.hello_request(
-            api_url="account",
-            type="GET",
-            url_params={'email': self.input},
-            raw_output=True
-        )
-        if raw_response.data:
-            raw_response.set_data([raw_response.data])
-        self.response.write(raw_response.get_serialized_output())
-
-    def get_by_email_partial(self):
-        self.hello_request(
-            api_url="account/partial",
-            type="GET",
-            url_params={'email': self.input},
-        )
-
-    def get_by_name_partial(self):
-        self.hello_request(
-            api_url="account/partial",
-            type="GET",
-            url_params={'name': self.input},
-        )
-
-    def get_by_device_id(self):
-        self.hello_request(
-            api_url="devices/{}/accounts".format(self.input),
-            type="GET",
-        )
-
-    def get_by_partner(self):
-        self.hello_request(
-            api_url="account/{}/partner".format(self.input),
-            type="GET",
-        )
-
-    def get(self):
-        self.search()
 
 
 class PasswordResetAPI(ProtectedRequestHandler):
