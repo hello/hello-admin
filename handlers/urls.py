@@ -1,5 +1,6 @@
-from api.account import RecentAccountsAPI, AccountSearchAPI
+from api.account import RecentAccountsAPI, AccountSearchAPI, AccountCountsBreakdownByCreatedDateAPI
 from api.namespace import NamespaceAPI
+from api.password import PasswordResetAPI, PasswordForceUpdateAPI
 from handlers.alarms import AlarmRingsHistoryAPI
 from handlers.alarms import AlarmsAPI
 from handlers.alarms import AlarmsByEmailAPI
@@ -70,10 +71,6 @@ from handlers.teams import TeamsAPI
 from handlers.timeline import TimelineAPI
 from handlers.timezone import TimezoneAPI
 from handlers.timezone import TimezoneHistoryAPI
-from handlers.users import AccountCountsBreakdownByCreatedDateAPI
-from handlers.users import ForcePasswordUpdateAPI
-from handlers.users import OmniSearchAPI
-from handlers.users import PasswordResetAPI
 from handlers.views import AccountProfileView, RoomConditionsMinuteView
 from handlers.views import ActiveDevicesHistoryView
 from handlers.views import AlarmRingsHistoryView
@@ -180,13 +177,12 @@ api_routes = [
     ('/api/firmware_unhash/?$', FirmwareUnhashAPI),
     ('/api/firmware_group_status/?$', FirmwareGroupStatusAPI),
     ('/api/firmware_group_path/?$', FirmwareGroupPathAPI),
-    ('/api/force_password_update/?$', ForcePasswordUpdateAPI),
+    ('/api/password_force_update/?$', PasswordForceUpdateAPI),
     ('/api/label_data/?$', LabelDataAPI),
     ('/api/last_room_conditions/?$', LastRoomConditionsAPI),
     ('/api/log_facets/?$', LogsPatternFacetsAPI),
     ('/api/motion/?$', MotionAPI),
     ('/api/notification/?$', NotificationAPI),
-    ('/api/omni_search/?$', OmniSearchAPI),
     ('/api/onboarding_logs_by_result/?$', OnboardingLogsByResultAPI),
     ('/api/onboarding_logs_by_sense_id/?$', OnboardingLogsBySenseIdAPI),
     ('/api/onboarding_logs_by_email/?$', OnboardingLogsByEmailAPI),

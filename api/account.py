@@ -1,7 +1,5 @@
 from handlers.helpers import ProtectedRequestHandler, ResponseOutput
 
-__author__ = 'zet'
-
 
 class RecentAccountsAPI(ProtectedRequestHandler):
     def get(self):
@@ -92,3 +90,11 @@ class AccountSearchAPI(ProtectedRequestHandler):
 
     def get(self):
         self.search()
+
+
+class AccountCountsBreakdownByCreatedDateAPI(ProtectedRequestHandler):
+    def get(self):
+         self.hello_request(
+            api_url="account/count_by_created",
+            type="GET",
+        )
