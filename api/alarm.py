@@ -1,6 +1,7 @@
 import json
-import settings
-from helpers import ProtectedRequestHandler
+from handlers.helpers import ProtectedRequestHandler
+
+__author__ = 'zet'
 
 
 class AlarmsAPI(ProtectedRequestHandler):
@@ -31,6 +32,7 @@ class AlarmsByEmailAPI(ProtectedRequestHandler):
             api_url="alarms/{}".format(self.request.get("email")),
             type="GET",
         )
+
 
 class AlarmRingsHistoryAPI(ProtectedRequestHandler):
     def get(self):

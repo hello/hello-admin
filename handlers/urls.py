@@ -1,9 +1,9 @@
+import webapp2
+
 from api.account import RecentAccountsAPI, AccountSearchAPI, AccountCountsBreakdownByCreatedDateAPI
+from api.alarm import AlarmsAPI, AlarmsByEmailAPI, AlarmRingsHistoryAPI
 from api.namespace import NamespaceAPI
 from api.password import PasswordResetAPI, PasswordForceUpdateAPI
-from handlers.alarms import AlarmRingsHistoryAPI
-from handlers.alarms import AlarmsAPI
-from handlers.alarms import AlarmsByEmailAPI
 from handlers.features import FeaturesAPI
 from handlers.cron import ActiveDevicesHistory15MinutesPurge
 from handlers.cron import ActiveDevicesHistoryPurge
@@ -49,7 +49,7 @@ from handlers.orders import OrdersAPI
 from handlers.papertrail import PaperTrailEventsAPI
 from handlers.papertrail import PaperTrailSystemsAPI
 from handlers.pch_serial import PCHSerialNumberCheckAPI
-from handlers.pill_status import PillStatusAPI
+from api.battery import BatteryAPI
 from handlers.room_conditions import LastRoomConditionsAPI
 from handlers.room_conditions import RoomConditionsAPI
 from handlers.searchify_logs import DustStatsAPI
@@ -117,18 +117,18 @@ from handlers.zendesk import ZendeskHistoryAPI
 from handlers.zendesk import ZendeskNowAPI
 from handlers.zendesk import ZendeskStatsAPI
 import settings
-import webapp2
 from handlers.orders import OrdersMapAPI
 from handlers.timeline import TimelineAlgorithmAPI
 from handlers.devices import ColorlessSensesAPI
 from handlers.cron import SenseColorUpdate
 from handlers.cron import SenseColorUpdateQueue
-from handlers.clearbit import ClearbitAPI
+from api.clearbit import ClearbitAPI
 from handlers.cron import FirmwareCrashLogsRetain
 from handlers.setup import CreateBuggyFirmwareAPI
 from handlers.cron import UpdateTimezoneByPartner
 from handlers.cron import UpdateTimezoneByPartnerQueue
 from api.datastore import InitializeDataStore
+
 
 cron_routes = [
     ('/cron/active_devices_history_15_minutes_purge', ActiveDevicesHistory15MinutesPurge),
@@ -160,7 +160,7 @@ api_routes = [
     ('/api/app/?$', AppAPI),
     ('/api/app_scope/?$', AppScopeAPI),
     ('/api/append_app_info/?$', AppendAppInfo),
-    ('/api/battery/?$', PillStatusAPI),
+    ('/api/battery/?$', BatteryAPI),
     ('/api/create_key_store_locker/?$', CreateKeyStoreLockerAPI),
     ('/api/device_by_email/?$', DeviceByEmailAPI),
     ('/api/devices/?$', DeviceAPI),

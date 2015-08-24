@@ -1,12 +1,11 @@
 from collections import defaultdict
-import settings
 import json
-from handlers.helpers import ProtectedRequestHandler, ResponseOutput
+from handlers.helpers import ProtectedRequestHandler
 
 __author__ = 'zet'
 
 
-class PillStatusAPI(ProtectedRequestHandler):
+class BatteryAPI(ProtectedRequestHandler):
     def get(self):
         search_input = self.request.get("search_input")
         end_ts = int(self.request.get("end_ts", 0))
