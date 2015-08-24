@@ -103,17 +103,26 @@ class DeviceInactiveAPI(ProtectedRequestHandler):
             },
         )
 
-class DeviceKeyStoreHint(ProtectedRequestHandler):
+class DeviceKeyStoreAPI(ProtectedRequestHandler):
     """
-    Retrieve hints for key store of a device
+    Retrieve key store info of a device
     """
     def get(self):
         device_id = self.request.get('device_id', default_value="")
         device_type = self.request.get('device_type', default_value="")
-        self.hello_request(
+
+        raw_output = self.hello_request(
             api_url="devices/key_store_hints/{}/{}".format(device_type, device_id),
             type="GET",
+            raw_output=True
         )
+
+        if raw_output.error:
+            self.send_to_slack_admin_logs_channel("{} {} - {}".format(device_type, device_id, raw_output.error))
+        elif not raw_output.data.get("key", None):
+            self.send_to_slack_admin_logs_channel("{} {} has blank key".format(device_type, device_id))
+        self.response.write(raw_output.get_serialized_output())
+
 
 class ActiveDevicesMinuteHistoryAPI(ProtectedRequestHandler):
     """Retrieve recently active devices (seen last minute) zcount from redis"""
