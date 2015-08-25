@@ -5,17 +5,14 @@ from api.alarm import AlarmsAPI, AlarmsByEmailAPI, AlarmRingsHistoryAPI
 from api.namespace import NamespaceAPI
 from api.password import PasswordResetAPI, PasswordForceUpdateAPI
 from api.feature import FeaturesAPI
-from handlers.cron import ActiveDevicesHistory15MinutesPurge
-from handlers.cron import ActiveDevicesHistoryPurge
-from handlers.cron import AlarmsCountPush
-from handlers.cron import DevicesCountPush
-from handlers.cron import DropOldSenseLogsSearchifyIndex
-from handlers.cron import HoldsCountPush
-from handlers.cron import StoreRecentlyActiveDevicesStats15Minutes
-from handlers.cron import StoreRecentlyActiveDevicesStatsDaily
-from handlers.cron import StoreRecentlyActiveDevicesStatsMinute
-from handlers.cron import WavesCountPush
-from handlers.cron import ZendeskCronHandler
+from cron.datastore_cron import StoreRecentlyActiveDevicesStatsMinute, StoreRecentlyActiveDevicesStats15Minutes, \
+    StoreRecentlyActiveDevicesStatsDaily, ActiveDevicesHistoryPurge, ActiveDevicesHistory15MinutesPurge
+from cron.firmware_cron import FirmwareLogsAlert
+from cron.geckoboard_cron import DevicesCountPush, AlarmsCountPush
+from cron.searchify_cron import DropOldSenseLogsSearchifyIndex
+from cron.sense_color_cron import SenseColorUpdate, SenseColorUpdateQueue
+from cron.timezone_cron import UpdateTimezoneByPartnerQueue, UpdateTimezoneByPartner
+from cron.zendesk_cron import ZendeskCron
 from api.device import ActiveDevices15MinutesHistoryAPI
 from api.device import ActiveDevicesDailyHistoryAPI
 from api.device import ActiveDevicesMinuteHistoryAPI
@@ -56,17 +53,17 @@ from api.searchify import DustStatsAPI
 from api.searchify import LogsPatternFacetsAPI
 from api.searchify import SenseLogsAPI, SearchifyStatsAPI
 from api.searchify import WifiSignalStrengthAPI
-from handlers.setup import AppAPI
-from handlers.setup import AppendAppInfo
-from handlers.setup import AppScopeAPI
-from handlers.setup import CreateAccountAPI
-from handlers.setup import CreateKeyStoreLockerAPI
-from handlers.setup import ProxyAPI
-from handlers.setup import RegisterPillAPI, SetupAPI
-from handlers.setup import TokenAPI
-from handlers.setup import UpdateAdminAccessTokenAPI
-from handlers.setup import UpdateGeckoBoardCredentials
-from handlers.setup import ViewPermissionAPI
+from api.setup import AppAPI
+from api.setup import AppendAppInfo
+from api.setup import AppScopeAPI
+from api.setup import CreateAccountAPI
+from api.setup import CreateKeyStoreLockerAPI
+from api.setup import ProxyAPI
+from api.setup import RegisterPillAPI, SetupAPI
+from api.setup import TokenAPI
+from api.setup import UpdateAdminAccessTokenAPI
+from api.setup import UpdateGeckoBoardCredentials
+from api.setup import ViewPermissionAPI
 from api.team import TeamsAPI
 from api.timeline import TimelineAPI
 from api.timezone import TimezoneAPI
@@ -120,13 +117,8 @@ import settings
 from api.order import OrdersMapAPI
 from api.timeline import TimelineAlgorithmAPI
 from api.device import ColorlessSensesAPI
-from handlers.cron import SenseColorUpdate
-from handlers.cron import SenseColorUpdateQueue
 from api.clearbit import ClearbitAPI
-from handlers.cron import FirmwareCrashLogsRetain
-from handlers.setup import CreateBuggyFirmwareAPI
-from handlers.cron import UpdateTimezoneByPartner
-from handlers.cron import UpdateTimezoneByPartnerQueue
+from api.setup import CreateBuggyFirmwareAPI
 from api.datastore import InitializeDataStore
 
 
@@ -136,15 +128,13 @@ cron_routes = [
     ('/cron/alarms_count_push', AlarmsCountPush),
     ('/cron/devices_count_push', DevicesCountPush),
     ('/cron/drop_old_sense_logs_searchify_index', DropOldSenseLogsSearchifyIndex),
-    ('/cron/holds_count_push', HoldsCountPush),
     ('/cron/store_recently_active_devices_stats_15_minutes', StoreRecentlyActiveDevicesStats15Minutes),
     ('/cron/store_recently_active_devices_stats_daily', StoreRecentlyActiveDevicesStatsDaily),
     ('/cron/store_recently_active_devices_stats_minute', StoreRecentlyActiveDevicesStatsMinute),
-    ('/cron/waves_count_push', WavesCountPush),
-    ('/cron/zendesk_daily_stats', ZendeskCronHandler),
+    ('/cron/zendesk_daily_stats', ZendeskCron),
     ('/cron/sense_color_update', SenseColorUpdate),
     ('/cron/sense_color_update_queue', SenseColorUpdateQueue),
-    ('/cron/firmware_crash_logs_retain', FirmwareCrashLogsRetain),
+    ('/cron/firmware_crash_logs_retain', FirmwareLogsAlert),
     ('/cron/update_timezone_by_partner', UpdateTimezoneByPartner),
     ('/cron/update_timezone_by_partner_queue', UpdateTimezoneByPartnerQueue),
 ]

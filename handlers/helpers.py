@@ -466,6 +466,6 @@ class ResponseOutput():
         })
 
 
-class CronRequestHandler(ProtectedRequestHandler):
+class BaseCron(ProtectedRequestHandler):
     def persist_namespace(self):
         namespace_manager.set_namespace("production")
