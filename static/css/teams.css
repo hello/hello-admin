@@ -9,3 +9,4 @@ table.table td{text-align: center;}
 button {margin-right: 10px; opacity: 0.9;}
 #mode-input {max-width: 200px;}
 .form-group:first-child {margin-left: 16px;}
+tbody {background-color: #F7F8FA;}
