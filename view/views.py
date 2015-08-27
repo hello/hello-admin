@@ -1,8 +1,3 @@
-import datetime as dt
-import os
-
-import jinja2
-
 from core.handlers.base import BaseRequestHandler
 from core.handlers.base import ProtectedRequestHandler
 from core.handlers.base import CustomerExperienceRequestHandler
@@ -11,20 +6,6 @@ from core.handlers.base import SuperFirmwareRequestHandler
 from core.handlers.base import ShippingRequestHandler
 from core.handlers.base import SettingsModeratorRequestHandler
 from core.handlers.base import TokenMakerRequestHandler
-from models.setup import AccessToken
-
-
-this_file_path = os.path.dirname(__file__)
-
-print "my path", os.path.split(this_file_path)[0]
-
-
-JINJA_ENVIRONMENT = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(os.path.split(this_file_path)[0]),
-    extensions=['jinja2.ext.autoescape'],
-    autoescape=True
-)
-
 
 
 class ZendeskView(CustomerExperienceRequestHandler):
