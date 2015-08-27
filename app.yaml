@@ -1,5 +1,5 @@
 application: 'hello-admin'
-version: 51e
+version: 51g
 
 runtime: python27
 api_version: 1
@@ -12,10 +12,10 @@ handlers:
   static_files: static/icon/favicon.ico
   upload: static/icon/favicon\.ico
 - url: /cron/.*
-  script: handlers.urls.hello_admin_app
+  script: url.launcher.cron
   login: admin
 - url: .*
-  script: handlers.urls.hello_admin_app
+  script: url.launcher.main
   login: required
   secure: always
 

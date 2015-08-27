@@ -2,8 +2,9 @@ from collections import Counter
 import datetime
 import json
 import operator
+
 from api.searchify import SearchifyQuery
-from handlers.helpers import ProtectedRequestHandler
+from core.handlers.base import ProtectedRequestHandler
 from indextank import ApiClient
 from models.ext import BuggyFirmware
 import settings

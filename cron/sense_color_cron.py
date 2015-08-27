@@ -1,6 +1,8 @@
 import logging as log
+
 from google.appengine.api import memcache, taskqueue
-from handlers.helpers import BaseCron
+
+from core.handlers.base import BaseCron
 
 
 class SenseColorUpdate(BaseCron):

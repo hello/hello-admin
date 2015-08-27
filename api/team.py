@@ -1,6 +1,7 @@
 import json
 import logging as log
-from handlers.helpers import FirmwareRequestHandler
+
+from core.handlers.base import FirmwareRequestHandler
 
 
 class TeamsAPI(FirmwareRequestHandler):

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block extrastatic %}
+    <script type="text/javascript" src="/static/js/third-party/moment.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/d3.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/bootstrap-slider.js"></script>
+
+    <script type="text/jsx" src="/static/js/third-party/long-datetimepicker.js"></script>
+    <script type="text/jsx" src="/static/js/inactive_devices.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-slider.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-datetimepicker.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/inactive_devices.css"/>
+{% endblock %}
+
+{% block content %}
+    <div class="col-xs-12" id="inactive-devices"></div>
+{% endblock %}

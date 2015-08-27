@@ -1,4 +1,5 @@
-from handlers.helpers import ProtectedRequestHandler, ResponseOutput
+from core.models.response import ResponseOutput
+from core.handlers.base import ProtectedRequestHandler
 
 
 class RecentAccountsAPI(ProtectedRequestHandler):

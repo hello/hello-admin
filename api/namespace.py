@@ -1,7 +1,9 @@
 import logging as log
-from google.appengine.api import namespace_manager
-from handlers.helpers import ProtectedRequestHandler, BaseRequestHandler
 import datetime
+
+from google.appengine.api import namespace_manager
+
+from core.handlers.base import ProtectedRequestHandler
 
 
 class NamespaceAPI(ProtectedRequestHandler):

@@ -1,11 +1,14 @@
 import logging as log
 import json
-from handlers.helpers import FirmwareRequestHandler
-from handlers.helpers import SuperFirmwareRequestHandler
-from handlers.helpers import ProtectedRequestHandler
-from handlers.helpers import ResponseOutput
-from google.appengine.api import memcache
 import time
+
+from google.appengine.api import memcache
+
+from core.models.response import ResponseOutput
+from core.handlers.base import FirmwareRequestHandler
+from core.handlers.base import SuperFirmwareRequestHandler
+from core.handlers.base import ProtectedRequestHandler
+
 
 class FirmwareAPI(FirmwareRequestHandler):
     '''Enables OTA firmware updates'''

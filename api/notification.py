@@ -1,5 +1,7 @@
 import json
-from handlers.helpers import ProtectedRequestHandler
+
+from core.handlers.base import ProtectedRequestHandler
+
 
 class NotificationAPI(ProtectedRequestHandler):
     def post(self):

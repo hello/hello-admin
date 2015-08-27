@@ -1,5 +1,7 @@
 import time
-from handlers.helpers import ProtectedRequestHandler
+
+from core.handlers.base import ProtectedRequestHandler
+
 
 class OnboardingLogsByResultAPI(ProtectedRequestHandler):
     def get(self):

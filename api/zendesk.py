@@ -1,9 +1,14 @@
 import json
+
 from google.appengine.api import namespace_manager
 import requests
-from handlers.helpers import ProtectedRequestHandler, ResponseOutput
-from handlers.utils import display_error, get_zendesk_stats
+
+from core.models.response import ResponseOutput
+from core.handlers.base import ProtectedRequestHandler
+from core.utils.zendesk import get_zendesk_stats
+from core.utils.common import display_error
 from models.ext import ZendeskDailyStats
+
 
 class ZendeskAPI(ProtectedRequestHandler):
     def get_tickets(self, page_limit=100000):

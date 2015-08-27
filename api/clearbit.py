@@ -1,7 +1,9 @@
-import requests
 import logging as log
-from handlers.helpers import ProtectedRequestHandler
-from handlers.helpers import ResponseOutput
+
+import requests
+
+from core.models.response import ResponseOutput
+from core.handlers.base import ProtectedRequestHandler
 from models.ext import Clearbit
 
 
