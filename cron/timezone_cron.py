@@ -1,9 +1,11 @@
 import datetime
 import logging as log
 import re
+
 from google.appengine.api import taskqueue
+
 from api.papertrail import PaperTrailWrapper
-from handlers.helpers import ProtectedRequestHandler
+from core.handlers.base import ProtectedRequestHandler
 
 
 class UpdateTimezoneByPartnerQueue(PaperTrailWrapper):

@@ -1,12 +1,13 @@
 import json
 import logging as log
 import urllib
-from core.models.authentication import AVAILABLE_NAMESPACES
+
 import settings
-from models.setup import AppInfo, AdminUser, AccessToken, UserGroup
-from handlers.helpers import ProtectedRequestHandler, SuperEngineerRequestHandler, BaseRequestHandler
+from models.setup import AppInfo, AdminUser, AccessToken
+from core.handlers.base import ProtectedRequestHandler, SuperEngineerRequestHandler, BaseRequestHandler
 from models.ext import ZendeskCredentials, SearchifyCredentials, KeyStoreLocker, GeckoboardCredentials
 from models.ext import BuggyFirmware
+
 
 class AppAPI(ProtectedRequestHandler):
     def get(self):

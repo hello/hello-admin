@@ -1,4 +1,4 @@
-from handlers.helpers import ProtectedRequestHandler
+from core.handlers.base import ProtectedRequestHandler
 
 class SenseEventsAPI(ProtectedRequestHandler):
     def get(self):

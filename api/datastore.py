@@ -1,7 +1,9 @@
 import logging as log
-from core.models.authentication import ApiInfo, AVAILABLE_NAMESPACES
-from handlers.helpers import BaseRequestHandler
+
 from google.appengine.api import namespace_manager
+
+from core.models.authentication import ApiInfo, AVAILABLE_NAMESPACES
+from core.handlers.base import BaseRequestHandler
 from models.ext import ZendeskCredentials, SearchifyCredentials, KeyStoreLocker, GeckoboardCredentials, OrdersMap, \
     Clearbit, BuggyFirmware
 from models.setup import UserGroup

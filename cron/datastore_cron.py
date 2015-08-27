@@ -1,9 +1,11 @@
 import datetime
 import json
 import time
+
 from google.appengine.api import namespace_manager
 from google.appengine.ext import ndb
-from handlers.helpers import BaseCron
+
+from core.handlers.base import BaseCron
 from models.ext import RecentlyActiveDevicesStats, RecentlyActiveDevicesStats15Minutes, RecentlyActiveDevicesStatsDaily
 import settings
 

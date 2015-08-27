@@ -1,6 +1,9 @@
-import requests
 import json
-from handlers.helpers import ProtectedRequestHandler, ResponseOutput
+
+import requests
+
+from core.models.response import ResponseOutput
+from core.handlers.base import ProtectedRequestHandler
 
 
 PAPERTRAIL_ENDPOINT = "https://papertrailapp.com/api/v1/{}"

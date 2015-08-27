@@ -2,8 +2,10 @@ import datetime
 import json
 import logging as log
 import time
+
 import requests
-from handlers.helpers import BaseCron
+
+from core.handlers.base import BaseCron
 from indextank import ApiClient
 import settings
 

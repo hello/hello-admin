@@ -1,7 +1,7 @@
 import json
 import logging as log
-import settings
-from handlers.helpers import FirmwareRequestHandler
+
+from core.handlers.base import FirmwareRequestHandler
 
 
 class FeaturesAPI(FirmwareRequestHandler):

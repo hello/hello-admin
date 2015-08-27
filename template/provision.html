@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block extrastatic %}
+    <link rel="stylesheet" type="text/css" href="/static/css/keys.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/jquery.fileupload.css" />
+
+    <script type="text/javascript" src="/static/js/third-party/jquery.ui.widget.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/jquery.iframe-transport.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/jquery.fileupload.js"></script>
+
+    <script type="text/jsx" src="/static/js/sense_key_provision.js"></script>
+    <script type="text/jsx" src="/static/js/pill_key_provision.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div id="sense-key-provision"></div>
+    <div id="pill-key-provision"></div>
+{% endblock %}

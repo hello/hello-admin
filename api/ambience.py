@@ -1,5 +1,6 @@
 import time
-from handlers.helpers import ProtectedRequestHandler
+
+from core.handlers.base import ProtectedRequestHandler
 
 
 class RoomConditionsAPI(ProtectedRequestHandler):

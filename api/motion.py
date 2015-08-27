@@ -1,5 +1,4 @@
-import settings
-from handlers.helpers import ProtectedRequestHandler
+from core.handlers.base import ProtectedRequestHandler
 
 class MotionAPI(ProtectedRequestHandler):
     def get(self):

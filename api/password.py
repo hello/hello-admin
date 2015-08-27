@@ -1,5 +1,6 @@
 import json
-from handlers.helpers import ProtectedRequestHandler, CustomerExperienceRequestHandler
+
+from core.handlers.base import ProtectedRequestHandler, CustomerExperienceRequestHandler
 
 
 class PasswordResetAPI(ProtectedRequestHandler):

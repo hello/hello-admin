@@ -1,6 +1,8 @@
 from collections import defaultdict
 import json
-from handlers.helpers import ProtectedRequestHandler
+
+from core.handlers.base import ProtectedRequestHandler
+
 
 __author__ = 'zet'
 

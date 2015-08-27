@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <h3 xmlns="http://www.w3.org/1999/html">Setup</h3>
+    <hr class="fancy-line"/>
+    <br>
+
+    <p>1. First, let's <a target="_blank" href="/api/setup"> create essential credentials</a>: </p>
+    <p>&nbsp;&nbsp;&nbsp;This action will wipe out current entities of AppInfo, AdminUser, SearchifyCredentials & ZendeskCredentials if existed and initiate default entities for those essential credentials.</p>
+    <br>
+
+    <p>2. Next, go to GAE's <a target="_blank" href="http://localhost:8000/datastore">local datastore</a> or <a target="_blank" href="https://appengine.google.com/datastore/explorer?&app_id=s~hello-admin">prod datastore</a> to fill in credentials, save and <strong>flush memcache</strong></p>
+    <br>
+
+    <p>3. Let's <a target="_blank" href="/update">update</a> to make setup effective</p>
+    <br>
+
+    <p>4. It is optional to <a target="_blank" href="/api/create_groups"> recreate user groups</a> as the current ones shall prevail</p>
+    <p>&nbsp;&nbsp;&nbsp;This action will wipe out current entities of UserGroup if existed and initiate default user groups.</p>
+    <p>&nbsp;&nbsp;&nbsp;If you did perform this action, you might want to repeat steps 2 and 3 to add yourself to super engineer group.</p>
+    <br>
+
+    <p>5. It is also optional to <a target="_blank" href="/api/create_key_store_locker">recreate RSA private keys</a> for sense provision</p>
+    <p>&nbsp;&nbsp;&nbsp;This action will wipe out current RSA private keys if existed and initiate empty ones for sense on DVT, PVT and MP phases.</p>
+    <p>&nbsp;&nbsp;&nbsp;If you did perform this action, you might want to <a target="_blank" href="/provision">recreate RSA private keys for sense provision</a>.</p>
+    <br>
+
+{% endblock %}
