@@ -6,7 +6,7 @@ from google.appengine.api import urlfetch
 
 from core.models.response import ResponseOutput
 from core.handlers.base import ProtectedRequestHandler
-from core.utils.time import epoch_to_human
+from core.utils.time_helpers import epoch_to_human
 
 
 THROTTLE_PERIOD = 2*60

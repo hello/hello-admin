@@ -2,7 +2,7 @@ import unittest
 import datetime
 
 from core.lib import pytz
-from core.utils.time import iso_to_utc_timestamp, iso_to_pacific_datetime_obj, iso_to_human_timestring
+from core.utils.time_helpers import iso_to_utc_timestamp, iso_to_pacific_datetime_obj, iso_to_human_timestring
 
 
 utc_timezone = pytz.timezone("UTC")

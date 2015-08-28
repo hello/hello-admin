@@ -4,7 +4,7 @@ import logging as log
 import requests
 
 from core.handlers.base import BaseCron
-from core.utils.time import get_current_pacific_datetime
+from core.utils.time_helpers import get_current_pacific_datetime
 from core.utils.zendesk import get_zendesk_stats
 from core.utils.common import display_error
 from models.ext import ZendeskDailyStats

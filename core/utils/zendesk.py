@@ -1,5 +1,5 @@
 from collections import Counter, defaultdict
-from core.utils import time
+from core.utils import time_helpers
 
 
 def get_zendesk_stats(tickets):
