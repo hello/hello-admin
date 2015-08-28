@@ -1,7 +1,7 @@
 import json
 
 from core.handlers.base import ProtectedRequestHandler
-from core.utils.time import get_current_pacific_datetime
+from core.utils.time_helpers import get_current_pacific_datetime
 
 
 class LabelDataAPI(ProtectedRequestHandler):
