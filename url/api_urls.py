@@ -54,7 +54,7 @@ from api.setup import UpdateAdminAccessTokenAPI
 from api.setup import UpdateGeckoBoardCredentials
 from api.setup import ViewPermissionAPI
 from api.team import TeamsAPI
-from api.timeline import TimelineAPI
+from api.timeline import TimelineAPI, TimelineV2API
 from api.timezone import TimezoneAPI
 from api.timezone import TimezoneHistoryAPI
 from api.zendesk import ZendeskAPI
@@ -147,5 +147,6 @@ routes = [
     ('/register_pill', RegisterPillAPI),
     ('/api/setup', SetupAPI),
     ('/create_account', CreateAccountAPI),
+    ('/api/timeline_v2/?$', TimelineV2API),
 ]
 

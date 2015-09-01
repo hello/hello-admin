@@ -230,3 +230,8 @@ class SenseUptimeView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='sense_uptime.html',
                                 context={'title': "Sense Uptime"})
+
+class TimelineV2View(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='timeline_v2.html',
+                                context={'title': "Timeline V2"})
