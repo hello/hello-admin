@@ -35,9 +35,9 @@ var SleepSummaryModal = React.createClass({
                                 var conditionFriendlies = {
                                     IDEAL: "just right",
                                     WARNING: "not ideal",
-                                    ALERT: "lethal"
+                                    ALERT: "uncomfortable"
                                 };
-                                value = conditionFriendlies[m.condition] || m.condition;
+                                value = conditionFriendlies[m.condition] || "--";
                                 unit = "";
                             }
 
