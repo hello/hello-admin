@@ -1,4 +1,4 @@
-from view.views import AccountProfileView, RoomConditionsMinuteView
+from view.views import AccountProfileView, RoomConditionsMinuteView, TimelineV2View
 from view.views import ActiveDevicesHistoryView
 from view.views import AlarmRingsHistoryView
 from view.views import AlarmsView
@@ -88,4 +88,5 @@ routes = [
     ('/zendesk_history/?$', ZendeskHistoryView),
     ('/zendesk_now/?$', ZendeskNowView),
     ('/sense_uptime/?$', SenseUptimeView),
+    ('/timeline_v2/?$', TimelineV2View),
 ]

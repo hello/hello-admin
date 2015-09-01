@@ -139,7 +139,7 @@ var TimelineTile = React.createClass({
         return <div>
             {this.props.status}
             {timelinePreview}
-            <p><a target="_blank" href={"/timeline/?email=" + this.props.email + "&date=" + lastNightDate}>See full detail</a></p>
+            <p><a target="_blank" href={"/timeline_v2/?email=" + this.props.email + "&date=" + lastNightDate}>See full detail</a></p>
         </div>
     }
 });

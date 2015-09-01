@@ -51,8 +51,6 @@ var TimelineContent = React.createClass({
                             {sensors}
                             {sleepDepth}
                             {sound}
-                            <a href={"/sense_logs/?devices=" + currentEmailInput + "&start=" +  start + "&end=" + end + "&max_docs=100"}
-                               target="_blank" className="cd-read-more">Sense Logs</a>
                             {message}
                         </div>
                     </div>

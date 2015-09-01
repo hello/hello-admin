@@ -19,7 +19,7 @@ import settings
 from models.setup import AppInfo
 from models.setup import AdminUser
 from models.setup import UserGroup
-from core.models.authentication import ApiInfo, SURIPU_APP_ID, SURIPU_ADMIN_ID, AVAILABLE_NAMESPACES, \
+from core.models.authentication import ApiInfo, SURIPU_APP_ID, SURIPU_ADMIN_ID, SURIPU_APP_V2_ID, AVAILABLE_NAMESPACES, \
     LOCAL_AVAILABLE_NAMESPACES
 
 
@@ -97,6 +97,10 @@ class BaseRequestHandler(webapp2.RequestHandler):
     @property
     def suripu_app(cls):
         return ApiInfo.get_by_id(SURIPU_APP_ID)
+
+    @property
+    def suripu_app_v2(cls):
+        return ApiInfo.get_by_id(SURIPU_APP_V2_ID)
 
     @property
     def suripu_admin(cls):
