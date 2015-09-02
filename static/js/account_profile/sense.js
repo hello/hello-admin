@@ -1,3 +1,83 @@
+var FirmwareModal = React.createClass({
+    getInitialState: function() {
+        return {fwHistory: []};
+    },
+    translateFirmwares: function(firmwareHexList) {
+        console.log(firmwareHexList);
+        var fwTranslation = {};
+        $.ajax({
+            url: '/api/firmware_unhash',
+            dataType: 'json',
+            data: firmwareHexList,
+            type: "POST",
+            async: false,
+            success: function(response) {
+                fwTranslation = response.data
+            }.bind(this)
+        });
+        return fwTranslation;
+    },
+    getFirmwares: function() {
+        $.ajax({
+            url: '/api/firmware/history',
+            dataType: 'json',
+            data: {'device_id': this.props.senseId},
+            type: 'GET',
+            success: function(response) {
+                if (response.error.isWhiteString()){
+                    var fwTranslation = this.translateFirmwares(JSON.stringify(Object.keys(response.data).map(function(ts){return parseInt(response.data[ts], 10).toString(16);})));
+                    this.setState({
+                        fwHistory: Object.keys(response.data).sort().reverse().map(function(ts){
+                            var firmwareInt = response.data[ts];
+                            var firmwareHex = parseInt(response.data[ts], 10).toString(16);
+                            return {
+                                timestamp: d3.time.format("%d %b %Y %H:%M:%S")(new Date(Number(ts))),
+                                firmwareInt: firmwareInt,
+                                firmwareHex: firmwareHex,
+                                firmwareMan: fwTranslation[firmwareHex] || <span className="not-ok">--</span>
+                            }
+                        }.bind(this))
+                    })
+                }
+            }.bind(this)
+        });
+    },
+    componentDidMount: function() {
+        this.getFirmwares();
+    },
+    render: function() {
+        return <Modal animation={true}>
+            <div className='modal-body'>
+                <div className="modal-title">Firmware History <Button className="btn-round btn-borderless btn-fade" onClick={this.props.onRequestHide}>X</Button></div>
+                <div className="modal-subtitle">Order by upgrade timestamp, see full detail for sense {this.props.senseId} <a href={"/firmware/?device_id=" + this.props.senseId} target="_blank">here</a></div>
+                <br/>
+                <Table id="fw-history">
+                    <tbody>
+                        <tr className="modal-col-title">
+                            <td>Timestamp (Browser tz)</td>
+                            <td>Version (Int)</td>
+                            <td>Version (Hex)</td>
+                            <td>Version (Man)</td>
+                        </tr>
+                        {this.state.fwHistory.map(function(h){
+                            return <tr>
+                                <td>{h.timestamp}</td>
+                                <td>{h.firmwareInt}</td>
+                                <td>{h.firmwareHex}</td>
+                                <td className="modal-fw-man">{h.firmwareMan}</td>
+                            </tr>;
+                        })}
+                        <tr><td/><td/><td/><td/></tr>
+                    </tbody>
+                </Table>
+            </div>
+            <div className='modal-footer'>
+                <Button className="btn-round btn-fade" onClick={this.props.onRequestHide}>X</Button>
+            </div>
+        </Modal>;
+    }
+});
+
 var SenseSummary = React.createClass({
     loadUnhashedFirmware: function(version, senseId) {
         $.ajax({
@@ -9,16 +89,15 @@ var SenseSummary = React.createClass({
             success: function(response) {
                 if (response.error.isWhiteString()) {
                     version = <div>
-                        <a href={"/firmware/?device_id=" + senseId} target="_blank">
-                        {version || <span className="not-ok">unknown</span>}</a>
-                        <span>{response.data.join(", ") ? "(" + response.data.join(", ") + ")" : null}</span>
+                        {version || <span className="not-ok">unknown</span>}
+                        <span> {response.data.join(", ") ? "(" + response.data.join(", ") + ")" : null}</span>
                     </div>;
                 }
             }
         });
         return version;
     },
-    
+
     closePopoverManually: function() {
         $("#popover-trigger").trigger("click");
     },
@@ -38,7 +117,7 @@ var SenseSummary = React.createClass({
         });
         return false;
     },
-    
+
     render: function() {
         var senseResponse = this.props.senseResponse,
             senseKeyStoreResponse = this.props.senseKeyStoreResponse,
@@ -95,6 +174,9 @@ var SenseSummary = React.createClass({
                 <ul className="extra">
                     <li><a target="_blank" href={"/sense_logs/?field=device_id&keyword=" + senseId + "&sense_id=&limit=&start=&end="}>Logs</a></li>
                     <li><a target="_blank" href={"/sense_events/?account_input=" + senseId + "&start_ts=" + new Date().getTime()}>Events</a></li>
+                    <li><ModalTrigger modal={<FirmwareModal senseId={senseId} />}>
+                        <a className="cursor-hand">Firmware-History</a>
+                    </ModalTrigger></li>
                 </ul>
             </div>;
         }
@@ -103,3 +185,4 @@ var SenseSummary = React.createClass({
             <Well>{senseResponse.error}</Well>: result;
     }
 });
+

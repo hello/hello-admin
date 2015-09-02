@@ -97,3 +97,6 @@ html {
 .right-wrapper {text-align: right;}
 .paddingless {padding: 0;}
 .btn-group.open {width: 175px;}
+.btn-round {border-radius: 50%;}
+.btn-borderless {border: none;}
+.btn-fade {opacity: 0.5;}
