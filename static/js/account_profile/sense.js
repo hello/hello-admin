@@ -90,7 +90,7 @@ var SenseSummary = React.createClass({
                 if (response.error.isWhiteString()) {
                     version = <div>
                         {version || <span className="not-ok">unknown</span>}
-                        <span>{response.data.join(", ") ? "(" + response.data.join(", ") + ")" : null}</span>
+                        <span> {response.data.join(", ") ? "(" + response.data.join(", ") + ")" : null}</span>
                     </div>;
                 }
             }
@@ -175,7 +175,7 @@ var SenseSummary = React.createClass({
                     <li><a target="_blank" href={"/sense_logs/?field=device_id&keyword=" + senseId + "&sense_id=&limit=&start=&end="}>Logs</a></li>
                     <li><a target="_blank" href={"/sense_events/?account_input=" + senseId + "&start_ts=" + new Date().getTime()}>Events</a></li>
                     <li><ModalTrigger modal={<FirmwareModal senseId={senseId} />}>
-                        <a className="cursor-hand">Firmware</a>
+                        <a className="cursor-hand">Firmware-History</a>
                     </ModalTrigger></li>
                 </ul>
             </div>;
