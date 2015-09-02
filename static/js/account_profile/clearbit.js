@@ -111,7 +111,7 @@ var ClearbitModal = React.createClass({
                 <ClearbitTile email={this.props.email} />
             </div>
             <div className='modal-footer'>
-                <Button onClick={this.props.onRequestHide}>Close</Button>
+                <Button className="btn-round" onClick={this.props.onRequestHide}>X</Button>
             </div>
         </Modal>;
     }

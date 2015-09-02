@@ -145,3 +145,9 @@ svg {
     margin: 0 -4px -7px -4px;
 }
 
+.modal-footer {text-align: center; margin-top: -20px; padding-top: 0; border: none;}
+.modal-title>button {right: 10px; position: absolute;}
+#fw-history>tbody{overflow-y: scroll;}
+.modal-subtitle {color: #999999; font-size: 11px; margin-top: 5px;}
+.modal-col-title {text-transform: uppercase; color: #000000; font-weight: lighter; font-size: 10px;}
+.modal-fw-man {color: #41D7AB;}
