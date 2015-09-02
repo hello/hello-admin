@@ -61,8 +61,7 @@ class FirmwareInfoAPI(FirmwareRequestHandler):
             url_params={'range_start': range_start, 'range_end': range_end},
         )
 
-class FirmwareHistoryAPI(FirmwareRequestHandler):
-
+class FirmwareHistoryAPI(ProtectedRequestHandler):
     def get(self):
         device_id = self.request.get('device_id', default_value="")
 
