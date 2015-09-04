@@ -468,7 +468,7 @@ input, select {font-weight: lighter !important;}
     box-shadow: 0 1px 0 #d7e4ed;
 }
 #sleep-summary {text-transform: uppercase; margin: 0 1em; font-size: 13px;}
-#hours-message {font-size: 14px; color: #000000; margin: 0 1em;}
+.summary-message {font-size: 14px; color: #000000; margin: 5px 1em 0 1em;}
 hr {margin: 12px 0;}
 a {color: #4CB9FF;}
 .modal-footer {text-align: center; margin-top: -20px; padding-top: 0; border: none; opacity: 0.5;}
