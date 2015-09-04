@@ -1,4 +1,4 @@
-var LogFacets = React.createClass({
+var LogsFacet = React.createClass({
     getInitialState: function() {
         return {facets: {}, error: "", loading: false, firmwares: []}
     },
@@ -20,31 +20,28 @@ var LogFacets = React.createClass({
                     if (firmwareFromURL){
                         $("#firmware").val(firmwareFromURL);
                     }
-
-                    this.handleSubmit();
+                    if (getParameterByName("pattern")) {
+                        this.handleSubmit();
+                    }
                 }
             }.bind(this)
         });
+        return false;
     },
 
     componentDidMount: function() {
         var patternFromURL = getParameterByName("pattern");
-        if (patternFromURL.isWhiteString()) {
-            return false;
-        }
         var dateFromURL = getParameterByName("date");
         var firmwareFromURL = getParameterByName("firmware");
 
         $("#pattern").val(patternFromURL);
         $("#date-input").val(dateFromURL);
-
         if(firmwareFromURL) {
             this.getFirmwares(firmwareFromURL);
         }
         else {
             this.getFirmwares();
         }
-        return false;
     },
 
     handleSubmit: function() {
@@ -52,9 +49,9 @@ var LogFacets = React.createClass({
         var pattern = $("#pattern").val().trim();
         var date = $("#date-input").val();
         var firmware = $("#firmware").val();
-        history.pushState({}, '', '/log_facets/?pattern=' + pattern + "&date=" + date + "&firmware=" + firmware);
+        history.pushState({}, '', '/logs_facet/?pattern=' + pattern + "&date=" + date + "&firmware=" + firmware);
         $.ajax({
-            url: '/api/log_facets',
+            url: '/api/logs_facet',
             dataType: 'json',
             data: {
                 pattern: pattern,
@@ -119,4 +116,4 @@ var LogFacets = React.createClass({
     }
 });
 
-React.render (<LogFacets/>, document.getElementById("log-facets"));
+React.render (<LogsFacet/>, document.getElementById("logs-facet"));

@@ -4,6 +4,7 @@ import datetime
 import logging as log
 
 from google.appengine.api import urlfetch
+from models.ext import LogsFacet
 
 import settings
 from core.handlers.base import ProtectedRequestHandler
@@ -254,7 +255,12 @@ class WifiSignalStrengthAPI(ProtectedRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class LogsPatternFacetsAPI(ProtectedRequestHandler):
+class LogsFacetAPI(ProtectedRequestHandler):
+    @property
+    def date(self):
+        date_components = self.request.get("date", default_value=datetime.datetime.now().strftime("%m-%d-%Y")).split("-")
+        return "-".join([date_components[2], date_components[0], date_components[1]])
+
     @property
     def pattern(self):
         return self.request.get("pattern")
@@ -268,11 +274,11 @@ class LogsPatternFacetsAPI(ProtectedRequestHandler):
         return self.request.get("end_ts", default_value=None) or None
 
     @property
-    def middle_fw_version_filter(self):
+    def middle_fw_version(self):
         middle_fw_version = self.request.get("middle_fw_version", default_value=None)
         if not middle_fw_version:
             return None
-        return {"middle_fw_version": middle_fw_version}
+        return middle_fw_version
 
     def get_facets(self, index_name):
         output = {"data": [], "error": "Facets not found!"}
@@ -280,7 +286,7 @@ class LogsPatternFacetsAPI(ProtectedRequestHandler):
         try:
             output['data'] = index.search(
                 query="text:{}".format(self.pattern),
-                category_filters=self.middle_fw_version_filter,
+                category_filters={"middle_fw_version": self.middle_fw_version.upper()},
                 docvar_filters={0: [[self.start_ts, self.end_ts]]}
             ).get("facets", {})
             if output['data']:
@@ -292,10 +298,19 @@ class LogsPatternFacetsAPI(ProtectedRequestHandler):
 
     def get(self):
         urlfetch.set_default_fetch_deadline(30)
-        date_components = self.request.get("date", default_value=datetime.datetime.now().strftime("%m-%d-%Y")).split("-")
-        date = "-".join([date_components[2], date_components[0], date_components[1]])
-        facets = self.get_facets(settings.SENSE_LOGS_INDEX_PREFIX + date)
+        facets = self.get_facets(settings.SENSE_LOGS_INDEX_PREFIX + self.date)
         self.response.write(json.dumps(facets))
+
+
+class LogsFacetHistoryAPI(LogsFacetAPI):
+    def get(self):
+        output = {"data": [], "error": ""}
+        try:
+            output["data"] = LogsFacet.get_by_date_as_dicts(self.date)
+        except Exception as e:
+            output["error"] = e.message
+
+        self.response.write(json.dumps(output))
 
 
 class SearchifyQuery():

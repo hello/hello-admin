@@ -1,13 +1,17 @@
 from collections import Counter
 import datetime
 import json
+import time
 import operator
+from google.appengine.api import urlfetch
+from google.appengine.api.taskqueue import taskqueue
 
-from api.searchify import SearchifyQuery
+from api.searchify import SearchifyQuery, LogsFacetAPI
 from core.handlers.base import ProtectedRequestHandler
 from indextank import ApiClient
-from models.ext import BuggyFirmware
+from models.ext import BuggyFirmware, LogsFacet
 import settings
+import logging as log
 
 
 class FirmwareLogsAlert(ProtectedRequestHandler):
@@ -89,3 +93,52 @@ class FirmwareLogsAlert(ProtectedRequestHandler):
         if messages:
             self.send_to_slack_admin_logs_channel(messages)
         self.response.write(json.dumps(output))
+
+
+class StoreLogsFacet(LogsFacetAPI):
+    def get(self):
+        urlfetch.set_default_fetch_deadline(60)
+        facets = self.get_facets(settings.SENSE_LOGS_INDEX_PREFIX + self.date)
+        unique_senses_count = facets.get('data', {}).get('device_id', {}).__len__()
+
+        if unique_senses_count:
+            log.info("record logs facet {} {} {} {}".format(self.date, self.pattern, self.middle_fw_version, unique_senses_count))
+            LogsFacet(
+                id="{}_{}_{}".format(self.date, self.pattern, self.middle_fw_version),
+                date=self.date,
+                pattern=self.pattern,
+                middle_fw_version=self.middle_fw_version,
+                count=unique_senses_count
+            ).put()
+        self.response.write(json.dumps(facets))
+
+
+class StoreLogsFacetQueue(StoreLogsFacet):
+    @property
+    def patterns(self):
+        return ["i2c recovery", "boot completed", "ASSERT", "fail", "fault"]
+
+    @property
+    def middle_fw_versions(self):
+        fw_info_list = self.hello_request(
+            api_url="firmware/list_by_time",
+            raw_output=True,
+            type="GET",
+            url_params={'range_start': int(time.time()*1000) - 365*86400000, 'range_end': int(time.time()*1000)},
+        ).data
+        return ['{0:x}'.format(int(f.get('version'))) for f in fw_info_list]
+
+    def get(self):
+        log.info("fw list {}".format(self.middle_fw_versions))
+        for p in self.patterns:
+            for fw in self.middle_fw_versions:
+                taskqueue.add(
+                    url="/cron/store_logs_facet",
+                    params={
+                        "pattern": p,
+                        "middle_fw_version": fw,
+                    },
+                    method="GET",
+                    queue_name="store-logs-facet"
+                )
+

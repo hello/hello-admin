@@ -49,8 +49,8 @@ class FirmwareAPI(FirmwareRequestHandler):
             type="DELETE",
         )
 
-class FirmwareInfoAPI(FirmwareRequestHandler):
 
+class FirmwareInfoAPI(FirmwareRequestHandler):
     def get(self):
         range_start = self.request.get('range_start', default_value=int(time.time()*1000) - 7*86400000)
         range_end = self.request.get('range_end', default_value=int(time.time()*1000))
@@ -60,6 +60,7 @@ class FirmwareInfoAPI(FirmwareRequestHandler):
             type="GET",
             url_params={'range_start': range_start, 'range_end': range_end},
         )
+
 
 class FirmwareHistoryAPI(ProtectedRequestHandler):
     def get(self):

@@ -35,3 +35,6 @@ cron:
 - description: update timezone by partner queue
   url: /cron/update_timezone_by_partner_queue
   schedule: every 15 mins
+- description: store logs facet queue
+  url: /cron/store_logs_facet_queue
+  schedule: every 60 mins

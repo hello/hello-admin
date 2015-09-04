@@ -38,8 +38,8 @@ from api.pch import PCHSerialNumberCheckAPI
 from api.battery import BatteryAPI
 from api.ambience import LastRoomConditionsAPI
 from api.ambience import RoomConditionsAPI
-from api.searchify import DustStatsAPI
-from api.searchify import LogsPatternFacetsAPI
+from api.searchify import DustStatsAPI, LogsFacetHistoryAPI
+from api.searchify import LogsFacetAPI
 from api.searchify import SenseLogsAPI, SearchifyStatsAPI
 from api.searchify import WifiSignalStrengthAPI
 from api.setup import AppAPI
@@ -100,7 +100,7 @@ routes = [
     ('/api/password_force_update/?$', PasswordForceUpdateAPI),
     ('/api/label_data/?$', LabelDataAPI),
     ('/api/last_room_conditions/?$', LastRoomConditionsAPI),
-    ('/api/log_facets/?$', LogsPatternFacetsAPI),
+    ('/api/logs_facet/?$', LogsFacetAPI),
     ('/api/motion/?$', MotionAPI),
     ('/api/notification/?$', NotificationAPI),
     ('/api/onboarding_logs_by_result/?$', OnboardingLogsByResultAPI),
@@ -148,5 +148,6 @@ routes = [
     ('/api/setup', SetupAPI),
     ('/create_account', CreateAccountAPI),
     ('/api/timeline_v2/?$', TimelineV2API),
+    ('/api/logs_facet_history/?$', LogsFacetHistoryAPI),
 ]
 
