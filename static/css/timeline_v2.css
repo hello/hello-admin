@@ -447,8 +447,7 @@ header h1 {
 
 #modal-trigger {display: none;}
 canvas {background-color: #e9f0f5;}
-#insights-info {margin-bottom: -100px;}
-#score-bar {text-align: center;}
+#score-bar {text-align: center; height: 80px;}
 
 div.event-date {font-size: 13px; color: #969696;}
 p.event-type, p.event-duration, p.event-sleep-depth {font-size: 13px !important ; color: #666666;}

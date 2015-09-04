@@ -136,7 +136,7 @@ var TimelineMaestro = React.createClass({
                 metrics: [],
                 algorithm: ""
             },
-            filterStatus: "all",
+            filterStatus: "key_events",
             alert: ""
         };
     },
@@ -336,7 +336,7 @@ var TimelineMaestro = React.createClass({
             <TimelineContent data={this.state.data} filterStatus={this.state.filterStatus}/>;
 
         var alertPanel = that.state.alert === "" ? null : <Alert byStyle="danger">{that.state.alert}</Alert>;
-        var scoreBar = that.state.data.score !== -1 ? <Col id="score-bar" xs={2} sm={2} md={2} lg={2} xl={2}>
+        var scoreBar = that.state.data.score !== -1 ? <Col id="score-bar" xs={12}>
                     <LongCircularBar score={this.state.data.score} />
                 </Col>: null;
         return(<div>
@@ -350,7 +350,8 @@ var TimelineMaestro = React.createClass({
                 </Col>
                 <Col xs={3} md={3}>
                     <Input id="filter-input" addonBefore={<Glyphicon glyph="filter"/>} type="select" onChange={this.handleFilter}>
-                        <option value="all">All data</option>
+                        <option value="key_events">Key Events</option>
+                        <option value="all">All Events</option>
                         <option value="IN_BED">IN BED</option>
                         <option value="GENERIC_MOTION">GENERIC MOTION</option>
                         <option value="PARTNER_MOTION">PARTNER MOTION</option>
@@ -372,11 +373,7 @@ var TimelineMaestro = React.createClass({
             <div>
                 {this.state.algorithm}
             </div>
-            <Row id="insights-info">
-                <Col xs={3} sm={3} md={3} lg={3} xl={3} xsOffset={2} mdOffset={2} smOffset={2} lgOffset={2} xlOffset={2}></Col>
-                {scoreBar}
-                <Col xs={4} md={4} sm={4} lg={4} xl={4}></Col>
-            </Row>
+            {scoreBar}
             {timelineContent}
         </div>)
     }
@@ -452,6 +449,11 @@ function timelineBackground(eventType) {
 }
 
 function filterEvents(events, type) {
+    if (type === "key_events") {
+        return events.filter(function(s){
+            return s.event_type !== "IN_BED";
+        })
+    }
     return events.filter(function(s){
         return s.event_type === type;
     });
