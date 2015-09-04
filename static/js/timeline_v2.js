@@ -4,6 +4,19 @@ var d = new Date();
 d.setDate(d.getDate() - 1);
 var yesterday = d3.time.format("%m-%d-%Y")(d);
 
+var SLEEP_EVENTS = [
+    "GENERIC_MOTION",
+    "PARTNER_MOTION",
+    "GENERIC_SOUND",
+    "LIGHT",
+    "LIGHTS_OUT",
+    "GOT_IN_BED",
+    "FELL_ASLEEP",
+    "GOT_OUT_OF_BED",
+    "WOKE_UP",
+    "ALARM_RANG"
+];
+
 var SleepSummaryModal = React.createClass({
     render: function() {
         return <Modal animation={true}>
@@ -60,7 +73,6 @@ var SleepSummaryModal = React.createClass({
 var TimelineContent = React.createClass({
     render: function() {
         var blocks = [];
-        console.log(this.props.filterStatus);
         var events = this.props.filterStatus !== "all" ?
             filterEvents(this.props.data.events, this.props.filterStatus)
             : this.props.data.events;
@@ -72,7 +84,8 @@ var TimelineContent = React.createClass({
                     <a className="cursor-hand">Sleep Summary</a>
                 </ModalTrigger></div>
                 <hr/>
-                <div id="hours-message">{hoursMessage}</div>
+                <div className="summary-message">{hoursMessage}</div>
+                <div className="summary-message">{this.props.algorithm}</div>
             </div>
         );
 
@@ -95,13 +108,10 @@ var TimelineContent = React.createClass({
                 null:
                 <p>Sound: <span>{event.sound}</span></p>;
 
-            var svgIcon = "/static/image/timeline_events/" + timelinePNG(event.event_type);
-            var currentEmailInput = $('#email-input').val();
-            var start = d3.time.format("%m/%d/%Y %H:%M:%S")(new Date(new Date(event.timestamp - 5*60*1000).toUTCString().split("GMT")[0]));
-            var end = d3.time.format("%m/%d/%Y %H:%M:%S")(new Date(new Date(event.timestamp + 5*60*1000).toUTCString().split("GMT")[0]));
+            var svgIcon = "/static/image/timeline_events/" + getTimelinePNG(event.event_type);
             blocks.push(
                 <div className="cd-timeline-block">
-                    <div className={"cd-timeline-img " + timelineBackground(event.event_type)}>
+                    <div className="cd-timeline-img">
                         <img src={svgIcon} alt="Picture"/>
                     </div>
 
@@ -129,7 +139,7 @@ var TimelineMaestro = React.createClass({
         return {
             data: {
                 events: [],
-                score_condition: "UNAVAILABLE",
+                score_condition: "",
                 date: "2015-09-04",
                 score: -1,
                 message: "There was no sleep data recorded for this night.",
@@ -161,35 +171,6 @@ var TimelineMaestro = React.createClass({
         });
     },
 
-    invalidateCache: function() {
-        var emailInput = $('#email-input').val();
-        var dateInput = $('#date-input').val();
-        var requestData = {
-            email: emailInput,
-            date: reformatDate(dateInput)
-        };
-
-        if (requestData.email.isWhiteString() || requestData.date.isWhiteString()) {
-            return false;
-        }
-
-        $.ajax({
-            url: "/api/timeline",
-            type: 'POST',
-            data: requestData,
-            dataType: 'json',
-            success: function(response) {
-                if (response.data === true) {
-                    location.reload();
-                }
-            },
-            error: function(e) {
-                console.log(e);
-            }
-        });
-        return false;
-    },
-
     getTimelineAlgorithm: function() {
         var emailInput = $('#email-input').val();
         var dateInput = $('#date-input').val();
@@ -208,9 +189,8 @@ var TimelineMaestro = React.createClass({
             data: requestData,
             dataType: 'json',
             success: function(response) {
-                console.log("algo", response);
                 if (response.error.isWhiteString()) {
-                    this.setState({algorithm: "Algorithm: " + response.data.algorithm});
+                    this.setState({algorithm: "Applied algorithm was " + response.data.algorithm});
                 }
             }.bind(this),
             error: function(e) {
@@ -261,25 +241,12 @@ var TimelineMaestro = React.createClass({
     },
 
     handleSubmit: function() {
-        if (this.isAuthorized() === true) {
-            this.retrieveTimelineData();
-            this.getTimelineAlgorithm();
-        }
+        this.retrieveTimelineData();
+        this.getTimelineAlgorithm();
         return false;
     },
 
-    isAuthorized: function() {
-        var that = this;
-        // TODO: see pseudocode below
-        // if user belongs to priority group:
-        //    get_or_create admin-data-viewer (ADMIN_READ scope) token to see data
-        // else:
-        //    get_or_create timeline-viewer token (SLEEP_TIMELINE scope) to see data for that user only
-        return true;
-    },
-
     retrieveTimelineData: function() {
-        var that = this;
         var emailInput = $('#email-input').val().trim();
         var dateInput = $('#date-input').val();
 
@@ -287,13 +254,12 @@ var TimelineMaestro = React.createClass({
             email: emailInput,
             date: reformatDate(dateInput)
         };
-        console.log('requestData', requestData);
         if (requestData.email.isWhiteString() || requestData.date.isWhiteString()) {
             return false;
         }
 
-        that.setState(that.getInitialState());
-        that.setState({alert: "Loading ..."});
+        this.setState(this.getInitialState());
+        this.setState({alert: "Loading ..."});
 
         $.ajax({
             url: "/api/timeline_v2",
@@ -301,22 +267,21 @@ var TimelineMaestro = React.createClass({
             data: requestData,
             dataType: 'json',
             success: function(response) {
-                console.log(response);
                 if (response.error.isWhiteString()) {
-                    that.setState({data: response.data, alert: ""});
+                    this.setState({data: response.data, alert: ""});
                     $('.dial').val(response.data.score).trigger('change');
-                    that.pushHistory(emailInput, dateInput);
+                    this.pushHistory(emailInput, dateInput);
                 }
                 else {
-                    that.setState({
+                    this.setState({
                         alert: response.error,
-                        data: that.getInitialState().data
+                        data: this.getInitialState().data
                     });
                 }
-            }.bind(that),
+            }.bind(this),
             error: function(e) {
                 console.log(e);
-            }.bind(that)
+            }.bind(this)
         });
         return false;
     },
@@ -329,16 +294,28 @@ var TimelineMaestro = React.createClass({
         this.retrieveTimelineData();
     },
 
+    getScoreBar: function() {
+        switch(this.state.data.score_condition) {
+            case this.getInitialState().data.score_condition:
+                return null;
+            case "UNAVAILABLE":
+                return <Col id="score-bar" xs={12}>{this.state.data.message}</Col>;
+            case "INCOMPLETE":
+                return <Col id="score-bar" xs={12}>{this.state.data.message}</Col>;
+            default:
+                return <Col id="score-bar" xs={12}>
+                    <LongCircularBar score={this.state.data.score} />
+                </Col>;
+        }
+    },
+
     render: function() {
-        var that = this;
         var timelineContent =
             (this.state.data.events.length === 0) ? null:
-            <TimelineContent data={this.state.data} filterStatus={this.state.filterStatus}/>;
+            <TimelineContent data={this.state.data} filterStatus={this.state.filterStatus} algorithm={this.state.algorithm}/>;
 
-        var alertPanel = that.state.alert === "" ? null : <Alert byStyle="danger">{that.state.alert}</Alert>;
-        var scoreBar = that.state.data.score !== -1 ? <Col id="score-bar" xs={12}>
-                    <LongCircularBar score={this.state.data.score} />
-                </Col>: null;
+        var alertPanel = this.state.alert === "" ? null : <Alert byStyle="danger">{this.state.alert}</Alert>;
+
         return(<div>
             <form onSubmit={this.handleSubmit} className="row">
                 <LongDatetimePicker size="2" placeHolder="date" id="date-input" pickTime={false} format="MM-DD-YYYY" defaultDate={yesterday} />
@@ -352,17 +329,9 @@ var TimelineMaestro = React.createClass({
                     <Input id="filter-input" addonBefore={<Glyphicon glyph="filter"/>} type="select" onChange={this.handleFilter}>
                         <option value="key_events">Key Events</option>
                         <option value="all">All Events</option>
-                        <option value="IN_BED">IN BED</option>
-                        <option value="GENERIC_MOTION">GENERIC MOTION</option>
-                        <option value="PARTNER_MOTION">PARTNER MOTION</option>
-                        <option value="GENERIC_SOUND">GENERIC SOUND</option>
-                        <option value="LIGHT">LIGHT</option>
-                        <option value="LIGHTS_OUT">LIGHTS OUT</option>
-                        <option value="GOT_IN_BED">GOT IN BED</option>
-                        <option value="FELL_ASLEEP">FELL ASLEEP</option>
-                        <option value="GOT_OUT_OF_BED">GOT OUT OF BED</option>
-                        <option value="WOKE_UP">WOKE UP</option>
-                        <option value="ALARM_RANG">ALARM RANG</option>
+                        {SLEEP_EVENTS.map(function(se){
+                            return <option value={se}>{se.replace(/_/g, " ")}</option>;
+                        })}   
                     </Input>
                 </Col>
                 <Col xs={2}>
@@ -370,10 +339,7 @@ var TimelineMaestro = React.createClass({
                 </Col>
             </form>
             {alertPanel}
-            <div>
-                {this.state.algorithm}
-            </div>
-            {scoreBar}
+            {this.getScoreBar()}
             {timelineContent}
         </div>)
     }
@@ -382,70 +348,8 @@ var TimelineMaestro = React.createClass({
 
 React.renderComponent(<TimelineMaestro />, document.getElementById('timeline-canvas'));
 
-function labelColor(eventType) {
-    var assignColor = {
-        IN_BED: "label-in-bed",
-        GENERIC_MOTION: "label-generic-motion",
-        PARTNER_MOTION: "label-partner-motion",
-        GENERIC_SOUND: "label-generic-sound",
-        SNORED: "label-snored",
-        SLEEP_TALKED: "label-sleep-talked",
-        LIGHT: "label-light",
-        LIGHTS_OUT: "label-lights-out",
-        SUNSET: "label-sunset",
-        SUNRISE: "label-sunrise",
-        GOT_IN_BED: "label-got-in-bed",
-        FELL_ASLEEP: "label-fell-asleep",
-        GOT_OUT_OF_BED: "label-got-out-of-bed",
-        WOKE_UP: "label-woke-up",
-        ALARM_RANG: "label-alarm-rang",
-        UNKNOWN: "label-unknown"
-    };
-    return assignColor[eventType] || "label-no-event";
-}
-
-function timelinePNG(eventType) {
-    var assignPNG = {
-        IN_BED: "got_in_bed.png",
-        GENERIC_MOTION: "generic_motion.png",
-        PARTNER_MOTION: "partner_motion.png",
-        GENERIC_SOUND: "generic_sound.png",
-        SNORED: "unknown.png",
-        SLEEP_TALKED: "unknown.png",
-        LIGHT: "light.png",
-        LIGHTS_OUT: "lights_out.png",
-        SUNSET: "sunset.png",
-        SUNRISE: "sunrise.png",
-        GOT_IN_BED: "got_in_bed.png",
-        FELL_ASLEEP: "fell_asleep.png",
-        GOT_OUT_OF_BED: "got_out_of_bed.png",
-        WOKE_UP: "woke_up.png",
-        ALARM_RANG: "alarm_rang.png",
-        UNKNOWN: "unknown.png"
-    };
-    return assignPNG[eventType] || "unknown.png";
-}
-
-function timelineBackground(eventType) {
-    var assignBackground = {
-        IN_BED: "timeline-in-bed",
-        GENERIC_MOTION: "timeline-generic-motion",
-        PARTNER_MOTION: "timeline-partner-motion",
-        GENERIC_SOUND: "timeline-generic-sound",
-        SNORED: "timeline-snored",
-        SLEEP_TALKED: "timeline-sleep-talked",
-        LIGHT: "timeline-light",
-        LIGHTS_OUT: "timeline-lights-out",
-        SUNSET: "timeline-sunset",
-        SUNRISE: "timeline-sunrise",
-        GOT_IN_BED: "timeline-got-in-bed",
-        FELL_ASLEEP: "timeline-fell-asleep",
-        GOT_OUT_OF_BED: "timeline-got-out-of-bed",
-        WOKE_UP: "timeline-woke-up",
-        ALARM_RANG: "timeline-alarm-rang",
-        UNKNOWN: "timeline-unknown"
-    };
-    return assignBackground[eventType] || "timeline-unknown";
+function getTimelinePNG(eventType) {
+    return eventType.toLowerCase() + ".png" || "unknown.png";
 }
 
 function filterEvents(events, type) {
