@@ -32,7 +32,8 @@ var LogFacetsHistory = React.createClass({
             <Table>
                 <thead>
                     <tr>
-                        <th/>
+                        <th>FW(Hex)</th>
+                        <th>FW(Man)</th>
                         {getPatterns(this.state.data).map(function(p){return <th>{p}</th>;})}
                     </tr>
                 </thead>
@@ -86,12 +87,31 @@ function getCounts(data) {
 }
 
 function createMatrixFromCounts(counts) {
-    return Object.keys(counts).map(function(fw) {
+    var middleFwVersions = Object.keys(counts);
+    var fwHexToManMap = translateFirmwares(middleFwVersions);
+    return middleFwVersions.map(function(fw) {
         return <tr>
             <td>{fw}</td>
+            <td>{fwHexToManMap[fw] || "--"}</td>
             {Object.keys(counts[fw]).map(function(p) {
                 return <td>{counts[fw][p]}</td>;
             })}
         </tr>
     });
+}
+
+function translateFirmwares(firmwareHexList) {
+    var fwTranslation = {};
+    $.ajax({
+        url: '/api/firmware_unhash',
+        dataType: 'json',
+        data: JSON.stringify(firmwareHexList),
+        type: "POST",
+        async: false,
+        success: function(response) {
+            console.log('rr', response);
+            fwTranslation = response.data;
+        }.bind(this)
+    });
+    return fwTranslation;
 }
