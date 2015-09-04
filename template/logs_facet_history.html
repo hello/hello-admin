@@ -1,0 +1,20 @@
+{% extends "base_latest_react.html" %}
+
+{% block extrastatic %}
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-datetimepicker.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/logs_facet_history.css" />
+
+    <script type="text/javascript" src="/static/js/third-party/underscore.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/moment.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/bootstrap-datetimepicker.min.js"></script>
+
+    <script type="text/jsx" src="/static/js/third-party/long-datetimepicker.js"></script>
+    <script type="text/jsx" src="/static/js/logs_facet_history.js"></script>
+
+{% endblock %}
+
+{% block content %}
+    <div id="logs-facet-history"></div>
+{% endblock %}
+

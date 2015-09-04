@@ -1,4 +1,4 @@
-from view.views import AccountProfileView, RoomConditionsMinuteView, TimelineV2View
+from view.views import AccountProfileView, RoomConditionsMinuteView, TimelineV2View, LogsFacetHistoryView
 from view.views import ActiveDevicesHistoryView
 from view.views import AlarmRingsHistoryView
 from view.views import AlarmsView
@@ -13,7 +13,7 @@ from view.views import FirmwareView
 from view.views import KeyStoreView
 from view.views import ProvisionView
 from view.views import LabelView
-from view.views import LogsPatternFacetsView
+from view.views import LogsFacetView
 from view.views import MotionView
 from view.views import NotificationView
 from view.views import OnboardingLogsView
@@ -59,7 +59,8 @@ routes = [
     ('/keys/?$', ProvisionView),
     ('/provision/?$', ProvisionView),
     ('/label/?$', LabelView),
-    ('/log_facets/?$', LogsPatternFacetsView),
+    ('/log_facets/?$', LogsFacetView),
+    ('/logs_facet/?$', LogsFacetView),
     ('/motion/?$', MotionView),
     ('/notification/?$', NotificationView),
     ('/onboarding_logs/?$', OnboardingLogsView),
@@ -89,4 +90,5 @@ routes = [
     ('/zendesk_now/?$', ZendeskNowView),
     ('/sense_uptime/?$', SenseUptimeView),
     ('/timeline_v2/?$', TimelineV2View),
+    ('/logs_facet_history/?$', LogsFacetHistoryView),
 ]

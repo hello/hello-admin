@@ -1,7 +1,7 @@
 from cron.datastore_cron import ActiveDevicesHistory15MinutesPurge, ActiveDevicesHistoryPurge, \
     StoreRecentlyActiveDevicesStats15Minutes, StoreRecentlyActiveDevicesStatsDaily, \
     StoreRecentlyActiveDevicesStatsMinute
-from cron.firmware_cron import FirmwareLogsAlert
+from cron.firmware_cron import FirmwareLogsAlert, StoreLogsFacet, StoreLogsFacetQueue
 from cron.geckoboard_cron import AlarmsCountPush, DevicesCountPush
 from cron.searchify_cron import DropOldSenseLogsSearchifyIndex
 from cron.sense_color_cron import SenseColorUpdate, SenseColorUpdateQueue
@@ -24,4 +24,6 @@ routes = [
     ('/cron/firmware_crash_logs_retain', FirmwareLogsAlert),
     ('/cron/update_timezone_by_partner', UpdateTimezoneByPartner),
     ('/cron/update_timezone_by_partner_queue', UpdateTimezoneByPartnerQueue),
+    ('/cron/store_logs_facet/?$', StoreLogsFacet),
+    ('/cron/store_logs_facet_queue/?$', StoreLogsFacetQueue),
 ]

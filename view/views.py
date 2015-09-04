@@ -17,7 +17,7 @@ class ZendeskView(CustomerExperienceRequestHandler):
 class SettingsView(SettingsModeratorRequestHandler):
     """Returns a panel for manipulating apps, accounts"""
     def get(self):
-        self.render_to_response(template_file='settings.html',
+        self.render_to_response(template_file='logs_facet_history.html/../template/settings.html',
                                 context={'title': 'Settings'})
 
 class SenseLogsView(ProtectedRequestHandler):
@@ -196,10 +196,10 @@ class OnboardingLogsView(ProtectedRequestHandler):
         self.render_to_response(template_file='onboarding_logs.html',
                                 context={'title': "Onboarding Logs"})
 
-class LogsPatternFacetsView(ProtectedRequestHandler):
+class LogsFacetView(ProtectedRequestHandler):
     def get(self):
-        self.render_to_response(template_file='log_facets.html',
-                                context={'title': "Log Facets"})
+        self.render_to_response(template_file='logs_facet.html',
+                                context={'title': "Logs Facet"})
 
 class SearchifyStatsView(ProtectedRequestHandler):
     def get(self):
@@ -235,3 +235,9 @@ class TimelineV2View(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='timeline_v2.html',
                                 context={'title': "Timeline V2"})
+
+class LogsFacetHistoryView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='logs_facet_history.html',
+                                context={'title': "Logs Facet History"})
+

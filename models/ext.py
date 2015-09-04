@@ -1,3 +1,4 @@
+import json
 from google.appengine.ext import ndb
 
 DVT_PK = """-----BEGIN RSA PRIVATE KEY-----
@@ -155,3 +156,36 @@ class BuggyFirmware(ndb.Model):
     top_versions = ndb.StringProperty(required=True, indexed=False, default="0.7.2, 0.7.4, 0.7.5")
     middle_versions = ndb.StringProperty(required=True, indexed=False, default="")
     sense_ids = ndb.StringProperty(required=True, indexed=False, default="")
+
+
+class LogsFacet(ndb.Model):
+    date = ndb.StringProperty(required=True, indexed=True)
+    pattern = ndb.StringProperty(required=True, indexed=True)
+    middle_fw_version = ndb.StringProperty(required=True, indexed=False)
+    count = ndb.IntegerProperty(required=True, indexed=False)
+    created_at = ndb.DateTimeProperty(required=True, auto_now_add=True)
+
+    @classmethod
+    def get_by_date(cls, date):
+        return cls.query(cls.date == date).order(-cls.created_at)
+
+    @classmethod
+    def get_by_date_as_dicts(cls, date):
+        return [{
+            "date": each.date,
+            "pattern": each.pattern,
+            "middle_fw_version": each.middle_fw_version,
+            "count": each.count
+        } for each in cls.get_by_date(date)]
+
+    @classmethod
+    def get_keys_by_date(cls, date):
+        return cls.get_by_date(date).fetch(keys_only=True)
+
+    @classmethod
+    def delete_by_date(cls, date):
+        return ndb.delete_multi(cls.get_keys_by_date(date))
+
+    @classmethod
+    def delete_all(cls):
+        return ndb.delete_multi(cls.query().fetch(keys_only=True))

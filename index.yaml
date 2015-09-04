@@ -24,3 +24,9 @@ indexes:
   - name: username
   - name: created
     direction: desc
+
+- kind: LogsFacet
+  properties:
+  - name: date
+  - name: created_at
+    direction: desc
