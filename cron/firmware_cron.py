@@ -17,7 +17,7 @@ import logging as log
 class FirmwareLogsAlert(ProtectedRequestHandler):
     @property
     def keywords(self):
-        return ["ASSERT", "fault", "fail at"]
+        return ["i2c recovery", "boot completed", "ASSERT", "fail", "fault", "bounce", "Bouncing"]
 
     def get(self):
         output = {}
@@ -116,7 +116,7 @@ class StoreLogsFacet(LogsFacetAPI):
 class StoreLogsFacetQueue(StoreLogsFacet):
     @property
     def patterns(self):
-        return ["i2c recovery", "boot completed", "ASSERT", "fail", "fault"]
+        return ["i2c recovery", "boot completed", "ASSERT", "fail", "fault", "bounce", "Bouncing"]
 
     @property
     def middle_fw_versions(self):
