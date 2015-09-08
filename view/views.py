@@ -17,7 +17,7 @@ class ZendeskView(CustomerExperienceRequestHandler):
 class SettingsView(SettingsModeratorRequestHandler):
     """Returns a panel for manipulating apps, accounts"""
     def get(self):
-        self.render_to_response(template_file='logs_facet_history.html/../template/settings.html',
+        self.render_to_response(template_file='settings.html',
                                 context={'title': 'Settings'})
 
 class SenseLogsView(ProtectedRequestHandler):
