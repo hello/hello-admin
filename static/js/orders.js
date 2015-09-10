@@ -93,8 +93,8 @@ var QueryOrdersById = React.createClass({
                 <p>Be careful, you are about to uncancel an order</p><br/>
                 <p>There is no going back after you hit the following link</p><br/>
                 <p>
-                    <a href={"https://order.hello.is/uncancel/" + this.state.alert} target="_blank">
-                    {"https://order.hello.is/uncancel/" + this.state.alert}
+                    <a href={"https://store.hello.is/uncancel/" + this.state.alert} target="_blank">
+                    {"https://store.hello.is/uncancel/" + this.state.alert}
                     </a>
                 </p><br/>
                 <p><Button onClick={this.neverMindUncancel}>Never mind <Glyphicon glyph="arrow-left"/></Button></p>
@@ -103,8 +103,8 @@ var QueryOrdersById = React.createClass({
         var alert = (this.state.alert === "") ? null:
             <div id="order-specs"><Alert bsStyle="info">
                 <p>Order Details:</p><br/>
-                <p><a href={"https://order.hello.is/details/" + this.state.alert} target="_blank">
-                    {"https://order.hello.is/details/" + this.state.alert}
+                <p><a href={"https://store.hello.is/details/" + this.state.alert} target="_blank">
+                    {"https://store.hello.is/details/" + this.state.alert}
                 </a></p>
             </Alert>
                 <Alert bsStyle="danger">
