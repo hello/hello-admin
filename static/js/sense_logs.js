@@ -116,7 +116,7 @@ var SenseLogsNew = React.createClass({
                     console.log("error", response.error);
                 }
 
-                var responseResults = response.results.sort(function(r1, r2){return r1.variable_1 - r2.variable_1;});
+                var responseResults = response.results.sort(sortByTimestamp);
 
                 var resultsSize = responseResults ? responseResults.length : 0;
                 var newState = {
@@ -155,37 +155,81 @@ var SenseLogsNew = React.createClass({
 	render: function(){
         var response = this.state.response;
         var keyword = $("#keyword").val();
-        var resultsTable = !$.isEmptyObject(response) && response.results ?
-            <Table striped>
-                <thead><tr><th className="alert-success">
-                    <Col xs={2}><Button onClick={this.loadOlderLogs} className="previous-time-window">Prev</Button></Col>
-                    <Col xs={6}>{this.state.resultsSize} documents</Col>
-                    <Col xs={2}><Button bsSize="xs"><FileExporter fileContent={response.results} fileName="sense_logs"/></Button></Col>
-                    <Col xs={2}><Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button></Col>
-                </th></tr></thead>
-                <tbody>
-                    {response.results.sort(function(r1, r2){return r1.variable_1 - r2.variable_1;}).map(function(r){
-                        return <tr><td>
-                            <div className="center-wrapper">
-                                <Button className="borderless" disabled>
-                                    <span className="span-upload-ts">{new Date(r.variable_1).toUTCString()}</span>
+        var dustyMatches = [];
+        var resultsTable = null;
+
+        if (!$.isEmptyObject(response) && response.results) {
+            response.results.sort(sortByTimestamp).forEach(function (r) {
+                var dustyRegex = /(DUSTYY) (\d+) (\d+)\n/g;
+                var found;
+                while (found = dustyRegex.exec(r.text)) {
+                    dustyMatches.push(found[3] + "," + new Date(Number(found[3])*1000).toString() + "," + found[2]);
+                }
+            });
+
+
+            resultsTable = <Table striped>
+                <thead>
+                    <tr>
+                        <th className="alert-success">
+                            <Col xs={2}>
+                                <Button onClick={this.loadOlderLogs} className="previous-time-window">Prev</Button>
+                            </Col>
+                            <Col xs={4}>{this.state.resultsSize} documents</Col>
+                            <Col xs={2}>
+                                <Button bsSize="xs">
+                                    <FileExporter fileContent={response.results} fileName="sense_logs"/>
                                 </Button>
-                                - Sense: <a target="_blank" href={"/account_profile/?type=sense_id&input=" + r.device_id}>{r.device_id}</a>&nbsp;
+                            </Col>
+                            <Col xs={2}>
+                                <Button bsSize="xs">
+                                    <FileExporter fileContent={dustyMatches.join("\r\n")} fileName="DUSTY" dataType="data:text/csv," buttonName="DUSTY" needStringify={false} />
+                                </Button>
+                            </Col>
+                            <Col xs={2}>
+                                <Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button>
+                            </Col>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {response.results.sort(sortByTimestamp).map(function (r) {
+                        return <tr>
+                            <td>
+                                <div className="center-wrapper">
+                                    <Button className="borderless" disabled>
+                                        <span className="span-upload-ts">{new Date(r.variable_1).toUTCString()}</span>
+                                    </Button>
+                                - Sense:
+                                    <a target="_blank" href={"/account_profile/?type=sense_id&input=" + r.device_id}>{r.device_id}</a>
+                                &nbsp;
                                 - Top FW: {r.top_fw_version}&nbsp;
-                                - Middle FW: <a target="_blank" href={"/firmware/?firmware_version=" + parseInt(r.middle_fw_version, 16)}>{r.middle_fw_version}</a>&nbsp;
-                                <Button onClick={this.focusWindow.bind(this, r.device_id, r.variable_1)}>Logs around this time</Button>
-                            </div><br/>
-                            <div dangerouslySetInnerHTML={{__html: formatLogText(r.text, keyword)}}/>
-                        </td></tr>;
+                                - Middle FW:
+                                    <a target="_blank" href={"/firmware/?firmware_version=" + parseInt(r.middle_fw_version, 16)}>{r.middle_fw_version}</a>
+                                &nbsp;&nbsp;
+                                    <Button onClick={this.focusWindow.bind(this, r.device_id, r.variable_1)}>Around then</Button>
+                                </div>
+                                <br/>
+                                <div dangerouslySetInnerHTML={{__html: formatLogText(r.text, keyword)}}/>
+                            </td>
+                        </tr>;
                     }.bind(this))}
                 </tbody>
-                {response.results.length === 0 ? null :  <thead><tr><th className="alert-success">
-                    <Col xs={2}><Button onClick={this.loadOlderLogs} className="previous-time-window">Prev</Button></Col>
-                    <Col xs={8}>{this.state.resultsSize} documents</Col>
-                    <Col xs={2}><Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button></Col>
-                </th></tr></thead>}
-            </Table>
-            : null;
+                {response.results.length === 0 ? null : <thead>
+                    <tr>
+                        <th className="alert-success">
+                            <Col xs={2}>
+                                <Button onClick={this.loadOlderLogs} className="previous-time-window">Prev</Button>
+                            </Col>
+                            <Col xs={8}>{this.state.resultsSize} documents</Col>
+                            <Col xs={2}>
+                                <Button onClick={this.loadNewerLogs} className="next-time-window">Next</Button>
+                            </Col>
+                        </th>
+                    </tr>
+                </thead>}
+            </Table>;
+        }
 
 		return(<div>
             <form onSubmit={this.loadSenseLogs.bind(this, 0)}>
@@ -238,4 +282,8 @@ function formatLogText(text, keyword){
 
 function formatUTCDateFromEpoch(ts) {
     return d3.time.format.utc("%m/%d/%Y %H:%M:%S")(new Date(ts));
+}
+
+function sortByTimestamp(r1, r2) {
+    return r1.variable_1 - r2.variable_1;
 }
