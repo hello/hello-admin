@@ -9,11 +9,11 @@ var sensors = allSensors;
 
 var resolutionList = ['day'];
 var colorChoice = {
-    particulates: {day: '#00ffff', minute: 'blue'},
-    dust_min: {day: 'red', minute: 'violet'},
-    dust_max: {day: 'red', minute: 'violet'},
-    dust_variance: {day: 'red', minute: 'violet'},
-    dust_raw: {day: 'red', minute: 'pink'}
+    particulates: {day: '#4CB9FF', minute: 'blue'},
+    dust_min: {day: '#4CB9FF', minute: 'violet'},
+    dust_max: {day: '#4CB9FF', minute: 'violet'},
+    dust_variance: {day: '#4CB9FF', minute: 'violet'},
+    dust_raw: {day: '#4CB9FF', minute: 'pink'}
 };
 
 var yAxisLabel = {
@@ -78,7 +78,7 @@ var vizCanvas = React.createClass({
 
 var vizForm = React.createClass({
     getInitialState: function() {
-        return sensors.reduce(function(obj, k){obj[k] = [];return obj}, {alert: "", allSensors: false});
+        return sensors.reduce(function(obj, k){obj[k] = []; obj[k + "_smooth"] = []; obj[k + "_raw"] = []; return obj}, {alert: "", allSensors: false});
     },
 
     componentDidMount: function() {
@@ -122,21 +122,23 @@ var vizForm = React.createClass({
                     resolution: "minute",
                     ts: new Date(until).getTime()
                 };
-                console.log('sending', request_params);
                 $.ajax({
                     url: '/api/room_conditions',
                     dataType: 'json',
                     data: request_params,
                     type: 'GET',
                     success: function(response) {
-                        console.log("sensor", response);
                         if (response.error.isWhiteString()) {
                             var d = {};
                             d[sensor] = this.state[sensor];
+                            d[sensor + "_smooth"] = this.state[sensor + "_smooth"];
+                            d[sensor + "_raw"] = this.state[sensor + "_raw"];
                             if (d[sensor].length === resolutionList.length) {
                                 d[sensor] = [];
                             }
                             d[sensor].push(manipulateData(response.data, sensor, resolution, email));
+                            d[sensor+"_smooth"].push(manipulateData(smoothIt(response.data), sensor, resolution, email));
+                            d[sensor+"_raw"].push(manipulateData(response.data, sensor, resolution, email));
                             d["alert"] = "";
                             this.setState(d);
                         }
@@ -155,6 +157,21 @@ var vizForm = React.createClass({
     handleBasicSubmit: function() {
         sensors = allSensors;
         this.loadData(false);
+        return false;
+    },
+
+    handleSmooth: function() {
+        var currentState = this.state;
+        var newState = {};
+        allSensors.forEach(function(sensor){
+            if ($("#smooth-it").is(":checked")) {
+                newState[sensor] = currentState[sensor + "_smooth"];
+            }
+            else {
+                newState[sensor] = currentState[sensor + "_raw"];
+            }
+        });
+        this.setState(newState);
         return false;
     },
 
@@ -177,8 +194,11 @@ var vizForm = React.createClass({
                 <Col xs={1}>
                     <Button type="submit" bsStyle="success"><Glyphicon glyph="search"/></Button>
                 </Col>
-                <Col xs={1}>
+                <Col xs={2}>
                     <DropdownButton bsStyle="info" title="&darr; JSON">{fileExporters}</DropdownButton>
+                </Col>
+                <Col xs={2}>
+                    Smooth it <input id="smooth-it" type="checkbox" onChange={this.handleSmooth}/>
                 </Col>
             </form>
             {alert}
@@ -186,15 +206,8 @@ var vizForm = React.createClass({
         </div>)
     }
 });
-var vizBox = React.createClass({
-    render: function() {
-        return (<code className="nonscript">
-            <vizForm />
-        </code>)
-    }
-});
 
-React.renderComponent(<vizBox />, document.getElementById('room-conditions-minute'));
+React.renderComponent(<vizForm />, document.getElementById('room-conditions-minute'));
 
 function manipulateData(rawData, sensor, resolution, email) {
     var offsetScale;
@@ -202,11 +215,28 @@ function manipulateData(rawData, sensor, resolution, email) {
         default: offsetScale = 1;
     }
     return {
-        values: rawData.filter(function(point){return point.value !== -1}).map(function(point){return {x: point.datetime, y: point.value * offsetScale};}),
+        values: rawData.map(function(point){return {x: point.datetime, y: point.value * offsetScale};}),
         key: legends[resolution],
         color: colorChoice[sensor][resolution],
         disabled: resolution !== "day"
     }
 }
 
+function smoothIt(data) {
+    return data.filter(function(point, i) {
+        if (point.value === 0 || point.value === -1 || point.value === 1) {
+            return false;
+        }
+        var precededPoints = data.slice(0, i);
+        var movingAvg = precededPoints.map(function(d){return d.value}).reduce(function(x, y){return x+y;}, 0) / precededPoints.length;
+
+        if ((point.value >= movingAvg - 25) && (point.value <= movingAvg + 25)){
+            return true;
+        }
+
+        return (i > 0 && (data[i-1].value < movingAvg - 25 || data[i-1].value > movingAvg + 25))
+            || (i < data.length - 1 && (data[i+1].value < movingAvg - 25 || data[i+1].value > movingAvg + 25));
+
+    });
+}
 
