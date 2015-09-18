@@ -10,21 +10,21 @@ var sensors = basicSensors;
 
 var resolutionList = ['day', 'week'];
 var colorChoice = {
-    temperature: {day: '#E30B5C', week: 'pink'},
-    humidity: {day: '#8db600', week: 'teal'},
-    particulates: {day: '#00ffff', week: 'blue'},
-    light: {day: 'orange', week: 'brown'},
-    sound: {day: 'teal', week: 'indigo'},
-    wave_count: {day: 'red', red: 'violet'},
-    hold_count: {day: 'red', week: 'violet'},
-    background: {day: 'red', week: 'violet'},
-    num_disturb: {day: 'red', week: 'violet'},
-    peak_disturb: {day: 'red', week: 'violet'},
-    light_variance: {day: 'red', week: 'violet'},
-    light_peakiness: {day: 'red', week: 'violet'},
-    dust_min: {day: 'red', week: 'violet'},
-    dust_max: {day: 'red', week: 'violet'},
-    dust_variance: {day: 'red', week: 'violet'}
+    temperature: {day: "#009BFF", week: "#41D7AB"},
+    humidity: {day: "#009BFF", week: "#41D7AB"},
+    particulates: {day: "#009BFF", week: "#41D7AB"},
+    light: {day: "#009BFF", week: "#41D7AB"},
+    sound: {day: "#009BFF", week: "#41D7AB"},
+    wave_count: {day: "#009BFF", week: "#41D7AB"},
+    hold_count: {day: "#009BFF", week: "#41D7AB"},
+    background: {day: "#009BFF", week: "#41D7AB"},
+    num_disturb: {day: "#009BFF", week: "#41D7AB"},
+    peak_disturb: {day: "#009BFF", week: "#41D7AB"},
+    light_variance: {day: "#009BFF", week: "#41D7AB"},
+    light_peakiness: {day: "#009BFF", week: "#41D7AB"},
+    dust_min: {day: "#009BFF", week: "#41D7AB"},
+    dust_max: {day: "#009BFF", week: "#41D7AB"},
+    dust_variance: {day: "#009BFF", week: "#41D7AB"},
 };
 
 var yAxisLabel = {
@@ -97,7 +97,7 @@ var vizCanvas = React.createClass({
     }
 });
 
-var vizForm = React.createClass({
+var RoomConditionMaster = React.createClass({
     getInitialState: function() {
         return sensors.reduce(function(obj, k){obj[k] = [];return obj}, {alert: "", allSensors: false});
     },
@@ -202,12 +202,12 @@ var vizForm = React.createClass({
                 </Col>
                 <LongDatetimePicker placeHolder="end time" id="end-time" defaultDate={todayInDatepickerFormat} glyphicon="time" />
                 <Col xs={1}>
-                    <Button type="submit" bsStyle="success"><Glyphicon glyph="search"/></Button>
+                    <Button type="submit"><Glyphicon glyph="search"/></Button>
                 </Col>
                 <Col xs={2}>
-                    <Button bsStyle="warning" onClick={this.handleHardwareSubmit}><Glyphicon glyph="search"/> for hardware</Button>
+                    <Button onClick={this.handleHardwareSubmit}><Glyphicon glyph="search"/> for hardware</Button>
                 </Col>
-                <Col xs={1}>
+                <Col xs={2}>
                     <DropdownButton bsStyle="info" title="&darr; JSON">{fileExporters}</DropdownButton>
                 </Col>
             </form>
@@ -216,15 +216,8 @@ var vizForm = React.createClass({
         </div>)
     }
 });
-var vizBox = React.createClass({
-    render: function() {
-        return (<code className="nonscript">
-            <vizForm />
-        </code>)
-    }
-});
 
-React.renderComponent(<vizBox />, document.getElementById('room-conditions'));
+React.renderComponent(<RoomConditionMaster />, document.getElementById('room-conditions'));
 
 function manipulateData(rawData, sensor, resolution) {
     return {

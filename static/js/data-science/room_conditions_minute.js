@@ -9,11 +9,11 @@ var sensors = allSensors;
 
 var resolutionList = ['day'];
 var colorChoice = {
-    particulates: {day: '#00ffff', minute: 'blue'},
-    dust_min: {day: 'red', minute: 'violet'},
-    dust_max: {day: 'red', minute: 'violet'},
-    dust_variance: {day: 'red', minute: 'violet'},
-    dust_raw: {day: 'red', minute: 'pink'}
+    particulates: {day: "#4CB9FF", week: "#41D7AB"},
+    dust_min: {day: "#4CB9FF", week: "#41D7AB"},
+    dust_max: {day: "#4CB9FF", week: "#41D7AB"},
+    dust_variance: {day: "#4CB9FF", week: "#41D7AB"},
+    dust_raw: {day: "#4CB9FF", week: "#41D7AB"}
 };
 
 var yAxisLabel = {
@@ -76,7 +76,7 @@ var vizCanvas = React.createClass({
     }
 });
 
-var vizForm = React.createClass({
+var RoomConditionMinuteMaster = React.createClass({
     getInitialState: function() {
         return sensors.reduce(function(obj, k){obj[k] = [];return obj}, {alert: "", allSensors: false});
     },
@@ -175,9 +175,9 @@ var vizForm = React.createClass({
                 </Col>
                 <LongDatetimePicker placeHolder="end time" id="end-time" defaultDate={todayInDatepickerFormat} glyphicon="time" />
                 <Col xs={1}>
-                    <Button type="submit" bsStyle="success"><Glyphicon glyph="search"/></Button>
+                    <Button type="submit"><Glyphicon glyph="search"/></Button>
                 </Col>
-                <Col xs={1}>
+                <Col xs={2}>
                     <DropdownButton bsStyle="info" title="&darr; JSON">{fileExporters}</DropdownButton>
                 </Col>
             </form>
@@ -186,15 +186,8 @@ var vizForm = React.createClass({
         </div>)
     }
 });
-var vizBox = React.createClass({
-    render: function() {
-        return (<code className="nonscript">
-            <vizForm />
-        </code>)
-    }
-});
 
-React.renderComponent(<vizBox />, document.getElementById('room-conditions-minute'));
+React.renderComponent(<RoomConditionMinuteMaster />, document.getElementById('room-conditions-minute'));
 
 function manipulateData(rawData, sensor, resolution, email) {
     var offsetScale;
