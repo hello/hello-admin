@@ -72,10 +72,10 @@ var OmniTableContent = React.createClass({
                 <span>&nbsp;{device.type}</span>, <br/>,
                 debugLogLink, <br/>
             ];
-            var lastSeenDateTimeString = that.state.useUserLocalTimezone === false ? displayDateTime(device.lastSeen) : displayDateTime(device.lastSeen, thisContent.profile.tz);
+            var lastSeenDateTimeString = that.state.useUserLocalTimezone === false ? displayDateTime(device.last_seen) : displayDateTime(device.last_seen, thisContent.profile.tz);
             var deviceLastSeen = <span>Last Seen: <span className=
-                { isNaN(device.lastSeen) || (device.type === "SENSE" && device.lastSeen < new Date().getTime() - 3600*1000) || (device.type === "PILL" && device.lastSeen < new Date().getTime() - 4*3600*1000) ? "inactive-devices" : "active-devices"}>
-                { isNaN(device.lastSeen) ? "unknown" : lastSeenDateTimeString}
+                { isNaN(device.last_seen) || (device.type === "SENSE" && device.last_seen < new Date().getTime() - 3600*1000) || (device.type === "PILL" && device.last_seen < new Date().getTime() - 4*3600*1000) ? "inactive-devices" : "active-devices"}>
+                { isNaN(device.last_seen) ? "unknown" : lastSeenDateTimeString}
             </span></span>;
             if (device.type === "SENSE") {
                 var unhashedFwVersion = that.unhashFirmware(device.firmwareVersion);
@@ -87,7 +87,7 @@ var OmniTableContent = React.createClass({
                         <span className={unhashedFwVersion && unhashedFwVersion.indexOf("unknown") === -1 ? "known-firmware" : "unknown-firmware"}>{unhashedFwVersion}</span>
                     </a></span>:
                     <span>Battery Level: <a href={"/battery/?search=" + device.deviceId} target="_blank">
-                    {device.batteryLevel}
+                    {device.battery_level}
                     </a></span>,
                 <br/>
             ];

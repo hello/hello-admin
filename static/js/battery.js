@@ -11,20 +11,20 @@ var c3Chart = React.createClass({
         that.props.data.forEach(function(d, i){
             var sumBattery = 0, sumBatteryMod3Arr = [];
             d = d.map(function(o, j) {
-                if (o.batteryLevel <= 100) {
-                    sumBattery += o.batteryLevel;
+                if (o.battery_level <= 100) {
+                    sumBattery += o.battery_level;
                 }
                 if (sumBatteryMod3Arr.length > 24) { // For now have N = 5 as a constant, later make it a url param
                     sumBatteryMod3Arr.shift();
                 }
-                if (o.batteryLevel >= 100) {
+                if (o.battery_level >= 100) {
                     o.batteryMod3  = 0;
                 }
-                else if (o.batteryLevel < 10) {
+                else if (o.battery_level < 10) {
                     o.batteryMod3  = 2;
                 }
                 else {
-                    o.batteryMod3 = o.batteryLevel % 3;
+                    o.batteryMod3 = o.battery_level % 3;
                 }
 
                 o.batteryCumAvg = (sumBattery / (j+1)).toFixed(2);
@@ -47,7 +47,7 @@ var c3Chart = React.createClass({
             ]);
 
             if (d && d !== [] && d.last()) {
-                categories = ['uptime', 'batteryLevel', 'batteryCumAvg', 'batteryMod3', 'batteryMod3MovingAvg'];
+                categories = ['uptime', 'battery_level', 'batteryCumAvg', 'batteryMod3', 'batteryMod3MovingAvg'];
                 stackingGroups = that.props.stackable === true ? [categories] : [];
             }
 
@@ -66,7 +66,7 @@ var c3Chart = React.createClass({
                     },
                     colors: {
                         uptime: "orangered",
-                        batteryLevel: "#0D98BA",
+                        battery_level: "#0D98BA",
                         batteryMod3: "green",
                         batteryCumAvg: "orange",
                         batteryMod3MovingAvg: "purple"
@@ -237,8 +237,8 @@ React.renderComponent(<BatteryChart />, document.getElementById('battery'));
 function filterData(data) {
     return data.map(function(s){
         return s.map(function(d){
-            if (d.lastSeen < Math.pow(10, 12)) {
-                d.lastSeen *= 1000;
+            if (d.last_seen < Math.pow(10, 12)) {
+                d.last_seen *= 1000;
             }
             return d;
         }).sort(compareTimestamp);
@@ -246,10 +246,10 @@ function filterData(data) {
 }
 
 function compareTimestamp(log1, log2) {
-    if (log1.lastSeen < log2.lastSeen) {
+    if (log1.last_seen < log2.last_seen) {
         return -1;
     }
-    if (log1.lastSeen > log2.lastSeen) {
+    if (log1.last_seen > log2.last_seen) {
         return 1;
     }
     return 0;

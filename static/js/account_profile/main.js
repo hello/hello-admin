@@ -342,8 +342,8 @@ var AccountProfile = React.createClass({
                 this.setState({senseResponse: response});
                 if (response.data.length > 0) {
                     if (response.data[0].device_account_pair) {
-                        if (response.data[0].device_account_pair.externalDeviceId) {
-                            var senseId = response.data[0].device_account_pair.externalDeviceId;
+                        if (response.data[0].device_account_pair.external_device_id) {
+                            var senseId = response.data[0].device_account_pair.external_device_id;
                             this.setState({senseId: senseId});
                             this.loadSenseKeyStore(senseId);
                             this.loadWifi(senseId);
@@ -379,8 +379,8 @@ var AccountProfile = React.createClass({
             success: function (response) {
                 this.setState({pillResponse: response});
                 if (response.data.length > 0) {
-                    if (response.data[0].device_account_pair && response.data[0].device_account_pair.externalDeviceId) {
-                        var pillId = response.data[0].device_account_pair.externalDeviceId;
+                    if (response.data[0].device_account_pair && response.data[0].device_account_pair.external_device_id) {
+                        var pillId = response.data[0].device_account_pair.external_device_id;
                         this.loadPillStatus(pillId);
                         this.loadPillKeyStore(pillId);
                     }
