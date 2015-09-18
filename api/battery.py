@@ -24,7 +24,7 @@ class BatteryAPI(ProtectedRequestHandler):
         previous_last_week_data = []
 
         if last_week_data:
-            url_params["end_ts"] = min([d['lastSeen'] for d in last_week_data])
+            url_params["end_ts"] = min([d['last_seen'] for d in last_week_data])
             previous_last_week_data = self.hello_request(
                 api_url="devices/pill_status",
                 type="GET",
@@ -42,7 +42,7 @@ class BatteryAPI(ProtectedRequestHandler):
                 output['error'] = "No data found!"
 
             for d in aggregate_data:
-                battery_by_pill_id['pill{}'.format(d['deviceId'])].append(d)
+                battery_by_pill_id['pill{}'.format(d['device_id'])].append(d)
 
             output['data'] = dict(battery_by_pill_id).values()
 

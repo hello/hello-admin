@@ -99,7 +99,7 @@ var AlarmRingsFromLogs = React.createClass({
                 var senseIdList = [];
                 response.data.forEach(function(d) {
                     if (d.device_account_pair && !$.isEmptyObject(d.device_account_pair)) {
-                        senseIdList.push(d.device_account_pair.externalDeviceId);
+                        senseIdList.push(d.device_account_pair.external_device_id);
                     }
                 });
                 if (senseIdList.length > 0) {
