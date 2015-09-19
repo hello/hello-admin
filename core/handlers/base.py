@@ -260,8 +260,9 @@ class BaseRequestHandler(webapp2.RequestHandler):
     def error_log(self):
         return
 
-    @staticmethod
-    def send_to_slack(webhook, payload):
+    def send_to_slack(self, webhook, payload):
+        if self.namespace == "dev":
+            return
         try:
             requests.post(webhook, data=json.dumps(payload), headers={"Content-Type": "application/json"})
         except Exception as e:
