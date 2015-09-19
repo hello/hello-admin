@@ -36,8 +36,8 @@ from api.papertrail import PaperTrailEventsAPI
 from api.papertrail import PaperTrailSystemsAPI
 from api.pch import PCHSerialNumberCheckAPI
 from api.battery import BatteryAPI
-from api.ambience import LastRoomConditionsAPI
-from api.ambience import RoomConditionsAPI
+from api.room_conditions import LastRoomConditionsAPI
+from api.room_conditions import RoomConditionsAPI
 from api.searchify import DustStatsAPI, LogsFacetHistoryAPI
 from api.searchify import LogsFacetAPI
 from api.searchify import SenseLogsAPI, SearchifyStatsAPI
