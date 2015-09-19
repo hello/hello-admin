@@ -6,10 +6,19 @@ from core.handlers.base import FirmwareRequestHandler
 
 class FeaturesAPI(FirmwareRequestHandler):
     def get(self):
-        self.hello_request(
+        raw_output = self.hello_request(
             api_url="features",
             type="GET",
+            raw_output=True
         )
+        feature = self.request.get("feature")
+        if feature:
+            for item in raw_output.data:
+                if item.get("name", "") == feature:
+                    raw_output.set_data(item)
+
+        self.response.write(raw_output.get_serialized_output())
+
 
     def put(self):
         req = json.loads(self.request.body)
