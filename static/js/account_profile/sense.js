@@ -1,3 +1,5 @@
+var BYPASS_OTA_CHECKS_FEATURE_NAME = "bypass_ota_checks";
+
 var FirmwareModal = React.createClass({
     getInitialState: function() {
         return {fwHistory: []};
@@ -70,6 +72,60 @@ var FirmwareModal = React.createClass({
                         <tr><td/><td/><td/><td/></tr>
                     </tbody>
                 </Table>
+            </div>
+            <div className='modal-footer'>
+                <Button className="btn-round btn-fade" onClick={this.props.onRequestHide}>X</Button>
+            </div>
+        </Modal>;
+    }
+});
+
+
+var BypassOTAModal = React.createClass({
+    putSenseIdToFeature: function(putData) {
+        console.log("putData", putData);
+        $.ajax({
+            url: '/api/features',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify(putData),
+            type: 'PUT',
+            success: function(response) {
+                console.log("PUT", response);
+                if (!(response.status === 204 && response.error === "")) {
+                    alert("Failed to update feature");
+                }
+            }.bind(this)
+        });
+    },
+    updateFeatureBypassOTA: function() {
+        $.ajax({
+            url: "/api/features",
+            dataType: 'json',
+            type: 'GET',
+            data: {feature: BYPASS_OTA_CHECKS_FEATURE_NAME},
+            success: function(response) {
+                if (response.error.isWhiteString()) {
+                    console.log(response);
+                    if (response.data.ids && response.data.ids.indexOf(this.props.senseId) === -1) {
+                        var putData = response.data;
+                        putData.ids.push(this.props.senseId);
+                        putData.ids = putData.ids.join();
+                        putData.feature = putData.name;
+                        this.putSenseIdToFeature(putData);
+                    }
+                }
+            }.bind(this)
+        });
+        this.props.onRequestHide();
+    },
+    render: function() {
+        return <Modal animation={true}>
+            <div className='modal-body'>
+                <div className="modal-title">Bypass OTA Checks <Button className="btn-round btn-borderless btn-fade" onClick={this.props.onRequestHide}>X</Button></div>
+                <div className="modal-subtitle">Once submitted, {this.props.senseId} will be added to feature "bypass_ota_checks", see more <a href="/features/" target="_blank">here</a></div>
+                <br/>
+                <Button onClick={this.updateFeatureBypassOTA}>Submit</Button>
             </div>
             <div className='modal-footer'>
                 <Button className="btn-round btn-fade" onClick={this.props.onRequestHide}>X</Button>
@@ -176,6 +232,9 @@ var SenseSummary = React.createClass({
                     <li><a target="_blank" href={"/sense_events/?account_input=" + senseId + "&start_ts=" + new Date().getTime()}>Events</a></li>
                     <li><ModalTrigger modal={<FirmwareModal senseId={senseId} />}>
                         <a className="cursor-hand">Firmware-History</a>
+                    </ModalTrigger></li>
+                    <li><ModalTrigger modal={<BypassOTAModal senseId={senseId} />}>
+                        <a className="cursor-hand">Bypass-OTA</a>
                     </ModalTrigger></li>
                 </ul>
             </div>;
