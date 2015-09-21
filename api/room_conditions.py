@@ -15,7 +15,7 @@ class RoomConditionsAPI(ProtectedRequestHandler):
         ts = int(self.request.get('ts', int(time.time() * 1000)))
         self.hello_request(
             api_url="data/{}/{}/{}".format(email, sensor, resolution),
-            url_params={'from': ts, 'smooth': False},
+            url_params={'from': ts, 'smooth': True},
             type="GET",
         )
 
