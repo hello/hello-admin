@@ -8,23 +8,23 @@ var allSensors = ['wave_count', 'hold_count', 'background', 'num_disturb', 'peak
 var basicSensors = ['temperature', 'humidity', 'particulates', 'light', 'sound'];
 var sensors = basicSensors;
 
-var resolutionList = ['day', 'week'];
+var resolutionList = ['day', 'week', 'minute'];
 var colorChoice = {
-    temperature: {day: "#009BFF", week: "#41D7AB"},
-    humidity: {day: "#009BFF", week: "#41D7AB"},
-    particulates: {day: "#009BFF", week: "#41D7AB"},
-    light: {day: "#009BFF", week: "#41D7AB"},
-    sound: {day: "#009BFF", week: "#41D7AB"},
-    wave_count: {day: "#009BFF", week: "#41D7AB"},
-    hold_count: {day: "#009BFF", week: "#41D7AB"},
-    background: {day: "#009BFF", week: "#41D7AB"},
-    num_disturb: {day: "#009BFF", week: "#41D7AB"},
-    peak_disturb: {day: "#009BFF", week: "#41D7AB"},
-    light_variance: {day: "#009BFF", week: "#41D7AB"},
-    light_peakiness: {day: "#009BFF", week: "#41D7AB"},
-    dust_min: {day: "#009BFF", week: "#41D7AB"},
-    dust_max: {day: "#009BFF", week: "#41D7AB"},
-    dust_variance: {day: "#009BFF", week: "#41D7AB"},
+    temperature: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
+    humidity: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
+    particulates: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
+    light: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
+    sound: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
+    wave_count: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
+    hold_count: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
+    background: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
+    num_disturb: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
+    peak_disturb: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
+    light_variance: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
+    light_peakiness: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
+    dust_min: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
+    dust_max: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
+    dust_variance: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"}
 };
 
 var yAxisLabel = {
@@ -46,8 +46,9 @@ var yAxisLabel = {
 };
 
 var legends = {
-    day: 'every 5 minutes',
-    week: 'every hour'
+    day: 'every 5 minutes last 24 hours',
+    week: 'every hour last week',
+    minute: 'every minute last 24 hours '
 };
 
 var vizCanvas = React.createClass({
