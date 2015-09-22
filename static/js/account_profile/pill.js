@@ -3,17 +3,17 @@ var PillSummary = React.createClass({
         var pillResponse = this.props.pillResponse,
             pillStatusResponse = this.props.pillStatusResponse,
             pillKeyStoreResponse = this.props.pillKeyStoreResponse,
-            result = null, batteryLevel = null, lastSeen = null, keyStore = null, uptime = null;
+            result = null, battery_level = null, lastSeen = null, keyStore = null, uptime = null;
         if (pillStatusResponse.data.length > 0) {
             if(pillStatusResponse.data[0][0]) {
-                batteryLevel = pillStatusResponse.data[0][0].batteryLevel ?
-                    <span>{pillStatusResponse.data[0][0].batteryLevel + " %"}</span> : null;
-                var lastSeenEpoch = pillStatusResponse.data[0][0].lastSeen;
+                battery_level = pillStatusResponse.data[0][0].battery_level ?
+                    <span>{pillStatusResponse.data[0][0].battery_level + " %"}</span> : null;
+                var lastSeenEpoch = pillStatusResponse.data[0][0].last_seen;
                 lastSeen = <span className={lastSeenEpoch < new Date().getTime() - 4*3600*1000 ? "not-ok" : "ok"} dangerouslySetInnerHTML={{__html: utcFormatter(new Date(lastSeenEpoch))}}/>;
                 uptime = millisecondsToHumanReadableString(pillStatusResponse.data[0][0].uptime * 1000, true);
             }
             else {
-                batteryLevel = <span className="not-ok">-</span>;
+                battery_level = <span className="not-ok">-</span>;
                 lastSeen = <span className="not-ok">-</span>;
                 uptime = <span className="not-ok">-</span>;
 
@@ -31,8 +31,8 @@ var PillSummary = React.createClass({
 
         var pillColor = <Button className="device-color" bsSize="xsmall" disabled>BLUE</Button>;
         if (pillResponse.data.length > 0) {
-            var pillId = pillResponse.data[0].device_account_pair ? pillResponse.data[0].device_account_pair.externalDeviceId : undefined;
-            var pillInternalId = pillResponse.data[0].device_account_pair ? " (" + pillResponse.data[0].device_account_pair.internalDeviceId + ")" : undefined;
+            var pillId = pillResponse.data[0].device_account_pair ? pillResponse.data[0].device_account_pair.external_device_id : undefined;
+            var pillInternalId = pillResponse.data[0].device_account_pair ? " (" + pillResponse.data[0].device_account_pair.internal_device_id + ")" : undefined;
             var lastNightDate =  d3.time.format("%m-%d-%Y")(new Date(new Date().getTime() - 24*3600*1000));
             var pairedByAdmin = pillResponse.data[0].paired_by_admin === true ? "&nbsp;&nbsp;by admin": "";
             var lastPairing =  pillResponse.data[0].pairing_ts ? <span dangerouslySetInnerHTML={{__html: utcFormatter(new Date(pillResponse.data[0].pairing_ts)) + pairedByAdmin}}/> : null;
@@ -42,7 +42,7 @@ var PillSummary = React.createClass({
                     <tbody>
                         <tr><td>ID</td><td>{pillId + pillInternalId}</td></tr>
                         <tr><td>Keystore</td><td>{keyStore}</td></tr>
-                        <tr><td>Battery</td><td>{batteryLevel}</td></tr>
+                        <tr><td>Battery</td><td>{battery_level}</td></tr>
                         <tr><td>Uptime</td><td>{uptime}</td></tr>
                         <tr><td>Color</td><td>{pillColor}</td></tr>
                         <tr><td>Last Seen</td><td>{lastSeen}</td></tr>

@@ -194,12 +194,12 @@ var SenseSummary = React.createClass({
         }
 
         if (senseResponse.data.length > 0) {
-            var senseId = senseResponse.data[0].device_account_pair ? senseResponse.data[0].device_account_pair.externalDeviceId : undefined;
-            var senseInternalId = senseResponse.data[0].device_account_pair ? " (" + senseResponse.data[0].device_account_pair.internalDeviceId + ")" : undefined;
-            var firmwareVersion = senseResponse.data[0].device_status ? senseResponse.data[0].device_status.firmwareVersion : undefined;
+            var senseId = senseResponse.data[0].device_account_pair ? senseResponse.data[0].device_account_pair.external_device_id : undefined;
+            var senseInternalId = senseResponse.data[0].device_account_pair ? " (" + senseResponse.data[0].device_account_pair.internal_device_id + ")" : undefined;
+            var firmware_version = senseResponse.data[0].device_status ? senseResponse.data[0].device_status.firmware_version : undefined;
 
             if (senseResponse.data[0].device_status){
-                var lastSeenEpoch = senseResponse.data[0].device_status.lastSeen;
+                var lastSeenEpoch = senseResponse.data[0].device_status.last_seen;
                 lastSeen = <span className={lastSeenEpoch < new Date().getTime() - 3600*1000 ? "not-ok" : "ok"}  dangerouslySetInnerHTML={{__html:utcFormatter(new Date(lastSeenEpoch))}}/>;
                 var pairedByAdmin = senseResponse.data[0].paired_by_admin === true ? "&nbsp;&nbsp;by admin": "";
             }
@@ -219,7 +219,7 @@ var SenseSummary = React.createClass({
                     <tbody>
                         <tr><td>ID</td><td>{senseId + senseInternalId}</td></tr>
                         <tr><td>Keystore</td><td>{keyStore}</td></tr>
-                        <tr><td>Firmware</td><td>{this.loadUnhashedFirmware(firmwareVersion, senseId)}</td></tr>
+                        <tr><td>Firmware</td><td>{this.loadUnhashedFirmware(firmware_version, senseId)}</td></tr>
                         <tr><td>Timezone</td><td>{timezone}</td></tr>
                         <tr><td>Color</td><td>{senseColor}</td></tr>
                         <tr><td>Last Seen</td><td>{lastSeen}</td></tr>

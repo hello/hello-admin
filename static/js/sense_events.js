@@ -55,7 +55,7 @@ var SenseEventsMaestro = React.createClass({
                 data: {email: accountInput, device_type: "sense"},
                 async: false,
                 success: function (response) {
-                    accountInput = response.data[0].device_account_pair.externalDeviceId
+                    accountInput = response.data[0].device_account_pair.external_device_id
                 }
             });
         }
@@ -77,7 +77,7 @@ var SenseEventsMaestro = React.createClass({
                     that.setState({error: ""});
 
                     if (response.data.length > 0){
-                        that.setState({cursor: response.data.last().createdAt});
+                        that.setState({cursor: response.data.last().created_at});
                     }
 
                     if (response.data.length < PAGE_LIMIT){
@@ -106,13 +106,13 @@ var SenseEventsMaestro = React.createClass({
     render: function() {
         var loading = this.state.loading === "" ? null : <Alert>{this.state.loading}</Alert>;
         var senseEventsData = this.state.data.map(function(senseEvent){
-            console.log("sense event ts", senseEvent.createdAt);
-            var beforeEventTs = d3.time.format.utc('%m/%d/%Y %H:%M:%S')(new Date(senseEvent.createdAt - 5*60*1000));
-            var afterEventTs = d3.time.format.utc('%m/%d/%Y %H:%M:%S')(new Date(senseEvent.createdAt + 5*60*1000));
+            console.log("sense event ts", senseEvent.created_at);
+            var beforeEventTs = d3.time.format.utc('%m/%d/%Y %H:%M:%S')(new Date(senseEvent.created_at - 5*60*1000));
+            var afterEventTs = d3.time.format.utc('%m/%d/%Y %H:%M:%S')(new Date(senseEvent.created_at + 5*60*1000));
             return <tr>
                 <td>{senseEvent.deviceId}</td>
                 <td>
-                    {d3.time.format('%a %d %b %H:%M:%S %Z')(new Date(senseEvent.createdAt))}
+                    {d3.time.format('%a %d %b %H:%M:%S %Z')(new Date(senseEvent.created_at))}
                     &nbsp;
                     <a target="_blank" href={"/sense_logs/?field=device_id&keyword=" + senseEvent.deviceId + "&category=device_id&category_input=&limit=&start=" + beforeEventTs + "&end=" + afterEventTs}>see logs</a>
                 </td>

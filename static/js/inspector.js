@@ -90,7 +90,7 @@ var ProblemUsersMaestro = React.createClass({
                 that.setState({senses: newSenses});
 
                 var deviceId = response.data[0] && response.data[0]['device_account_pair'] ?
-                    response.data[0]['device_account_pair']['externalDeviceId'] : undefined;
+                    response.data[0]['device_account_pair']['external_device_id'] : undefined;
 
                 var newSenseProvisionStatuses = that.state.senseProvisionStatuses;
                 if (deviceId) {
@@ -124,7 +124,7 @@ var ProblemUsersMaestro = React.createClass({
                 that.setState({pills: newPills});
 
                 var deviceId = response.data[0] && response.data[0]['device_account_pair'] ?
-                    response.data[0]['device_account_pair']['externalDeviceId'] : undefined;
+                    response.data[0]['device_account_pair']['external_device_id'] : undefined;
 
                 var newPillProvisionStatuses = that.state.pillProvisionStatuses;
                 if (deviceId) {
@@ -222,14 +222,14 @@ var ProblemUsersMaestro = React.createClass({
             if (thisSense !== undefined){
                 if (thisSense !== null) {
                     if (thisSense.device_account_pair) {
-                        hasSense = !isNaN(thisSense.device_account_pair.internalDeviceId);
+                        hasSense = !isNaN(thisSense.device_account_pair.internal_device_id);
                     }
                     else {
                         hasSense = false;
                     }
 
                     if (thisSense.device_status) {
-                        isSenseActive = thisSense.device_status.lastSeen > new Date().getTime() - ACTIVE_SENSE_HOURS_THRESHOLD * 3600000;
+                        isSenseActive = thisSense.device_status.last_seen > new Date().getTime() - ACTIVE_SENSE_HOURS_THRESHOLD * 3600000;
                     }
                     else {
                         isSenseActive = null;
@@ -245,7 +245,7 @@ var ProblemUsersMaestro = React.createClass({
             if (thisPill !== undefined) {
                 if (thisPill !== null) {
                     if (thisPill.device_account_pair) {
-                        hasPill = !isNaN(thisPill.device_account_pair.internalDeviceId);
+                        hasPill = !isNaN(thisPill.device_account_pair.internal_device_id);
                     }
                     else {
                         hasPill = false;
@@ -259,8 +259,8 @@ var ProblemUsersMaestro = React.createClass({
             var thisPillStatus = that.state.pillStatuses[i];
             if (thisPillStatus !== undefined) {
                 if (thisPillStatus !== null) {
-                    isPillActive = thisPillStatus.lastSeen > new Date().getTime() - ACTIVE_PILL_HOURS_THRESHOLD * 3600000;
-                    isBatteryLevelOk = thisPillStatus.batteryLevel > ACCEPTABLE_BATTERY_LEVEL;
+                    isPillActive = thisPillStatus.last_seen > new Date().getTime() - ACTIVE_PILL_HOURS_THRESHOLD * 3600000;
+                    isBatteryLevelOk = thisPillStatus.battery_level > ACCEPTABLE_BATTERY_LEVEL;
                 }
                 else {
                     isPillActive = null;
