@@ -39,7 +39,7 @@ var c3Chart = React.createClass({
             });
 
             var pillIdTitle = d && d !== [] && d.last() ?
-                <h3>{"Pill " + d.last().deviceId}</h3>:null;
+                <h3>{"Pill " + d.last().device_id}</h3>:null;
 
             graphs.push([
                 pillIdTitle,
@@ -50,14 +50,13 @@ var c3Chart = React.createClass({
                 categories = ['uptime', 'battery_level', 'batteryCumAvg', 'batteryMod3', 'batteryMod3MovingAvg'];
                 stackingGroups = that.props.stackable === true ? [categories] : [];
             }
-
             c3.generate({
                 bindto: '#pill'.concat(i.toString()),
                 data: {
                     type: that.props.chartType,
                     json: d,
                     keys: {
-                        x: 'lastSeen',
+                        x: 'last_seen',
                         value: categories
                     },
                     groups: stackingGroups,
