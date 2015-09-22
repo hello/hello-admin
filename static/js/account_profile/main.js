@@ -313,6 +313,12 @@ var AccountProfile = React.createClass({
                 }
                 else if (response.data.length === 0) {
                     this.setState({accountError: <Alert>Account Not Found !</Alert>});
+                    if (type == "sense_id") {
+                        this.loadSenseByExternalId(input);
+                    }
+                    else if (type == "pill_id") {
+                        this.loadPillByExternalId(input);
+                    }
                 }
                 else {
                     this.loadProfile(response.data[0].email);
@@ -321,25 +327,12 @@ var AccountProfile = React.createClass({
                         accountError: null,
                         account: response.data[0]
                     });
-                    if (response.data.length > 1) {
-                        this.setState({
-                            hits: <div id="account-hits" className="center-wrapper"><ButtonGroup>
-                                <Button disabled>Hits: </Button>{
-                                    response.data.map(function (d) {
-                                        return <Button onClick={this.loadAccount.bind(this, d.email, "email")}>
-                                                {d.email}
-                                        </Button>;
-                                    }.bind(this))
-                                }<Button onClick={this.clearHits}><Glyphicon glyph="trash"/></Button>
-                            </ButtonGroup></div>
-                        });
-                    }
                 }
             }.bind(this)
         });
     },
 
-    loadSense: function(email) {
+    loadSenseByEmail: function(email) {
         $.ajax({
             url: '/api/device_by_email',
             dataType: 'json',
@@ -364,7 +357,20 @@ var AccountProfile = React.createClass({
         });
     },
 
-    loadPill: function(email) {
+    loadSenseByExternalId: function(senseId) {
+        this.setState({senseId: senseId});
+        this.loadSenseKeyStore(senseId);
+        this.loadWifi(senseId);
+        this.loadSenseColor(senseId);
+        this.loadLastRoomConditionsWithoutParticulates(senseId);
+    },
+
+    loadPillByExternalId: function(pillId) {
+        this.loadPillStatus(pillId);
+        this.loadPillKeyStore(pillId);
+    },
+
+    loadPillByEmail: function(email) {
         $.ajax({
             url: '/api/device_by_email',
             dataType: 'json',
@@ -545,8 +551,8 @@ var AccountProfile = React.createClass({
 
     loadProfile: function(email) {
         this.loadPartner(email);
-        this.loadSense(email);
-        this.loadPill(email);
+        this.loadSenseByEmail(email);
+        this.loadPillByEmail(email);
         this.loadTimezone(email);
         this.loadTimeline(email);
         this.loadAlarms(email);
@@ -573,7 +579,7 @@ var AccountProfile = React.createClass({
 
     switchSearchType: function(searchType) {
         $("#viewer").trigger("click");
-        this.refs.accountInput.getDOMNode().value = "";
+//        this.refs.accountInput.getDOMNode().value = "";
         this.refs.accountInput.getDOMNode().focus();
         this.setState({searchType: searchType});
     },
@@ -605,7 +611,7 @@ var AccountProfile = React.createClass({
             </div>
         </form></Col>;
 
-        var results = [
+        var resultsTotal = [
             <Col xs={12} className="paddingless-left hits">{this.state.hits}</Col>,
             <Col xs={12} lg={4} className="paddingless-left">
                 <Tile img="svg/sleep.svg" title="User Summary" img="svg/sleep.svg" content={<AccountTile account={this.state.account} partner={this.state.partner} zendeskResponse={this.state.zendeskResponse} zendeskStatus={this.state.zendeskStatus} />} />
@@ -623,9 +629,25 @@ var AccountProfile = React.createClass({
                 <Tile img="svg/wifi.svg" title="Wifi Info" content={<WifiTile wifiResponse={this.state.wifiResponse} />} />
             </Col>
         ];
+
+        var deviceId = $("#account-input").val();
+        var resultsForOrphanSense = deviceId &&  this.state.searchType === "sense_id" ?
+            <Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseLimitedSummary senseId={deviceId} senseKeyStoreResponse={this.state.senseKeyStoreResponse} senseColorResponse={this.state.senseColorResponse} />} />
+            : null;
+
+
+        var resultsForOrphanPill = deviceId && this.state.searchType === "pill_id" ?
+            <Tile img="image/sense-bw.png" title="Pill Summary" content={<PillLimitedSummary pillId={deviceId} pillKeyStoreResponse={this.state.pillKeyStoreResponse}  />} />
+            : null;
+
         return <Col xs={12} className="paddingless container">
             {searchForm}
-            {this.state.accountError === null ? results : <Col xs={12} className="paddingless">{this.state.accountError }</Col>}
+            {this.state.accountError === null ? null : <Col xs={12} className="paddingless">{this.state.accountError }</Col>}
+            {this.state.accountError === null ? resultsTotal :
+                <Col xs={12} lg={4} className="paddingless-left">
+                        {resultsForOrphanSense || resultsForOrphanPill}
+                </Col>
+            }
         </Col>;
     }
 });
