@@ -61,3 +61,28 @@ var PillSummary = React.createClass({
             <Well>{pillResponse.error}</Well>: result;
     }
 });
+
+
+var PillLimitedSummary = React.createClass({
+    render: function() {
+        var keyStore = null;
+        var pillKeyStoreResponse = this.props.pillKeyStoreResponse;
+
+        if (pillKeyStoreResponse.error.isWhiteString()) {
+            if(!$.isEmptyObject(pillKeyStoreResponse) && pillKeyStoreResponse.data.key) {
+                keyStore = pillKeyStoreResponse.data.key.slice(pillKeyStoreResponse.data.key.length-5, pillKeyStoreResponse.data.key.length) + " " + (pillKeyStoreResponse.data.created_at || "");
+            }
+        }
+        else {
+            keyStore = <span className="not-ok">unprovisioned</span>;
+        }
+
+        return <Table>
+            <tbody>
+                <tr><td>ID</td><td>{this.props.pillId}</td></tr>
+                <tr><td>Keystore</td><td>{keyStore}</td></tr>
+                <tr><td/><td/></tr>
+            </tbody>
+        </Table>;
+    }
+});

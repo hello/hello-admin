@@ -111,7 +111,7 @@ var BypassOTAModal = React.createClass({
                         var putData = response.data;
                         putData.ids.push(this.props.senseId);
                         putData.ids = putData.ids.join();
-                        putData.feature = putData.name;
+                        putData.feature = putData
                         this.putSenseIdToFeature(putData);
                     }
                 }
@@ -245,3 +245,69 @@ var SenseSummary = React.createClass({
     }
 });
 
+
+var SenseLimitedSummary = React.createClass({
+    updateSenseColor: function(senseId, color) {
+        this.closePopoverManually();
+        $.ajax({
+            url: "/api/sense_color",
+            dataType: 'json',
+            type: 'PUT',
+            data: {sense_id: senseId, color: color},
+            success: function(response) {
+                if (response.error.isWhiteString()){
+                    $("#popover-trigger").text(color);
+                }
+            }
+        });
+        return false;
+    },
+    closePopoverManually: function() {
+        $("#popover-trigger").trigger("click");
+    },
+    render: function() {
+        var keyStore = null;
+        var senseKeyStoreResponse = this.props.senseKeyStoreResponse;
+        var senseColorResponse = this.props.senseColorResponse;
+
+        if (senseKeyStoreResponse.error.isWhiteString()) {
+            if(!$.isEmptyObject(senseKeyStoreResponse) && senseKeyStoreResponse.data.key) {
+                keyStore = senseKeyStoreResponse.data.key.slice(senseKeyStoreResponse.data.key.length-5, senseKeyStoreResponse.data.key.length) + " " + (senseKeyStoreResponse.data.created_at || "");
+            }
+        }
+        else {
+            keyStore = <span className="not-ok">unprovisioned</span>;
+        }
+
+        var senseColor = senseColorResponse.error.isWhiteString() && senseColorResponse.data ?
+                <OverlayTrigger trigger="click" placement="right" overlay={
+                    <Popover title={<span>Update Color &nbsp;<Button id="popover-close" onClick={this.closePopoverManually} bsSize="xsmall">x</Button></span>}>
+                        <Button onClick={this.updateSenseColor.bind(this, this.props.senseId, "BLACK")} className="device-color" bsSize="xsmall">BLACK</Button>&nbsp;
+                        <Button onClick={this.updateSenseColor.bind(this, this.props.senseId, "WHITE")} className="device-color" bsSize="xsmall">WHITE</Button>
+                    </Popover>}>
+                    <Button id="popover-trigger" className="device-color" bsSize="xsmall">{senseColorResponse.data}</Button>
+                </OverlayTrigger> : null;
+
+
+        return <div>
+            <Table>
+                <tbody>
+                    <tr><td>ID</td><td>{this.props.senseId}</td></tr>
+                    <tr><td>Keystore</td><td>{keyStore}</td></tr>
+                    <tr><td>Color</td><td>{senseColor}</td></tr>
+                    <tr><td/><td/></tr>
+                </tbody>
+            </Table>
+            <ul className="extra">
+                <li><a target="_blank" href={"/sense_logs/?field=device_id&keyword=" + this.props.senseId + "&sense_id=&limit=&start=&end="}>Logs</a></li>
+                <li><a target="_blank" href={"/sense_events/?account_input=" + this.props.senseId + "&start_ts=" + new Date().getTime()}>Events</a></li>
+                <li><ModalTrigger modal={<FirmwareModal senseId={this.props.senseId} />}>
+                    <a className="cursor-hand">Firmware-History</a>
+                </ModalTrigger></li>
+                <li><ModalTrigger modal={<BypassOTAModal senseId={this.props.senseId} />}>
+                    <a className="cursor-hand">Bypass-OTA</a>
+                </ModalTrigger></li>
+            </ul>
+        </div>;
+    }
+});
