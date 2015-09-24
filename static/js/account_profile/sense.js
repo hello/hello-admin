@@ -111,7 +111,7 @@ var BypassOTAModal = React.createClass({
                         var putData = response.data;
                         putData.ids.push(this.props.senseId);
                         putData.ids = putData.ids.join();
-                        putData.feature = putData
+                        putData.feature = putData.name;
                         this.putSenseIdToFeature(putData);
                     }
                 }
