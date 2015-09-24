@@ -110,11 +110,11 @@ var SenseEventsMaestro = React.createClass({
             var beforeEventTs = d3.time.format.utc('%m/%d/%Y %H:%M:%S')(new Date(senseEvent.created_at - 5*60*1000));
             var afterEventTs = d3.time.format.utc('%m/%d/%Y %H:%M:%S')(new Date(senseEvent.created_at + 5*60*1000));
             return <tr>
-                <td>{senseEvent.deviceId}</td>
+                <td>{senseEvent.device_id}</td>
                 <td>
                     {d3.time.format('%a %d %b %H:%M:%S %Z')(new Date(senseEvent.created_at))}
                     &nbsp;
-                    <a target="_blank" href={"/sense_logs/?field=device_id&keyword=" + senseEvent.deviceId + "&category=device_id&category_input=&limit=&start=" + beforeEventTs + "&end=" + afterEventTs}>see logs</a>
+                    <a target="_blank" href={"/sense_logs/?field=device_id&keyword=" + senseEvent.device_id + "&category=device_id&category_input=&limit=&start=" + beforeEventTs + "&end=" + afterEventTs}>see logs</a>
                 </td>
                 <td>{senseEvent.events.map(function(event){
                     if (event.indexOf("color") > -1){
@@ -142,7 +142,7 @@ var SenseEventsMaestro = React.createClass({
             <Table id="events-table" striped>
                 <thead>
                     <tr>
-                        <th>Device ID</th>
+                        <th>Sense ID</th>
                         <th>Created At</th>
                         <th>Events</th>
                     </tr>
