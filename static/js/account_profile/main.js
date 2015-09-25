@@ -144,52 +144,6 @@ var TimelineTile = React.createClass({
     }
 });
 
-var RoomConditionsTile = React.createClass({
-    render: function() {
-        var nowDateTime = d3.time.format("%m/%d/%Y %H:%M:%S")(new Date());
-        var temperatureData = this.props.lastRoomConditionsResponse.data.temperature;
-        var humidityData = this.props.lastRoomConditionsResponse.data.humidity;
-        var lightData = this.props.lastRoomConditionsResponse.data.light;
-        var soundData = this.props.lastRoomConditionsResponse.data.sound;
-
-        var particulatesResponseData = this.props.particulatesResponse.data ? this.props.particulatesResponse.data.filter(purgeSentinels) : [];
-        var latestTemperature = temperatureData && !$.isEmptyObject(temperatureData) && temperatureData.value != undefined ?
-            [<td>{temperatureData.value.toFixed(2)}</td>, <td>{"°" + temperatureData.unit.toUpperCase()}</td>]
-            :[<td><img className="loading-inline" src="/static/image/loading.gif" /></td>, <td/>];
-        var latestHumidity = humidityData && !$.isEmptyObject(humidityData) && humidityData.value != undefined ?
-            [<td>{humidityData.value.toFixed(2)}</td>, <td>{humidityData.unit}</td>]
-            :[<td><img className="loading-inline" src="/static/image/loading.gif" /></td>, <td/>];
-        var latestLight = lightData && !$.isEmptyObject(lightData) && lightData.value != undefined ?
-            [<td>{lightData.value.toFixed(2)}</td>, <td>{lightData.unit}</td>]
-            :[<td><img className="loading-inline" src="/static/image/loading.gif" /></td>, <td/>];
-        var latestSound = soundData && !$.isEmptyObject(soundData) && soundData.value != undefined?
-            [<td>{soundData.value.toFixed(2)}</td>, <td>{soundData.unit}</td>]
-            :<td><img className="loading-inline" src="/static/image/loading.gif" /></td>;
-
-        var latestParticulates = particulatesResponseData.length > 0 ?
-            [<td>{particulatesResponseData[particulatesResponseData.length - 1].value.toFixed(2)}</td>, <td>µg/m³</td>]
-            :[<td><img className="loading-inline" src="/static/image/loading.gif" /></td>, <td/>];
-
-        var lastReadingTs = temperatureData && !$.isEmptyObject(temperatureData) ?
-            new Date(temperatureData.last_updated_utc).toUTCString() : null;
-        return <div>
-            <p>Last Reading: {lastReadingTs}</p><br/>
-            <Table>
-                <thead></thead>
-                <tbody>
-                    <tr><td>Temperature</td>{latestTemperature}</tr>
-                    <tr><td>Humidity</td>{latestHumidity}</tr>
-                    <tr><td>Light</td>{latestLight}</tr>
-                    <tr><td>Sound</td>{latestSound}</tr>
-                    <tr><td>Particulates</td>{latestParticulates}</tr>
-                    <tr><td/><td/><td/></tr>
-                </tbody>
-            </Table>
-            <p><a target="_blank" href={"/room_conditions/?email=" + this.props.email + "&until=" + nowDateTime}>Last "Day" (not necessarily 24 hours)</a></p>
-            <p><a target="_blank" href={"/dust_stats/?device_id=" + this.props.senseId + "&start_ts=&end_ts=&length=100"}>Last 100 Dust Counts</a></p>
-        </div>
-    }
-});
 
 
 var WifiTile = React.createClass({
@@ -229,7 +183,6 @@ var AccountProfile = React.createClass({
             timezoneHistoryResponse: {data: {}, error: ""},
             temperatureResponse: {data: [], error: ""},
             humidityResponse: {data: [], error: ""},
-            particulatesResponse: {data: [], error: ""},
             lightResponse: {data: [], error: ""},
             soundResponse: {data: [], error: ""},
             wifiResponse: {data: {}, error: ""},
@@ -262,7 +215,6 @@ var AccountProfile = React.createClass({
             zendeskResponse: {data: {}, error: ""},
             temperatureResponse: {data: [], error: ""},
             humidityResponse: {data: [], error: ""},
-            particulatesResponse: {data: [], error: ""},
             lightResponse: {data: [], error: ""},
             soundResponse: {data: [], error: ""},
             wifiResponse: {data: {}, error: ""},
@@ -349,7 +301,6 @@ var AccountProfile = React.createClass({
                             this.loadWifi(senseId);
                             this.loadSenseColor(senseId);
                             this.loadLastRoomConditionsWithoutParticulates(senseId);
-                            this.loadParticulates(email);
                         }
                     }
                 }
@@ -470,20 +421,6 @@ var AccountProfile = React.createClass({
                 this.setState({timezoneResponse: response})
             }.bind(this)
         });
-    },
-
-    loadParticulates: function(email) {
-        ['particulates'].forEach(function(sensor){
-            $.ajax({
-                url: "/api/room_conditions",
-                dataType: "json",
-                type: 'GET',
-                data: {email: email, ts: new Date().getTime(), resolution: "day", sensor: sensor},
-                success: function (response) {
-                    this.setState({particulatesResponse: response});
-                }.bind(this)
-            });
-        }.bind(this));
     },
 
     loadWifi: function(senseId) {
@@ -620,7 +557,7 @@ var AccountProfile = React.createClass({
             </Col>,
             <Col xs={12} lg={4} className="paddingless-left">
                 <Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseResponse={this.state.senseResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} timezoneResponse={this.state.timezoneResponse} senseColorResponse={this.state.senseColorResponse} />} />
-                <Tile img="svg/room_conditions.svg" title="Room Conditions" content={<RoomConditionsTile email={this.state.email} lastRoomConditionsResponse={this.state.lastRoomConditionsResponse} particulatesResponse={this.state.particulatesResponse} senseId={this.state.senseId} />} />
+                <Tile img="svg/room_conditions.svg" title="Room Conditions" content={<LastRoomConditionsTile lastRoomConditionsResponse={this.state.lastRoomConditionsResponse} email={this.state.email} />} />
                 <Tile img="svg/timezone.svg" title="Timezone History" content={<TimezoneHistoryTile timezoneHistoryResponse={this.state.timezoneHistoryResponse} />} />
             </Col>,
             <Col xs={12} lg={4} className="paddingless-left">
@@ -631,23 +568,25 @@ var AccountProfile = React.createClass({
         ];
 
         var deviceId = $("#account-input").val();
-        var resultsForOrphanSense = deviceId &&  this.state.searchType === "sense_id" ?
-            <Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseLimitedSummary senseId={deviceId} senseKeyStoreResponse={this.state.senseKeyStoreResponse} senseColorResponse={this.state.senseColorResponse} />} />
-            : null;
-
+        var resultsForOrphanSense = deviceId &&  this.state.searchType === "sense_id" ? [
+            <Col xs={12} lg={4} className="paddingless-left">
+                <Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseLimitedSummary senseId={deviceId} senseKeyStoreResponse={this.state.senseKeyStoreResponse} senseColorResponse={this.state.senseColorResponse} />} />
+            </Col>,
+            <Col xs={12} lg={4} className="paddingless-left">
+                <Tile img="svg/room_conditions.svg" title="Room Conditions" content={<LastRoomConditionsTile lastRoomConditionsResponse={this.state.lastRoomConditionsResponse} />} />
+            </Col>
+        ] : null;
 
         var resultsForOrphanPill = deviceId && this.state.searchType === "pill_id" ?
-            <Tile img="image/sense-bw.png" title="Pill Summary" content={<PillLimitedSummary pillId={deviceId} pillKeyStoreResponse={this.state.pillKeyStoreResponse}  />} />
+            <Col xs={12} lg={4} className="paddingless-left">
+                <Tile img="image/sense-bw.png" title="Pill Summary" content={<PillLimitedSummary pillId={deviceId} pillKeyStoreResponse={this.state.pillKeyStoreResponse}  />} />
+            </Col>
             : null;
 
         return <Col xs={12} className="paddingless container">
             {searchForm}
             {this.state.accountError === null ? null : <Col xs={12} className="paddingless">{this.state.accountError }</Col>}
-            {this.state.accountError === null ? resultsTotal :
-                <Col xs={12} lg={4} className="paddingless-left">
-                        {resultsForOrphanSense || resultsForOrphanPill}
-                </Col>
-            }
+            {this.state.accountError === null ? resultsTotal : (resultsForOrphanSense || resultsForOrphanPill)}
         </Col>;
     }
 });
