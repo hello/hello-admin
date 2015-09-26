@@ -5,7 +5,7 @@ var datepickerFormat = d3.time.format("%m/%d/%Y %H:%M:%S");
 var todayInDatepickerFormat = datepickerFormat(today);
 
 var allSensors = ['wave_count', 'hold_count', 'background', 'num_disturb', 'peak_disturb', 'light_variance', 'light_peakiness', 'dust_min', 'dust_max', 'dust_variance', 'temperature', 'humidity', 'particulates', 'light', 'sound'];
-var basicSensors = ['temperature', 'humidity', 'particulates', 'light', 'sound'];
+var basicSensors = ['temperature', 'humidity', 'particulates', 'particulates_smooth', 'light', 'sound'];
 var sensors = basicSensors;
 
 var resolutionList = ['day', 'week', 'minute'];
@@ -13,6 +13,7 @@ var colorChoice = {
     temperature: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
     humidity: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
     particulates: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
+    particulates_smooth: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
     light: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
     sound: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
     wave_count: {day: "#009BFF", week: "#41D7AB", minute: "#FFAA00"},
@@ -30,7 +31,8 @@ var colorChoice = {
 var yAxisLabel = {
     temperature: "Temperature ( °C )",
     humidity: "Humidity ( % )",
-    particulates: "Particulates ( µg/m³ )",
+    particulates: "Raw Particulates ( µg/m³ )",
+    particulates_smooth: "Smooth Particulates ( µg/m³ )",
     light: "Light ( lx )",
     sound: "Sound ( dB )",
     wave_count: "Wave Count ( times )",
@@ -89,7 +91,7 @@ var vizCanvas = React.createClass({
                         return chart;
                     });
                     return <div id={s + "-wrapper"}>
-                        <h4 className="chart-title">{s.split("_").map(function(c){return c.capitalize()}).join(" ")}</h4>
+                        <h4 className="chart-title">{yAxisLabel[s]}</h4>
                         <svg id={s} />
                     </div>;
                 }
