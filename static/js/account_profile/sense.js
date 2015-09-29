@@ -134,7 +134,47 @@ var BypassOTAModal = React.createClass({
     }
 });
 
+
+var DustOffsetUpdateModal = React.createClass({
+    updateDustOffset: function() {
+        $.ajax({
+            url: "/api/dust_offset",
+            dataType: 'json',
+            type: 'PUT',
+            async: false,
+            data: {sense_id: this.props.senseId},
+            success: function(response) {
+                if (!response.error.isWhiteString()){
+                    alert(response.error);
+                }
+                this.props.onRequestHide();
+            }.bind(this)
+        })
+    },
+    render: function() {
+        return <Modal animation={true}>
+            <div className='modal-body'>
+                <div className="modal-title">Dust Calibration Update<Button className="btn-round btn-borderless btn-fade" onClick={this.props.onRequestHide}>X</Button></div>
+                <div className="modal-subtitle">Once submitted, dust calibration offset will be calculated for {this.props.senseId}</div>
+                <br/>
+                <Button onClick={this.updateDustOffset}>Submit</Button>
+            </div>
+            <div className='modal-footer'>
+                <Button className="btn-round btn-fade" onClick={this.props.onRequestHide}>X</Button>
+            </div>
+        </Modal>;
+    }
+});
+
 var SenseSummary = React.createClass({
+    getInitialState: function() {
+        return {dustOffset: null}
+    },
+
+    componentDidMount: function() {
+        this.getDustOffset();
+    },
+
     loadUnhashedFirmware: function(version, senseId) {
         $.ajax({
             url: "/api/firmware_unhash",
@@ -172,6 +212,25 @@ var SenseSummary = React.createClass({
             }
         });
         return false;
+    },
+
+    getDustOffset: function(senseId) {
+        var dustOffset = <ModalTrigger modal={<DustOffsetUpdateModal senseId={senseId} />}>
+                <Button bsSize="xsmall">Compute</Button>
+            </ModalTrigger>;
+        $.ajax({
+            url: "/api/dust_offset",
+            dataType: 'json',
+            type: 'GET',
+            async: false,
+            data: {sense_id: senseId},
+            success: function(response) {
+                if (response.error.isWhiteString()){
+                    dustOffset = response.data.dust_calibration_delta;
+                }
+            }.bind(this)
+        });
+        return dustOffset;
     },
 
     render: function() {
@@ -220,6 +279,7 @@ var SenseSummary = React.createClass({
                         <tr><td>ID</td><td>{senseId + senseInternalId}</td></tr>
                         <tr><td>Keystore</td><td>{keyStore}</td></tr>
                         <tr><td>Firmware</td><td>{this.loadUnhashedFirmware(firmware_version, senseId)}</td></tr>
+                        <tr><td>Dust Offset</td><td>{this.getDustOffset(senseId)}</td></tr>
                         <tr><td>Timezone</td><td>{timezone}</td></tr>
                         <tr><td>Color</td><td>{senseColor}</td></tr>
                         <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
