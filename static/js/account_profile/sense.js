@@ -5,7 +5,6 @@ var FirmwareModal = React.createClass({
         return {fwHistory: []};
     },
     translateFirmwares: function(firmwareHexList) {
-        console.log(firmwareHexList);
         var fwTranslation = {};
         $.ajax({
             url: '/api/firmware_unhash',
@@ -83,7 +82,6 @@ var FirmwareModal = React.createClass({
 
 var BypassOTAModal = React.createClass({
     putSenseIdToFeature: function(putData) {
-        console.log("putData", putData);
         $.ajax({
             url: '/api/features',
             dataType: 'json',
@@ -91,7 +89,6 @@ var BypassOTAModal = React.createClass({
             data: JSON.stringify(putData),
             type: 'PUT',
             success: function(response) {
-                console.log("PUT", response);
                 if (!(response.status === 204 && response.error === "")) {
                     alert("Failed to update feature");
                 }
@@ -106,7 +103,6 @@ var BypassOTAModal = React.createClass({
             data: {feature: BYPASS_OTA_CHECKS_FEATURE_NAME},
             success: function(response) {
                 if (response.error.isWhiteString()) {
-                    console.log(response);
                     if (response.data.ids && response.data.ids.indexOf(this.props.senseId) === -1) {
                         var putData = response.data;
                         putData.ids.push(this.props.senseId);
@@ -136,13 +132,35 @@ var BypassOTAModal = React.createClass({
 
 
 var DustOffsetUpdateModal = React.createClass({
-    updateDustOffset: function() {
+    computeAndUpsertDustCalibration: function() {
         $.ajax({
             url: "/api/dust_offset",
             dataType: 'json',
+            type: 'GET',
+            data: {sense_internal_id: this.props.senseInternalId, account_id: this.props.accountId},
+            success: function(response) {
+                if (!response.error.isWhiteString()){
+                    alert(response.error);
+                }
+                else {
+                    var averageDustOffset = response.data.average_dust_last_10_days;
+                    this.upsertDustCalibration(averageDustOffset);
+                }
+                this.props.onRequestHide();
+            }.bind(this)
+        })
+    },
+    upsertDustCalibration: function(averageDustOffset) {
+        $.ajax({
+            url: "/api/dust_calibration",
+            dataType: 'json',
+            contentType: 'application/json',
             type: 'PUT',
-            async: false,
-            data: {sense_id: this.props.senseId},
+            data: JSON.stringify({
+                    sense_id: this.props.senseId,
+                    test_at: new Date().getTime(),
+                    dust_offset: averageDustOffset
+                }),
             success: function(response) {
                 if (!response.error.isWhiteString()){
                     alert(response.error);
@@ -157,7 +175,7 @@ var DustOffsetUpdateModal = React.createClass({
                 <div className="modal-title">Dust Calibration Update<Button className="btn-round btn-borderless btn-fade" onClick={this.props.onRequestHide}>X</Button></div>
                 <div className="modal-subtitle">Once submitted, dust calibration offset will be calculated for {this.props.senseId}</div>
                 <br/>
-                <Button onClick={this.updateDustOffset}>Submit</Button>
+                <Button onClick={this.computeAndUpsertDustCalibration}>Submit</Button>
             </div>
             <div className='modal-footer'>
                 <Button className="btn-round btn-fade" onClick={this.props.onRequestHide}>X</Button>
@@ -169,10 +187,6 @@ var DustOffsetUpdateModal = React.createClass({
 var SenseSummary = React.createClass({
     getInitialState: function() {
         return {dustOffset: null}
-    },
-
-    componentDidMount: function() {
-        this.getDustOffset();
     },
 
     loadUnhashedFirmware: function(version, senseId) {
@@ -214,23 +228,23 @@ var SenseSummary = React.createClass({
         return false;
     },
 
-    getDustOffset: function(senseId) {
-        var dustOffset = <ModalTrigger modal={<DustOffsetUpdateModal senseId={senseId} />}>
+    getDustCalibration: function(senseId, accountId, senseInternalId) {
+        var dustCalibration = <ModalTrigger modal={<DustOffsetUpdateModal senseId={senseId} accountId={accountId} senseInternalId={senseInternalId} />}>
                 <Button bsSize="xsmall">Compute</Button>
             </ModalTrigger>;
         $.ajax({
-            url: "/api/dust_offset",
+            url: "/api/dust_calibration",
             dataType: 'json',
             type: 'GET',
             async: false,
             data: {sense_id: senseId},
             success: function(response) {
                 if (response.error.isWhiteString()){
-                    dustOffset = response.data.dust_calibration_delta;
+                    dustCalibration = response.data.dust_calibration_delta;
                 }
             }.bind(this)
         });
-        return dustOffset;
+        return dustCalibration;
     },
 
     render: function() {
@@ -253,8 +267,9 @@ var SenseSummary = React.createClass({
         }
 
         if (senseResponse.data.length > 0) {
+            var accountId = senseResponse.data[0].device_account_pair ? senseResponse.data[0].device_account_pair.account_id : undefined;
             var senseId = senseResponse.data[0].device_account_pair ? senseResponse.data[0].device_account_pair.external_device_id : undefined;
-            var senseInternalId = senseResponse.data[0].device_account_pair ? " (" + senseResponse.data[0].device_account_pair.internal_device_id + ")" : undefined;
+            var senseInternalId = senseResponse.data[0].device_account_pair ? senseResponse.data[0].device_account_pair.internal_device_id : undefined;
             var firmware_version = senseResponse.data[0].device_status ? senseResponse.data[0].device_status.firmware_version : undefined;
 
             if (senseResponse.data[0].device_status){
@@ -276,10 +291,10 @@ var SenseSummary = React.createClass({
             result = <div>
                 <Table>
                     <tbody>
-                        <tr><td>ID</td><td>{senseId + senseInternalId}</td></tr>
+                        <tr><td>ID</td><td>{senseId + " (" + senseInternalId + ")"}</td></tr>
                         <tr><td>Keystore</td><td>{keyStore}</td></tr>
                         <tr><td>Firmware</td><td>{this.loadUnhashedFirmware(firmware_version, senseId)}</td></tr>
-                        <tr><td>Dust Offset</td><td>{this.getDustOffset(senseId)}</td></tr>
+                        <tr><td>Dust Calib.</td><td>{this.getDustCalibration(senseId, accountId, senseInternalId)}</td></tr>
                         <tr><td>Timezone</td><td>{timezone}</td></tr>
                         <tr><td>Color</td><td>{senseColor}</td></tr>
                         <tr><td>Last Seen</td><td>{lastSeen}</td></tr>

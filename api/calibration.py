@@ -1,22 +1,25 @@
 from core.handlers.base import ProtectedRequestHandler
 import json
 
-class DustOffsetAPI(ProtectedRequestHandler):
+class DustCalibrationAPI(ProtectedRequestHandler):
     def get(self):
-        # self.hello_request(
-        #     api_url="calibration/{}".format(self.request.get("sense_id"))
-        #     type="GET",
-        # )
-        self.response.write(json.dumps({"error": "x", "data": {
-            "sense_id": "sep-28",
-            "dust_offset": 1579,
-            "dust_calibration_delta": "Just Placeholder, Back-end not ready",
-            "tested_at": 1356789789777
-        }}))
+        self.hello_request(
+            api_url="calibration/{}".format(self.request.get("sense_id")),
+            type="GET"
+        )
 
     def put(self):
-        # self.hello_request(
-        #     body_data=json.dumps({"sense_id": self.request.get("sense_id")}),
-        #     type="PUT",
-        # )
-        self.response.write(json.dumps({"error": "", "data": {}}))
+        self.send_to_slack_admin_logs_channel("{} has put a new calibration {}".format(self.current_user, self.request.body))
+        self.hello_request(
+            api_url="calibration",
+            body_data=self.request.body,
+            type="PUT"
+        )
+
+class DustOffsetAPI(ProtectedRequestHandler):
+    def get(self):
+        self.hello_request(
+            api_url="calibration/average_dust/{}".format(self.request.get("account_id")),
+            url_params={"sense_internal_id": self.request.get("sense_internal_id")},
+            type="GET"
+        )
