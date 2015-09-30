@@ -1,5 +1,6 @@
 from api.account import RecentAccountsAPI, AccountSearchAPI, AccountCountsBreakdownByCreatedDateAPI
 from api.alarm import AlarmsAPI, AlarmsByEmailAPI, AlarmRingsHistoryAPI
+from api.calibration import DustCalibrationAPI, DustOffsetAPI
 from api.namespace import NamespaceAPI
 from api.password import PasswordResetAPI, PasswordForceUpdateAPI
 from api.feature import FeaturesAPI
@@ -148,6 +149,7 @@ routes = [
     ('/api/setup', SetupAPI),
     ('/create_account', CreateAccountAPI),
     ('/api/timeline_v2/?$', TimelineV2API),
-    ('/api/logs_facet_history/?$', LogsFacetHistoryAPI),
+    ('/api/dust_calibration/?$', DustCalibrationAPI),
+    ('/api/dust_offset/?$', DustOffsetAPI),
 ]
 
