@@ -151,6 +151,9 @@ var DustOffsetUpdateModal = React.createClass({
         })
     },
     upsertDustCalibration: function(averageDustOffset) {
+        if (averageDustOffset <= 0) {
+            return false;
+        }
         $.ajax({
             url: "/api/dust_calibration",
             dataType: 'json',
@@ -165,15 +168,14 @@ var DustOffsetUpdateModal = React.createClass({
                 if (!response.error.isWhiteString()){
                     alert(response.error);
                 }
-                this.props.onRequestHide();
             }.bind(this)
-        })
+        });
     },
     render: function() {
         return <Modal animation={true}>
             <div className='modal-body'>
                 <div className="modal-title">Dust Calibration Update<Button className="btn-round btn-borderless btn-fade" onClick={this.props.onRequestHide}>X</Button></div>
-                <div className="modal-subtitle">Once submitted, dust calibration offset will be calculated for {this.props.senseId}</div>
+                <div className="modal-subtitle">Once submitted, average dust concentration will be calculated for {this.props.senseId} over the last 10 days or less. If that calculation yields positive value, we will use it to compute calibration delta which trigger AQ rendering server-side</div>
                 <br/>
                 <Button onClick={this.computeAndUpsertDustCalibration}>Submit</Button>
             </div>

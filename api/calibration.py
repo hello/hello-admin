@@ -1,5 +1,4 @@
 from core.handlers.base import ProtectedRequestHandler
-import json
 
 class DustCalibrationAPI(ProtectedRequestHandler):
     def get(self):
