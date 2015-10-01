@@ -145,30 +145,6 @@ var TimelineTile = React.createClass({
 });
 
 
-
-var WifiTile = React.createClass({
-    render: function() {
-        var response = this.props.wifiResponse;
-        var networksTable = response.data.networks && response.data.networks.length > 0 ? <Table>
-            <thead>
-                <tr><th>Network SSID</th><th>Security</th><th>Strength</th></tr>
-            </thead>
-            <tbody>{
-                response.data.networks.map(function(w){return <tr>
-                    <td>{w.network_name}</td>
-                    <td className="center-wrapper">{w.network_security}</td>
-                    <td className="center-wrapper">{w.signal_strength}</td>
-                </tr>;})
-            }<tr><td/><td/><td/></tr></tbody>
-        </Table> : null;
-
-        return <div>
-            {networksTable}
-            <p> Last Scan: {response.data.scan_time ? new Date(Number(response.data.scan_time) * 1000).toUTCString() : null}</p>
-        </div>
-    }
-});
-
 var AccountProfile = React.createClass({
     getInitialState: function() {
         return {
@@ -185,7 +161,6 @@ var AccountProfile = React.createClass({
             humidityResponse: {data: [], error: ""},
             lightResponse: {data: [], error: ""},
             soundResponse: {data: [], error: ""},
-            wifiResponse: {data: {}, error: ""},
             lastRoomConditionsResponse: {data: {}, error: ""},
             senseColorResponse: {data: null, error: ""},
             accountInput: "",
@@ -217,7 +192,6 @@ var AccountProfile = React.createClass({
             humidityResponse: {data: [], error: ""},
             lightResponse: {data: [], error: ""},
             soundResponse: {data: [], error: ""},
-            wifiResponse: {data: {}, error: ""},
             lastRoomConditionsResponse: {data: {}, error: ""},
             senseId: "",
             pillId: ""
@@ -273,12 +247,26 @@ var AccountProfile = React.createClass({
                     }
                 }
                 else {
-                    this.loadProfile(response.data[0].email);
+                    var data =  response.data.sort(function(t1, t2){return t2.created - t1.created;});
+                    this.loadProfile(data[0].email);
                     this.setState({
-                        email: response.data[0].email,
+                        email: data[0].email,
                         accountError: null,
-                        account: response.data[0]
+                        account: data[0]
                     });
+                    if (data.length > 1) {
+                        this.setState({
+                            hits: <div id="account-hits" className="center-wrapper"><ButtonGroup>
+                                <Button disabled>Hits: </Button>{
+                                    data.map(function (d) {
+                                        return <Button onClick={this.loadAccount.bind(this, d.email, "email")}>
+                                            {d.email}
+                                        </Button>;
+                                    }.bind(this))
+                                }<Button onClick={this.clearHits}><Glyphicon glyph="trash"/></Button>
+                            </ButtonGroup></div>
+                        });
+                    }
                 }
             }.bind(this)
         });
@@ -298,7 +286,6 @@ var AccountProfile = React.createClass({
                             var senseId = response.data[0].device_account_pair.external_device_id;
                             this.setState({senseId: senseId});
                             this.loadSenseKeyStore(senseId);
-                            this.loadWifi(senseId);
                             this.loadSenseColor(senseId);
                             this.loadLastRoomConditionsWithoutParticulates(senseId);
                         }
@@ -311,7 +298,6 @@ var AccountProfile = React.createClass({
     loadSenseByExternalId: function(senseId) {
         this.setState({senseId: senseId});
         this.loadSenseKeyStore(senseId);
-        this.loadWifi(senseId);
         this.loadSenseColor(senseId);
         this.loadLastRoomConditionsWithoutParticulates(senseId);
     },
@@ -423,18 +409,7 @@ var AccountProfile = React.createClass({
         });
     },
 
-    loadWifi: function(senseId) {
-        $.ajax({
-            url: "/api/wifi_signal_strength",
-            dataType: "json",
-            type: 'GET',
-            aysnc: false,
-            data: {device_id: senseId},
-            success: function (response) {
-                this.setState({wifiResponse: response});
-            }.bind(this)
-        });
-    },
+
 
     loadSenseColor: function(senseId) {
         $.ajax({
@@ -548,6 +523,7 @@ var AccountProfile = React.createClass({
             </div>
         </form></Col>;
 
+        var senseId =  (this.state.senseResponse.data.length > 0 && this.state.senseResponse.data[0].device_account_pair) ? this.state.senseResponse.data[0].device_account_pair.external_device_id : undefined;
         var resultsTotal = [
             <Col xs={12} className="paddingless-left hits">{this.state.hits}</Col>,
             <Col xs={12} lg={4} className="paddingless-left">
@@ -563,7 +539,7 @@ var AccountProfile = React.createClass({
             <Col xs={12} lg={4} className="paddingless-left">
                 <Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary pillResponse={this.state.pillResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} email={this.state.email} />} />
                 <Tile img="svg/uptime.svg" title="Sense Online Uptime" content={<UptimeTile email={this.state.email} />} />
-                <Tile img="svg/wifi.svg" title="Wifi Info" content={<WifiTile wifiResponse={this.state.wifiResponse} />} />
+                <Tile img="svg/wifi.svg" title="Wifi Info" content={<WifiTile senseId={senseId} />} />
             </Col>
         ];
 
