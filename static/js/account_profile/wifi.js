@@ -1,8 +1,17 @@
+var utcFormatter = d3.time.format.utc("%a&nbsp;&nbsp;%d&nbsp;&nbsp;%b&nbsp;&nbsp;%Y<br>%H : %M : %S - GMT");
+
 var WifiTile = React.createClass({
     getInitialState: function() {
-        return {senseId: "", wifiInfo: {}}
+        return {senseId: "", wifiInfo: {
+            ssid: "",
+            rssi:  "",
+            condition:  "",
+            last_updated:  ""
+        }}
     },
+
     loadWifi: function(senseId) {
+        this.getInitialState();
         $.ajax({
             url: "/api/wifi_info",
             dataType: "json",
@@ -11,7 +20,20 @@ var WifiTile = React.createClass({
             data: {sense_id: senseId},
             success: function (response) {
                 if (response.error.isWhiteString()) {
-                    this.setState({wifiInfo: response.data});
+                    this.setState({wifiInfo: {
+                        ssid: response.data.ssid,
+                        rssi:  response.data.rssi,
+                        condition:  response.data.condition,
+                        last_updated:  <span dangerouslySetInnerHTML={{__html: utcFormatter(new Date(response.data.last_updated))}}/>
+                    }});
+                }
+                else {
+                    this.setState({wifiInfo: {
+                        ssid: <span className="not-ok">--</span>,
+                        rssi:  <span className="not-ok">--</span>,
+                        condition:  <span className="not-ok">--</span>,
+                        last_updated:  <span className="not-ok">--</span>
+                    }});
                 }
             }.bind(this)
         });
@@ -25,23 +47,15 @@ var WifiTile = React.createClass({
             }
         }
     },
+
     render: function() {
-        //var response = this.props.wifiResponse;
-        //var networksTable = response.data.networks && response.data.networks.length > 0 ? <Table>
-        //    <thead>
-        //        <tr><th>Network SSID</th><th>Strength</th></tr>
-        //    </thead>
-        //    <tbody>{
-        //        response.data.networks.map(function(w){return <tr>
-        //            <td>{w.network_name}</td>
-        //            <td className="center-wrapper">{w.signal_strength}</td>
-        //        </tr>;})
-        //    }<tr><td/><td/></tr></tbody>
-        //</Table> : null;
-        return <div>Placeholder</div>;
-        //return <div>
-        //    {networksTable}
-        //    <p> Last Scan: {response.data.scan_time ? new Date(Number(response.data.scan_time) * 1000).toUTCString() : null}</p>
-        //</div>
+        return <Table>
+            <tbody>
+                <tr><td>SSID</td><td>{this.state.wifiInfo.ssid}</td></tr>
+                <tr><td>RSSI</td><td>{this.state.wifiInfo.rssi}</td></tr>
+                <tr><td>Condition</td><td>{this.state.wifiInfo.condition}</td></tr>
+                <tr><td>Last Updated</td><td>{this.state.wifiInfo.last_updated}</td></tr>
+            </tbody>
+        </Table>;
     }
 });
