@@ -58,7 +58,7 @@ from api.team import TeamsAPI
 from api.timeline import TimelineAPI, TimelineV2API
 from api.timezone import TimezoneAPI
 from api.timezone import TimezoneHistoryAPI
-from api.wifi import WifiAPI
+from api.wifi import WifiInfoAPI
 from api.zendesk import ZendeskAPI
 from api.zendesk import ZendeskHistoryAPI
 from api.zendesk import ZendeskNowAPI
@@ -152,6 +152,6 @@ routes = [
     ('/api/timeline_v2/?$', TimelineV2API),
     ('/api/dust_calibration/?$', DustCalibrationAPI),
     ('/api/dust_offset/?$', DustOffsetAPI),
-    ('/api/wifi_info/?$', WifiAPI),
+    ('/api/wifi_info/?$', WifiInfoAPI),
 ]
 
