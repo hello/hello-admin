@@ -38,3 +38,6 @@ cron:
 - description: store logs facet queue
   url: /cron/store_logs_facet_queue
   schedule: every 60 mins
+- description: dust calibration update queue
+  url: /cron/dust_calibration_update_queue
+  schedule: every 2 days
