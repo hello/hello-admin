@@ -189,3 +189,7 @@ class LogsFacet(ndb.Model):
     @classmethod
     def delete_all(cls):
         return ndb.delete_multi(cls.query().fetch(keys_only=True))
+
+
+class DustCalibrationCheckPoint(ndb.Model):
+    max_id = ndb.IntegerProperty(required=True, indexed=False)
