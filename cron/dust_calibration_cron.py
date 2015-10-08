@@ -145,6 +145,7 @@ class DustCalibrationLeftOverUpdateQueue(BaseCron):
 
     def get(self):
         leftover_pairs = self.get_leftover_pairs()
+        log.info("Attempt to calibrate for {} leftover pairs: {}".format(len(leftover_pairs)))
         for leftover_pair in leftover_pairs:
             taskqueue.add(
                 url="/cron/dust_calibration_left_over_update",
