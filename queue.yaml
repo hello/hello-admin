@@ -26,3 +26,9 @@ queue:
   retry_parameters:
     task_retry_limit: 1
     task_age_limit: 240m
+
+- name: calibrate-leftover-senses
+  rate: 10/m
+  retry_parameters:
+    task_retry_limit: 1
+    task_age_limit: 240m

@@ -41,3 +41,6 @@ cron:
 - description: dust calibration update queue
   url: /cron/dust_calibration_update_queue
   schedule: every day 09:00
+- description: dust calibration leftover update queue
+  url: /cron/dust_calibration_leftover_update_queue
+  schedule: every tuesday 21:00
