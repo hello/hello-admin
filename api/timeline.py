@@ -56,3 +56,11 @@ class TimelineAlgorithmAPI(ProtectedRequestHandler):
             type="GET",
             api_info=self.suripu_app
         )
+
+
+class TimelineLogsAPI(ProtectedRequestHandler):
+    def get(self):
+        self.hello_request(
+            api_url="timelines/summary/{}".format(self.request.get("date")),
+            type="GET",
+        )
