@@ -70,7 +70,6 @@ from api.clearbit import ClearbitAPI
 from api.setup import CreateBuggyFirmwareAPI
 from api.datastore import InitializeDataStore
 
-
 routes = [
     ('/api/account_breakdown/?$', AccountCountsBreakdownByCreatedDateAPI),
     ('/api/active_devices_15_minutes_history/?$', ActiveDevices15MinutesHistoryAPI),
@@ -153,5 +152,6 @@ routes = [
     ('/api/dust_offset/?$', DustOffsetAPI),
     ('/api/wifi_info/?$', WifiInfoAPI),
     ('/api/timeline_logs/?$', TimelineLogsAPI),
+    ('/api/logs_facet_history/?$', LogsFacetHistoryAPI),
 ]
 

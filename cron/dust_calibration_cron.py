@@ -12,10 +12,12 @@ MAX_RECENT_PAIRS_PAGES = 20
 
 class DustCalibrationUpdate(BaseCron):
     def get(self):
+        self.calibrate(False)
+    def calibrate(self, is_leftover):
         urlfetch.set_default_fetch_deadline(60)
         avg_dust_response = self.hello_request(
             api_url="calibration/average_dust/{}".format(self.request.get("account_id")),
-            url_params={"sense_internal_id": self.request.get("internal_device_id")},
+            url_params={"sense_internal_id": int(self.request.get("internal_device_id"))},
             type="GET",
             raw_output=True
         )
@@ -23,14 +25,16 @@ class DustCalibrationUpdate(BaseCron):
         if avg_dust_response.error or not avg_dust_response.data:
             log.error(avg_dust_response.error)
             return
+
         if avg_dust_response.data.values()[0] == 0:
             log.info("cron-bot reject updating calibration because avg_dust last N days is 0 for {}".format(self.request.get("external_device_id")))
-            DustCalibrationLeftOverPairs(
-                id=self.request.get("external_device_id"),
-                account_id=self.request.get("account_id"),
-                internal_device_id=self.request.get("internal_device_id"),
-                external_device_id=self.request.get("external_device_id")
-            ).put()
+            if not is_leftover:
+                DustCalibrationLeftOverPairs(
+                    id=self.request.get("external_device_id"),
+                    account_id=int(self.request.get("account_id")),
+                    internal_device_id=int(self.request.get("internal_device_id")),
+                    external_device_id=self.request.get("external_device_id")
+                ).put()
             return
 
         adc_offset = int((AVG_CALIBRATED_ADC - avg_dust_response.data.values()[0] - BASE)/(-1 * K_FACTOR))
@@ -44,6 +48,8 @@ class DustCalibrationUpdate(BaseCron):
             body_data=body_data,
             type="PUT"
         )
+        if is_leftover:
+            DustCalibrationLeftOverPairs.get_by_id(self.request.get("external_device_id")).key.delete()
         log.info("cron-bot has put a new calibration {}".format(body_data))
 
 
@@ -74,7 +80,7 @@ class DustCalibrationUpdateQueue(BaseCron):
             if not recent_pairs_response.data:
                 break
 
-            max_id = recent_pairs_response.data[-1].get("internal_device_id") - 1
+            max_id = int(recent_pairs_response.data[-1].get("internal_device_id")) - 1
 
             if checkpoint is not None and max_id <= checkpoint.max_id:
                 break
@@ -84,7 +90,7 @@ class DustCalibrationUpdateQueue(BaseCron):
         if recent_pairs:
             DustCalibrationCheckPoint(
                 id=DUST_CALIBRATION_CHECKPOINT_KEY,
-                max_id=recent_pairs[0].get("internal_device_id")
+                max_id=int(recent_pairs[0].get("internal_device_id"))
             ).put()
         return recent_pairs
 
@@ -125,4 +131,24 @@ class DustCalibrationUpdateQueue(BaseCron):
                 params=uncalibrated_pair,
                 method="GET",
                 queue_name="calibrate-recent-senses"
+            )
+
+
+class DustCalibrationLeftOverUpdate(DustCalibrationUpdate):
+    def get(self):
+        return self.calibrate(True)
+
+
+class DustCalibrationLeftOverUpdateQueue(BaseCron):
+    def get_leftover_pairs(self):
+        return DustCalibrationLeftOverPairs.query()
+
+    def get(self):
+        leftover_pairs = self.get_leftover_pairs()
+        for leftover_pair in leftover_pairs:
+            taskqueue.add(
+                url="/cron/dust_calibration_left_over_update",
+                params=leftover_pair.to_dict(),
+                method="GET",
+                queue_name="calibrate-leftover-senses"
             )

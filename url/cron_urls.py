@@ -1,7 +1,8 @@
 from cron.datastore_cron import ActiveDevicesHistory15MinutesPurge, ActiveDevicesHistoryPurge, \
     StoreRecentlyActiveDevicesStats15Minutes, StoreRecentlyActiveDevicesStatsDaily, \
     StoreRecentlyActiveDevicesStatsMinute
-from cron.dust_calibration_cron import DustCalibrationUpdateQueue, DustCalibrationUpdate
+from cron.dust_calibration_cron import DustCalibrationUpdateQueue, DustCalibrationUpdate, \
+    DustCalibrationLeftOverUpdateQueue, DustCalibrationLeftOverUpdate
 from cron.firmware_cron import FirmwareLogsAlert, StoreLogsFacet, StoreLogsFacetQueue
 from cron.geckoboard_cron import AlarmsCountPush, DevicesCountPush
 from cron.searchify_cron import DropOldSenseLogsSearchifyIndex
@@ -29,4 +30,6 @@ routes = [
     ('/cron/store_logs_facet_queue/?$', StoreLogsFacetQueue),
     ('/cron/dust_calibration_update/?$', DustCalibrationUpdate),
     ('/cron/dust_calibration_update_queue/?$', DustCalibrationUpdateQueue),
+    ('/cron/dust_calibration_leftover_update/?$', DustCalibrationLeftOverUpdate),
+    ('/cron/dust_calibration_leftover_update_queue/?$', DustCalibrationLeftOverUpdateQueue),
 ]
