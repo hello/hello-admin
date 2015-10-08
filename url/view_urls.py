@@ -1,4 +1,5 @@
-from view.views import AccountProfileView, RoomConditionsMinuteView, TimelineV2View, LogsFacetHistoryView
+from view.views import AccountProfileView, RoomConditionsMinuteView, TimelineV2View, LogsFacetHistoryView, \
+    TimelineLogsView
 from view.views import ActiveDevicesHistoryView
 from view.views import AlarmRingsHistoryView
 from view.views import AlarmsView
@@ -91,4 +92,5 @@ routes = [
     ('/sense_uptime/?$', SenseUptimeView),
     ('/timeline_v2/?$', TimelineV2View),
     ('/logs_facet_history/?$', LogsFacetHistoryView),
+    ('/timeline_logs/?$', TimelineLogsView),
 ]

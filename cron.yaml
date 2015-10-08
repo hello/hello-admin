@@ -40,4 +40,4 @@ cron:
   schedule: every 60 mins
 - description: dust calibration update queue
   url: /cron/dust_calibration_update_queue
-  schedule: every 2 days
+  schedule: every day 09:00

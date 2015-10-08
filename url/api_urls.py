@@ -55,7 +55,7 @@ from api.setup import UpdateAdminAccessTokenAPI
 from api.setup import UpdateGeckoBoardCredentials
 from api.setup import ViewPermissionAPI
 from api.team import TeamsAPI
-from api.timeline import TimelineAPI, TimelineV2API
+from api.timeline import TimelineAPI, TimelineV2API, TimelineLogsAPI
 from api.timezone import TimezoneAPI
 from api.timezone import TimezoneHistoryAPI
 from api.wifi import WifiInfoAPI
@@ -63,7 +63,6 @@ from api.zendesk import ZendeskAPI
 from api.zendesk import ZendeskHistoryAPI
 from api.zendesk import ZendeskNowAPI
 from api.zendesk import ZendeskStatsAPI
-import settings
 from api.order import OrdersMapAPI
 from api.timeline import TimelineAlgorithmAPI
 from api.device import ColorlessSensesAPI
@@ -153,5 +152,6 @@ routes = [
     ('/api/dust_calibration/?$', DustCalibrationAPI),
     ('/api/dust_offset/?$', DustOffsetAPI),
     ('/api/wifi_info/?$', WifiInfoAPI),
+    ('/api/timeline_logs/?$', TimelineLogsAPI),
 ]
 

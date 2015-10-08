@@ -1,41 +1,84 @@
 import json
 import logging as log
 import time
+from api.calibration import AVG_CALIBRATED_ADC, BASE, K_FACTOR
 from core.handlers.base import BaseCron
 from google.appengine.api import taskqueue
+from models.ext import DustCalibrationCheckPoint
+from google.appengine.api import urlfetch
 
+DUST_CALIBRATION_CHECKPOINT_KEY = "checkpoint"
+MAX_RECENT_PAIRS_PAGES = 20
 
 class DustCalibrationUpdate(BaseCron):
     def get(self):
-        self.send_to_slack_admin_logs_channel("cron-bot has put a new calibration {}".format(self.request.body))
+        urlfetch.set_default_fetch_deadline(60)
+        avg_dust_response = self.hello_request(
+            api_url="calibration/average_dust/{}".format(self.request.get("account_id")),
+            url_params={"sense_internal_id": self.request.get("internal_device_id")},
+            type="GET",
+            raw_output=True
+        )
+
+        if avg_dust_response.error or not avg_dust_response.data:
+            log.error(avg_dust_response.error)
+            return
+
+        adc_offset = int((AVG_CALIBRATED_ADC - avg_dust_response.data.values()[0] - BASE)/(-1 * K_FACTOR))
+        body_data = json.dumps({
+                "tested_at": int(time.time() * 1000),
+                "sense_id": self.request.get("external_device_id"),
+                "dust_offset": adc_offset
+            })
         self.hello_request(
             api_url="calibration",
-            body_data=json.dumps({
-                "tested_at": self.request.get("tested_at"),
-                "sense_id": self.request.get("sense_id"),
-                "dust_offset": self.request.get("dust_offset")
-            }),
+            body_data=body_data,
             type="PUT"
         )
+        log.info("cron-bot has put a new calibration {}".format(body_data))
+        # self.send_to_slack_admin_logs_channel("cron-bot has put a new calibration {}".format(self.request.body))
 
 
 class DustCalibrationUpdateQueue(BaseCron):
     def get_recent_pairs(self):
-        recent_pairs_response = self.hello_request(
-            api_url="account/recent_pairs",
-            type="GET",
-            url_params={
+        recent_pairs = []
+        checkpoint = DustCalibrationCheckPoint.get_by_id(DUST_CALIBRATION_CHECKPOINT_KEY)
+        max_id = None
+        iter = 0
+        while True:
+            iter += 1
+            if iter > MAX_RECENT_PAIRS_PAGES:
+                log.warn("hitting ceiling pagination when getting recent pairs")
+                break
+            url_params = {
                 "min_up_days": self.request.get("min_up_days", default_value=10),
-                "limit": self.request.get("min_up_days", default_value=200),
-                "max_id": self.request.get("max_id", default_value=1000000000000),
-            },
-            raw_output=True
-        )
-        if recent_pairs_response.error:
-            log.error("Failed to get recent pairs {}".format(recent_pairs_response.error))
-            return []
+                "limit": self.request.get("litmit", default_value=200),
+            }
+            if max_id:
+                url_params["max_id"] = max_id
+            recent_pairs_response = self.hello_request(
+                api_url="account/recent_pairs",
+                type="GET",
+                url_params=url_params,
+                raw_output=True
+            )
 
-        return recent_pairs_response.data
+            if not recent_pairs_response.data:
+                break
+
+            max_id = recent_pairs_response.data[-1].get("internal_device_id") - 1
+
+            if checkpoint is not None and max_id <= checkpoint.max_id:
+                break
+
+            if not recent_pairs_response.error:
+                recent_pairs += recent_pairs_response.data
+        if recent_pairs:
+            DustCalibrationCheckPoint(
+                id=DUST_CALIBRATION_CHECKPOINT_KEY,
+                max_id=recent_pairs[0].get("internal_device_id")
+            ).put()
+        return recent_pairs
 
     def get_calibration_batch(self, sense_ids):
         calibration_batch_response = self.hello_request(
@@ -53,6 +96,7 @@ class DustCalibrationUpdateQueue(BaseCron):
 
     def get_recent_uncalibrated_pairs(self):
         recent_pairs = self.get_recent_pairs()
+
         calibrated_map = self.get_calibration_batch([t.get("external_device_id") for t in recent_pairs])
         calibrated_sense_ids = calibrated_map.keys()
 
@@ -60,34 +104,17 @@ class DustCalibrationUpdateQueue(BaseCron):
         return uncalibrated_pairs
 
 
-    def make_calibration(self, uncalibrated_pairs):
-        calibrations = []
-        for uncalibrated_pair in uncalibrated_pairs:
-            avgOffsetResponse = self.hello_request(
-                api_url="calibration/average_dust/{}".format(uncalibrated_pair.get("account_id")),
-                url_params={"sense_internal_id": uncalibrated_pair.get("internal_device_id")},
-                type="GET",
-                raw_output=True
-            )
-            if avgOffsetResponse.error or not avgOffsetResponse.data:
-                break
-            calibrations.append({
-                "tested_at": int(time.time() * 1000),
-                "sense_id": uncalibrated_pair.get("external_device_id"),
-                "dust_offset": avgOffsetResponse.data.values()[0]
-            })
-        return calibrations
-
     def get(self):
         # Only calibrate for new senses which did not have calibration record and been online long enough
+        urlfetch.set_default_fetch_deadline(60)
         uncalibrated_pairs = self.get_recent_uncalibrated_pairs()
-        calibrations = self.make_calibration(uncalibrated_pairs)
-        log.info("calibrations {}".format(calibrations))
-
-        for calibration in calibrations:
+        if not uncalibrated_pairs:
+            log.info("There is no sense in need of calibration in this job")
+        log.info("Attempt to calibrate for {} pairs: {}".format(len(uncalibrated_pairs), uncalibrated_pairs))
+        for uncalibrated_pair in uncalibrated_pairs:
             taskqueue.add(
                 url="/cron/dust_calibration_update",
-                params=calibration,
+                params=uncalibrated_pair,
                 method="GET",
                 queue_name="calibrate-recent-senses"
             )

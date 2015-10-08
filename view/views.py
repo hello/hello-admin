@@ -241,3 +241,8 @@ class LogsFacetHistoryView(ProtectedRequestHandler):
         self.render_to_response(template_file='logs_facet_history.html',
                                 context={'title': "Logs Facet History"})
 
+class TimelineLogsView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='timeline_logs.html',
+                                context={'title': "Timeline logs"})
+
