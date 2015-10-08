@@ -4,7 +4,7 @@ import time
 from api.calibration import AVG_CALIBRATED_ADC, BASE, K_FACTOR
 from core.handlers.base import BaseCron
 from google.appengine.api import taskqueue
-from models.ext import DustCalibrationCheckPoint
+from models.ext import DustCalibrationCheckPoint, DustCalibrationLeftOverPairs
 from google.appengine.api import urlfetch
 
 DUST_CALIBRATION_CHECKPOINT_KEY = "checkpoint"
@@ -25,6 +25,12 @@ class DustCalibrationUpdate(BaseCron):
             return
         if avg_dust_response.data.values()[0] == 0:
             log.info("cron-bot reject updating calibration because avg_dust last N days is 0 for {}".format(self.request.get("external_device_id")))
+            DustCalibrationLeftOverPairs(
+                id=self.request.get("external_device_id"),
+                account_id=self.request.get("account_id"),
+                internal_device_id=self.request.get("internal_device_id"),
+                external_device_id=self.request.get("external_device_id")
+            ).put()
             return
 
         adc_offset = int((AVG_CALIBRATED_ADC - avg_dust_response.data.values()[0] - BASE)/(-1 * K_FACTOR))
