@@ -23,6 +23,9 @@ class DustCalibrationUpdate(BaseCron):
         if avg_dust_response.error or not avg_dust_response.data:
             log.error(avg_dust_response.error)
             return
+        if avg_dust_response.data.values()[0] == 0:
+            log.info("cron-bot reject updating calibration because avg_dust last N days is 0 for {}".format(self.request.get("external_device_id")))
+            return
 
         adc_offset = int((AVG_CALIBRATED_ADC - avg_dust_response.data.values()[0] - BASE)/(-1 * K_FACTOR))
         body_data = json.dumps({
@@ -36,7 +39,6 @@ class DustCalibrationUpdate(BaseCron):
             type="PUT"
         )
         log.info("cron-bot has put a new calibration {}".format(body_data))
-        # self.send_to_slack_admin_logs_channel("cron-bot has put a new calibration {}".format(self.request.body))
 
 
 class DustCalibrationUpdateQueue(BaseCron):
