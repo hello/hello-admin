@@ -193,3 +193,10 @@ class LogsFacet(ndb.Model):
 
 class DustCalibrationCheckPoint(ndb.Model):
     max_id = ndb.IntegerProperty(required=True, indexed=False)
+
+
+class DustCalibrationLeftOverPairs(ndb.Model):
+    account_id = ndb.IntegerProperty(required=True, indexed=False)
+    internal_device_id = ndb.IntegerProperty(required=True, indexed=False)
+    external_device_id = ndb.StringProperty(required=True, indexed=False)
+
