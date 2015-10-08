@@ -17,7 +17,7 @@ import logging as log
 class FirmwareLogsAlert(ProtectedRequestHandler):
     @property
     def keywords(self):
-        return ["i2c recovery", "ASSERT", "fail", "fault", "bounce", "Bouncing"]
+        return ["i2c recovery", "ASSERT", "fault", "bounce", "Bouncing"]
 
     def get(self):
         output = {}
