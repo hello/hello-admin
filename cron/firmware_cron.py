@@ -17,7 +17,7 @@ import logging as log
 class FirmwareLogsAlert(ProtectedRequestHandler):
     @property
     def keywords(self):
-        return ["i2c recovery", "ASSERT", "fault", "bounce", "Bouncing"]
+        return ["i2c recovery", "ASSERT", "fault", "bounce", "Bouncing", "Bond Corruption"]
 
     def get(self):
         output = {}
@@ -34,7 +34,7 @@ class FirmwareLogsAlert(ProtectedRequestHandler):
         for keyword in self.keywords:
             searchify_query = SearchifyQuery()
             searchify_query.set_query("text:{}".format(keyword))
-            searchify_query.set_fetch_fields(["top_fw_version", "middle_fw_version", "device_id"])
+            searchify_query.set_fetch_fields(["top_fw_version", "middle_fw_version", "device_id", "text"])
             searchify_query.set_docvar_filters({0: [[utc_now_secs - 1*3600, utc_now_secs]]})
             response = index.search(**searchify_query.mapping())
 
@@ -58,6 +58,10 @@ class FirmwareLogsAlert(ProtectedRequestHandler):
                         not r.get("middle_fw_version"),
                         not r.get("device_id")]):
                     continue
+
+                if keyword == "ASSERT" and "NET TIMEOUT" in r["text"]:
+                    continue
+
                 total_legit_crash_logs += 1
                 if r.get("top_fw_version"):
                     top_fw_list.append(r.get("top_fw_version"))
@@ -116,7 +120,7 @@ class StoreLogsFacet(LogsFacetAPI):
 class StoreLogsFacetQueue(StoreLogsFacet):
     @property
     def patterns(self):
-        return ["i2c recovery", "boot completed", "ASSERT", "fail", "fault", "bounce", "Bouncing"]
+        return ["i2c recovery", "boot completed", "ASSERT", "fail", "fault", "bounce", "Bouncing", "Bond Corruption"]
 
     @property
     def middle_fw_versions(self):
