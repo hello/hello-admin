@@ -10,11 +10,8 @@ from google.appengine.api import urlfetch
 DUST_CALIBRATION_CHECKPOINT_KEY = "checkpoint"
 MAX_RECENT_PAIRS_PAGES = 20
 
-class DustCalibrationUpdate(BaseCron):
-    def get(self):
-        self.calibrate(False)
+class DustCalibration(BaseCron):
     def calibrate(self, is_leftover):
-        urlfetch.set_default_fetch_deadline(60)
         avg_dust_response = self.hello_request(
             api_url="calibration/average_dust/{}".format(self.request.get("account_id")),
             url_params={"sense_internal_id": int(self.request.get("internal_device_id"))},
@@ -51,6 +48,12 @@ class DustCalibrationUpdate(BaseCron):
         if is_leftover:
             DustCalibrationLeftOverPairs.get_by_id(self.request.get("external_device_id")).key.delete()
         log.info("cron-bot has put a new calibration {}".format(body_data))
+
+
+class DustCalibrationUpdate(DustCalibration):
+    def get(self):
+        urlfetch.set_default_fetch_deadline(60)
+        self.calibrate(False)
 
 
 class DustCalibrationUpdateQueue(BaseCron):
@@ -134,9 +137,10 @@ class DustCalibrationUpdateQueue(BaseCron):
             )
 
 
-class DustCalibrationLeftOverUpdate(DustCalibrationUpdate):
+class DustCalibrationLeftOverUpdate(DustCalibration):
     def get(self):
-        return self.calibrate(True)
+        urlfetch.set_default_fetch_deadline(60)
+        self.calibrate(True)
 
 
 class DustCalibrationLeftOverUpdateQueue(BaseCron):
@@ -145,10 +149,11 @@ class DustCalibrationLeftOverUpdateQueue(BaseCron):
 
     def get(self):
         leftover_pairs = self.get_leftover_pairs()
-        log.info("Attempt to calibrate for {} leftover pairs: {}".format(len(leftover_pairs)))
+        log.info("Attempt to calibrate for {} leftover pairs".format(leftover_pairs.count()))
+
         for leftover_pair in leftover_pairs:
             taskqueue.add(
-                url="/cron/dust_calibration_left_over_update",
+                url="/cron/dust_calibration_leftover_update",
                 params=leftover_pair.to_dict(),
                 method="GET",
                 queue_name="calibrate-leftover-senses"
