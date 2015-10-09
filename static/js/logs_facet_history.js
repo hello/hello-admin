@@ -56,8 +56,9 @@ var LogFacetsHistory = React.createClass({
 var LogFacetsHistoryMaestro = React.createClass({
     render: function() {
         return <div>
-            <Col xs={6}><LogFacetsHistory dateId="date1"/></Col>
-            <Col xs={6}><LogFacetsHistory dateId="date2"/></Col>
+            <Col xs={12}><LogFacetsHistory dateId="date1"/></Col>
+            <Col xs={12}>vs</Col>
+            <Col xs={12}><LogFacetsHistory dateId="date2"/></Col>
         </div>
     }
 });
