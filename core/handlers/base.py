@@ -230,6 +230,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
                     output.set_data({})
         if not response.ok:
             output.set_error(response.content)
+            self.response.headers.add_header("err", response.content)
 
         if raw_output is True:
             return output

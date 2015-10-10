@@ -28,6 +28,52 @@ var Badge = ReactBootstrap.Badge;
 var Popover = ReactBootstrap.Popover;
 var OverlayTrigger = ReactBootstrap.OverlayTrigger;
 
+
+var ErrorModal = React.createClass({
+    render: function() {
+        return <Modal animation={true}>
+            <div className='modal-body'>
+                <div className="modal-title">{this.props.err}</div>
+            </div>
+            <div className='modal-footer'>
+                <Button className="btn-round btn-fade" onClick={this.props.onRequestHide}>X</Button>
+            </div>
+        </Modal>;
+    }
+});
+
+
+var Err = React.createClass({
+    getInitialState: function() {
+        return {err: ""}
+    },
+    componentDidMount() {
+        $.ajaxSetup({
+            global: true,
+            dataType: 'json',
+            contentType: 'application/json',
+            complete: function(jqXHR) {
+                this.setState({err: jqXHR.getResponseHeader("err")});
+            }.bind(this)
+        });
+    },
+    render: function() {
+        return this.state.err ? <ModalTrigger modal={<ErrorModal err={this.state.err}/>}>
+            <span className="cursor-hand">View Error</span>
+        </ModalTrigger> : null;
+    }
+});
+
+if (React.render) {
+    React.render(<Err/>, document.getElementById("err"));
+}
+else {
+    React.renderComponent(<Err/>, document.getElementById("err"));
+}
+
+
+
+
 if (typeof String.prototype.startsWith != 'function') {
   String.prototype.startsWith = function (str){
     return this.indexOf(str) === 0;
