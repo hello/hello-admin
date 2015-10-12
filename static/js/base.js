@@ -51,7 +51,6 @@ var Err = React.createClass({
         $.ajaxSetup({
             global: true,
             dataType: 'json',
-            contentType: 'application/json',
             complete: function(jqXHR) {
                 this.setState({err: jqXHR.getResponseHeader("err")});
             }.bind(this)
