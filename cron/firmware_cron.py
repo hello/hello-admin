@@ -90,12 +90,12 @@ class FirmwareLogsAlert(ProtectedRequestHandler):
                 message += "\n\n```Breakdown by sense external ID"
                 for x in sorted(Counter(sense_id_list).items(), key=operator.itemgetter(1), reverse=True):
                     message += "\n {} \t {}".format(x[0], x[1])
-                message += "```"
+                message += "```\n\n"
             messages += message
 
         output["messages"] = messages
         if messages:
-            self.send_to_slack_admin_logs_channel(messages)
+            self.slack_pusher.send_to_admin_logs_channel(messages)
         self.response.write(json.dumps(output))
 
 

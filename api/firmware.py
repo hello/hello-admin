@@ -133,7 +133,7 @@ class FirmwareGroupPathAPI(SuperFirmwareRequestHandler):
             body_data['from_fw_version'],
             body_data['to_fw_version'],
             body_data['rollout_percent'])
-        self.send_to_slack_deploys_channel(message_text)
+        self.slack_pusher.send_to_deploys_channel(message_text)
 
     def post(self):
         body = json.loads(self.request.body)
@@ -147,5 +147,5 @@ class FirmwareGroupPathAPI(SuperFirmwareRequestHandler):
             self.current_user_email,
             body.get("group_name"),
             body.get("from_fw_version"))
-        self.send_to_slack_deploys_channel(message_text)
+        self.slack_pusher.send_to_deploys_channel(message_text)
 

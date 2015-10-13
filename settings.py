@@ -3,6 +3,7 @@ from models.setup import AppInfo
 from models.ext import SearchifyCredentials
 from models.ext import ZendeskCredentials
 from models.ext import GeckoboardCredentials
+from  collections import namedtuple
 
 DEBUG = False
 ENVIRONMENT = "prod"
@@ -41,10 +42,27 @@ SENSE_LOGS_KEEP_DAYS = 7
 ## Papertrail
 PAPERTRAIL_TOKEN = "AllkLtsvxLdFfsneCb3"
 
-
 # Slack
-SLACK_DEPLOYS_WEBHOOK_URL = 'https://hooks.slack.com/services/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'
-SLACK_STATS_WEBHOOK_URL = 'https://hooks.slack.com/services/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'
-SLACK_ADMIN_LOGS_WEBHOOK_URL = 'https://hooks.slack.com/services/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'
-
-
+SlackWebhookConfig = namedtuple("SlackWebhookConfig", "url bot icon")
+SLACK_WEBHOOK = {
+    "deploys": SlackWebhookConfig(
+        url="https://hooks.slack.com/services/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",
+        bot="deploy-bot",
+        icon=":ghost:"
+    ),
+    "stats": SlackWebhookConfig(
+        url="https://hooks.slack.com/services/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",
+        bot="stats-bot",
+        icon=":hammer:"
+    ),
+    "admin_logs": SlackWebhookConfig(
+        url="https://hooks.slack.com/services/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",
+        bot="admin-logs-bot",
+        icon=":snake:"
+    ),
+    "dust_calibration": SlackWebhookConfig(
+        url="https://hooks.slack.com/services/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",
+        bot="dusty-bot",
+        icon=":thought_balloon:"
+    ),
+}

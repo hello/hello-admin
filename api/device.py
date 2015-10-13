@@ -48,7 +48,7 @@ class DeviceAPI(ProtectedRequestHandler):
             type="POST",
             body_data=json.dumps(post_data),
         )
-        self.send_to_slack_admin_logs_channel("{} helped {} pair {} {}".format(self.current_user_email, email, device_type, device_id))
+        self.slack_pusher.send_to_admin_logs_channel("{} helped {} pair {} {}".format(self.current_user_email, email, device_type, device_id))
 
 
     def put(self):
@@ -62,7 +62,7 @@ class DeviceAPI(ProtectedRequestHandler):
             type="DELETE",
             url_params={"unlink_all": unlink_all}
         )
-        self.send_to_slack_admin_logs_channel("{} helped {} unpair {} {}".format(self.current_user_email, email, device_type, device_id))
+        self.slack_pusher.send_to_admin_logs_channel("{} helped {} unpair {} {}".format(self.current_user_email, email, device_type, device_id))
 
 class DeviceByEmailAPI(ProtectedRequestHandler):
     def get(self):
@@ -118,9 +118,9 @@ class DeviceKeyStoreAPI(ProtectedRequestHandler):
         )
 
         if raw_output.error:
-            self.send_to_slack_admin_logs_channel("{} {} - {}".format(device_type, device_id, raw_output.error))
+            self.slack_pusher.send_to_admin_logs_channel("{} {} - {}".format(device_type, device_id, raw_output.error))
         elif not raw_output.data.get("key", None):
-            self.send_to_slack_admin_logs_channel("{} {} has blank key".format(device_type, device_id))
+            self.slack_pusher.send_to_admin_logs_channel("{} {} has blank key".format(device_type, device_id))
         self.response.write(raw_output.get_serialized_output())
 
 
