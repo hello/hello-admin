@@ -4,7 +4,7 @@ from api.calibration import DustCalibrationAPI, DustOffsetAPI
 from api.namespace import NamespaceAPI
 from api.password import PasswordResetAPI, PasswordForceUpdateAPI
 from api.feature import FeaturesAPI
-from api.device import ActiveDevices15MinutesHistoryAPI
+from api.device import ActiveDevices15MinutesHistoryAPI, PillColorAPI
 from api.device import ActiveDevicesDailyHistoryAPI
 from api.device import ActiveDevicesMinuteHistoryAPI
 from api.device import DeviceAPI
@@ -153,5 +153,6 @@ routes = [
     ('/api/wifi_info/?$', WifiInfoAPI),
     ('/api/timeline_logs/?$', TimelineLogsAPI),
     ('/api/logs_facet_history/?$', LogsFacetHistoryAPI),
+    ('/api/pill_color/?$', PillColorAPI),
 ]
 

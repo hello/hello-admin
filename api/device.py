@@ -232,3 +232,11 @@ class SenseBlackListAPI(ProtectedRequestHandler):
             type="PUT",
             body_data=json.dumps(aggregate_black_list)
         )
+
+
+class PillColorAPI(ProtectedRequestHandler):
+    def get(self):
+        self.hello_request(
+            api_url="devices/pill_color/{}/{}".format(self.request.get("pill_id"), self.request.get("account_id")),
+            type="GET",
+        )
