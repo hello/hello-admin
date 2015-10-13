@@ -11,6 +11,7 @@ from google.appengine.api import memcache
 import requests
 
 from core.models.response import ResponseOutput
+from core.models.slack import Slack
 from core.utils.common import stripStringToList, extract_dicts_by_fields
 from models.ext import SearchifyCredentials, ZendeskCredentials, GeckoboardCredentials
 from rauth import OAuth2Service
@@ -21,6 +22,7 @@ from models.setup import AdminUser
 from models.setup import UserGroup
 from core.models.authentication import ApiInfo, SURIPU_APP_ID, SURIPU_ADMIN_ID, SURIPU_APP_V2_ID, AVAILABLE_NAMESPACES, \
     LOCAL_AVAILABLE_NAMESPACES
+
 
 
 class BaseRequestHandler(webapp2.RequestHandler):
@@ -265,29 +267,9 @@ class BaseRequestHandler(webapp2.RequestHandler):
     def error_log(self):
         return
 
-    def send_to_slack(self, webhook, payload):
-        if self.namespace == "dev":
-            return
-        try:
-            requests.post(webhook, data=json.dumps(payload), headers={"Content-Type": "application/json"})
-        except Exception as e:
-            log.error("Slack notification failed: %s", e)
-
-    def send_to_slack_deploys_channel(self, message_text=''):
-        self.send_to_slack(webhook=self.slack_deploys_webhok,
-                           payload={'text': "<{}> {}".format(self.namespace, message_text), "icon_emoji": ":ghost:", "username": "deploy-bot"})
-
-    def send_to_slack_stats_channel(self, message_text=''):
-        self.send_to_slack(webhook=self.slack_stats_webhook,
-                           payload={'text': "<{}> {}".format(self.namespace, message_text), "icon_emoji": ":hammer:", "username": "stats-bot"})
-
-    def send_to_slack_admin_logs_channel(self, message_text=''):
-        self.send_to_slack(webhook=self.slack_admin_webhook,
-                           payload={'text': "<{}> {}".format(self.namespace, message_text), "icon_emoji": ":snake:", "username": "admin-logs-bot", "link_names": 1})
-
-    def send_to_slack_dust_calibration_channel(self, message_text=''):
-        self.send_to_slack(webhook=self.slack_dust_calibration_webhook,
-                           payload={'text': "<{}> {}".format(self.namespace, message_text), "icon_emoji": ":thought_balloon:", "username": "dusty-bot", "link_names": 1})
+    @property
+    def slack_pusher(self):
+        return Slack(self.namespace)
 
     def make_oauth2_service(self, api_info):
         """

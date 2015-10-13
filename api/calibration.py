@@ -12,7 +12,7 @@ class DustCalibrationAPI(ProtectedRequestHandler):
         )
 
     def put(self):
-        self.send_to_slack_admin_logs_channel("{} has put a new calibration {}".format(self.current_user, self.request.body))
+        self.slack_pusher.send_to_dust_calibration_channel("{} has put a new calibration {}".format(self.current_user, self.request.body))
         self.hello_request(
             api_url="calibration",
             body_data=self.request.body,

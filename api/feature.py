@@ -54,4 +54,4 @@ class FeaturesAPI(FirmwareRequestHandler):
                     ','.join(body_data['ids']),
                     ','.join(body_data['groups']),
                     body_data['percentage'])
-            self.send_to_slack_deploys_channel(message_text)
+            self.slack_pusher.send_to_deploys_channel(message_text)

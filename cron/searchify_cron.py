@@ -35,5 +35,5 @@ class DropOldSenseLogsSearchifyIndex(BaseCron):
 
         dumped_output = json.dumps(output)
         log.info(dumped_output)
-        self.send_to_slack_stats_channel(dumped_output)
+        self.slack_pusher.send_to_stats_channel(dumped_output)
         self.response.write(dumped_output)

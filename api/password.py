@@ -16,7 +16,7 @@ class PasswordResetAPI(ProtectedRequestHandler):
             type="POST",
             body_data=json.dumps({"email": email})
         )
-        self.send_to_slack_admin_logs_channel("Employee {} sent a link to reset password to customer {}".format(self.current_user_email, email))
+        self.slack_pusher.send_to_admin_logs_channel("Employee {} sent a link to reset password to customer {}".format(self.current_user_email, email))
 
 
 class PasswordForceUpdateAPI(CustomerExperienceRequestHandler):
@@ -32,4 +32,4 @@ class PasswordForceUpdateAPI(CustomerExperienceRequestHandler):
             type="POST",
             body_data=json.dumps({"email": email, "password": password}),
         )
-        self.send_to_slack_admin_logs_channel("Employee {} hard-reseted password for customer {}".format(self.current_user_email, email))
+        self.slack_pusher.send_to_admin_logs_channel("Employee {} hard-reseted password for customer {}".format(self.current_user_email, email))

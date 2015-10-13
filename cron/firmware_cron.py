@@ -95,7 +95,7 @@ class FirmwareLogsAlert(ProtectedRequestHandler):
 
         output["messages"] = messages
         if messages:
-            self.send_to_slack_admin_logs_channel(messages)
+            self.slack_pusher.send_to_admin_logs_channel(messages)
         self.response.write(json.dumps(output))
 
 

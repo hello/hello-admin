@@ -61,4 +61,4 @@ class TeamsAPI(FirmwareRequestHandler):
             teams_response.status
         )
 
-        self.send_to_slack_deploys_channel(message_text)
+        self.slack_pusher.send_to_deploys_channel(message_text)
