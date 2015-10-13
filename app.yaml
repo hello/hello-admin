@@ -1,5 +1,5 @@
 application: 'hello-admin'
-version: 55h
+version: 55i
 
 runtime: python27
 api_version: 1
