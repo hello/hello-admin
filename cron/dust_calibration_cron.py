@@ -24,7 +24,9 @@ class DustCalibration(BaseCron):
             return
 
         if avg_dust_response.data.values()[0] == 0:
-            log.info("cron-bot reject updating calibration because avg_dust last N days is 0 for {}".format(self.request.get("external_device_id")))
+            reject_message = "cron-bot reject updating calibration because avg_dust last N days is 0 for {}".format(self.request.get("external_device_id"))
+            log.info(reject_message)
+            self.send_to_slack_admin_logs_channel(reject_message)
             if not is_leftover:
                 DustCalibrationLeftOverPairs(
                     id=self.request.get("external_device_id"),
@@ -47,7 +49,9 @@ class DustCalibration(BaseCron):
         )
         if is_leftover:
             DustCalibrationLeftOverPairs.get_by_id(self.request.get("external_device_id")).key.delete()
-        log.info("cron-bot has put a new calibration {}".format(body_data))
+        success_message = "cron-bot has put a new calibration {}".format(body_data)
+        log.info(success_message)
+        self.send_to_slack_admin_logs_channel(success_message)
 
 
 class DustCalibrationUpdate(DustCalibration):
