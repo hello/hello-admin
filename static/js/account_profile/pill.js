@@ -19,15 +19,15 @@ var PillSummary = React.createClass({
     },
 
     componentDidUpdate: function(nextProps, nextState) {
-        var currentPillId = this.props.pillResponse.data && this.props.pillResponse.data.length > 0  ? this.props.pillResponse.data[0].device_account_pair.external_device_id : null;
-        var nextPillId = nextProps.pillResponse.data && nextProps.pillResponse.data.length > 0  ? nextProps.pillResponse.data[0].device_account_pair.external_device_id : null;
+        var currentSenseId = this.props.senseResponse.data && this.props.senseResponse.data.length > 0  ? this.props.senseResponse.data[0].device_account_pair.external_device_id : null;
+        var nextSenseId = nextProps.senseResponse.data && nextProps.senseResponse.data.length > 0  ? nextProps.senseResponse.data[0].device_account_pair.external_device_id : null;
         var currentAccountId = this.props.pillResponse.data && this.props.pillResponse.data.length > 0  ? this.props.pillResponse.data[0].device_account_pair.account_id : null;
         var nextAccountId = nextProps.pillResponse.data && nextProps.pillResponse.data.length > 0  ? nextProps.pillResponse.data[0].device_account_pair.account_id : null;
 
-        if (currentPillId === nextPillId && currentAccountId === nextAccountId) {
+        if (currentSenseId === nextSenseId && currentAccountId === nextAccountId) {
            return false;
         }
-        this.getPillColor(currentPillId, currentAccountId);
+        this.getPillColor(currentSenseId, currentAccountId);
     },
 
     render: function() {
