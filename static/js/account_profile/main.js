@@ -537,7 +537,7 @@ var AccountProfile = React.createClass({
                 <Tile img="svg/timezone.svg" title="Timezone History" content={<TimezoneHistoryTile timezoneHistoryResponse={this.state.timezoneHistoryResponse} />} />
             </Col>,
             <Col xs={12} lg={4} className="paddingless-left">
-                <Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary pillResponse={this.state.pillResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} email={this.state.email} />} />
+                <Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary senseResponse={this.state.senseResponse} pillResponse={this.state.pillResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} email={this.state.email} />} />
                 <Tile img="svg/uptime.svg" title="Sense Online Uptime" content={<UptimeTile email={this.state.email} />} />
                 <Tile img="svg/wifi.svg" title="Wifi Info" content={<WifiTile senseId={senseId} />} />
             </Col>
