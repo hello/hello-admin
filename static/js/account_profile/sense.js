@@ -189,26 +189,67 @@ var DustOffsetUpdateModal = React.createClass({
 
 var SenseSummary = React.createClass({
     getInitialState: function() {
-        return {dustOffset: null}
+        return {dustOffset: null, unhashedFirmware: null, dustCalibration: null};
+    },
+    componentDidUpdate: function(nextProps, nextState) {
+        var currentSenseId = this.props.senseResponse.data && this.props.senseResponse.data.length > 0  ? this.props.senseResponse.data[0].device_account_pair.external_device_id : null;
+        var nextSenseId = nextProps.senseResponse.data && nextProps.senseResponse.data.length > 0  ? nextProps.senseResponse.data[0].device_account_pair.external_device_id : null;
+        if (currentSenseId === nextSenseId) {
+           return false;
+        }
+
+        var senseResponse = this.props.senseResponse;
+        var firmwareVersion = senseResponse.data[0].device_status ? senseResponse.data[0].device_status.firmware_version : undefined;
+        this.getUnhashedFirmware(firmwareVersion);
+
+        var accountId = senseResponse.data[0].device_account_pair ? senseResponse.data[0].device_account_pair.account_id : undefined;
+        var senseId = senseResponse.data[0].device_account_pair ? senseResponse.data[0].device_account_pair.external_device_id : undefined;
+        var senseInternalId = senseResponse.data[0].device_account_pair ? senseResponse.data[0].device_account_pair.internal_device_id : undefined;
+        this.getDustCalibration(senseId, accountId, senseInternalId);
     },
 
-    loadUnhashedFirmware: function(version, senseId) {
+    getUnhashedFirmware: function(firmwareVersion) {
         $.ajax({
             url: "/api/firmware_unhash",
             dataType: 'json',
             type: 'GET',
-            async: false,
-            data: {version: version},
+            data: {version: firmwareVersion},
             success: function(response) {
                 if (response.error.isWhiteString()) {
-                    version = <div>
-                        {version || <span className="not-ok">unknown</span>}
+                    this.setState({unhashedFirmware: <div>
+                        {firmwareVersion || <span className="not-ok">unknown</span>}
                         <span> {response.data.join(", ") ? "(" + response.data.join(", ") + ")" : null}</span>
-                    </div>;
+                    </div>});
                 }
-            }
+                else {
+                    this.setState({unhashedFirmware: <span className="not-ok">--</span>});
+                }
+            }.bind(this)
         });
-        return version;
+    },
+
+    getDustCalibration: function(senseId, accountId, senseInternalId) {
+        $.ajax({
+            url: "/api/dust_calibration",
+            dataType: 'json',
+            type: 'GET',
+            data: {sense_id: senseId},
+            success: function(response) {
+                if (response.error.isWhiteString()){
+                    this.setState({dustCalibration: <div>
+                        <span>{response.data.dust_calibration_delta} </span>
+                        <ModalTrigger modal={<DustOffsetUpdateModal senseId={senseId} accountId={accountId} senseInternalId={senseInternalId} />}>
+                            <Button bsSize="xsmall">Re-compute</Button>
+                        </ModalTrigger>
+                    </div>});
+                }
+                else {
+                    this.setState({dustCalibration: <ModalTrigger modal={<DustOffsetUpdateModal senseId={senseId} accountId={accountId} senseInternalId={senseInternalId} />}>
+                <Button bsSize="xsmall">Compute</Button>
+            </ModalTrigger>});
+                }
+            }.bind(this)
+        });
     },
 
     closePopoverManually: function() {
@@ -231,29 +272,7 @@ var SenseSummary = React.createClass({
         return false;
     },
 
-    getDustCalibration: function(senseId, accountId, senseInternalId) {
-        var dustCalibration = <ModalTrigger modal={<DustOffsetUpdateModal senseId={senseId} accountId={accountId} senseInternalId={senseInternalId} />}>
-                <Button bsSize="xsmall">Compute</Button>
-            </ModalTrigger>;
-        $.ajax({
-            url: "/api/dust_calibration",
-            dataType: 'json',
-            type: 'GET',
-            async: false,
-            data: {sense_id: senseId},
-            success: function(response) {
-                if (response.error.isWhiteString()){
-                    dustCalibration = <div>
-                        <span>{response.data.dust_calibration_delta} </span>
-                        <ModalTrigger modal={<DustOffsetUpdateModal senseId={senseId} accountId={accountId} senseInternalId={senseInternalId} />}>
-                            <Button bsSize="xsmall">Re-compute</Button>
-                        </ModalTrigger>
-                    </div>;
-                }
-            }.bind(this)
-        });
-        return dustCalibration;
-    },
+
 
     render: function() {
         var senseResponse = this.props.senseResponse,
@@ -288,7 +307,6 @@ var SenseSummary = React.createClass({
             }
 
             var senseInternalId = senseResponse.data[0].device_account_pair ? senseResponse.data[0].device_account_pair.internal_device_id : undefined;
-            var firmware_version = senseResponse.data[0].device_status ? senseResponse.data[0].device_status.firmware_version : undefined;
 
             if (senseResponse.data[0].device_status){
                 var lastSeenEpoch = senseResponse.data[0].device_status.last_seen;
@@ -311,8 +329,8 @@ var SenseSummary = React.createClass({
                     <tbody>
                         <tr><td>ID</td><td><span>{senseIdSpan}</span><span>{" (" + senseInternalId + ")"}</span></td></tr>
                         <tr><td>Keystore</td><td>{keyStore}</td></tr>
-                        <tr><td>Firmware</td><td>{this.loadUnhashedFirmware(firmware_version, senseId)}</td></tr>
-                        <tr><td>Dust Calib.</td><td>{this.getDustCalibration(senseId, accountId, senseInternalId)}</td></tr>
+                        <tr><td>Firmware</td><td>{this.state.unhashedFirmware}</td></tr>
+                        <tr><td>Dust Calib.</td><td>{this.state.dustCalibration}</td></tr>
                         <tr><td>Timezone</td><td>{timezone}</td></tr>
                         <tr><td>Color</td><td>{senseColor}</td></tr>
                         <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
