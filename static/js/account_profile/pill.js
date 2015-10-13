@@ -1,4 +1,35 @@
 var PillSummary = React.createClass({
+    getInitialState: function() {
+        return {pillColor: ""};
+    },
+    getPillColor(pillId, accountId) {
+        $.ajax({
+            url: "/api/pill_color",
+            type: 'GET',
+            data: {pill_id: pillId,  account_id: accountId},
+            success: function(response) {
+                if (response.error.isWhiteString()){
+                    this.setState({pillColor: response.data});
+                }
+                else {
+                    this.setState({pillColor: <span className="not-ok">--</span>});
+                }
+            }.bind(this)
+        });
+    },
+
+    componentDidUpdate: function(nextProps, nextState) {
+        var currentPillId = this.props.pillResponse.data && this.props.pillResponse.data.length > 0  ? this.props.pillResponse.data[0].device_account_pair.external_device_id : null;
+        var nextPillId = nextProps.pillResponse.data && nextProps.pillResponse.data.length > 0  ? nextProps.pillResponse.data[0].device_account_pair.external_device_id : null;
+        var currentAccountId = this.props.pillResponse.data && this.props.pillResponse.data.length > 0  ? this.props.pillResponse.data[0].device_account_pair.account_id : null;
+        var nextAccountId = nextProps.pillResponse.data && nextProps.pillResponse.data.length > 0  ? nextProps.pillResponse.data[0].device_account_pair.account_id : null;
+
+        if (currentPillId === nextPillId && currentAccountId === nextAccountId) {
+           return false;
+        }
+        this.getPillColor(currentPillId, currentAccountId);
+    },
+
     render: function() {
         var pillResponse = this.props.pillResponse,
             pillStatusResponse = this.props.pillStatusResponse,
@@ -29,7 +60,7 @@ var PillSummary = React.createClass({
             keyStore = <span className="not-ok">unprovisioned</span>;
         }
 
-        var pillColor = <Button className="device-color" bsSize="xsmall" disabled>BLUE</Button>;
+        var pillColor = <Button className="device-color" bsSize="xsmall" disabled>{this.state.pillColor}</Button>;
         if (pillResponse.data.length > 0) {
             var pillId = pillResponse.data[0].device_account_pair ? pillResponse.data[0].device_account_pair.external_device_id : undefined;
             var pillInternalId = pillResponse.data[0].device_account_pair ? " (" + pillResponse.data[0].device_account_pair.internal_device_id + ")" : undefined;
