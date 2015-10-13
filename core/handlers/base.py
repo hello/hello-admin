@@ -134,6 +134,10 @@ class BaseRequestHandler(webapp2.RequestHandler):
     def slack_admin_webhook(self):
         return 'https://hooks.slack.com/services/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'
 
+    @property
+    def slack_dust_calibration_webhook(self):
+        return 'https://hooks.slack.com/services/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'
+
     def render(self, template_file, template_values=None):
         """
         :param template_file: html file to be rendered
@@ -280,6 +284,10 @@ class BaseRequestHandler(webapp2.RequestHandler):
     def send_to_slack_admin_logs_channel(self, message_text=''):
         self.send_to_slack(webhook=self.slack_admin_webhook,
                            payload={'text': "<{}> {}".format(self.namespace, message_text), "icon_emoji": ":snake:", "username": "admin-logs-bot", "link_names": 1})
+
+    def send_to_slack_dust_calibration_channel(self, message_text=''):
+        self.send_to_slack(webhook=self.slack_dust_calibration_webhook,
+                           payload={'text': "<{}> {}".format(self.namespace, message_text), "icon_emoji": ":thought_balloon:", "username": "dusty-bot", "link_names": 1})
 
     def make_oauth2_service(self, api_info):
         """
