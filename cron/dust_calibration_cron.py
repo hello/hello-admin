@@ -26,7 +26,7 @@ class DustCalibration(BaseCron):
         if avg_dust_response.data.values()[0] == 0:
             reject_message = "cron-bot reject updating calibration because avg_dust last N days is 0 for {}".format(self.request.get("external_device_id"))
             log.info(reject_message)
-            self.send_to_slack_admin_logs_channel(reject_message)
+            self.send_to_slack_dust_calibration_channel(reject_message)
             if not is_leftover:
                 DustCalibrationLeftOverPairs(
                     id=self.request.get("external_device_id"),
@@ -51,7 +51,7 @@ class DustCalibration(BaseCron):
             DustCalibrationLeftOverPairs.get_by_id(self.request.get("external_device_id")).key.delete()
         success_message = "cron-bot has put a new calibration {}".format(body_data)
         log.info(success_message)
-        self.send_to_slack_admin_logs_channel(success_message)
+        self.send_to_slack_dust_calibration_channel(success_message)
 
 
 class DustCalibrationUpdate(DustCalibration):
@@ -99,6 +99,8 @@ class DustCalibrationUpdateQueue(BaseCron):
                 id=DUST_CALIBRATION_CHECKPOINT_KEY,
                 max_id=int(recent_pairs[0].get("internal_device_id"))
             ).put()
+
+        log.info("Recent pairs are {}".format(recent_pairs))
         return recent_pairs
 
     def get_calibration_batch(self, sense_ids):
@@ -131,7 +133,9 @@ class DustCalibrationUpdateQueue(BaseCron):
         uncalibrated_pairs = self.get_recent_uncalibrated_pairs()
         if not uncalibrated_pairs:
             log.info("There is no sense in need of calibration in this job")
-        log.info("Attempt to calibrate for {} pairs: {}".format(len(uncalibrated_pairs), uncalibrated_pairs))
+        attempt_messsage = "Attempt to calibrate for {} pairs: {}".format(len(uncalibrated_pairs), uncalibrated_pairs)
+        log.info(attempt_messsage)
+        self.send_to_slack_dust_calibration_channel(attempt_messsage)
         for uncalibrated_pair in uncalibrated_pairs:
             taskqueue.add(
                 url="/cron/dust_calibration_update",
