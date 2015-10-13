@@ -1,5 +1,4 @@
 import os
-import json
 import logging as log
 from copy import copy
 
@@ -8,7 +7,6 @@ import jinja2
 import webapp2
 from google.appengine.api import users
 from google.appengine.api import memcache
-import requests
 
 from core.models.response import ResponseOutput
 from core.models.slack import Slack
@@ -22,7 +20,6 @@ from models.setup import AdminUser
 from models.setup import UserGroup
 from core.models.authentication import ApiInfo, SURIPU_APP_ID, SURIPU_ADMIN_ID, SURIPU_APP_V2_ID, AVAILABLE_NAMESPACES, \
     LOCAL_AVAILABLE_NAMESPACES
-
 
 
 class BaseRequestHandler(webapp2.RequestHandler):
@@ -269,7 +266,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
 
     @property
     def slack_pusher(self):
-        return Slack(self.namespace)
+        return Slack(self.namespace, settings.SLACK_WEBHOOK)
 
     def make_oauth2_service(self, api_info):
         """
