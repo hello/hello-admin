@@ -24,7 +24,7 @@ class DustCalibration(BaseCron):
             return
 
         if avg_dust_response.data.values()[0] == 0:
-            reject_message = "cron-bot reject updating calibration because avg_dust last N days is 0 for {}".format(self.request.get("external_device_id"))
+            reject_message = "Cron-bot rejects updating calibration because avg_dust last N days is 0 for {}".format(self.request.get("external_device_id"))
             log.info(reject_message)
             self.slack_pusher.send_to_dust_calibration_channel(reject_message)
             if not is_leftover:
@@ -49,7 +49,7 @@ class DustCalibration(BaseCron):
         )
         if is_leftover:
             DustCalibrationLeftOverPairs.get_by_id(self.request.get("external_device_id")).key.delete()
-        success_message = "cron-bot has put a new calibration {}".format(body_data)
+        success_message = "Cron-bot has put a new calibration {}".format(body_data)
         log.info(success_message)
         self.slack_pusher.send_to_dust_calibration_channel(success_message)
 
@@ -77,6 +77,7 @@ class DustCalibrationUpdateQueue(BaseCron):
             }
             if max_id:
                 url_params["max_id"] = max_id
+
             recent_pairs_response = self.hello_request(
                 api_url="account/recent_pairs",
                 type="GET",
@@ -87,20 +88,17 @@ class DustCalibrationUpdateQueue(BaseCron):
             if not recent_pairs_response.data:
                 break
 
-            max_id = int(recent_pairs_response.data[-1].get("internal_device_id")) - 1
+            recent_pairs += recent_pairs_response.data
+            max_id = min([j.get("internal_device_id") for j in recent_pairs_response.data]) - 1
 
             if checkpoint is not None and max_id <= checkpoint.max_id:
                 break
 
-            if not recent_pairs_response.error:
-                recent_pairs += recent_pairs_response.data
         if recent_pairs:
             DustCalibrationCheckPoint(
                 id=DUST_CALIBRATION_CHECKPOINT_KEY,
-                max_id=int(recent_pairs[0].get("internal_device_id"))
+                max_id=max([j.get("internal_device_id") for j in recent_pairs])
             ).put()
-
-        log.info("Recent pairs are {}".format(recent_pairs))
         return recent_pairs
 
     def get_calibration_batch(self, sense_ids):
@@ -133,7 +131,7 @@ class DustCalibrationUpdateQueue(BaseCron):
         uncalibrated_pairs = self.get_recent_uncalibrated_pairs()
         if not uncalibrated_pairs:
             log.info("There is no sense in need of calibration in this job")
-        attempt_messsage = "Attempt to calibrate for {} pairs: {}".format(len(uncalibrated_pairs), uncalibrated_pairs)
+        attempt_messsage = "Cron-bot attempts to calibrate for {} pairs".format(len(uncalibrated_pairs))
         log.info(attempt_messsage)
         self.slack_pusher.send_to_dust_calibration_channel(attempt_messsage)
         for uncalibrated_pair in uncalibrated_pairs:
@@ -143,7 +141,7 @@ class DustCalibrationUpdateQueue(BaseCron):
                 method="GET",
                 queue_name="calibrate-recent-senses"
             )
-
+        self.response.write(json.dumps(self.get_recent_pairs()))
 
 class DustCalibrationLeftOverUpdate(DustCalibration):
     def get(self):
@@ -157,7 +155,7 @@ class DustCalibrationLeftOverUpdateQueue(BaseCron):
 
     def get(self):
         leftover_pairs = self.get_leftover_pairs()
-        log.info("Attempt to calibrate for {} leftover pairs".format(leftover_pairs.count()))
+        log.info("Cron-bot attempts to calibrate for {} leftover pairs".format(leftover_pairs.count()))
 
         for leftover_pair in leftover_pairs:
             taskqueue.add(
