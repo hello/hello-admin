@@ -246,3 +246,7 @@ class TimelineLogsView(ProtectedRequestHandler):
         self.render_to_response(template_file='timeline_logs.html',
                                 context={'title': "Timeline logs"})
 
+class TimelineLogsHistoryView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='timeline_logs_history.html',
+                                context={'title': "Timeline Logs History"})

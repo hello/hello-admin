@@ -64,3 +64,13 @@ class TimelineLogsAPI(ProtectedRequestHandler):
             api_url="timelines/summary/{}".format(self.request.get("date")),
             type="GET",
         )
+
+
+class TimelineLogsHistoryAPI(ProtectedRequestHandler):
+    def get(self):
+        self.hello_request(
+            api_url="timelines/summary_batch",
+            url_params={"start_date": self.request.get("start_date"), "end_date": self.request.get("end_date")},
+            type="GET",
+        )
+
