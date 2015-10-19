@@ -145,6 +145,15 @@ var ConfigMaestro = React.createClass({
             groups: $('#groups-input').val(),
             percentage: Number($("#percentage").val()).toFixed(2)
         };
+        if (!submitData.feature) {
+            that.setState({alert: "Feature cannot be empty"});
+            return false;
+        }
+        if (submitData.percentage < 0 || submitData.percentage > 100) {
+            that.setState({alert: "Percentage must be between [0, 100]"});
+            return false;
+        }
+
         $.ajax({
             url: '/api/features',
             dataType: 'json',
@@ -185,7 +194,7 @@ var ConfigMaestro = React.createClass({
             {groupsOptions}
                 </Input>
                 <h4>Percentage (float between 0.00 and 100.00): </h4>
-                <Input placeholder="e.g. 7.89" type="number" id="percentage" />
+                <Input placeholder="e.g. 7.89" type="number" id="percentage" max={100} min={0} />
                 <h4>Submit</h4>
                 <Button bsStyle="danger" onClick={this.handleSubmit}><Glyphicon glyph="send"/> PUT</Button>
                 <br/>
