@@ -53,7 +53,6 @@ var ConfigMaestro = React.createClass({
             ids: "",
             groups: [],
             data: [],
-            sliderValue: 0,
             alert: ""
         };
     },
@@ -61,10 +60,7 @@ var ConfigMaestro = React.createClass({
     populateInput: function () {
         var that = this;
         $('.feature-td').click(function(){
-            var updatedSliderValue = Number($(this).parent().siblings(".percentage-td").text());
-            var mySlider = $('input.slider').slider();
-            mySlider.slider("setValue", updatedSliderValue);
-            that.setState({sliderValue: updatedSliderValue});
+            $("#percentage").val(Number($(this).parent().siblings(".percentage-td").text()));
             $('#feature-input').focus().val($(this).text());
         });
         $('.ids-td').click(function(){
@@ -138,12 +134,6 @@ var ConfigMaestro = React.createClass({
         $('#groups-input').change(function(){
             that.setState({ids: $('#groups-input').val()});
         });
-        var mySlider = $('input.slider').slider();
-        mySlider.slider("setValue", 0).on('slide', function(slideEvt){
-            that.setState({sliderValue: slideEvt.value});
-        }).on('slideStop', function(slideEvt){
-            that.setState({sliderValue: slideEvt.value});
-        });
     },
 
     handleSubmit: function() {
@@ -153,8 +143,17 @@ var ConfigMaestro = React.createClass({
             feature: $('#feature-input').val(),
             ids: $('#ids-input').val(),
             groups: $('#groups-input').val(),
-            percentage: this.state.sliderValue
+            percentage: Number($("#percentage").val()).toFixed(2)
         };
+        if (!submitData.feature) {
+            that.setState({alert: "Feature cannot be empty"});
+            return false;
+        }
+        if (submitData.percentage < 0 || submitData.percentage > 100) {
+            that.setState({alert: "Percentage must be between [0, 100]"});
+            return false;
+        }
+
         $.ajax({
             url: '/api/features',
             dataType: 'json',
@@ -194,10 +193,8 @@ var ConfigMaestro = React.createClass({
                 <Input id="groups-input" type="select" multiple>
             {groupsOptions}
                 </Input>
-                <h4>Percentage: <span>{this.state.sliderValue}</span></h4>
-                <span>0&nbsp;&nbsp;&nbsp;</span>
-                <input type="text" className="span2 slider" value="" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-id="RC" id="R" data-slider-tooltip="show" data-slider-handle="square" />
-                <span>&nbsp;100</span>
+                <h4>Percentage (float between 0.00 and 100.00): </h4>
+                <Input placeholder="e.g. 7.89" type="number" id="percentage" max={100} min={0} />
                 <h4>Submit</h4>
                 <Button bsStyle="danger" onClick={this.handleSubmit}><Glyphicon glyph="send"/> PUT</Button>
                 <br/>

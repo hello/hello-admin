@@ -22,12 +22,11 @@ class FeaturesAPI(FirmwareRequestHandler):
 
     def put(self):
         req = json.loads(self.request.body)
-
         feature = req.get('feature', '')
         ids = req.get('ids', '').strip()
 
         groups = req.get('groups') or []
-        percentage = req.get('percentage', 0)
+        percentage = float(req.get('percentage', 0))
 
         body_data = {
             'name': feature,
