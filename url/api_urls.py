@@ -55,7 +55,7 @@ from api.setup import UpdateAdminAccessTokenAPI
 from api.setup import UpdateGeckoBoardCredentials
 from api.setup import ViewPermissionAPI
 from api.team import TeamsAPI
-from api.timeline import TimelineAPI, TimelineV2API, TimelineLogsAPI
+from api.timeline import TimelineAPI, TimelineV2API, TimelineLogsAPI, TimelineLogsHistoryAPI
 from api.timezone import TimezoneAPI
 from api.timezone import TimezoneHistoryAPI
 from api.wifi import WifiInfoAPI
@@ -152,6 +152,7 @@ routes = [
     ('/api/dust_offset/?$', DustOffsetAPI),
     ('/api/wifi_info/?$', WifiInfoAPI),
     ('/api/timeline_logs/?$', TimelineLogsAPI),
+    ('/api/timeline_logs_history/?$', TimelineLogsHistoryAPI),
     ('/api/logs_facet_history/?$', LogsFacetHistoryAPI),
     ('/api/pill_color/?$', PillColorAPI),
 ]
