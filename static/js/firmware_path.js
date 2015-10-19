@@ -112,7 +112,7 @@ var FirmwareGroupStatus = React.createClass({
             <Col xs={8} xsOffset={2}>
                 <select className="form-control" valueLink={this.linkState("group")}>
                     <option value="">Select a Group</option>
-                    {this.props.groups.reverse().map(function(g){return <option value={g.name}>{g.name}</option>;})}
+                    {this.props.groups.map(function(g){return <option value={g.name}>{g.name}</option>;})}
                 </select>
             </Col>
             <Table>
@@ -183,7 +183,7 @@ var FirmwareGroupPath = React.createClass({
                     <select className="form-control" valueLink={this.linkState("group")}>
                         <option value="">Select a Group</option>
                         <option value="release">Release</option>
-                        {this.props.groups.reverse().map(function(g){return <option value={g.name}>{g.name}</option>;})}
+                        {this.props.groups.map(function(g){return <option value={g.name}>{g.name}</option>;})}
                     </select>
                 </Col>
             </Row>
