@@ -12,6 +12,30 @@ var Tile = React.createClass({
     }
 });
 
+var FirmwareName = React.createClass({
+    getInitialState: function() {
+        return {unhashedVersion: ""}
+    },
+    unhashFirmwareName: function() {
+        $.ajax({
+            url: '/api/firmware_unhash',
+            type: 'GET',
+            data: {version: parseInt(this.props.version, 10).toString(16)},
+            success: function(response) {
+                this.setState({unhashedVersion: response.data.join(",") || "unknown"});
+            }.bind(this)
+        });
+    },
+    componentDidMount: function() {
+        this.unhashFirmwareName();
+    },
+
+    render: function() {
+        return <span>
+                {this.props.version} -- {this.state.unhashedVersion}
+            </span>
+    }
+});
 
 var AddFirmwareUpgradeNodeModal = React.createClass({
     addFirmwareUpgradeNode: function() {
@@ -57,6 +81,8 @@ var AddFirmwareUpgradeNodeModal = React.createClass({
 });
 
 
+
+
 var FirmwareGroupStatus = React.createClass({
     mixins: [React.addons.LinkedStateMixin],
     getInitialState: function() {
@@ -96,7 +122,7 @@ var FirmwareGroupStatus = React.createClass({
                 <tbody>{
                     this.loadFirmwareGroupStatus(this.state.group).map(function(gs){
                         return <tr>
-                            <td>{gs.version}</td>
+                            <td><FirmwareName version={gs.version}/></td>
                             <td>{gs.device_id}</td>
                             <td>{d3.time.format.utc("%b %d %H:%M")(new Date(gs.timestamp))}</td>
                         </tr>
@@ -169,8 +195,8 @@ var FirmwareGroupPath = React.createClass({
                 <tbody>{
                     this.loadFirmwareGroupPath(this.state.group).map(function(gp){
                         return <tr>
-                            <td>{gp.fromFWVersion}</td>
-                            <td>{gp.toFWVersion}</td>
+                            <td><FirmwareName version={gp.fromFWVersion}/></td>
+                            <td><FirmwareName version={gp.toFWVersion}/></td>
                             <td>{gp.rolloutPercent}</td>
                             <td><Button onClick={this.removeFirmwareUpgradeNode.bind(this, gp.groupName, gp.fromFWVersion)}><Glyphicon glyph="trash"/></Button></td>
                         </tr>
@@ -193,7 +219,6 @@ var FirmwarePathMaster = React.createClass({
             data: {mode: "devices"},
             type: 'GET',
             success: function(response) {
-                console.log(response);
                 this.setState({groups: response.data});
             }.bind(this)
         });

@@ -1,7 +1,6 @@
 import unittest
-import datetime
-
-from core.lib import pytz
+from google.appengine._internal.django.utils.datetime_safe import datetime
+import pytz
 from core.utils.time_helpers import iso_to_utc_timestamp, iso_to_pacific_datetime_obj, iso_to_human_timestring
 
 
@@ -17,7 +16,7 @@ class TestUtils(unittest.TestCase):
 
     def test_iso_to_datetime_obj(self):
         test_input = "2014-11-06T10:34:47Z"
-        expected_output = utc_timezone.localize(datetime.datetime(2014, 11, 6, 10, 34, 47))
+        expected_output = utc_timezone.localize(datetime(2014, 11, 6, 10, 34, 47))
         self.assertEqual(iso_to_pacific_datetime_obj(test_input), expected_output)
 
     def test_iso_to_human_timestring(self):
