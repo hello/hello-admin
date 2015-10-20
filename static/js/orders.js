@@ -130,6 +130,18 @@ var QueryOrdersOmni = React.createClass({
     getInitialState: function() {
         return {ordersMap: [], error: null, filteredResult: [], loading: true}
     },
+    submitWithInputsfromURL: function() {
+        var whoFromUrl = getParameterByName('who');
+        if (whoFromUrl.isWhiteString()) {
+            return false;
+        }
+        this.refs.omniInput.getDOMNode().value = whoFromUrl;
+        this.handleSubmit();
+    },
+
+    pushHistory: function(who) {
+        history.pushState({}, '', '/orders/?who=' + who);
+    },
     componentDidMount: function() {
         $.ajax({
             url: "/api/orders_map",
@@ -142,6 +154,7 @@ var QueryOrdersOmni = React.createClass({
                     loading: false,
                     error: response.error ? <Alert bsStyle="danger">{response.error}</Alert> : null
                 });
+                this.submitWithInputsfromURL();
             }.bind(this)
         });
         return false;
@@ -153,6 +166,7 @@ var QueryOrdersOmni = React.createClass({
         $("#order-specs").hide();
 
         var omniInput = this.refs.omniInput.getDOMNode().value.trim();
+        this.pushHistory(omniInput);
         if (omniInput.trim().length < 3) {
             this.setState({error: <Alert bsStyle="danger">Input string length must be at least 3 characters</Alert>});
             return false;
