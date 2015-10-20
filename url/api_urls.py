@@ -14,6 +14,7 @@ from api.device import DeviceKeyStoreAPI
 from api.device import DeviceOwnersAPI
 from api.device import SenseBlackListAPI
 from api.device import SenseColorAPI
+from api.pill import PillLastHeartbeatAPI, PillHeartbeatsAPI
 from api.uptime import SenseUptimeAPI
 from api.event import SenseEventsAPI
 from api.firmware import FirmwareAPI
@@ -155,5 +156,7 @@ routes = [
     ('/api/timeline_logs_history/?$', TimelineLogsHistoryAPI),
     ('/api/logs_facet_history/?$', LogsFacetHistoryAPI),
     ('/api/pill_color/?$', PillColorAPI),
+    ('/api/pill_last_heartbeat/?$', PillLastHeartbeatAPI),
+    ('/api/pill_heartbeats/?$', PillHeartbeatsAPI),
 ]
 
