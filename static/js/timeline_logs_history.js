@@ -68,7 +68,7 @@ var TimelineLogHistoryChart = React.createClass({
 
 var TimelineLogsHistoryMaster = React.createClass({
     getInitialState: function() {
-        return {data: [], error: "", breakdownByAlgorithm: [], breakdownByError: [], breakdownByAlgorithmError: [], stackable: false, normalize: false}
+        return {data: [], error: "", breakdownByAlgorithm: [], breakdownByError: [], breakdownByAlgorithmError: [], stackable: true, normalize: false}
     },
 
     pushHistory: function(startDate, endDate) {
@@ -77,6 +77,7 @@ var TimelineLogsHistoryMaster = React.createClass({
 
     componentDidMount: function() {
         this.submitWithInputsfromURL();
+        $("#stack").prop('checked', true);
     },
 
     submitWithInputsfromURL: function() {
@@ -212,17 +213,17 @@ function getAggregateData(responseData) {
 
         Object.keys(algorithmCount).forEach(function(k) {
             if (k !== "date" && k !== "timestamp") {
-                algorithmShare[k] = algorithmCount[k] * 100 / countByDate[d];
+                algorithmShare[k] = (algorithmCount[k] * 100 / countByDate[d]).toFixed(2);
             }
         });
         Object.keys(errorCount).forEach(function(k) {
             if (k !== "date" && k !== "timestamp") {
-                errorShare[k] = errorCount[k] * 100 / countByDate[d];
+                errorShare[k] = (errorCount[k] * 100 / countByDate[d]).toFixed(2);
             }
         });
         Object.keys(algorithmErrorCount).forEach(function(k) {
             if (k !== "date" && k !== "timestamp") {
-                algorithmErrorShare[k] = algorithmErrorCount[k] * 100 / countByDate[d];
+                algorithmErrorShare[k] = (algorithmErrorCount[k] * 100 / countByDate[d]).toFixed(2);
             }
         });
 
