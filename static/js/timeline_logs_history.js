@@ -8,12 +8,10 @@ var TimelineLogHistoryChart = React.createClass({
         }
     },
     render: function() {
-        var that = this;
-        if(that.props.data && that.props.data.length > 0) {
-            var categories = Object.keys(that.props.data[0]).filter(function(d){return d !== "date" && d !== "timestamp"});
-            console.log(that.props.id, that.props.data);
-            var stackingGroups = that.props.stackable === true ? [categories] : [];
-
+        if(this.props.data && this.props.data.length > 0) {
+            var categories = Object.keys(this.props.data[0]).filter(function(d){return d !== "date" && d !== "timestamp"});
+            var stackingGroups = this.props.stackable === true ? [categories] : [];
+            var that = this;
             c3.generate({
                 bindto: '#'.concat(that.props.id),
                 data: {
@@ -31,8 +29,17 @@ var TimelineLogHistoryChart = React.createClass({
                             format: function (x) {
                                 return d3.time.format('%b %d')(new Date(x));
                             }
+                        },
+                        label: {
+                            position: 'outer-center'
                         }
-                    }
+                    },
+                    y: {
+                        label: {
+                            text: "Count or Share",
+                            position: 'outer-middle'
+                        }
+                    },
                 },
                 bar: {
                     width: {
@@ -41,26 +48,27 @@ var TimelineLogHistoryChart = React.createClass({
                 },
                 grid: {
                   y: {
-                      show: false
+                      show: true
                   }
-                },
-                zoom: {
-                    enabled: that.props.zoomable
                 },
                 legend: {
                     position: "right"
                 }
             });
         }
-        return(
-            <div id={that.props.id} className="c3-chart"></div>
-        )
+        var chartTitle = this.props.data && this.props.data.length > 0 ?
+            <div className="center-wrapper"><h5>{this.props.id}</h5></div> : null;
+        return <div>
+            <br/>
+            {chartTitle}
+            <div id={this.props.id} className="c3-chart"></div>
+        </div>
     }
 });
 
 var TimelineLogsHistoryMaster = React.createClass({
     getInitialState: function() {
-        return {data: [], error: "", breakdownByAlgorithm: [], breakdownByError: [], breakdownByAlgorithmError: []}
+        return {data: [], error: "", breakdownByAlgorithm: [], breakdownByError: [], breakdownByAlgorithmError: [], stackable: false, normalize: false}
     },
 
     pushHistory: function(startDate, endDate) {
@@ -102,28 +110,46 @@ var TimelineLogsHistoryMaster = React.createClass({
             data: {start_date: reformatDate(startDate), end_date: reformatDate(endDate)},
             type: "GET",
             success: function(response) {
-                var aggregateData = getAggregateData(response.data);
-                console.log("aggregateData", aggregateData);
-                this.setState(aggregateData);
+                if (response.error.isWhiteString) {
+                    var aggregateData = getAggregateData(response.data);
+                    this.setState(aggregateData);
+                }
+                else {
+                    this.setState({error: response.error});
+                }
+
             }.bind(this)
         });
         return false;
     },
+
+    toggleStack: function() {
+        this.setState({stackable: $('#stack').is(':checked')});
+    },
+
+    toggleNormalize: function() {
+        this.setState({normalize: $('#normalize').is(':checked')});
+    },
+
     render: function() {
         var alert = this.state.error ? <Alert>{this.state.error}</Alert> : null;
         var results = [
-            <TimelineLogHistoryChart id="chart1" data={this.state.breakdownByAlgorithm} />,
-            <TimelineLogHistoryChart id="chart2" data={this.state.breakdownByError} />,
-            <TimelineLogHistoryChart id="chart3" data={this.state.breakdownByAlgorithmError} />
+            <TimelineLogHistoryChart id="Breakdown-By-Algorithm" data={this.state.normalize ? this.state.normalizedBreakdownByAlgorithm : this.state.breakdownByAlgorithm} stackable={this.state.stackable}/>,
+            <TimelineLogHistoryChart id="Breakdown-By-Error" data={this.state.normalize ? this.state.normalizedBreakdownByError : this.state.breakdownByError} stackable={this.state.stackable} />,
+            <TimelineLogHistoryChart id="Breakdown-By-Algorithm-Error" data={this.state.normalize ? this.state.normalizedBreakdownByAlgorithmError : this.state.breakdownByAlgorithmError} stackable={this.state.stackable} />
         ];
 
         return (<div>
             <form onSubmit={this.handleSubmit}>
-                <LongDatetimePicker size={3} glyphicon="clock" placeHolder="pick a date, default = last week" id="start-date" pickTime={false} format="MM-DD-YYYY" size="4" />
-                <LongDatetimePicker size={3} glyphicon="clock" placeHolder="pick a date, default = last night" id="end-date" pickTime={false} format="MM-DD-YYYY" size="4" />
-                <Col xs={2}><Button type="submit">Go</Button></Col>
-            </form>
-            {alert}
+                <LongDatetimePicker size={3} glyphicon="clock" placeHolder="pick a date, default = last week" id="start-date" pickTime={false} format="MM-DD-YYYY" />
+                <LongDatetimePicker size={3} glyphicon="clock" placeHolder="pick a date, default = last night" id="end-date" pickTime={false} format="MM-DD-YYYY" />
+                <Col xs={1}><Button type="submit">Go</Button></Col>
+                <Col xs={4}>
+                    Stack <input id="stack" type="checkbox" onChange={this.toggleStack} />&nbsp;&nbsp;&nbsp;
+                    Normalize <input id="normalize" type="checkbox" onChange={this.toggleNormalize} />
+                </Col>
+            </form><br/>
+            {alert}<br/>
             {results}
         </div>);
     }
@@ -161,7 +187,10 @@ function getAggregateData(responseData) {
     });
 
 
-    var breakdown = {breakdownByAlgorithm: [], breakdownByError: [], breakdownByAlgorithmError: []};
+    var breakdown = {
+        breakdownByAlgorithm: [], breakdownByError: [], breakdownByAlgorithmError: [],
+        normalizedBreakdownByAlgorithm: [], normalizedBreakdownByError: [], normalizedBreakdownByAlgorithmError: []
+    };
     dateList.forEach(function(d) {
         var algorithmCount = {timestamp: new Date(Date.parse(d)).getTime(), date: d};
         var errorCount = {timestamp: new Date(Date.parse(d)).getTime(), date: d};
@@ -172,9 +201,34 @@ function getAggregateData(responseData) {
             errorCount[r.error] = (errorCount[r.error] || 0) + r.count;
             algorithmErrorCount[r.algorithm + "-" + r.error] = (algorithmErrorCount[r.algorithm + "-" + r.error] || 0) + r.count;
         });
+
         breakdown.breakdownByAlgorithm.push(algorithmCount);
         breakdown.breakdownByError.push(errorCount);
         breakdown.breakdownByAlgorithmError.push(algorithmErrorCount);
+
+        var algorithmShare =  $.extend({}, algorithmCount);
+        var errorShare =  $.extend({}, errorCount);
+        var algorithmErrorShare =  $.extend({}, algorithmErrorCount);
+
+        Object.keys(algorithmCount).forEach(function(k) {
+            if (k !== "date" && k !== "timestamp") {
+                algorithmShare[k] = algorithmCount[k] * 100 / countByDate[d];
+            }
+        });
+        Object.keys(errorCount).forEach(function(k) {
+            if (k !== "date" && k !== "timestamp") {
+                errorShare[k] = errorCount[k] * 100 / countByDate[d];
+            }
+        });
+        Object.keys(algorithmErrorCount).forEach(function(k) {
+            if (k !== "date" && k !== "timestamp") {
+                algorithmErrorShare[k] = algorithmErrorCount[k] * 100 / countByDate[d];
+            }
+        });
+
+        breakdown.normalizedBreakdownByAlgorithm.push(algorithmShare);
+        breakdown.normalizedBreakdownByError.push(errorShare);
+        breakdown.normalizedBreakdownByAlgorithmError.push(algorithmErrorShare);
     });
     return breakdown;
 }
