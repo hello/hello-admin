@@ -175,7 +175,7 @@ var BatteryChart = React.createClass({
             requestData.email = searchInput;
         }
         else {
-            requestData.pill_partial_id = searchInput;
+            requestData.pill_id_partial = searchInput;
         }
         $.ajax({
             url: "/api/heartbeats",

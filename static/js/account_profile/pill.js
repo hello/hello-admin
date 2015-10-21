@@ -117,7 +117,7 @@ var PillSummary = React.createClass({
                     </tbody>
                 </Table>
                 <ul className="extra">
-                    <li><a target="_blank" href={"/battery/?search=" + pillId + "&end_ts="}>Heartbeats</a></li>
+                    <li><a target="_blank" href={"/heartbeat/?search=" + pillId + "&end_ts="}>Heartbeats</a></li>
                     <li><a target="_blank" href={"/motion/?email=" + this.props.email + "&date=" + lastNightDate}>Motion</a></li>
                 </ul>
             </div>;
