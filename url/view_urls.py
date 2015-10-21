@@ -1,5 +1,5 @@
 from view.views import AccountProfileView, RoomConditionsMinuteView, TimelineV2View, LogsFacetHistoryView, \
-    TimelineLogsView, TimelineLogsHistoryView
+    TimelineLogsView, TimelineLogsHistoryView, DustCalibrationLeftOverView
 from view.views import ActiveDevicesHistoryView
 from view.views import AlarmRingsHistoryView
 from view.views import AlarmsView
@@ -94,4 +94,5 @@ routes = [
     ('/logs_facet_history/?$', LogsFacetHistoryView),
     ('/timeline_logs/?$', TimelineLogsView),
     ('/timeline_logs_history/?$', TimelineLogsHistoryView),
+    ('/dust_calibration_left_over/?$', DustCalibrationLeftOverView),
 ]

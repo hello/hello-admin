@@ -4,12 +4,12 @@ import logging as log
 __author__ = 'zet'
 
 
-class ResponseOutput():
-    def __init__(self):
-        self.data = []
-        self.error = ""
-        self.status = 501
-        self.viewer = ""
+class ResponseOutput(object):
+    def __init__(self, data=[], error="", status=501, viewer=""):
+        self.data = data
+        self.error = error
+        self.status = status
+        self.viewer = viewer
 
     def set_data(self, data):
         if not isinstance(data, list) and not isinstance(data, dict):
