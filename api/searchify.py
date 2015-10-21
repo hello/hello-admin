@@ -1,7 +1,7 @@
 import json
 import re
 import logging as log
-from google.appengine._internal.django.utils.datetime_safe import datetime
+import datetime
 
 from google.appengine.api import urlfetch
 from models.ext import LogsFacet
