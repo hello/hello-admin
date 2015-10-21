@@ -43,6 +43,13 @@ var PillSummary = React.createClass({
         });
     },
 
+    componentDidMount() {
+        var yesterday = new Date();
+        yesterday.setDate(yesterday.getDate()-1);
+        this.getLastMotion(this.props.email, d3.time.format("%Y-%m-%d")(yesterday));
+        return false;
+    },
+
     componentDidUpdate: function(nextProps, nextState) {
         var currentSenseId = this.props.senseResponse.data && this.props.senseResponse.data.length > 0  ? this.props.senseResponse.data[0].device_account_pair.external_device_id : null;
         var nextSenseId = nextProps.senseResponse.data && nextProps.senseResponse.data.length > 0  ? nextProps.senseResponse.data[0].device_account_pair.external_device_id : null;
@@ -53,9 +60,6 @@ var PillSummary = React.createClass({
         var currentAccountId = this.props.pillResponse.data && this.props.pillResponse.data.length > 0  ? this.props.pillResponse.data[0].device_account_pair.account_id : null;
         var nextAccountId = nextProps.pillResponse.data && nextProps.pillResponse.data.length > 0  ? nextProps.pillResponse.data[0].device_account_pair.account_id : null;
 
-        var currentEmail = this.props.email;
-        var nextEmail = nextProps.email;
-
         if (currentSenseId !== nextSenseId || currentAccountId !== nextAccountId) {
             this.getPillColor(currentSenseId, currentAccountId);
         }
@@ -64,11 +68,6 @@ var PillSummary = React.createClass({
            this.getLastHeartbeat(currentPillId);
         }
 
-        if (currentEmail !== nextEmail) {
-            var yesterday = new Date();
-            yesterday.setDate(yesterday.getDate()-1);
-            this.getLastMotion(this.props.email, d3.time.format("%Y-%m-%d")(yesterday));
-        }
         return false;
     },
 
