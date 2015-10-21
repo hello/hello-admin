@@ -151,7 +151,6 @@ var AccountProfile = React.createClass({
             alarmsResponse: {data: [], error: ""},
             senseResponse: {data: [], error: ""},
             pillResponse: {data: [], error: ""},
-            pillStatusResponse: {data: [], error: ""},
             senseKeyStoreResponse: {data: {}, error: ""},
             pillKeyStoreResponse: {data: {}, error: ""},
             timelineResponse: {data: [], error: ""},
@@ -181,7 +180,6 @@ var AccountProfile = React.createClass({
             alarmsResponse: {data: [], error: ""},
             senseResponse: {data: [], error: ""},
             pillResponse: {data: [], error: ""},
-            pillStatusResponse: {data: [], error: ""},
             senseKeyStoreResponse: {data: {}, error: ""},
             pillKeyStoreResponse: {data: {}, error: ""},
             timelineResponse: {data: [], error: ""},
@@ -303,7 +301,6 @@ var AccountProfile = React.createClass({
     },
 
     loadPillByExternalId: function(pillId) {
-        this.loadPillStatus(pillId);
         this.loadPillKeyStore(pillId);
     },
 
@@ -318,23 +315,9 @@ var AccountProfile = React.createClass({
                 if (response.data.length > 0) {
                     if (response.data[0].device_account_pair && response.data[0].device_account_pair.external_device_id) {
                         var pillId = response.data[0].device_account_pair.external_device_id;
-                        this.loadPillStatus(pillId);
                         this.loadPillKeyStore(pillId);
                     }
                 }
-            }.bind(this)
-        });
-    },
-
-    loadPillStatus: function(pillId) {
-        $.ajax({
-            aysnc: false,
-            url: '/api/battery',
-            dataType: 'json',
-            type: 'GET',
-            data: {search_input: pillId, end_ts: new Date().getTime()},
-            success: function (response) {
-                this.setState({pillStatusResponse: response});
             }.bind(this)
         });
     },
@@ -537,7 +520,7 @@ var AccountProfile = React.createClass({
                 <Tile img="svg/timezone.svg" title="Timezone History" content={<TimezoneHistoryTile timezoneHistoryResponse={this.state.timezoneHistoryResponse} />} />
             </Col>,
             <Col xs={12} lg={4} className="paddingless-left">
-                <Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary senseResponse={this.state.senseResponse} pillResponse={this.state.pillResponse} pillStatusResponse={this.state.pillStatusResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} email={this.state.email} />} />
+                <Tile img="image/pill-bw.png" title="Pill Summary" content={<PillSummary senseResponse={this.state.senseResponse} pillResponse={this.state.pillResponse} pillKeyStoreResponse={this.state.pillKeyStoreResponse} email={this.state.email} />} />
                 <Tile img="svg/uptime.svg" title="Sense Online Uptime" content={<UptimeTile email={this.state.email} />} />
                 <Tile img="svg/wifi.svg" title="Wifi Info" content={<WifiTile senseId={senseId} />} />
             </Col>
