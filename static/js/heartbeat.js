@@ -147,17 +147,17 @@ var BatteryChart = React.createClass({
 
     submitWithInputsfromURL: function() {
         var searchInputFromURL = getParameterByName('search');
-        var endTsInputFromURL = getParameterByName('end_ts');
+        var tsInputFromURL = getParameterByName('end_ts');
         if (searchInputFromURL.isWhiteString()) {
             return false;
         }
         $('#search-input').val(searchInputFromURL);
-        $('#end-ts').val(endTsInputFromURL);
+        $('#end-ts').val(tsInputFromURL);
         this.handleSubmit();
     },
 
-    pushHistory: function(search, endTs) {
-        history.pushState({}, '', '/battery/?search=' + search + '&end_ts=' + endTs);
+    pushHistory: function(search, ts) {
+        history.pushState({}, '', '/heartbeat/?search=' + search + '&end_ts=' + ts);
     },
 
     handleSubmit: function() {
@@ -167,19 +167,24 @@ var BatteryChart = React.createClass({
             data: [[], [], [], [], [], [], [], [], [], []]
         });
         var searchInput = $('#search-input').val().trim();
-        var endTs = $('#end-ts').val();
+        var ts = $('#end-ts').val();
         var requestData = {
-            search_input: searchInput,
-            end_ts: endTs.isWhiteString() ? new Date().getTime() : getUTCEpochFromLocalTime(endTs)*1000
+            ts: ts.isWhiteString() ? new Date().getTime() : getUTCEpochFromLocalTime(ts)*1000
         };
+        if (searchInput.indexOf("@") > -1) {
+            requestData.email = searchInput;
+        }
+        else {
+            requestData.pill_partial_id = searchInput;
+        }
         $.ajax({
-            url: "/api/battery",
+            url: "/api/heartbeats",
             type: "GET",
             dataType: "json",
             data: requestData,
             success: function(response) {
-                console.log('raw', response.data);
-                that.pushHistory(searchInput, endTs);
+                console.log(response.data);
+                that.pushHistory(searchInput, ts);
                 if (response.error.isWhiteString()) {
                     that.setState({data: filterData(response.data), alert: ""});
                 }
@@ -197,7 +202,6 @@ var BatteryChart = React.createClass({
         });
         var alert = this.state.alert === "" ? null : <Alert>{this.state.alert}</Alert>;
         var notes = this.state.alert === "" ? <p className="chart-remark">Notes: <br/>
-                &nbsp;&nbsp;- By default, data is shown for the last 14 days<br/>
                 &nbsp;&nbsp;- Legends are clickable to toggle visiblity by group<br/>
                 &nbsp;&nbsp;- Zooming/Dragging may be laggy in certain browsers
             </p>: null;
@@ -213,10 +217,10 @@ var BatteryChart = React.createClass({
                 <Col xs={2} sm={2} md={2}>
                     <Input type="select" id="chart-type" onChange={this.handleChartType}>{chartOptions}</Input>
                 </Col>
-                <Col xs={1} sm={1} md={1}>
+                <Col xs={2} sm={2} md={2}>
                     <Input type="checkbox" id="zoom-check" label="Zoomable&nbsp;" onChange={this.handleZoom}/>
                 </Col>
-                <Col xs={1} sm={1} md={1}>
+                <Col xs={2} sm={2} md={2}>
                     <Button><FileExporter fileContent={this.state.data} fileName="battery"/></Button>
                 </Col>
             </form>
@@ -231,7 +235,7 @@ var BatteryChart = React.createClass({
         </div>)
     }
 });
-React.renderComponent(<BatteryChart />, document.getElementById('battery'));
+React.renderComponent(<BatteryChart />, document.getElementById('heartbeat'));
 
 function filterData(data) {
     return data.map(function(s){

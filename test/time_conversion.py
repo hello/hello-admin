@@ -1,5 +1,5 @@
 import unittest
-from google.appengine._internal.django.utils.datetime_safe import datetime
+import datetime
 import pytz
 from core.utils.time_helpers import iso_to_utc_timestamp, iso_to_pacific_datetime_obj, iso_to_human_timestring
 
