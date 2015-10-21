@@ -1,0 +1,7 @@
+#battery-chart, #uptime-chart {height: 250px; width: 100%; background-color: white; margin-top: -27px;}
+
+span.glyphicon-search, span.glyphicon-filter {top: 1px; font-size: 15px;}
+button.btn-circle {margin: 0; height: 37px; width: 37px; padding: 3px;}
+div.c3-chart {height: 70vh; background-color: white;}
+.c3-legend-item { font-size: 14px !important; margin-bottom: 15px !important;}
+.chart-remark {font-size: 80%; margin-left: 40px; font-style: italic;}

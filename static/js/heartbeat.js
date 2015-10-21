@@ -126,7 +126,7 @@ var BatteryChart = React.createClass({
         return {
             data: [[], [], [], [], [], [], [], [], [], []],
             zoomable: false,
-            chartType: "area",
+            chartType: "line",
             alert: ""
         }
     },
@@ -197,7 +197,7 @@ var BatteryChart = React.createClass({
     },
 
     render: function() {
-        var chartOptions = ["area", "area-spline", "area-step", "spline", "step", "line", "bar"].map(function (c) {
+        var chartOptions = ["line", "area", "area-spline", "area-step", "spline", "step", "bar"].map(function (c) {
             return <option value={c}>{c.capitalize() + " Chart"}</option>;
         });
         var alert = this.state.alert === "" ? null : <Alert>{this.state.alert}</Alert>;
