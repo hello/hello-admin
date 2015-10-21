@@ -28,7 +28,7 @@ from api.keystore import PillKeyProvision
 from api.keystore import PillProvisionAPI
 from api.keystore import SenseKeyProvision
 from api.label import LabelDataAPI
-from api.motion import MotionAPI
+from api.motion import MotionAPI, LastMotionAPI
 from api.notification import NotificationAPI
 from api.onboarding import OnboardingLogsByResultAPI
 from api.onboarding import OnboardingLogsBySenseIdAPI
@@ -159,5 +159,6 @@ routes = [
     ('/api/last_heartbeat/?$', LastHeartbeatAPI),
     ('/api/heartbeats/?$', HeartbeatsAPI),
     ('/api/dust_calibration_left_over/?$', DustCalibrationLeftOverPairsAPI),
+    ('/api/last_motion/?$', LastMotionAPI),
 ]
 

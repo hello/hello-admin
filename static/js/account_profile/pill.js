@@ -1,7 +1,8 @@
 var PillSummary = React.createClass({
     getInitialState: function() {
-        return {pillColor: ""};
+        return {pillColor: "", heartbeat: {}, motion: {}};
     },
+
     getPillColor(pillId, accountId) {
         $.ajax({
             url: "/api/pill_color",
@@ -18,37 +19,71 @@ var PillSummary = React.createClass({
         });
     },
 
+    getLastHeartbeat(pillId) {
+        $.ajax({
+            url: "/api/last_heartbeat",
+            type: 'GET',
+            data: {pill_id: pillId},
+            success: function(response) {
+                this.setState({heartbeat: response.data});
+            }.bind(this)
+        });
+    },
+
+    getLastMotion(email, date) {
+        $.ajax({
+            url: "/api/last_motion",
+            type: 'GET',
+            data: {email: email, date: date},
+            success: function(response) {
+                if (response.error.isWhiteString()) {
+                    this.setState({motion: response.data});
+                }
+            }.bind(this)
+        });
+    },
+
     componentDidUpdate: function(nextProps, nextState) {
         var currentSenseId = this.props.senseResponse.data && this.props.senseResponse.data.length > 0  ? this.props.senseResponse.data[0].device_account_pair.external_device_id : null;
         var nextSenseId = nextProps.senseResponse.data && nextProps.senseResponse.data.length > 0  ? nextProps.senseResponse.data[0].device_account_pair.external_device_id : null;
+
+        var currentPillId = this.props.pillResponse.data && this.props.pillResponse.data.length > 0  ? this.props.pillResponse.data[0].device_account_pair.external_device_id : null;
+        var nextPillId = nextProps.pillResponse.data && nextProps.pillResponse.data.length > 0  ? nextProps.pillResponse.data[0].device_account_pair.external_device_id : null;
+
         var currentAccountId = this.props.pillResponse.data && this.props.pillResponse.data.length > 0  ? this.props.pillResponse.data[0].device_account_pair.account_id : null;
         var nextAccountId = nextProps.pillResponse.data && nextProps.pillResponse.data.length > 0  ? nextProps.pillResponse.data[0].device_account_pair.account_id : null;
 
-        if (currentSenseId === nextSenseId && currentAccountId === nextAccountId) {
-           return false;
+        var currentEmail = this.props.email;
+        var nextEmail = nextProps.email;
+
+        if (currentSenseId !== nextSenseId || currentAccountId !== nextAccountId) {
+            this.getPillColor(currentSenseId, currentAccountId);
         }
-        this.getPillColor(currentSenseId, currentAccountId);
+
+        if (currentPillId !== nextPillId) {
+           this.getLastHeartbeat(currentPillId);
+        }
+
+        if (currentEmail !== nextEmail) {
+            var yesterday = new Date();
+            yesterday.setDate(yesterday.getDate()-1);
+            this.getLastMotion(this.props.email, d3.time.format("%Y-%m-%d")(yesterday));
+        }
+        return false;
     },
 
     render: function() {
         var pillResponse = this.props.pillResponse,
-            pillStatusResponse = this.props.pillStatusResponse,
             pillKeyStoreResponse = this.props.pillKeyStoreResponse,
-            result = null, battery_level = null, lastSeen = null, keyStore = null, uptime = null;
-        if (pillStatusResponse.data.length > 0) {
-            if(pillStatusResponse.data[0][0]) {
-                battery_level = pillStatusResponse.data[0][0].battery_level ?
-                    <span>{pillStatusResponse.data[0][0].battery_level + " %"}</span> : null;
-                var lastSeenEpoch = pillStatusResponse.data[0][0].last_seen;
-                lastSeen = <span className={lastSeenEpoch < new Date().getTime() - 4*3600*1000 ? "not-ok" : "ok"} dangerouslySetInnerHTML={{__html: utcFormatter(new Date(lastSeenEpoch))}}/>;
-                uptime = millisecondsToHumanReadableString(pillStatusResponse.data[0][0].uptime * 1000, true);
-            }
-            else {
-                battery_level = <span className="not-ok">-</span>;
-                lastSeen = <span className="not-ok">-</span>;
-                uptime = <span className="not-ok">-</span>;
+            result = null, battery_level = null, lastHeartbeat = null, lastMotion = null, keyStore = null, uptime = null;
+        if (!$.isEmptyObject(this.state.heartbeat)) {
+            battery_level = <span>{this.state.heartbeat.battery_level + " %"}</span>;
+            lastHeartbeat = <span className={this.state.heartbeat.created_at < new Date().getTime() - 4*3600*1000 ? "not-ok" : "ok"} dangerouslySetInnerHTML={{__html: utcFormatter(new Date(this.state.heartbeat.created_at))}}/>;
+            uptime = millisecondsToHumanReadableString(this.state.heartbeat.uptime * 1000, true);
+        }
 
-            }
+        if (!$.isEmptyObject(this.state.motion)) {
+            lastMotion = <span dangerouslySetInnerHTML={{__html: utcFormatter(new Date(this.state.motion.timestamp))}}/>;
         }
 
         if (pillKeyStoreResponse.error.isWhiteString()) {
@@ -76,7 +111,8 @@ var PillSummary = React.createClass({
                         <tr><td>Battery</td><td>{battery_level}</td></tr>
                         <tr><td>Uptime</td><td>{uptime}</td></tr>
                         <tr><td>Color</td><td>{pillColor}</td></tr>
-                        <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
+                        <tr><td>Last Heartbeat</td><td>{lastHeartbeat}</td></tr>
+                        <tr><td>Last Motion</td><td>{lastMotion}</td></tr>
                         <tr><td>Last Pairing</td><td>{lastPairing}</td></tr>
                         <tr><td/><td/></tr>
                     </tbody>
