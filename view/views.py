@@ -250,3 +250,8 @@ class TimelineLogsHistoryView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='timeline_logs_history.html',
                                 context={'title': "Timeline Logs History"})
+
+class DustCalibrationLeftOverView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='dust_calibration_left_over.html',
+                                context={'title': "Dust Calibration Left Over"})

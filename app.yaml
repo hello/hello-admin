@@ -1,5 +1,5 @@
 application: 'hello-admin'
-version: 56c
+version: 56d
 
 runtime: python27
 api_version: 1
@@ -25,4 +25,4 @@ libraries:
 - name: jinja2
   version: latest
 - name: pycrypto
-  version: latest0.57
+  version: latest

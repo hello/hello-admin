@@ -1,4 +1,6 @@
 from core.handlers.base import ProtectedRequestHandler
+from core.models.response import ResponseOutput
+from models.ext import DustCalibrationLeftOverPairs
 
 AVG_CALIBRATED_ADC = 300
 BASE = 300
@@ -34,4 +36,18 @@ class DustOffsetAPI(ProtectedRequestHandler):
 
         raw_response.set_data(adc_offset_dict)
         self.response.write(raw_response.get_serialized_output())
+
+
+class DustCalibrationLeftOverPairsAPI(ProtectedRequestHandler):
+    def get(self):
+        all_left_over_pairs = DustCalibrationLeftOverPairs.query()
+
+        response_output = ResponseOutput(
+            data=[p.to_dict() for p in all_left_over_pairs],
+            status=200,
+            viewer=self.current_user_email
+        )
+
+        self.response.write(response_output.get_serialized_output())
+
 

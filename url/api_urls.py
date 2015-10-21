@@ -1,6 +1,6 @@
 from api.account import RecentAccountsAPI, AccountSearchAPI, AccountCountsBreakdownByCreatedDateAPI
 from api.alarm import AlarmsAPI, AlarmsByEmailAPI, AlarmRingsHistoryAPI
-from api.calibration import DustCalibrationAPI, DustOffsetAPI
+from api.calibration import DustCalibrationAPI, DustOffsetAPI, DustCalibrationLeftOverPairsAPI
 from api.namespace import NamespaceAPI
 from api.password import PasswordResetAPI, PasswordForceUpdateAPI
 from api.feature import FeaturesAPI
@@ -158,5 +158,6 @@ routes = [
     ('/api/pill_color/?$', PillColorAPI),
     ('/api/pill_last_heartbeat/?$', PillLastHeartbeatAPI),
     ('/api/pill_heartbeats/?$', PillHeartbeatsAPI),
+    ('/api/dust_calibration_left_over/?$', DustCalibrationLeftOverPairsAPI),
 ]
 
