@@ -4,6 +4,7 @@ var PillSummary = React.createClass({
     },
 
     getPillColor(pillId, accountId) {
+        this.setState({pillColor: ""});
         $.ajax({
             url: "/api/pill_color",
             type: 'GET',
@@ -20,17 +21,24 @@ var PillSummary = React.createClass({
     },
 
     getLastHeartbeat(pillId) {
+        this.setState({heartbeat: {}});
         $.ajax({
             url: "/api/last_heartbeat",
             type: 'GET',
             data: {pill_id: pillId},
             success: function(response) {
-                this.setState({heartbeat: response.data});
+                if (response.error.isWhiteString()) {
+                    this.setState({heartbeat: response.data});
+                }
+                else {
+                    this.setState({heartbeat: null});
+                }
             }.bind(this)
         });
     },
 
     getLastMotion(email, date) {
+        this.setState({motion: {}});
         $.ajax({
             url: "/api/last_motion",
             type: 'GET',
@@ -38,6 +46,9 @@ var PillSummary = React.createClass({
             success: function(response) {
                 if (response.error.isWhiteString()) {
                     this.setState({motion: response.data});
+                }
+                else {
+                    this.setState({motion: null});
                 }
             }.bind(this)
         });
@@ -74,14 +85,22 @@ var PillSummary = React.createClass({
     render: function() {
         var pillResponse = this.props.pillResponse,
             pillKeyStoreResponse = this.props.pillKeyStoreResponse,
-            result = null, battery_level = null, lastHeartbeat = null, lastMotion = null, keyStore = null, uptime = null;
-        if (!$.isEmptyObject(this.state.heartbeat)) {
-            battery_level = <span>{this.state.heartbeat.battery_level + " %"}</span>;
+            result = null, batteryLevel = null, lastHeartbeat = null, lastMotion = null, keyStore = null, uptime = null;
+        if (this.state.heartbeat === null) {
+            batteryLevel = <span className="not-ok">--</span>;
+            lastHeartbeat = <span className="not-ok">--</span>;
+            uptime = <span className="not-ok">--</span>;
+        }
+        else if (!$.isEmptyObject(this.state.heartbeat)) {
+            batteryLevel = <span>{this.state.heartbeat.battery_level + " %"}</span>;
             lastHeartbeat = <span className={this.state.heartbeat.created_at < new Date().getTime() - 4*3600*1000 ? "not-ok" : "ok"} dangerouslySetInnerHTML={{__html: utcFormatter(new Date(this.state.heartbeat.created_at))}}/>;
             uptime = millisecondsToHumanReadableString(this.state.heartbeat.uptime * 1000, true);
         }
 
-        if (!$.isEmptyObject(this.state.motion)) {
+        if (this.state.motion === null) {
+            lastMotion = <span className="not-ok">--</span>;
+        }
+        else if (!$.isEmptyObject(this.state.motion)) {
             lastMotion = <span dangerouslySetInnerHTML={{__html: utcFormatter(new Date(this.state.motion.timestamp))}}/>;
         }
 
@@ -107,7 +126,7 @@ var PillSummary = React.createClass({
                     <tbody>
                         <tr><td>ID</td><td>{pillId + pillInternalId}</td></tr>
                         <tr><td>Keystore</td><td>{keyStore}</td></tr>
-                        <tr><td>Battery</td><td>{battery_level}</td></tr>
+                        <tr><td>Battery</td><td>{batteryLevel}</td></tr>
                         <tr><td>Uptime</td><td>{uptime}</td></tr>
                         <tr><td>Color</td><td>{pillColor}</td></tr>
                         <tr><td>Last Heartbeat</td><td>{lastHeartbeat}</td></tr>
