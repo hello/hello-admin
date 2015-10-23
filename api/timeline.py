@@ -35,7 +35,7 @@ class TimelineV2API(ProtectedRequestHandler):
             api_info=self.suripu_admin,
             body_data=json.dumps({
                 "email": self.request.get("email"),
-                "client_id": settings.MOBILE_OAUTH_CLIENT_ID
+                "client_id": settings.TIMELINE_RESEARCH_OAUTH_CLIENT_ID
             })
         ).data.get("access_token")
 
