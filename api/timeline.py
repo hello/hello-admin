@@ -1,4 +1,6 @@
 from core.handlers.base import ProtectedRequestHandler
+import settings
+
 __author__ = 'zet'
 import json
 
@@ -33,12 +35,13 @@ class TimelineV2API(ProtectedRequestHandler):
             api_info=self.suripu_admin,
             body_data=json.dumps({
                 "email": self.request.get("email"),
-                "client_id": "timeline-research"
+                "client_id": settings.MOBILE_OAUTH_CLIENT_ID
             })
         ).data.get("access_token")
 
     def get(self):
         token = self.get_impersonatee_token()
+        print "TOKEN", token
         self.hello_request(
             api_url="timeline/{}".format(self.request.get("date")),
             type="GET",
