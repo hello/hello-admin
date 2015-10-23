@@ -67,4 +67,4 @@ SLACK_WEBHOOK = {
     ),
 }
 
-MOBILE_OAUTH_CLIENT_ID = "cbaf8aaf-609a-46f8-98d9-292d5376a6b7"
+TIMELINE_RESEARCH_OAUTH_CLIENT_ID = "timeline-research"
