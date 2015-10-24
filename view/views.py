@@ -22,18 +22,19 @@ class SettingsView(SettingsModeratorRequestHandler):
 
 class SenseLogsView(ProtectedRequestHandler):
     """
-    Returns sense logs viewer
+    Returns sense logs view
     """
     def get(self):
         self.render_to_response(template_file='sense_logs.html',
                                 context={'title': 'Sense Logs'})
 
-class SenseLogsNewView(ProtectedRequestHandler):
+class SenseLogsESView(ProtectedRequestHandler):
     """
-    Returns sense logs viewer
+    Returns sense logs powered by elasticsearch view
     """
     def get(self):
-        self.redirect("/sense_logs")
+         self.render_to_response(template_file='sense_logs_es.html',
+                                context={'title': 'Sense Logs ES'})
 
 class FirmwareView(FirmwareRequestHandler):
     """Returns a panel for moderating firmware content"""

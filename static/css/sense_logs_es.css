@@ -1,0 +1,38 @@
+#row-basic-search, #row-advance-search {height: 75px;}
+.mode {cursor: pointer; color: #009CFF;}
+.mode-wrapper{font-size: 70%; margin-top: 12px;}
+
+.span-upload-ts {
+    font-weight: bold;
+}
+.center-wrapper {
+    text-align: center;
+}
+
+.time-window {
+    border: none;
+}
+
+#start, #end {
+    padding-left: 40px;
+}
+
+.highlight {
+    color: red;
+}
+
+.zero-padding-right {
+    padding-right: 0;
+}
+
+.zero-padding-left {
+    padding-left: 0;
+}
+
+.borderless {
+    border: none;
+}
+
+tbody {
+    background-color: #f5f5f5;
+}
