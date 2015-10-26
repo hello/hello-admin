@@ -36,3 +36,10 @@
 tbody {
     background-color: #f5f5f5;
 }
+
+.pager {margin: 0;}
+#size-input {padding: 6px 9px;}
+
+.splitter {margin: 5px 0;}
+.logs-meta {font-size: 12px; text-transform: uppercase;}
+.logs-content {font-size: 13px;}
