@@ -180,7 +180,7 @@ var SenseLogsESMaster = React.createClass({
                 </Col>
                 <LongDatetimePicker size={3} glyphicon="clock" placeHolder="end datetime" id="end"/>
                 <Col xs={2} className="mode-wrapper">
-                    <span>or switch to <span className="mode" onClick={this.switchToAdvanceMode}>advance mode</span></span>
+                    <span>or switch to <span className="mode" onClick={this.switchToAdvanceMode}>advanced mode</span></span>
                 </Col>
                 <span className="sort-wrapper">oldest first</span> <input id="is-asc" type="checkbox"/>
             </form>
