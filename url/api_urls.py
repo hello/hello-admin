@@ -1,6 +1,7 @@
 from api.account import RecentAccountsAPI, AccountSearchAPI, AccountCountsBreakdownByCreatedDateAPI
 from api.alarm import AlarmsAPI, AlarmsByEmailAPI, AlarmRingsHistoryAPI
 from api.calibration import DustCalibrationAPI, DustOffsetAPI, DustCalibrationLeftOverPairsAPI
+from api.elasticsearch import SenseLogsElasticSearchAPI
 from api.namespace import NamespaceAPI
 from api.password import PasswordResetAPI, PasswordForceUpdateAPI
 from api.feature import FeaturesAPI
@@ -160,5 +161,6 @@ routes = [
     ('/api/heartbeats/?$', HeartbeatsAPI),
     ('/api/dust_calibration_left_over/?$', DustCalibrationLeftOverPairsAPI),
     ('/api/last_motion/?$', LastMotionAPI),
+    ('/api/sense_logs_es/?$', SenseLogsElasticSearchAPI),
 ]
 

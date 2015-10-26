@@ -26,7 +26,7 @@ from view.views import RecentAccountsView
 from view.views import RoomConditionsView
 from view.views import SearchifyStatsView
 from view.views import SenseEventsView
-from view.views import SenseLogsNewView
+from view.views import SenseLogsESView
 from view.views import SenseLogsView
 from view.views import SettingsView
 from view.views import SetupView
@@ -77,7 +77,7 @@ routes = [
     ('/searchify_stats/?$', SearchifyStatsView),
     ('/sense_events/?$', SenseEventsView),
     ('/sense_logs/?$', SenseLogsView),
-    ('/sense_logs_new/?$', SenseLogsNewView),
+    ('/sense_logs_es/?$', SenseLogsESView),
     ('/settings/?$', SettingsView),
     ('/setup/?$', SetupView),
     ('/teams/?$', TeamsView),
