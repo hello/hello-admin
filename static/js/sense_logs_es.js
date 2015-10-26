@@ -9,7 +9,7 @@ var SenseLogsESResultsTable = React.createClass({
                 return <tr>
                     <td>
                         <div className="logs-meta">
-                            <Glyphicon glyph="time"/><span> {new Date(r._source.epoch_millis).toUTCString()} </span>
+                            <Glyphicon glyph="time"/><span>  {new Date(r._source.epoch_millis).toUTCString()} </span>
                             | Sense:
                             <a target="_blank" href={"/account_profile/?type=sense_id&input=" + r._source.sense_id}> {r._source.sense_id}</a>
                             &nbsp;
