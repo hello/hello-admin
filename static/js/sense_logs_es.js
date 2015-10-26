@@ -35,9 +35,13 @@ var SenseLogsESMaster = React.createClass({
     },
 
     submitWithInputsFromURL: function() {
+        var limitFromURL = getParameterByName("limit");
+        var isAscFromURL = getParameterByName("asc");
         var advanceInputFromURL = getParameterByName("advance_input");
         if(advanceInputFromURL) {
             this.refs.advanceInput.getDOMNode().value = advanceInputFromURL;
+            this.refs.sizeInputAdvance.getDOMNode().value = limitFromURL;
+            $("#is-asc-advance").prop('checked', isAscFromURL);
             this.setState({mode: "advance"});
             this.handleAdvanceSearch();
             return false;
@@ -49,7 +53,6 @@ var SenseLogsESMaster = React.createClass({
         var middleFWFromURL = getParameterByName("middle_fw");
         var startFromURL = getParameterByName("start");
         var endFromURL = getParameterByName("end");
-        var limitFromURL = getParameterByName("limit");
 
 
         this.refs.senseInput.getDOMNode().value = senseIdFromURL;
@@ -59,6 +62,7 @@ var SenseLogsESMaster = React.createClass({
         $("#start").val(startFromURL);
         $("#end").val(endFromURL);
         this.refs.sizeInput.getDOMNode().value = limitFromURL;
+        $("#is-asc").prop('checked', isAscFromURL);
         this.handleBasicSearch();
     },
 
@@ -66,11 +70,11 @@ var SenseLogsESMaster = React.createClass({
         this.submitWithInputsFromURL();
     },
 
-    query: function(lucenePhrase, size) {
+    query: function(lucenePhrase, size, sort) {
         this.setState({documents: [], error: "", total: 0, loading: true});
         $.ajax({
             url: "/api/sense_logs_es",
-            data: {lucene_phrase: lucenePhrase, size: size},
+            data: {lucene_phrase: lucenePhrase, size: size, sort: sort},
             type: "GET",
             success: function(response) {
                 if (response.error) {
@@ -92,13 +96,15 @@ var SenseLogsESMaster = React.createClass({
     handleBasicSearch: function() {
         var startDateTimeString = $("#start").val().trim();
         var endDateTimeString = $("#end").val().trim();
+        var isOrderAsc = $('#is-asc').is(':checked');
         history.pushState({}, '', '/sense_logs_es/?text=' + this.refs.textInput.getDOMNode().value.trim() +
                               '&sense_id=' + this.refs.senseInput.getDOMNode().value.trim() +
                               '&top_fw=' + this.refs.topFirmwareInput.getDOMNode().value.trim() +
                               '&middle_fw=' + this.refs.middleFirmwareInput.getDOMNode().value.trim() +
                               '&start=' + startDateTimeString +
                               '&end=' + endDateTimeString +
-                              '&limit=' + this.refs.sizeInput.getDOMNode().value.trim()
+                              '&limit=' + this.refs.sizeInput.getDOMNode().value.trim() +
+                              '&asc=' + isOrderAsc
         );
         var startEpochMillis = new Date(startDateTimeString + " GMT").getTime();
         var endEpochMillis = new Date(endDateTimeString + " GMT").getTime();
@@ -108,14 +114,23 @@ var SenseLogsESMaster = React.createClass({
             " AND top_firmware_version:" + (this.refs.topFirmwareInput.getDOMNode().value.trim() || "*") +
             " AND middle_firmware_version:" + (this.refs.middleFirmwareInput.getDOMNode().value.trim() || "*") +
             " AND epoch_millis:[" + (startEpochMillis || "*") + " TO " + (endEpochMillis || "*") + "]",
-            this.refs.sizeInput.getDOMNode().value.trim() || DEFAULT_PAGE_LIMIT
+            this.refs.sizeInput.getDOMNode().value.trim() || DEFAULT_PAGE_LIMIT,
+            isOrderAsc ? "epoch_millis:asc" : "epoch_millis:desc"
         );
         return false;
     },
 
     handleAdvanceSearch: function() {
-        history.pushState({}, '', '/sense_logs_es/?advance_input=' + this.refs.advanceInput.getDOMNode().value.trim());
-        this.query(this.refs.advanceInput.getDOMNode().value.trim()  || "*");
+        var isOrderAscAdvance = $('#is-asc-advance').is(':checked');
+        history.pushState({}, '', '/sense_logs_es/?advance_input=' + this.refs.advanceInput.getDOMNode().value.trim() +
+                              '&limit=' + this.refs.sizeInputAdvance.getDOMNode().value.trim() +
+                              '&asc=' + isOrderAscAdvance
+        );
+        this.query(
+            this.refs.advanceInput.getDOMNode().value.trim()  || "*",
+            this.refs.sizeInputAdvance.getDOMNode().value.trim() || DEFAULT_PAGE_LIMIT,
+            isOrderAscAdvance ? "epoch_millis:asc" : "epoch_millis:desc"
+        );
         return false;
     },
 
@@ -151,8 +166,7 @@ var SenseLogsESMaster = React.createClass({
                 <LongDatetimePicker size={3} glyphicon="clock" placeHolder="start datetime"
                                     id="start"/>
                 <Col xs={1}>
-                    <input id="size-input" className="form-control" ref="sizeInput" type="number"
-                           placeholder="limit"/>
+                    <input className="size-input form-control" ref="sizeInput" type="number" placeholder="limit"/>
                 </Col>
                 <Col xs={1}>
                     <Button bsStyle="info" type="submit">{this.state.loading ? "..." : <Glyphicon glyph="search"/>}</Button>
@@ -168,6 +182,7 @@ var SenseLogsESMaster = React.createClass({
                 <Col xs={2} className="mode-wrapper">
                     <span>or switch to <span className="mode" onClick={this.switchToAdvanceMode}>advance mode</span></span>
                 </Col>
+                <span className="sort-wrapper">oldest first</span> <input id="is-asc" type="checkbox"/>
             </form>
             <br/>
         </Row>;
@@ -176,13 +191,16 @@ var SenseLogsESMaster = React.createClass({
                 <Col xs={7}>
                     <input className="form-control" ref="advanceInput" type="text" placeholder="query in lucene syntax"/>
                 </Col>
-
+                <Col xs={1}>
+                    <input className="size-input form-control" ref="sizeInputAdvance" type="number" placeholder="limit"/>
+                </Col>
                 <Col xs={1}>
                     <Button bsStyle="info" type="submit">{this.state.loading ? "..." : <Glyphicon glyph="search"/>}</Button>
                 </Col>
                 <Col xs={2} className="mode-wrapper">
                     <span>or switch to <span className="mode" onClick={this.switchToBasicMode}>basic mode</span></span>
                 </Col>
+                <span className="sort-wrapper">oldest first</span> <input id="is-asc-advance" type="checkbox"/>
             </form><br/>
         </Row>;
 
