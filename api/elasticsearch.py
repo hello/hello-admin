@@ -10,9 +10,10 @@ class SenseLogsElasticSearchAPI(ProtectedRequestHandler):
         es_config = ElasticSearchConfiguration.query().get()
 
         response = requests.get(
-            url="{}/_search?q={}".format(
+            url="{}/_search?q={}&size={}".format(
                 es_config.host,
-                self.request.get("lucene_phrase")
+                self.request.get("lucene_phrase", default_value="*"),
+                self.request.get("size", default_value=20)
             ),
             auth=HTTPBasicAuth(
                 username=es_config.read_user,
