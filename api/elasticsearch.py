@@ -1,7 +1,6 @@
 from core.configuration.elasticsearch_configuration import ElasticSearchConfiguration
 from core.handlers.base import ProtectedRequestHandler
 from core.models.response import ResponseOutput
-from requests.auth import HTTPBasicAuth
 import requests
 
 
