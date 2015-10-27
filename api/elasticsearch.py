@@ -19,14 +19,12 @@ class SenseLogsElasticSearchAPI(ProtectedRequestHandler):
         ]
 
         response = requests.get(
-            url="{}/_search?{}".format(
+            url="{}:{}/_search?{}".format(
                 es_config.host,
+                es_config.http_port,
                 "&".join([esp for esp in es_params if esp != ""])
             ),
-            auth=HTTPBasicAuth(
-                username=es_config.read_user,
-                password=es_config.read_password
-            )
+            headers={"Authorization": es_config.token}
         )
 
         response_output = ResponseOutput(
