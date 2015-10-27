@@ -57,7 +57,7 @@ var FirmwareModal = React.createClass({
                     <tbody>
                         <tr className="modal-col-title">
                             <td>Last seen (Browser tz)</td>
-                            <td>Version (Int)</td>
+                            <td>Version (Dec)</td>
                             <td>Version (Hex)</td>
                             <td>Version (Man)</td>
                         </tr>
