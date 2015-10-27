@@ -56,7 +56,7 @@ var FirmwareModal = React.createClass({
                 <Table id="fw-history">
                     <tbody>
                         <tr className="modal-col-title">
-                            <td>Timestamp (Browser tz)</td>
+                            <td>Last seen (Browser tz)</td>
                             <td>Version (Int)</td>
                             <td>Version (Hex)</td>
                             <td>Version (Man)</td>
