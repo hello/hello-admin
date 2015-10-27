@@ -97,27 +97,40 @@ var SenseLogsESMaster = React.createClass({
         var startDateTimeString = $("#start").val().trim();
         var endDateTimeString = $("#end").val().trim();
         var isOrderAsc = $('#is-asc').is(':checked');
-        history.pushState({}, '', '/sense_logs_es/?text=' + this.refs.textInput.getDOMNode().value.trim() +
-                              '&sense_id=' + this.refs.senseInput.getDOMNode().value.trim() +
-                              '&top_fw=' + this.refs.topFirmwareInput.getDOMNode().value.trim() +
-                              '&middle_fw=' + this.refs.middleFirmwareInput.getDOMNode().value.trim() +
+        var senseInput = this.refs.senseInput.getDOMNode().value.trim();
+        var textInput = this.refs.textInput.getDOMNode().value.trim();
+        var topFirmwareInput = this.refs.topFirmwareInput.getDOMNode().value.trim();
+        var middleFirmwareInput = this.refs.middleFirmwareInput.getDOMNode().value.trim();
+        var sizeInput = this.refs.sizeInput.getDOMNode().value.trim();
+
+        history.pushState({}, '', '/sense_logs_es/?text=' + textInput +
+                              '&sense_id=' + senseInput +
+                              '&top_fw=' + topFirmwareInput +
+                              '&middle_fw=' + middleFirmwareInput +
                               '&start=' + startDateTimeString +
                               '&end=' + endDateTimeString +
-                              '&limit=' + this.refs.sizeInput.getDOMNode().value.trim() +
+                              '&limit=' + sizeInput +
                               '&asc=' + isOrderAsc
         );
         var startEpochMillis = new Date(startDateTimeString + " GMT").getTime();
         var endEpochMillis = new Date(endDateTimeString + " GMT").getTime();
+        var lucenePhrase = this.generateLucenePhrase([
+            senseInput ? "sense_id:" + senseInput : "",
+            textInput ? "text:" + textInput : "",
+            topFirmwareInput ? "top_firmware_version:" + topFirmwareInput : "",
+            middleFirmwareInput ? "top_firmware_version:" + middleFirmwareInput : "",
+            startEpochMillis && endEpochMillis ? "epoch_millis:[" + (startEpochMillis || "*") + " TO " + (endEpochMillis || "*") + "]" : ""
+        ]);
         this.query(
-            "sense_id:" + (this.refs.senseInput.getDOMNode().value.trim() || "*") +
-            " AND text:" + (this.refs.textInput.getDOMNode().value.trim() || "*") +
-            " AND top_firmware_version:" + (this.refs.topFirmwareInput.getDOMNode().value.trim() || "*") +
-            " AND middle_firmware_version:" + (this.refs.middleFirmwareInput.getDOMNode().value.trim() || "*") +
-            " AND epoch_millis:[" + (startEpochMillis || "*") + " TO " + (endEpochMillis || "*") + "]",
-            this.refs.sizeInput.getDOMNode().value.trim() || DEFAULT_PAGE_LIMIT,
+            lucenePhrase,
+            sizeInput || DEFAULT_PAGE_LIMIT,
             isOrderAsc ? "epoch_millis:asc" : "epoch_millis:desc"
         );
         return false;
+    },
+
+    generateLucenePhrase(args) {
+        return args.filter(function(d){return d !== ""}).join("AND")
     },
 
     handleAdvanceSearch: function() {
