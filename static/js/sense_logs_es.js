@@ -232,6 +232,7 @@ var SenseLogsESMaster = React.createClass({
             {advanceSearchForm}
             <div className="es-summary">hits: {this.state.total}</div>
             <SenseLogsESResultsTable documents={this.state.documents} tableHeaders={tableHeaders}/>
+            {this.state.error ? <Alert>{this.state.error}</Alert> : null}
         </div>;
     }
 });
