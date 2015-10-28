@@ -81,7 +81,7 @@ var SenseLogsESMaster = React.createClass({
                     this.setState({error: response.error, loading: false});
                 }
                 else if(response.data.hits) {
-                    this.setState({documents: response.data.hits.hits.sort(compareTimestamp), total: response.data.hits.total, loading: false});
+                    this.setState({documents: response.data.hits.hits, total: response.data.hits.total, loading: false});
                     if (this.state.documents.length > 0) {
                         this.setState({
                             oldestTimestamp: this.state.documents[0]._source.epoch_millis,
@@ -249,8 +249,4 @@ function formatLogText(text, keyword){
 
 function formatUTCDateFromEpoch(ts) {
     return d3.time.format.utc("%m/%d/%Y %H:%M:%S")(new Date(ts));
-}
-
-function compareTimestamp(d1, d2) {
-    return d1._source.epoch_millis - d2._source.epoch_millis;
 }
