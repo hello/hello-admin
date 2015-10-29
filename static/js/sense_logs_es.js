@@ -1,22 +1,37 @@
 var DEFAULT_PAGE_LIMIT = 200;
 
 var SenseLogsESResultsTable = React.createClass({
+    loadSurroundingLogs: function(senseId, epochMillis) {
+        $("#sense-input").val(senseId);
+        $("#start").val(formatUTCDateFromEpoch(epochMillis - 5*60*1000));
+        $("#end").val(formatUTCDateFromEpoch(epochMillis + 5*60*1000));
+        $("#text-input").val("");
+        $("#top-fw-input").val("");
+        $("#middle-fw-input").val("");
+        $("#submit").trigger("click");
+    },
     render: function() {
         return  <Table striped>
             {this.props.tableHeaders}
             <tbody>
             {this.props.documents.map(function (r) {
+                var lookUpAround = this.props.mode !== "basic" ? null :
+                    <DropdownButton bsSize="xsmall" title="Action" id="bg-vertical-dropdown-1">
+                        <MenuItem className="surrounding-logs" eventKey="1" onClick={this.loadSurroundingLogs.bind(this, r._source.sense_id, r._source.epoch_millis)}>Get surrounding logs</MenuItem>
+                    </DropdownButton>;
                 return <tr>
                     <td>
                         <div className="logs-meta">
-                            <Glyphicon glyph="time"/><span>  {new Date(r._source.epoch_millis).toUTCString()} </span>
-                            | Sense:
-                            <a target="_blank" href={"/account_profile/?type=sense_id&input=" + r._source.sense_id}> {r._source.sense_id}</a>
-                            &nbsp;
-                            | Top FW: {r._source.top_firmware_version}&nbsp;
-                            | Middle FW:
-                            <a target="_blank" href={"/firmware/?firmware_version=" + parseInt(r._source.middle_firmware_version, 16)}> {r._source.middle_firmware_version}</a>
-                            &nbsp;&nbsp;
+                            <Col xs={10}>
+                                <Glyphicon glyph="time"/><span>  {new Date(r._source.epoch_millis).toUTCString()} </span>
+                                | Sense:
+                                <a target="_blank" href={"/account_profile/?type=sense_id&input=" + r._source.sense_id}> {r._source.sense_id}</a>
+                                &nbsp;
+                                | Top FW: {r._source.top_firmware_version}&nbsp;
+                                | Middle FW:
+                                <a target="_blank" href={"/firmware/?firmware_version=" + parseInt(r._source.middle_firmware_version, 16)}> {r._source.middle_firmware_version}</a>
+                            </Col>
+                            <Col xs={2}>{lookUpAround}</Col>
                         </div><hr className="splitter"/>
                         <br/>
                         <div className="logs-content" dangerouslySetInnerHTML={{__html: formatLogText(r._source.text, $("#text-input").val())}}/>
@@ -130,7 +145,7 @@ var SenseLogsESMaster = React.createClass({
     },
 
     generateLucenePhrase(args) {
-        return args.filter(function(d){return d !== ""}).join("AND")
+        return args.filter(function(d){return d !== ""}).join(" AND ")
     },
 
     handleAdvanceSearch: function() {
@@ -160,6 +175,7 @@ var SenseLogsESMaster = React.createClass({
         $("#end").val(formatUTCDateFromEpoch(this.state.oldestTimestamp));
         this.handleBasicSearch();
     },
+
     loadNewerLogs: function() {
         $("#start").val(formatUTCDateFromEpoch(this.state.newestTimestamp));
         $("#end").val("");
@@ -170,26 +186,23 @@ var SenseLogsESMaster = React.createClass({
         var basicSearchForm = <Row id="row-basic-search" className={this.state.mode === "basic" ? "row-visible" : "row-invisible"}>
             <form id="basic-search" onSubmit={this.handleBasicSearch}>
                 <Col xs={3}>
-                    <input className="form-control" ref="senseInput" type="text" placeholder="sense external id"/>
+                    <input id="sense-input" className="form-control" ref="senseInput" type="text" placeholder="sense external id"/>
                 </Col>
                 <Col xs={3}>
-                    <input className="form-control" ref="topFirmwareInput" type="text"
-                           placeholder="top FW version"/>
+                    <input id="top-fw-input" className="form-control" ref="topFirmwareInput" type="text" placeholder="top FW version"/>
                 </Col>
-                <LongDatetimePicker size={3} glyphicon="clock" placeHolder="start datetime"
-                                    id="start"/>
+                <LongDatetimePicker size={3} glyphicon="clock" placeHolder="start datetime" id="start"/>
                 <Col xs={1}>
                     <input className="size-input form-control" ref="sizeInput" type="number" placeholder="limit"/>
                 </Col>
                 <Col xs={1}>
-                    <Button bsStyle="info" type="submit">{this.state.loading ? "..." : <Glyphicon glyph="search"/>}</Button>
+                    <Button id="submit" bsStyle="info" type="submit">{this.state.loading ? "..." : <Glyphicon glyph="search"/>}</Button>
                 </Col>
                 <Col xs={3}>
                     <input id="text-input" className="form-control" ref="textInput" type="text" placeholder="text phrase"/>
                 </Col>
                 <Col xs={3}>
-                    <input className="form-control" ref="middleFirmwareInput" type="text"
-                           placeholder="middle FW version"/>
+                    <input id="middle-fw-input" className="form-control" ref="middleFirmwareInput" type="text" placeholder="middle FW version"/>
                 </Col>
                 <LongDatetimePicker size={3} glyphicon="clock" placeHolder="end datetime" id="end"/>
                 <Col xs={2} className="mode-wrapper">
@@ -231,7 +244,7 @@ var SenseLogsESMaster = React.createClass({
             {basicSearchForm}
             {advanceSearchForm}
             <div className="es-summary">hits: {this.state.total}</div>
-            <SenseLogsESResultsTable documents={this.state.documents} tableHeaders={tableHeaders}/>
+            <SenseLogsESResultsTable documents={this.state.documents} tableHeaders={tableHeaders} mode={this.state.mode}/>
             {this.state.error ? <Alert>{this.state.error}</Alert> : null}
         </div>;
     }
