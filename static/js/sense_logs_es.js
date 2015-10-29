@@ -133,7 +133,7 @@ var SenseLogsESMaster = React.createClass({
             senseInput ? "sense_id:" + senseInput : "",
             textInput ? "text:" + textInput : "",
             topFirmwareInput ? "top_firmware_version:" + topFirmwareInput : "",
-            middleFirmwareInput ? "top_firmware_version:" + middleFirmwareInput : "",
+            middleFirmwareInput ? "middle_firmware_version:" + middleFirmwareInput : "",
             startEpochMillis && endEpochMillis ? "epoch_millis:[" + (startEpochMillis || "*") + " TO " + (endEpochMillis || "*") + "]" : ""
         ]);
         this.query(
