@@ -48,3 +48,14 @@ tbody {
 .sort-wrapper {font-size: 12px; color: #95959C;}
 
 .surrounding-logs {font-size: 9px;}
+
+.modal-footer {text-align: center; margin-top: -20px; padding-top: 0; border: none;}
+.modal-body {font-size: 13px;}
+.modal-title>button {right: 10px; position: absolute;}
+.modal-subtitle {color: #999999; font-size: 11px; margin-top: 5px;}
+.modal-col-title {text-transform: uppercase; color: #000000; font-weight: lighter; font-size: 10px;}
+.modal-fw-man {color: #41D7AB;}
+.well {height: 10px; min-height: 10px; padding: 10px 10px 21px 10px;}
+
+.lucene-fields {color: #009BFF;}
+.lucene-operators {color: #FF794C;}

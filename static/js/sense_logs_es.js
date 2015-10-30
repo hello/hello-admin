@@ -1,5 +1,26 @@
 var DEFAULT_PAGE_LIMIT = 200;
 
+
+var LuceneExampleModal = React.createClass({
+    render: function() {
+        return <Modal animation={true}>
+            <div className='modal-body'>
+                <div className="modal-title">Examples written in Lucene syntax <Button className="btn-round btn-borderless btn-fade" onClick={this.props.onRequestHide}>X</Button></div>
+                <div className="modal-subtitle">Google lucene syntax for more</div>
+                <br/>
+                Available fields are are <span className="lucene-fields">sense_id, text, epoch_millis, origin, has_alarm, has_firmware_crash, has_wifi_info, has_dust, top_firmware_version, middle_firmware_version</span>
+                <br/><br/>
+                <Well><span className="lucene-fields">sense_id</span>:C76DFE8CA359C503 <span className="lucene-operators">AND</span> <span className="lucene-fields">text</span>:RINGING</Well>
+                <Well><span className="lucene-fields">has_wifi_info</span>:true <span className="lucene-operators">OR</span> <span className="lucene-fields">has_firmware_crash</span>:false</Well>
+                <Well><span className="lucene-fields">top_firmware_version</span>:"0.9.1" <span className="lucene-operators">AND</span> <span className="lucene-fields">epoch_millis</span>:[1445635297760 TO 1445635297762]</Well>
+                <Well><span className="lucene-fields">has_wifi_info</span>:true <span className="lucene-operators">OR</span> <span className="lucene-fields">has_wifi_info</span>:true</Well>
+            </div>
+            <div className='modal-footer'>
+                <Button className="btn-round btn-fade" onClick={this.props.onRequestHide}>X</Button>
+            </div>
+        </Modal>;
+    }
+});
 var SenseLogsESResultsTable = React.createClass({
     loadSurroundingLogs: function(senseId, epochMillis) {
         $("#sense-input").val(senseId);
@@ -133,7 +154,7 @@ var SenseLogsESMaster = React.createClass({
             senseInput ? "sense_id:" + senseInput : "",
             textInput ? "text:" + textInput : "",
             topFirmwareInput ? "top_firmware_version:" + topFirmwareInput : "",
-            middleFirmwareInput ? "top_firmware_version:" + middleFirmwareInput : "",
+            middleFirmwareInput ? "middle_firmware_version:" + middleFirmwareInput : "",
             startEpochMillis && endEpochMillis ? "epoch_millis:[" + (startEpochMillis || "*") + " TO " + (endEpochMillis || "*") + "]" : ""
         ]);
         this.query(
@@ -214,7 +235,12 @@ var SenseLogsESMaster = React.createClass({
         </Row>;
         var advanceSearchForm = <Row id="row-advance-search" className={this.state.mode === "advance" ? "row-visible" : "row-invisible"}>
             <form id="advance-search" onSubmit={this.handleAdvanceSearch}>
-                <Col xs={7}>
+                <Col xs={2}>
+                    <ModalTrigger modal={<LuceneExampleModal/>}>
+                        <Button>Examples</Button>
+                    </ModalTrigger>
+                </Col>
+                <Col xs={6}>
                     <input className="form-control" ref="advanceInput" type="text" placeholder="query in lucene syntax"/>
                 </Col>
                 <Col xs={1}>
