@@ -14,6 +14,7 @@ var LuceneExampleModal = React.createClass({
                 <Well><span className="lucene-fields">has_wifi_info</span>:true <span className="lucene-operators">OR</span> <span className="lucene-fields">has_firmware_crash</span>:false</Well>
                 <Well><span className="lucene-fields">top_firmware_version</span>:"0.9.1" <span className="lucene-operators">AND</span> <span className="lucene-fields">epoch_millis</span>:[1445635297760 TO 1445635297762]</Well>
                 <Well><span className="lucene-fields">has_wifi_info</span>:true <span className="lucene-operators">OR</span> <span className="lucene-fields">has_wifi_info</span>:true</Well>
+                <Well><span className="lucene-fields">sense_id</span>:(E50DA3A9E224DD51 OR DD6CA8C58EC66882) <span className="lucene-operators">AND</span> <span className="lucene-fields">middle_firmware_version</span>:(NOT 1AB2782)</Well>
             </div>
             <div className='modal-footer'>
                 <Button className="btn-round btn-fade" onClick={this.props.onRequestHide}>X</Button>
