@@ -24,7 +24,7 @@ from api.firmware import FirmwareInfoAPI
 from api.firmware import FirmwareUnhashAPI
 from api.firmware import FirmwareGroupStatusAPI
 from api.firmware import FirmwareGroupPathAPI
-from api.keystore import PillKeyDecryptAPI
+from api.keystore import PillKeyDecryptAPI, SenseKeyStoreBatchAPI, PillKeyStoreBatchAPI
 from api.keystore import PillKeyProvision
 from api.keystore import PillProvisionAPI
 from api.keystore import SenseKeyProvision
@@ -162,5 +162,7 @@ routes = [
     ('/api/dust_calibration_left_over/?$', DustCalibrationLeftOverPairsAPI),
     ('/api/last_motion/?$', LastMotionAPI),
     ('/api/sense_logs_es/?$', SenseLogsElasticSearchAPI),
+    ('/api/sense_key_store/?$', SenseKeyStoreBatchAPI),
+    ('/api/pill_key_store/?$', PillKeyStoreBatchAPI),
 ]
 
