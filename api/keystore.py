@@ -296,3 +296,20 @@ def display_info(binary):
        "sha_1": sha_1,
        "sha_match": sha_match
     }
+
+
+class SenseKeyStoreBatchAPI(ProtectedRequestHandler):
+    def post(self):
+        self.hello_request(
+            api_url="key_store/sense",
+            body_data=self.request.body,
+            type="POST"
+        )
+
+class PillKeyStoreBatchAPI(ProtectedRequestHandler):
+    def post(self):
+        self.hello_request(
+            api_url="key_store/pill",
+            body_data=self.request.body,
+            type="POST"
+        )
