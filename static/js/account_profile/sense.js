@@ -177,7 +177,10 @@ var DustOffsetUpdateModal = React.createClass({
         return <Modal animation={true}>
             <div className='modal-body'>
                 <div className="modal-title">Dust Calibration Update<Button className="btn-round btn-borderless btn-fade" onClick={this.props.onRequestHide}>X</Button></div>
-                <div className="modal-subtitle">Once submitted, average dust concentration will be calculated for {this.props.senseId} over the last 10 days or less. If that calculation yields positive value, we will use it to compute calibration delta which trigger AQ rendering server-side</div>
+                <div className="modal-subtitle">Once submitted, average dust concentration will be calculated for {this.props.senseId} over the last 10 days or less. If that calculation yields positive value, we will use it to compute calibration delta which trigger AQ rendering server-side.
+                </div>
+                <br/>
+                <div className="modal-subtitle">Try NOT to do it twice within a short time.</div>
                 <br/>
                 <Button onClick={this.computeAndUpsertDustCalibration}>Submit</Button>
             </div>
