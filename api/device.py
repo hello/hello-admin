@@ -112,7 +112,7 @@ class DeviceKeyStoreAPI(ProtectedRequestHandler):
         device_type = self.request.get('device_type', default_value="")
 
         raw_output = self.hello_request(
-            api_url="devices/key_store_hints/{}/{}".format(device_type, device_id),
+            api_url="key_store/{}/{}".format(device_type, device_id),
             type="GET",
             raw_output=True
         )
