@@ -1,5 +1,6 @@
 from view.views import AccountProfileView, RoomConditionsMinuteView, TimelineV2View, LogsFacetHistoryView, \
-    TimelineLogsView, TimelineLogsHistoryView, DustCalibrationLeftOverView, HeartbeatView, KeyStoreBatchView
+    TimelineLogsView, TimelineLogsHistoryView, DustCalibrationLeftOverView, HeartbeatView, KeyStoreBatchView, \
+    LogsLevelView
 from view.views import ActiveDevicesHistoryView
 from view.views import AlarmRingsHistoryView
 from view.views import AlarmsView
@@ -97,4 +98,5 @@ routes = [
     ('/timeline_logs_history/?$', TimelineLogsHistoryView),
     ('/dust_calibration_left_over/?$', DustCalibrationLeftOverView),
     ('/key_store_batch/?$', KeyStoreBatchView),
+    ('/logs_level/?$', LogsLevelView),
 ]

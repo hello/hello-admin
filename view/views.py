@@ -267,3 +267,8 @@ class KeyStoreBatchView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='key_store_batch.html',
                                 context={'title': "KeyStore Batch"})
+
+class LogsLevelView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='logs_level.html',
+                                context={'title': "Logs Level"})

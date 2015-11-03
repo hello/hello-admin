@@ -2,6 +2,7 @@ from api.account import RecentAccountsAPI, AccountSearchAPI, AccountCountsBreakd
 from api.alarm import AlarmsAPI, AlarmsByEmailAPI, AlarmRingsHistoryAPI
 from api.calibration import DustCalibrationAPI, DustOffsetAPI, DustCalibrationLeftOverPairsAPI
 from api.elasticsearch import SenseLogsElasticSearchAPI
+from api.logs_level import LogsLevelAPI
 from api.namespace import NamespaceAPI
 from api.password import PasswordResetAPI, PasswordForceUpdateAPI
 from api.feature import FeaturesAPI
@@ -164,5 +165,6 @@ routes = [
     ('/api/sense_logs_es/?$', SenseLogsElasticSearchAPI),
     ('/api/sense_key_store/?$', SenseKeyStoreBatchAPI),
     ('/api/pill_key_store/?$', PillKeyStoreBatchAPI),
+    ('/api/logs_level/?$', LogsLevelAPI),
 ]
 
