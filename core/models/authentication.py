@@ -13,7 +13,7 @@ DEFAULT_SURIPU_ADMIN_DOMAIN = "http://localhost:3333/v1/"
 DEFAULT_CLIENT_ID = "gae_admin"
 DEFAULT_TOKEN = ""
 
-LOCAL_AVAILABLE_NAMESPACES = ["dev", "staging", "canary", "production"]
+LOCAL_AVAILABLE_NAMESPACES = ["dev", "staging"]  # local should not point to prod/canary
 AVAILABLE_NAMESPACES = ["staging", "canary", "production"]
 
 class ApiInfo(ndb.Model):
