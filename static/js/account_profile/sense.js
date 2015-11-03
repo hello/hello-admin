@@ -146,6 +146,7 @@ var DustOffsetUpdateModal = React.createClass({
                 else {
                     var averageDustOffset = response.data.adc_offset;
                     this.upsertDustCalibration(averageDustOffset);
+                    this.props.parent.getDustCalibration(this.props.senseId, this.props.accountId, this.props.senseInternalId);
                 }
                 this.props.onRequestHide();
             }.bind(this)
@@ -238,7 +239,7 @@ var SenseSummary = React.createClass({
                 if (response.error.isWhiteString()){
                     this.setState({dustCalibration: <div>
                         <span>{response.data.dust_calibration_delta} </span>
-                        <ModalTrigger modal={<DustOffsetUpdateModal senseId={senseId} accountId={accountId} senseInternalId={senseInternalId} />}>
+                        <ModalTrigger modal={<DustOffsetUpdateModal parent={this} senseId={senseId} accountId={accountId} senseInternalId={senseInternalId} />}>
                             <Button bsSize="xsmall">Re-compute</Button>
                         </ModalTrigger>
                     </div>});
@@ -271,8 +272,6 @@ var SenseSummary = React.createClass({
         });
         return false;
     },
-
-
 
     render: function() {
         var senseResponse = this.props.senseResponse,
