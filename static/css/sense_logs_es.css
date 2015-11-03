@@ -55,7 +55,7 @@ tbody {
 .modal-subtitle {color: #999999; font-size: 11px; margin-top: 5px;}
 .modal-col-title {text-transform: uppercase; color: #000000; font-weight: lighter; font-size: 10px;}
 .modal-fw-man {color: #41D7AB;}
-.well {height: 10px; min-height: 10px; padding: 10px 10px 21px 10px;}
+.well {min-height: 10px; padding: 10px 10px 21px 10px;}
 
 .lucene-fields {color: #009BFF;}
 .lucene-operators {color: #FF794C;}
