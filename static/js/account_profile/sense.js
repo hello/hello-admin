@@ -146,6 +146,7 @@ var DustOffsetUpdateModal = React.createClass({
                 else {
                     var averageDustOffset = response.data.adc_offset;
                     this.upsertDustCalibration(averageDustOffset);
+                    this.props.parent.getDustCalibration(this.props.senseId, this.props.accountId, this.props.senseInternalId);
                 }
                 this.props.onRequestHide();
             }.bind(this)
@@ -176,7 +177,10 @@ var DustOffsetUpdateModal = React.createClass({
         return <Modal animation={true}>
             <div className='modal-body'>
                 <div className="modal-title">Dust Calibration Update<Button className="btn-round btn-borderless btn-fade" onClick={this.props.onRequestHide}>X</Button></div>
-                <div className="modal-subtitle">Once submitted, average dust concentration will be calculated for {this.props.senseId} over the last 10 days or less. If that calculation yields positive value, we will use it to compute calibration delta which trigger AQ rendering server-side</div>
+                <div className="modal-subtitle">Once submitted, average dust concentration will be calculated for {this.props.senseId} over the last 10 days or less. If that calculation yields positive value, we will use it to compute calibration delta which trigger AQ rendering server-side.
+                </div>
+                <br/>
+                <div className="modal-subtitle">Try NOT to do it twice within a short time.</div>
                 <br/>
                 <Button onClick={this.computeAndUpsertDustCalibration}>Submit</Button>
             </div>
@@ -238,7 +242,7 @@ var SenseSummary = React.createClass({
                 if (response.error.isWhiteString()){
                     this.setState({dustCalibration: <div>
                         <span>{response.data.dust_calibration_delta} </span>
-                        <ModalTrigger modal={<DustOffsetUpdateModal senseId={senseId} accountId={accountId} senseInternalId={senseInternalId} />}>
+                        <ModalTrigger modal={<DustOffsetUpdateModal parent={this} senseId={senseId} accountId={accountId} senseInternalId={senseInternalId} />}>
                             <Button bsSize="xsmall">Re-compute</Button>
                         </ModalTrigger>
                     </div>});
@@ -271,8 +275,6 @@ var SenseSummary = React.createClass({
         });
         return false;
     },
-
-
 
     render: function() {
         var senseResponse = this.props.senseResponse,
