@@ -49,7 +49,9 @@ var SparkLine = React.createClass({
 
 
         data.forEach(function(d) {
-            return d[this.props.xAttr] = d3.time.format.iso.parse(d[this.props.xAttr]);
+            d[this.props.xAttr] = d3.time.format.iso.parse(d[this.props.xAttr]);
+            d[this.props.yAttr] = Math.min(60, d[this.props.yAttr]);
+            d[this.props.yAttr] = Math.max(0, d[this.props.yAttr]);
         }.bind(this));
 
         var line = d3.svg.line()
