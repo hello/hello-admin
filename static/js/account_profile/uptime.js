@@ -182,7 +182,7 @@ var UptimeTile = React.createClass({
             var cleanUptime = this.state.uptime.slice(1, this.state.uptime.length-1); // remove last hour because incomplete
 
             var totalUpTime = cleanUptime.map(function(i){return i.count}).reduce(function(x, y){return x+y;}, 0);
-            upTimeProportion = (totalUpTime /(cleanUptime.length*60)*100).toFixed(2) + " %";
+            upTimeProportion = (Math.min(100, totalUpTime /(cleanUptime.length*60)*100)).toFixed(2) + " %";
         }
         return <div>
                 <div>Last-10-day-ratio = {upTimeProportion}</div>
