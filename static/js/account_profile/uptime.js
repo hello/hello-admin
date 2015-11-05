@@ -50,8 +50,6 @@ var SparkLine = React.createClass({
 
         data.forEach(function(d) {
             d[this.props.xAttr] = d3.time.format.iso.parse(d[this.props.xAttr]);
-            d[this.props.yAttr] = Math.min(60, d[this.props.yAttr]);
-            d[this.props.yAttr] = Math.max(0, d[this.props.yAttr]);
         }.bind(this));
 
         var line = d3.svg.line()
@@ -164,7 +162,10 @@ var UptimeTile = React.createClass({
                 type: 'GET',
                 data: {email: email, padded: 1},
                 success: function (response) {
-                    this.setState({uptime : response.data})
+                    this.setState({uptime : response.data.map(function(u){
+                        u.count =   Math.min(60, Math.max(0, u.count));  // patch for bad feed from server
+                        return u;
+                    })});
                 }.bind(this)
             });
         }
