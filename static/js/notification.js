@@ -20,8 +20,13 @@ var NotificationMaestro = React.createClass({
             contentType: 'application/json',
             data: JSON.stringify(requestData),
             success: function (response) {
-                console.log(response);
-                that.setState({alert: "Message sent to " + requestData.receiver + "! Check it out in a bit. Make sure push notification is enabled on receiver's phone)"});
+                if (response.error.isWhiteString()) {
+                    that.setState({alert: "Message sent to " + requestData.receiver + "! Check it out in a bit. Make sure push notification is enabled on receiver's phone)"});
+                }
+                else {
+                    that.setState({alert: response.error});
+                }
+
             }.bind(that),
             error: function (e) {
                 that.setState({alert: e.toString});
