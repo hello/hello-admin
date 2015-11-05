@@ -221,7 +221,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         response = getattr(OAuth2Session, type.lower())(session, api_url, **request_detail)
         output.set_status(response.status_code)
         if response.status_code == 200:
-            if response.headers["content-type"] == "text/plain":
+            if response.headers.get("content-type") == "text/plain":
                 output.set_data(response.content)
             else:
                 try:
