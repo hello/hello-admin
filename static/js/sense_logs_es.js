@@ -1,5 +1,7 @@
 var DEFAULT_PAGE_LIMIT = 200;
 
+var specialCharactersAllowed = ["�"];
+
 
 var LuceneExampleModal = React.createClass({
     render: function() {
@@ -151,6 +153,9 @@ var SenseLogsESMaster = React.createClass({
         );
         var startEpochMillis = new Date(startDateTimeString + " GMT").getTime();
         var endEpochMillis = new Date(endDateTimeString + " GMT").getTime();
+        if (specialCharactersAllowed.indexOf(textInput) > -1) {
+            textInput = encodeURIComponent(textInput)
+        }
         var lucenePhrase = this.generateLucenePhrase([
             senseInput ? "sense_id:" + senseInput : "",
             textInput ? "text:" + textInput : "",
@@ -221,7 +226,7 @@ var SenseLogsESMaster = React.createClass({
                     <Button id="submit" bsStyle="info" type="submit">{this.state.loading ? "..." : <Glyphicon glyph="search"/>}</Button>
                 </Col>
                 <Col xs={3}>
-                    <input id="text-input" className="form-control" ref="textInput" type="text" placeholder="text phrase"/>
+                    <input id="text-input" className="form-control" ref="textInput" type="text" placeholder={"text, allowed " + specialCharactersAllowed.join(", ")}/>
                 </Col>
                 <Col xs={3}>
                     <input id="middle-fw-input" className="form-control" ref="middleFirmwareInput" type="text" placeholder="middle FW version"/>
