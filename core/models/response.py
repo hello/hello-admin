@@ -38,3 +38,12 @@ class ResponseOutput(object):
             'status': self.status,
             'viewer': self.viewer
         })
+
+    @classmethod
+    def fromPyRequestResponse(cls, response, viewer):
+        return ResponseOutput(
+            data=response.json(),
+            status=response.status_code,
+            error="" if response.ok else response.reason,
+            viewer=viewer
+        )
