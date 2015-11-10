@@ -213,6 +213,11 @@ class SearchifyStatsView(ProtectedRequestHandler):
         self.render_to_response(template_file='searchify_stats.html',
                                 context={'title': "Searchify Statistics"})
 
+class ESStatusView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='es_status.html',
+                                context={'title': "ES Status"})
+
 class BlackListView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='black_list.html',
