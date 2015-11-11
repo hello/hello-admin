@@ -3,7 +3,8 @@ var ESStatus = React.createClass({
     getInitialState: function() {
         return {
             data: [],
-            total: 0,
+            totalDocsCount: 0,
+            totalSize: 0,
             zoomable: false,
             chartType: "bar",
             alert: <Alert>Loading</Alert>
@@ -22,11 +23,12 @@ var ESStatus = React.createClass({
                     var data = extractIndicesInfo(response.data);
                     this.setState({
                         data: data, alert: null,
-                        total: data.map(function(z){return z.docsCount;}).reduce(function(x,y){return x+y;})
+                        totalDocsCount: data.map(function(z){return z.docsCount;}).reduce(function(x,y){return x+y;}),
+                        totalSize: data.map(function(z){return z.size;}).reduce(function(x,y){return x+y;})
                     });
                 }
                 else {
-                    this.setState({alert: <Alert>{response.error}</Alert>, total: 0});
+                    this.setState({alert: <Alert>{response.error}</Alert>, totalDocsCount: 0, totalSize: 0});
                 }
             }.bind(this)
         });
@@ -103,7 +105,8 @@ var ESStatus = React.createClass({
         return (<div>
             <h3>ES Index Status</h3>
             {this.state.alert}
-            <Col xs={3} xsOffset={1}>&Sigma; = {numberWithCommas(this.state.total)} documents</Col>
+            <Col xs={3} xsOffset={1}>&Sigma;docs = {numberWithCommas(this.state.totalDocsCount)}</Col>
+            <Col xs={3} xsOffset={7}>&Sigma;bytes = {numberWithCommas(this.state.totalSize)} ({(this.state.totalSize/(32*Math.pow(10, 9))).toFixed(2)}%)</Col>
             <div id="es-status-graph" className="c3-chart"></div>
 
         </div>)
