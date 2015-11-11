@@ -20,8 +20,9 @@ class FirmwareCrashElasticSearchAlert(ElasticSearchHandler):
         for field in fields}
 
         response = requests.post(
-            url="{}/_search{}".format(
+            url="{}/{}/_search{}".format(
                 self.base_url,
+                self.SENSE_LOGS_INDEX_PATTERN,
                 search_params
             ),
             data=json.dumps({

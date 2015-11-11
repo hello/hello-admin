@@ -1,5 +1,5 @@
 var DEFAULT_PAGE_LIMIT = 200;
-
+var SENSE_LOGS_INDEX_PATTERN = "sense-logs-20*";
 var specialCharactersAllowed = ["�"];
 
 
@@ -144,7 +144,7 @@ var SenseLogsESMaster = React.createClass({
 
         var now = new Date();
         var todayIndex = "sense-logs-" + now.getUTCFullYear() + "-" + (now.getUTCMonth() + 1) + "-" + now.getUTCDate();
-        var index = (startDateTimeString ||startDateTimeString || senseInput || textInput || topFirmwareInput || middleFirmwareInput) ? "_all" : todayIndex;
+        var index = (startDateTimeString ||startDateTimeString || senseInput || textInput || topFirmwareInput || middleFirmwareInput) ? SENSE_LOGS_INDEX_PATTERN : todayIndex;
         console.log("searching on index", index);
 
         history.pushState({}, '', '/sense_logs_es/?text=' + textInput +
