@@ -1,5 +1,6 @@
 var DEFAULT_PAGE_LIMIT = 200;
 var SENSE_LOGS_INDEX_PATTERN = "sense-logs-20*";
+var SENSE_LOGS_INDEX_FW_CRASH = "sense-logs-fw-crash"
 var specialCharactersAllowed = ["�"];
 
 
@@ -76,11 +77,13 @@ var SenseLogsESMaster = React.createClass({
     submitWithInputsFromURL: function() {
         var limitFromURL = getParameterByName("limit");
         var isAscFromURL = getParameterByName("asc");
+        var isFwCrashFromURL = getParameterByName("crash_only");
         var advanceInputFromURL = getParameterByName("advance_input");
         if(advanceInputFromURL) {
             this.refs.advanceInput.getDOMNode().value = advanceInputFromURL;
             this.refs.sizeInputAdvance.getDOMNode().value = limitFromURL;
             $("#is-asc-advance").prop('checked', isAscFromURL);
+            $("#is-fw-crash-advance").prop('checked', isFwCrashFromURL);
             this.setState({mode: "advance"});
             this.handleAdvanceSearch();
             return false;
@@ -102,6 +105,7 @@ var SenseLogsESMaster = React.createClass({
         $("#end").val(endFromURL);
         this.refs.sizeInput.getDOMNode().value = limitFromURL;
         $("#is-asc").prop('checked', isAscFromURL);
+        $("#is-fw-crash").prop('checked', isFwCrashFromURL);
         this.handleBasicSearch();
     },
 
@@ -113,7 +117,7 @@ var SenseLogsESMaster = React.createClass({
         this.setState({documents: [], error: "", total: 0, loading: true});
         $.ajax({
             url: "/api/sense_logs_es",
-            data: {lucene_phrase: lucenePhrase, size: size, sort: sort},
+            data: {lucene_phrase: lucenePhrase, size: size, sort: sort, index: index},
             type: "GET",
             success: function(response) {
                 if (response.error) {
@@ -136,6 +140,7 @@ var SenseLogsESMaster = React.createClass({
         var startDateTimeString = $("#start").val().trim();
         var endDateTimeString = $("#end").val().trim();
         var isOrderAsc = $('#is-asc').is(':checked');
+        var isFwCrash = $('#is-fw-crash').is(':checked');
         var senseInput = this.refs.senseInput.getDOMNode().value.trim();
         var textInput = this.refs.textInput.getDOMNode().value.trim();
         var topFirmwareInput = this.refs.topFirmwareInput.getDOMNode().value.trim();
@@ -143,8 +148,15 @@ var SenseLogsESMaster = React.createClass({
         var sizeInput = this.refs.sizeInput.getDOMNode().value.trim();
 
         var now = new Date();
-        var todayIndex = "sense-logs-" + now.getUTCFullYear() + "-" + (now.getUTCMonth() + 1) + "-" + now.getUTCDate();
-        var index = (startDateTimeString ||startDateTimeString || senseInput || textInput || topFirmwareInput || middleFirmwareInput) ? SENSE_LOGS_INDEX_PATTERN : todayIndex;
+        var index = "sense-logs-" + now.getUTCFullYear() + "-" + (now.getUTCMonth() + 1) + "-" + now.getUTCDate();
+
+        if (isFwCrash) {
+            index = SENSE_LOGS_INDEX_FW_CRASH;
+        }
+        else if (startDateTimeString ||startDateTimeString || senseInput || textInput || topFirmwareInput || middleFirmwareInput) {
+            index = SENSE_LOGS_INDEX_PATTERN;
+        }
+
         console.log("searching on index", index);
 
         history.pushState({}, '', '/sense_logs_es/?text=' + textInput +
@@ -154,7 +166,8 @@ var SenseLogsESMaster = React.createClass({
                               '&start=' + startDateTimeString +
                               '&end=' + endDateTimeString +
                               '&limit=' + sizeInput +
-                              '&asc=' + isOrderAsc
+                              '&asc=' + isOrderAsc +
+                              '&crash_only=' + isFwCrash
         );
         var startEpochMillis = new Date(startDateTimeString + " GMT").getTime();
         var endEpochMillis = new Date(endDateTimeString + " GMT").getTime();
@@ -242,7 +255,8 @@ var SenseLogsESMaster = React.createClass({
                 <Col xs={2} className="mode-wrapper">
                     <span>or switch to <span className="mode" onClick={this.switchToAdvanceMode}>advanced mode</span></span>
                 </Col>
-                <span className="sort-wrapper">oldest first</span> <input id="is-asc" type="checkbox"/>
+                <span className="sort-wrapper">oldest first</span> <input onChange={this.handleBasicSearch} id="is-asc" type="checkbox"/>
+                <span className="sort-wrapper">fw-crash</span> <input onChange={this.handleBasicSearch} id="is-fw-crash" type="checkbox"/>
             </form>
             <br/>
         </Row>;
@@ -265,7 +279,8 @@ var SenseLogsESMaster = React.createClass({
                 <Col xs={2} className="mode-wrapper">
                     <span>or switch to <span className="mode" onClick={this.switchToBasicMode}>basic mode</span></span>
                 </Col>
-                <span className="sort-wrapper">oldest first</span> <input id="is-asc-advance" type="checkbox"/>
+                <span className="sort-wrapper">oldest first</span> <input onChange={this.handleAdvanceSearch} id="is-asc-advance" type="checkbox"/>
+                <span className="sort-wrapper">fw-crash</span> <input onChange={this.handleAdvanceSearch} id="is-fw-crash-advance" type="checkbox"/>
             </form><br/>
         </Row>;
 
