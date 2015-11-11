@@ -1,3 +1,4 @@
+var DISK_CAP_SIZE = 64; //Gb;
 
 var ESStatus = React.createClass({
     getInitialState: function() {
@@ -106,7 +107,7 @@ var ESStatus = React.createClass({
             <h3>ES Index Status</h3>
             {this.state.alert}
             <Col xs={3} xsOffset={1}>&Sigma;docs = {numberWithCommas(this.state.totalDocsCount)}</Col>
-            <Col xs={3} xsOffset={7}>&Sigma;bytes = {numberWithCommas(this.state.totalSize)} ({(this.state.totalSize/(32*Math.pow(10, 9))).toFixed(2)}%)</Col>
+            <Col xs={3} xsOffset={7}>&Sigma;bytes = {numberWithCommas(this.state.totalSize)} ({(this.state.totalSize/(DISK_CAP_SIZE*Math.pow(10, 7))).toFixed(2)}%)</Col>
             <div id="es-status-graph" className="c3-chart"></div>
 
         </div>)
