@@ -59,11 +59,12 @@ class ElasticSearchAggregationAPI(ElasticSearchHandler):
         index = self.request.get("index", default_value="_all")
         lucene_phrase = self.request.get("lucene_phrase")
         search_params = "?q={}".format(lucene_phrase) if lucene_phrase else ""
+        top_size = self.request.get("size", default_value=10)  # show top ten and others by default
 
         fields = self.request.get("fields", default_value="").split(",")
         multi_facets_settings = {
             field.strip() : {
-                "terms": {"field": field.strip()}
+                "terms": {"field": field.strip(), "size": top_size}
             }
         for field in fields if field}
 

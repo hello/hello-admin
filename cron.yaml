@@ -44,3 +44,6 @@ cron:
 - description: dust calibration leftover update queue
   url: /cron/dust_calibration_leftover_update_queue
   schedule: every tuesday 21:00
+- description: firmware crash alert from ES logs
+  url: /cron/firmware_crash_alert_es
+  schedule: every 60 mins
