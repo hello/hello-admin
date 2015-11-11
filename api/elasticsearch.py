@@ -1,3 +1,4 @@
+import json
 from core.configuration.elasticsearch_configuration import ElasticSearchConfiguration
 from core.handlers.base import ProtectedRequestHandler
 from core.models.response import ResponseOutput
@@ -50,3 +51,28 @@ class ElasticSearchStatusAPI(ElasticSearchHandler):
         response_output = ResponseOutput.fromPyRequestResponse(response, self.current_user_email)
         self.response.write(response_output.get_serialized_output())
 
+
+class ElasticSearchAggregationAPI(ElasticSearchHandler):
+    def get(self):
+        lucene_phrase = self.request.get("lucene_phrase")
+        search_params = "?q={}".format(lucene_phrase) if lucene_phrase else ""
+
+        fields = self.request.get("fields", default_value="").split(",")
+        multi_facets_settings = {
+            field.strip() : {
+                "terms": {"field": field.strip()}
+            }
+        for field in fields}
+
+        response = requests.post(
+            url="{}/_search{}".format(
+                self.base_url,
+                search_params
+            ),
+            data=json.dumps({
+                "aggs" : multi_facets_settings
+            }),
+            headers={"Authorization": self.token}
+        )
+        response_output = ResponseOutput.fromPyRequestResponse(response, self.current_user_email)
+        self.response.write(response_output.get_serialized_output())
