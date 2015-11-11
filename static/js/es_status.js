@@ -120,11 +120,10 @@ var extractIndicesInfo = function(data) {
             return indexName.startsWith("sense-logs") && !indexName.endsWith("fallback");
         })
         .map(function(indexName){
-            var info = data.indices[indexName].merges;
             return{
                 indexName: indexName,
-                docsCount: info.total_docs,
-                size: info.total_size_in_bytes
+                docsCount: data.indices[indexName].docs.max_doc,
+                size: data.indices[indexName].index.size_in_bytes
             }
         })
         .sort(function(d1, d2){
