@@ -7,6 +7,7 @@ class Slack(object):
     STATS_CHANNEL = "stats"
     ADMIN_LOGS_CHANNEL = "admin_logs"
     DUST_CALIBRATION_CHANNEL = "dust_calibration"
+    FIRMWARE_CRASH_LOGS_CHANNEL = "firmware-crash-logs"
 
     def __init__(self, namespace, slack_webhook_settings):
         self.namespace = namespace
@@ -43,3 +44,6 @@ class Slack(object):
 
     def send_to_dust_calibration_channel(self, message=""):
         self.send(self.DUST_CALIBRATION_CHANNEL, message)
+
+    def send_to_firmware_crash_logs_channel(self, message=""):
+        self.send(self.FIRMWARE_CRASH_LOGS_CHANNEL, message)

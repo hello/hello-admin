@@ -65,6 +65,11 @@ SLACK_WEBHOOK = {
         bot="dusty-bot",
         icon=":thought_balloon:"
     ),
+    "firmware-crash-logs": SlackWebhookConfig(
+        url="https://hooks.slack.com/services/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",
+        bot="crash-bot",
+        icon=":broken_heart:"
+    ),
 }
 
 TIMELINE_RESEARCH_OAUTH_CLIENT_ID = "timeline-research"
