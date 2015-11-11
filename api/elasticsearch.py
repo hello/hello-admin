@@ -18,6 +18,7 @@ class ElasticSearchHandler(ProtectedRequestHandler):
 
 class SenseLogsElasticSearchAPI(ElasticSearchHandler):
     def get(self):
+        index = self.request.get("index", default_value="_all")
         lucene_phrase = self.request.get("lucene_phrase")
         size = self.request.get("size")
         sort = self.request.get("sort")
@@ -29,8 +30,9 @@ class SenseLogsElasticSearchAPI(ElasticSearchHandler):
         ]
 
         response = requests.get(
-            url="{}/_search?{}".format(
+            url="{}/{}/_search?{}".format(
                 self.base_url,
+                index,
                 "&".join([esp for esp in es_params if esp != ""])
             ),
             headers={"Authorization": self.token}
@@ -54,6 +56,7 @@ class ElasticSearchStatusAPI(ElasticSearchHandler):
 
 class ElasticSearchAggregationAPI(ElasticSearchHandler):
     def get(self):
+        index = self.request.get("index", default_value="_all")
         lucene_phrase = self.request.get("lucene_phrase")
         search_params = "?q={}".format(lucene_phrase) if lucene_phrase else ""
 
@@ -62,11 +65,12 @@ class ElasticSearchAggregationAPI(ElasticSearchHandler):
             field.strip() : {
                 "terms": {"field": field.strip()}
             }
-        for field in fields}
+        for field in fields if field}
 
         response = requests.post(
-            url="{}/_search{}".format(
+            url="{}/{}/_search{}".format(
                 self.base_url,
+                index,
                 search_params
             ),
             data=json.dumps({
