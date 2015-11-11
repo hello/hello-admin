@@ -109,7 +109,7 @@ var SenseLogsESMaster = React.createClass({
         this.submitWithInputsFromURL();
     },
 
-    query: function(lucenePhrase, size, sort) {
+    query: function(lucenePhrase, size, sort, index) {
         this.setState({documents: [], error: "", total: 0, loading: true});
         $.ajax({
             url: "/api/sense_logs_es",
@@ -142,6 +142,11 @@ var SenseLogsESMaster = React.createClass({
         var middleFirmwareInput = this.refs.middleFirmwareInput.getDOMNode().value.trim();
         var sizeInput = this.refs.sizeInput.getDOMNode().value.trim();
 
+        var now = new Date();
+        var todayIndex = "sense-logs-" + now.getUTCFullYear() + "-" + (now.getUTCMonth() + 1) + "-" + now.getUTCDate();
+        var index = (startDateTimeString ||startDateTimeString || senseInput || textInput || topFirmwareInput || middleFirmwareInput) ? "_all" : todayIndex;
+        console.log("searching on index", index);
+
         history.pushState({}, '', '/sense_logs_es/?text=' + textInput +
                               '&sense_id=' + senseInput +
                               '&top_fw=' + topFirmwareInput +
@@ -163,10 +168,12 @@ var SenseLogsESMaster = React.createClass({
             middleFirmwareInput ? "middle_firmware_version:" + middleFirmwareInput : "",
             startEpochMillis && endEpochMillis ? "epoch_millis:[" + (startEpochMillis || "*") + " TO " + (endEpochMillis || "*") + "]" : ""
         ]);
+
         this.query(
             lucenePhrase,
             sizeInput || DEFAULT_PAGE_LIMIT,
-            isOrderAsc ? "epoch_millis:asc" : "epoch_millis:desc"
+            isOrderAsc ? "epoch_millis:asc" : "epoch_millis:desc",
+            index
         );
         return false;
     },
