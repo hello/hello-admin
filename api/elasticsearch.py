@@ -6,6 +6,7 @@ import requests
 
 
 class ElasticSearchHandler(ProtectedRequestHandler):
+    SENSE_LOGS_INDEX_PATTERN = "sense-logs-20*"
     @property
     def es_config(self):
         return ElasticSearchConfiguration.query().get()
@@ -18,7 +19,7 @@ class ElasticSearchHandler(ProtectedRequestHandler):
 
 class SenseLogsElasticSearchAPI(ElasticSearchHandler):
     def get(self):
-        index = self.request.get("index", default_value="_all")
+        index = self.request.get("index", default_value=self.SENSE_LOGS_INDEX_PATTERN)
         lucene_phrase = self.request.get("lucene_phrase")
         size = self.request.get("size")
         sort = self.request.get("sort")
@@ -45,8 +46,9 @@ class SenseLogsElasticSearchAPI(ElasticSearchHandler):
 class ElasticSearchStatusAPI(ElasticSearchHandler):
     def get(self):
         response = requests.get(
-            url="{}/_all/_status".format(
-                self.base_url
+            url="{}/{}/_status".format(
+                self.base_url,
+                self.SENSE_LOGS_INDEX_PATTERN
             ),
             headers={"Authorization": self.token}
         )
@@ -56,7 +58,7 @@ class ElasticSearchStatusAPI(ElasticSearchHandler):
 
 class ElasticSearchAggregationAPI(ElasticSearchHandler):
     def get(self):
-        index = self.request.get("index", default_value="_all")
+        index = self.request.get("index", default_value=self.SENSE_LOGS_INDEX_PATTERN)
         lucene_phrase = self.request.get("lucene_phrase")
         search_params = "?q={}".format(lucene_phrase) if lucene_phrase else ""
         top_size = self.request.get("size", default_value=10)  # show top ten and others by default
