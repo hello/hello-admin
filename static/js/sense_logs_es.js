@@ -76,8 +76,8 @@ var SenseLogsESMaster = React.createClass({
 
     submitWithInputsFromURL: function() {
         var limitFromURL = getParameterByName("limit");
-        var isAscFromURL = getParameterByName("asc");
-        var isFwCrashFromURL = getParameterByName("crash_only");
+        var isAscFromURL = getParameterByName("asc") === "true";
+        var isFwCrashFromURL = getParameterByName("crash_only") === "true";
         var advanceInputFromURL = getParameterByName("advance_input");
         if(advanceInputFromURL) {
             this.refs.advanceInput.getDOMNode().value = advanceInputFromURL;
@@ -179,7 +179,7 @@ var SenseLogsESMaster = React.createClass({
             textInput ? "text:" + textInput : "",
             topFirmwareInput ? "top_firmware_version:" + topFirmwareInput : "",
             middleFirmwareInput ? "middle_firmware_version:" + middleFirmwareInput : "",
-            startEpochMillis && endEpochMillis ? "epoch_millis:[" + (startEpochMillis || "*") + " TO " + (endEpochMillis || "*") + "]" : ""
+            (startEpochMillis || endEpochMillis) ? "epoch_millis:[" + (startEpochMillis || "*") + " TO " + (endEpochMillis || "*") + "]" : ""
         ]);
 
         this.query(
