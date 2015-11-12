@@ -33,8 +33,10 @@ class FirmwareCrashElasticSearchAlert(ElasticSearchHandler):
         )
 
         response_output = ResponseOutput.fromPyRequestResponse(response, self.current_user_email)
+        last_hour_string = (datetime.datetime.utcnow() - datetime.timedelta(hours=1)).strftime("%m/%d/%y %H:%M:%S")
+        now_string = datetime.datetime.utcnow().strftime("%m/%d/%y %H:%M:%S")
         sense_logs_es_url = "https://hello-admin.appspot.com/sense_logs_es/?text=&sense_id=&top_fw=&middle_fw=" \
-                            "&start={}&end=&limit=&asc=false&crash_only=true".format(datetime.datetime.utcnow().strftime("%m/%d/%y %H:%M:%S"))
+                            "&start={}&end={}&limit=&asc=false&crash_only=true".format(last_hour_string, now_string)
 
         total_hits = response_output.data.get("hits", {}).get("total", 0)
         if total_hits > 0:
