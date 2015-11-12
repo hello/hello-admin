@@ -7,7 +7,7 @@ from google.appengine.api import urlfetch
 
 class ElasticSearchHandler(ProtectedRequestHandler):
     SENSE_LOGS_INDEX_PATTERN = "sense-logs-20*"
-    SENSE_LOGS_INDEX_FW_CRASH = "sense-log-fw-crash"
+    SENSE_LOGS_INDEX_FW_CRASH = "sense-logs-fw-crash"
 
     def __init__(self, request, response):
         super(ElasticSearchHandler, self).__init__(request, response)
