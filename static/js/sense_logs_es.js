@@ -1,6 +1,6 @@
 var DEFAULT_PAGE_LIMIT = 200;
 var SENSE_LOGS_INDEX_PATTERN = "sense-logs-20*";
-var SENSE_LOGS_INDEX_FW_CRASH = "sense-logs-fw-crash"
+var SENSE_LOGS_INDEX_FW_CRASH = "sense-logs-fw-crash";
 var specialCharactersAllowed = ["�"];
 
 
