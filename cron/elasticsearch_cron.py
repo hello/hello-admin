@@ -41,6 +41,8 @@ class FirmwareCrashElasticSearchAlert(ElasticSearchHandler):
             message = "{} documents with FW crash symptoms found <{}|last_hour>".format(total_hits, sense_logs_es_url)
             aggregations = response_output.data.get("aggregations", {})
             for agg_field in aggregations.keys():
+                if not aggregations[agg_field]["buckets"]:
+                    continue
                 message += "\n```Breakdown by {}\n".format(agg_field)
                 message += "\n".join(["{}: {}".format(j["key"].upper(), j["doc_count"]) for j in aggregations[agg_field]["buckets"]])
                 message += "\nOthers: {}\n".format(aggregations[agg_field]["sum_other_doc_count"])  + "\n```"
