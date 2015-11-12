@@ -277,3 +277,8 @@ class LogsLevelView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='logs_level.html',
                                 context={'title': "Logs Level"})
+
+class ESAggregationView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='es_aggregation.html',
+                                context={'title': "Sense Logs ES Aggregation"})

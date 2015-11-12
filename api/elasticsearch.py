@@ -3,10 +3,15 @@ from core.configuration.elasticsearch_configuration import ElasticSearchConfigur
 from core.handlers.base import ProtectedRequestHandler
 from core.models.response import ResponseOutput
 import requests
-
+from google.appengine.api import urlfetch
 
 class ElasticSearchHandler(ProtectedRequestHandler):
     SENSE_LOGS_INDEX_PATTERN = "sense-logs-20*"
+
+    def __init__(self, request, response):
+        super(ElasticSearchHandler, self).__init__(request, response)
+        urlfetch.set_default_fetch_deadline(60)
+
     @property
     def es_config(self):
         return ElasticSearchConfiguration.query().get()
