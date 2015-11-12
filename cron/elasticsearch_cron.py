@@ -23,7 +23,7 @@ class FirmwareCrashElasticSearchAlert(ElasticSearchHandler):
         response = requests.post(
             url="{}/{}/_search{}".format(
                 self.base_url,
-                self.SENSE_LOGS_INDEX_PATTERN,
+                self.SENSE_LOGS_INDEX_FW_CRASH,
                 search_params
             ),
             data=json.dumps({
