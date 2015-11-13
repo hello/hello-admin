@@ -51,3 +51,18 @@ class FirmwareCrashElasticSearchAlert(ElasticSearchHandler):
 
             self.slack_pusher.send_to_firmware_crash_logs_channel(message)
         self.response.write(response_output.get_serialized_output())
+
+
+class ElasticSearchDropIndex(ElasticSearchHandler):
+    TOLERANCE_DAYS = 7
+    def get(self):
+        index_name = "sense-logs-" + (datetime.datetime.utcnow() - datetime.timedelta(days=self.TOLERANCE_DAYS)).strftime("%Y-%m-%d")
+        response = requests.delete(
+            url="{}/{}".format(
+                self.base_url,
+                index_name
+            ),
+            headers={"Authorization": self.token}
+        )
+        response_output = ResponseOutput.fromPyRequestResponse(response, self.current_user_email)
+        self.response.write(response_output.get_serialized_output())

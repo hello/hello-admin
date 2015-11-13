@@ -3,7 +3,7 @@ from cron.datastore_cron import ActiveDevicesHistory15MinutesPurge, ActiveDevice
     StoreRecentlyActiveDevicesStatsMinute
 from cron.dust_calibration_cron import DustCalibrationUpdateQueue, DustCalibrationUpdate, \
     DustCalibrationLeftOverUpdateQueue, DustCalibrationLeftOverUpdate
-from cron.elasticsearch_cron import FirmwareCrashElasticSearchAlert
+from cron.elasticsearch_cron import FirmwareCrashElasticSearchAlert, ElasticSearchDropIndex
 from cron.firmware_cron import FirmwareLogsAlert, StoreLogsFacet, StoreLogsFacetQueue
 from cron.geckoboard_cron import AlarmsCountPush, DevicesCountPush
 from cron.searchify_cron import DropOldSenseLogsSearchifyIndex
@@ -34,4 +34,5 @@ routes = [
     ('/cron/dust_calibration_leftover_update/?$', DustCalibrationLeftOverUpdate),
     ('/cron/dust_calibration_leftover_update_queue/?$', DustCalibrationLeftOverUpdateQueue),
     ('/cron/firmware_crash_alert_es/?$', FirmwareCrashElasticSearchAlert),
+    ('/cron/es_drop/?$', ElasticSearchDropIndex),
 ]

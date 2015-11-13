@@ -47,3 +47,6 @@ cron:
 - description: firmware crash alert from ES logs
   url: /cron/firmware_crash_alert_es
   schedule: every 60 mins
+- description: drop ES index
+  url: /cron/es_drop
+  schedule: every day 23:55
