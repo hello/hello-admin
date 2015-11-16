@@ -1,0 +1,44 @@
+namespace: staging
+api_info:
+  admin:
+    id: suripu-admin
+    client_id: gae_admin
+    domain: https://dev-admin.hello.is/v1/
+    namespace: staging
+    token: 3.c5f9fa6093cb41dcb6f819728c1127e7
+  app:
+    id: suripu-app
+    client_id: gae_admin
+    domain: https://dev-api.hello.is/v1/
+    namespace: staging
+    token: 3.c5f9fa6093cb41dcb6f819728c1127e7
+  appv2:
+    id: suripu-app-v2
+    client_id: gae_admin
+    domain: https://dev-api.hello.is/v2/
+    namespace: staging
+    token: 3.c5f9fa6093cb41dcb6f819728c1127e7
+
+
+clear_bit:
+  id: clearbit
+  token: d9b6441e8815f109870f5e0adfa90875
+
+
+zendesk_credentials:
+  id: zendesk
+  api_token: 2qKOLrL5GbOva2LDOI4q4agcxplZ9GrycH1JqCMZ
+  domain: https://helloinc.zendesk.com
+  email_account: marina@sayhello.com
+
+
+searchify_credentials:
+  id: searchify
+  api_client: http://:G3KvEnaw2bDdQc@d7q83.api.searchify.com/
+
+
+elasticsearch_configuration:
+  id: es
+  host: https://5ef1fe1be448f837d91a38960abf6c0a.us-east-1.aws.found.io
+  http_port: 9243
+  token: Basic cmVhZHdyaXRlOmVnYW5oYmgwaHdmYzNmYmUyMw==

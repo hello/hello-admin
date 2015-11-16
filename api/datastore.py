@@ -1,9 +1,11 @@
+import json
 import logging as log
+import yaml
 
 from google.appengine.api import namespace_manager
-
 from core.models.authentication import ApiInfo, AVAILABLE_NAMESPACES
 from core.handlers.base import BaseRequestHandler
+from core.configuration.elasticsearch_configuration import ElasticSearchConfiguration
 from models.ext import ZendeskCredentials, SearchifyCredentials, KeyStoreLocker, GeckoboardCredentials, OrdersMap, \
     Clearbit, BuggyFirmware
 from models.setup import UserGroup
@@ -22,16 +24,19 @@ class InitializeDataStore(BaseRequestHandler):
 
     def init_per_namespace(self, namespace):
         namespace_manager.set_namespace(namespace)
+        with open("config.staging.yaml", "r") as stream:
+            config_from_file = yaml.load(stream)
+            namespace_manager.set_namespace(config_from_file.get("namespace"))
+            ApiInfo(**config_from_file.get("api_info").get("admin")).put()
+            ApiInfo(**config_from_file.get("api_info").get("app")).put()
+            ApiInfo(**config_from_file.get("api_info").get("appv2")).put()
 
-        self.init_api_info(namespace)
-        self.init_user_group(namespace)
-        self.init_zendesk_credentials()
-        self.init_searchify_credentials()
-        self.init_key_store_locker()
-        self.init_geckoboard_credentials()
-        self.init_orders_map()
-        self.init_clearbit()
-        self.init_buggy_firmware()
+            Clearbit(**config_from_file.get("clear_bit")).put()
+            ElasticSearchConfiguration(**config_from_file.get("elasticsearch_configuration")).put()
+            SearchifyCredentials(**config_from_file.get("searchify_credentials")).put()
+            ZendeskCredentials(**config_from_file.get("zendesk_credentials")).put()
+
+            self.response.write(json.dumps(config_from_file))
 
         log.info("Initialized datastore for namespace {}".format(namespace))
 
