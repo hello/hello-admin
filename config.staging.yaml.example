@@ -1,0 +1,44 @@
+namespace: staging
+api_info:
+  admin:
+    id: suripu-admin
+    client_id: gae_admin
+    domain: https://dev-admin.hello.is/v1/
+    namespace: staging
+    token: OH WELL
+  app:
+    id: suripu-app
+    client_id: gae_admin
+    domain: https://dev-api.hello.is/v1/
+    namespace: staging
+    token: OH WELL
+  appv2:
+    id: suripu-app-v2
+    client_id: gae_admin
+    domain: https://dev-api.hello.is/v2/
+    namespace: staging
+    token: OH WELL
+
+
+clear_bit:
+  id: clearbit
+  token: OH WELL
+
+
+zendesk_credentials:
+  id: zendesk
+  api_token: OH WELL
+  domain: https://helloinc.zendesk.com
+  email_account: marina@sayhello.com
+
+
+searchify_credentials:
+  id: searchify
+  api_client: http://:G3KvEnaw2bDdQc@d7q83.api.searchify.com/
+
+
+elasticsearch_configuration:
+  id: es
+  host: https://5ef1fe1be448f837d91a38960abf6c0a.us-east-1.aws.found.io
+  http_port: 9243
+  token: OH WELL
