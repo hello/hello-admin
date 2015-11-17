@@ -1,0 +1,12 @@
+language: python
+python:
+  - "2.7"
+deploy:
+  provider: gae
+  keyfile: "YOUR SERVICE ACCOUNT JSON FILE"
+  default: true
+  project: "hello-admin"
+
+notifications:
+  email:
+  - long+travis@sayhello.com
