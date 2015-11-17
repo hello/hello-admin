@@ -9,4 +9,7 @@ deploy:
 
 notifications:
   email:
-  - long+travis@sayhello.com
+    recipients:
+      -long+travis@sayhello.com
+    on_success: never
+    on_failure: always
