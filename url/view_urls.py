@@ -1,6 +1,6 @@
 from view.views import AccountProfileView, RoomConditionsMinuteView, TimelineV2View, LogsFacetHistoryView, \
     TimelineLogsView, TimelineLogsHistoryView, DustCalibrationLeftOverView, HeartbeatView, KeyStoreBatchView, \
-    LogsLevelView, ESStatusView, ESAggregationView
+    LogsLevelView, ESStatusView, ESAggregationView, FeedbackView
 from view.views import ActiveDevicesHistoryView
 from view.views import AlarmRingsHistoryView
 from view.views import AlarmsView
@@ -101,4 +101,5 @@ routes = [
     ('/logs_level/?$', LogsLevelView),
     ('/es_status/?$', ESStatusView),
     ('/es_aggregation/?$', ESAggregationView),
+    ('/feedback/?$', FeedbackView),
 ]

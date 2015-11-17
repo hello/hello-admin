@@ -282,3 +282,8 @@ class ESAggregationView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='es_aggregation.html',
                                 context={'title': "Sense Logs ES Aggregation"})
+
+class FeedbackView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='feedback.html',
+                                context={'title': "Feedback"})
