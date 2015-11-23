@@ -1,4 +1,4 @@
-var DISK_CAP_SIZE = 64; //Gb;
+var DISK_CAP_SIZE = 128; //Gb;
 
 var ESStatus = React.createClass({
     getInitialState: function() {
