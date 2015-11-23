@@ -339,7 +339,7 @@ var SenseSummary = React.createClass({
                     </tbody>
                 </Table>
                 <ul className="extra">
-                    <li><a target="_blank" href={"/sense_logs/?field=device_id&keyword=" + senseId + "&sense_id=&limit=&start=&end="}>Logs</a></li>
+                    <li><a target="_blank" href={"/sense_logs_es/?text=&sense_id=" + senseId + "&top_fw=&middle_fw=&start=&end=&limit=&asc=false&crash_only=false"}>Logs</a></li>
                     <li><a target="_blank" href={"/sense_events/?account_input=" + senseId + "&start_ts=" + new Date().getTime()}>Events</a></li>
                     <li><ModalTrigger modal={<FirmwareModal senseId={senseId} />}>
                         <a className="cursor-hand">Firmware-History</a>
@@ -410,7 +410,7 @@ var SenseLimitedSummary = React.createClass({
                 </tbody>
             </Table>
             <ul className="extra">
-                <li><a target="_blank" href={"/sense_logs/?field=device_id&keyword=" + this.props.senseId + "&sense_id=&limit=&start=&end="}>Logs</a></li>
+                <li><a target="_blank" href={"/sense_logs_es/?text=&sense_id=" + senseId + "&top_fw=&middle_fw=&start=&end=&limit=&asc=false&crash_only=false"}>Logs</a></li>
                 <li><a target="_blank" href={"/sense_events/?account_input=" + this.props.senseId + "&start_ts=" + new Date().getTime()}>Events</a></li>
                 <li><ModalTrigger modal={<FirmwareModal senseId={this.props.senseId} />}>
                     <a className="cursor-hand">Firmware-History</a>
