@@ -238,7 +238,7 @@ var SenseLogsESMaster = React.createClass({
                 <Col xs={3}>
                     <input id="top-fw-input" className="form-control" ref="topFirmwareInput" type="text" placeholder="top FW version"/>
                 </Col>
-                <LongDatetimePicker size={3} glyphicon="clock" placeHolder="start datetime" id="start"/>
+                <LongDatetimePicker size={3} glyphicon="clock" placeHolder="start time utc" id="start"/>
                 <Col xs={1}>
                     <input className="size-input form-control" ref="sizeInput" type="number" placeholder="limit"/>
                 </Col>
@@ -251,7 +251,7 @@ var SenseLogsESMaster = React.createClass({
                 <Col xs={3}>
                     <input id="middle-fw-input" className="form-control" ref="middleFirmwareInput" type="text" placeholder="middle FW version"/>
                 </Col>
-                <LongDatetimePicker size={3} glyphicon="clock" placeHolder="end datetime" id="end"/>
+                <LongDatetimePicker size={3} glyphicon="clock" placeHolder="end time utc" id="end"/>
                 <Col xs={2} className="mode-wrapper">
                     <span>or switch to <span className="mode" onClick={this.switchToAdvanceMode}>advanced mode</span></span>
                 </Col>
