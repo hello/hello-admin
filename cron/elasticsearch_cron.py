@@ -56,7 +56,7 @@ class FirmwareCrashElasticSearchAlert(ElasticSearchHandler):
 class ElasticSearchDropIndex(ElasticSearchHandler):
     TOLERANCE_DAYS = 14
     def get(self):
-        index_name = "sense-logs-" + (datetime.datetime.utcnow() - datetime.timedelta(days=self.TOLERANCE_DAYS)).strftime("%Y-%m-%d")
+        index_name = "sense-logs-" + (datetime.datetime.utcnow() - datetime.timedelta(days=self.TOLERANCE_DAYS - 1)).strftime("%Y-%m-%d")
         response = requests.delete(
             url="{}/{}".format(
                 self.base_url,
