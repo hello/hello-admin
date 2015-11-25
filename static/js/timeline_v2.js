@@ -79,14 +79,16 @@ var TimelineContent = React.createClass({
         var hoursMessage = debunkMarkdown(this.props.data.message);
 
         blocks.push(
-            <div className="cd-timeline-summary">
-                <div id="sleep-summary"><ModalTrigger modal={<SleepSummaryModal metrics={this.props.data.metrics} message={debunkMarkdown(this.props.data.message)} />}>
-                    <a className="cursor-hand">Sleep Summary</a>
-                </ModalTrigger></div>
-                <hr/>
-                <div className="summary-message">{hoursMessage}</div>
-                <div className="summary-message">{this.props.algorithm}</div>
-            </div>
+            <ModalTrigger modal={<SleepSummaryModal metrics={this.props.data.metrics} message={debunkMarkdown(this.props.data.message)} />}>
+                <div className="cd-timeline-summary cursor-hand">
+                    <div id="sleep-summary">
+                        <a>Sleep Summary</a>
+                    </div>
+                    <hr/>
+                    <div className="summary-message">{hoursMessage}</div>
+                    <div className="summary-message">{this.props.algorithm}</div>
+                </div>
+            </ModalTrigger>
         );
 
         events.forEach(function(event, i) {
@@ -267,6 +269,7 @@ var TimelineMaestro = React.createClass({
             data: requestData,
             dataType: 'json',
             success: function(response) {
+                console.log(response);
                 if (response.error.isWhiteString()) {
                     this.setState({data: response.data, alert: ""});
                     $('.dial').val(response.data.score).trigger('change');
@@ -299,9 +302,9 @@ var TimelineMaestro = React.createClass({
             case this.getInitialState().data.score_condition:
                 return null;
             case "UNAVAILABLE":
-                return <Col id="score-bar" xs={12}>{this.state.data.message}</Col>;
+                return <Alert>{this.state.data.message}</Alert>;
             case "INCOMPLETE":
-                return <Col id="score-bar" xs={12}>{this.state.data.message}</Col>;
+                return <Alert>{this.state.data.message}</Alert>;
             default:
                 return <Col id="score-bar" xs={12}>
                     <LongCircularBar score={this.state.data.score} />
