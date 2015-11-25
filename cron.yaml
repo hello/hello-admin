@@ -49,7 +49,7 @@ cron:
   schedule: every 60 mins
 - description: drop ES index
   url: /cron/es_drop
-  schedule: every day 23:55
+  schedule: every day 22:55
 #- description: alert unexpected fw
 #  url: /cron/unexpected_firmware
 #  schedule: every 60 mins
