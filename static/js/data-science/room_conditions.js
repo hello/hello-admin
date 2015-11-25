@@ -190,11 +190,27 @@ var RoomConditionMaster = React.createClass({
 
     render: function() {
         var alert = this.state.alert === "" ? null : <div><br/><Alert>{this.state.alert}</Alert></div>;
-        var fileExporters = sensors.map(function(sensor, i){
+
+        var JsonExporter = sensors.map(function(sensor, i){
+            console.log(this.state[sensor]);
             return <MenuItem eventKey={i.toString()}>
                 <FileExporter fileContent={this.state[sensor]} fileName={sensor} buttonName={sensor.capitalize()}/>
             </MenuItem>;
         }.bind(this));
+
+        var CsvExporter = sensors.map(function(sensor, i){
+            var csvContent = [];
+            this.state[sensor].forEach(function(part){
+                csvContent.push(part.key + "," + sensor);
+                part.values.forEach(function(value){
+                    csvContent.push(value.x + "," + value.y);
+                }.bind(this));
+            }.bind(this));
+            return <MenuItem eventKey={i.toString()}>
+                <FileExporter fileContent={csvContent.join("\r\n")} fileName={sensor} dataType="data:text/csv," buttonName={sensor.capitalize()} needStringify={false}/>
+            </MenuItem>;
+        }.bind(this));
+
         return (<div>
             <form onSubmit={this.handleBasicSubmit} className="row">
                 <Col xs={3}>
@@ -207,11 +223,14 @@ var RoomConditionMaster = React.createClass({
                 <Col xs={1}>
                     <Button type="submit"><Glyphicon glyph="search"/></Button>
                 </Col>
-                <Col xs={2}>
-                    <Button onClick={this.handleHardwareSubmit}><Glyphicon glyph="search"/> for hardware</Button>
+                <Col xs={1}>
+                    <Button onClick={this.handleHardwareSubmit}><Glyphicon glyph="search"/> HW</Button>
                 </Col>
                 <Col xs={2}>
-                    <DropdownButton bsStyle="info" title="&darr; JSON">{fileExporters}</DropdownButton>
+                    <DropdownButton bsStyle="info" title="&darr; JSON">{JsonExporter}</DropdownButton>
+                </Col>
+                <Col xs={2}>
+                    <DropdownButton bsStyle="info" title="&darr; CSV">{CsvExporter}</DropdownButton>
                 </Col>
             </form>
             {alert}
