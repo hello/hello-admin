@@ -95,7 +95,7 @@ var InactiveDevicesMaestro = React.createClass({
         var before = end !== 0 ? end - thresholdInMilliseconds : 0;
         var deviceType = $('#device-type').val() || "";
         var requestData = {after: start, before: before, device_type: deviceType};
-        history.pushState({}, '', '/troubleshoot/?start=' + start + '&end=' + end + '&threshold=' + thresholdInMilliseconds + '&type=' + deviceType);
+        history.pushState({}, '', '/inactive_devices/?start=' + start + '&end=' + end + '&threshold=' + thresholdInMilliseconds + '&type=' + deviceType);
         console.log(requestData);
         $.ajax({
           url: '/api/devices/inactive',
