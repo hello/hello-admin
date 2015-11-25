@@ -113,8 +113,6 @@ var SenseEventsMaestro = React.createClass({
                 <td>{senseEvent.device_id}</td>
                 <td>
                     {d3.time.format('%a %d %b %H:%M:%S %Z')(new Date(senseEvent.created_at))}
-                    &nbsp;
-                    <a target="_blank" href={"/sense_logs/?field=device_id&keyword=" + senseEvent.device_id + "&category=device_id&category_input=&limit=&start=" + beforeEventTs + "&end=" + afterEventTs}>see logs</a>
                 </td>
                 <td>{senseEvent.events.map(function(event){
                     if (event.indexOf("color") > -1){
@@ -124,11 +122,14 @@ var SenseEventsMaestro = React.createClass({
                             color: luminate(correctedHex, -0.3),
                             "background-color": correctedHex
                         };
-//                        return <p style={senseColor}>{event.replace(event.split(": ")[1], convertChrisHex('#' + event.split(": ")[1]))}</p>
                         return <p>color: <span style={senseColor}>{convertChrisHex('#' + event.split(":")[1])}</span></p>;
                     }
                     return <p>{event.split(":")[0]}: {event.split(":")[1]}</p>
                 })}</td>
+                <td>
+                    <p><a target="_blank" href={"/account_profile/?input=" + senseEvent.device_id + "&type=sense_id"}>Account Profile</a></p>
+                    <p><a target="_blank" href={"/sense_logs_es/?text=&sense_id=" + senseEvent.device_id + "&top_fw=&middle_fw=&start=" + beforeEventTs + "&end=" + afterEventTs + "&limit=&asc=false&crash_only=false"}>Sense Logs</a></p>
+                </td>
             </tr>
         });
 
@@ -145,6 +146,7 @@ var SenseEventsMaestro = React.createClass({
                         <th>Sense ID</th>
                         <th>Created At</th>
                         <th>Events</th>
+                        <th>Links</th>
                     </tr>
                 </thead>
                 <tbody>
