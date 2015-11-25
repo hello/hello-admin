@@ -42,7 +42,7 @@ tbody {
 
 .splitter {margin: 5px 0;}
 .logs-meta {font-size: 12px; text-transform: uppercase; font-weight: bold}
-.logs-content {font-size: 13px; margin-left: 25px;}
+.logs-content {font-size: 13px; margin-left: 10px; border: 1px solid #BFE6FF; border-radius: 4px; padding: 8px;}
 .es-summary {font-size: 12px; text-transform: uppercase; color: #41D7AA; text-align: right; margin-right: 18px;}
 .row-invisible {display: none;}
 .sort-wrapper {font-size: 12px; color: #95959C;}
