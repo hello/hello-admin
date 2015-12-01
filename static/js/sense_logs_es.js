@@ -27,7 +27,7 @@ var LuceneExampleModal = React.createClass({
 });
 var SenseLogsESResultsTable = React.createClass({
     getDefaultProps: function() {
-        return {chronosOrder: false};
+        return {chronosOrder: true};
     },
 
     loadSurroundingLogs: function(senseId, epochMillis) {
@@ -40,14 +40,15 @@ var SenseLogsESResultsTable = React.createClass({
         $("#submit").trigger("click");
     },
 
-
     render: function() {
-        var documents = this.props.chronosOrder ? this.props.documents.reverse() : this.props.documents;
+        var documents = this.props.documents;
+        var reversedDocuments = this.props.documents.slice().reverse();
+        var displayedDocuments = this.props.chronosOrder ? reversedDocuments : documents;
         return  <Table striped>
             {this.props.tableHeaders}
             <tbody>
 
-            {documents.map(function (r) {
+            {displayedDocuments.map(function (r) {
                 var lookUpAround = this.props.mode !== "basic" ? null :
                     <DropdownButton bsSize="xsmall" title="Action" id="bg-vertical-dropdown-1">
                         <MenuItem className="surrounding-logs" eventKey="1" onClick={this.loadSurroundingLogs.bind(this, r._source.sense_id, r._source.epoch_millis)}>Get surrounding logs</MenuItem>
@@ -79,7 +80,7 @@ var SenseLogsESResultsTable = React.createClass({
 
 var SenseLogsESMaster = React.createClass({
     getInitialState: function() {
-        return {mode: "basic", documents: [], error: "", total: 0, loading: false, oldestTimestamp: null, newestTimestamp: null, chronosOrder: false};
+        return {mode: "basic", documents: [], error: "", total: 0, loading: false, oldestTimestamp: null, newestTimestamp: null, chronosOrder: true};
     },
 
     submitWithInputsFromURL: function() {
@@ -237,9 +238,7 @@ var SenseLogsESMaster = React.createClass({
         this.handleBasicSearch();
     },
     toggleChronosOrder: function() {
-        console.log($('#chronos-order').is(':checked'));
         this.setState({chronosOrder: $('#chronos-order').is(':checked')});
-        console.log(this.state.chronosOrder);
     },
 
     render: function() {
@@ -302,7 +301,7 @@ var SenseLogsESMaster = React.createClass({
                 <th>
                     <Pager>
                         <PageItem previous onClick={this.loadOlderLogs}>&larr; Older</PageItem>
-                        <span className="sort-wrapper">chronological order</span> <input onChange={this.toggleChronosOrder} id="chronos-order" type="checkbox"/>
+                        <span className="sort-wrapper">chronological order</span> <input ref="chronosOrder" onChange={this.toggleChronosOrder} id="chronos-order" type="checkbox" checked={this.state.chronosOrder}/>
                         <PageItem next onClick={this.loadNewerLogs}>Newer &rarr;</PageItem>
                     </Pager>
                 </th>
