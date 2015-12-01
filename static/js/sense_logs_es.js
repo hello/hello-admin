@@ -26,6 +26,10 @@ var LuceneExampleModal = React.createClass({
     }
 });
 var SenseLogsESResultsTable = React.createClass({
+    getDefaultProps: function() {
+        return {chronosOrder: false};
+    },
+
     loadSurroundingLogs: function(senseId, epochMillis) {
         $("#sense-input").val(senseId);
         $("#start").val(formatUTCDateFromEpoch(epochMillis - 5*60*1000));
@@ -35,11 +39,15 @@ var SenseLogsESResultsTable = React.createClass({
         $("#middle-fw-input").val("");
         $("#submit").trigger("click");
     },
+
+
     render: function() {
+        var documents = this.props.chronosOrder ? this.props.documents.reverse() : this.props.documents;
         return  <Table striped>
             {this.props.tableHeaders}
             <tbody>
-            {this.props.documents.map(function (r) {
+
+            {documents.map(function (r) {
                 var lookUpAround = this.props.mode !== "basic" ? null :
                     <DropdownButton bsSize="xsmall" title="Action" id="bg-vertical-dropdown-1">
                         <MenuItem className="surrounding-logs" eventKey="1" onClick={this.loadSurroundingLogs.bind(this, r._source.sense_id, r._source.epoch_millis)}>Get surrounding logs</MenuItem>
@@ -71,7 +79,7 @@ var SenseLogsESResultsTable = React.createClass({
 
 var SenseLogsESMaster = React.createClass({
     getInitialState: function() {
-        return {mode: "basic", documents: [], error: "", total: 0, loading: false, oldestTimestamp: null, newestTimestamp: null};
+        return {mode: "basic", documents: [], error: "", total: 0, loading: false, oldestTimestamp: null, newestTimestamp: null, chronosOrder: false};
     },
 
     submitWithInputsFromURL: function() {
@@ -228,6 +236,11 @@ var SenseLogsESMaster = React.createClass({
         $("#end").val("");
         this.handleBasicSearch();
     },
+    toggleChronosOrder: function() {
+        console.log($('#chronos-order').is(':checked'));
+        this.setState({chronosOrder: $('#chronos-order').is(':checked')});
+        console.log(this.state.chronosOrder);
+    },
 
     render: function() {
         var basicSearchForm = <Row id="row-basic-search" className={this.state.mode === "basic" ? "row-visible" : "row-invisible"}>
@@ -289,6 +302,7 @@ var SenseLogsESMaster = React.createClass({
                 <th>
                     <Pager>
                         <PageItem previous onClick={this.loadOlderLogs}>&larr; Older</PageItem>
+                        <span className="sort-wrapper">chronological order</span> <input onChange={this.toggleChronosOrder} id="chronos-order" type="checkbox"/>
                         <PageItem next onClick={this.loadNewerLogs}>Newer &rarr;</PageItem>
                     </Pager>
                 </th>
@@ -298,7 +312,7 @@ var SenseLogsESMaster = React.createClass({
             {basicSearchForm}
             {advanceSearchForm}
             <div className="es-summary">hits: {this.state.total}</div>
-            <SenseLogsESResultsTable documents={this.state.documents} tableHeaders={tableHeaders} mode={this.state.mode}/>
+            <SenseLogsESResultsTable chronosOrder={this.state.chronosOrder} documents={this.state.documents} tableHeaders={tableHeaders} mode={this.state.mode}/>
             {this.state.error ? <Alert>{this.state.error}</Alert> : null}
         </div>;
     }
