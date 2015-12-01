@@ -39,7 +39,10 @@ var PCHSerialNumberCheckForSense = React.createClass({
             return false;
         }
         that.setState({alert: <Alert bsStyle="warning">Checking...</Alert>});
-        var senseSNs = that.refs.sn.getDOMNode().value.split("\n");
+        var senseSNs = that.refs.sn.getDOMNode().value.split("\n")
+                            .filter(function(t){
+                                return t != "\n" && t.trim() != "";
+                            });
         $.ajax({
             url: '/api/pch_sn_check',
             dataType: 'json',
@@ -113,13 +116,18 @@ var PCHSerialNumberCheckForPill = React.createClass({
             },
             success: function (response) {
                 console.log(response);
+                var pillSNs = response.data.trim().split("\n")
+                            .filter(function(t){
+                                return t != "\n" && t.trim() != "";
+                            });
                 that.setState({alert: response.error ?
                     <Alert bsStyle="danger">{response.error}</Alert> :
                     <Alert bsStyle="success">
                         Summary:
-                        <p>{response.data.trim().split("\n").length} not found / {that.refs.sn.getDOMNode().value.trim().split("\n").length} submitted</p>
+                        <p>{pillSNs.length} not found / {that.refs.sn.getDOMNode().value.trim().split("\n").length} submitted</p>
                         <br/> Missing pill serial numbers: <br/>
-                        {response.data.trim().split("\n").map(function(psn){
+                        {pillSNs
+                            .map(function(psn){
                             return <p>{psn}</p>
                         })}
                     </Alert>
