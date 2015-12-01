@@ -156,8 +156,7 @@ var SenseLogsESMaster = React.createClass({
         var middleFirmwareInput = this.refs.middleFirmwareInput.getDOMNode().value.trim();
         var sizeInput = this.refs.sizeInput.getDOMNode().value.trim();
 
-        var now = new Date();
-        var index = "sense-logs-" + now.getUTCFullYear() + "-" + (now.getUTCMonth() + 1) + "-" + now.getUTCDate();
+        var index = d3.time.format.utc("sense-logs-%Y-%m-%d")(new Date());
 
         if (isFwCrash) {
             index = SENSE_LOGS_INDEX_FW_CRASH;
