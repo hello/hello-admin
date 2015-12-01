@@ -39,19 +39,25 @@ var PCHSerialNumberCheckForSense = React.createClass({
             return false;
         }
         that.setState({alert: <Alert bsStyle="warning">Checking...</Alert>});
+        var senseSNs = that.refs.sn.getDOMNode().value.split("\n")
+                            .filter(function(t){
+                                return t != "\n" && t.trim() != "";
+                            });
         $.ajax({
             url: '/api/pch_sn_check',
             dataType: 'json',
             type: 'POST',
             data: {
-                sn: JSON.stringify(that.refs.sn.getDOMNode().value.split("\n").map(function(ssn){return ssn.trim().toUpperCase()})),
+                sn: JSON.stringify(senseSNs.map(function(ssn){return ssn.trim().toUpperCase()})),
                 device_type: "sense"
             },
             success: function (response) {
-                console.log(response);
+                console.log(response, response.data.length);
                 that.setState({alert: response.error ?
                     <Alert bsStyle="danger">{response.error}</Alert> :
                     <Alert bsStyle="success">
+                        Summary:
+                        <p>{response.data.length} not found / {senseSNs.length} submitted</p>
                         Missing sense serial numbers: <br/>
                         {!(response.data && response.data.length) > 0 ? "[]" : response.data.map(function(ssn){
                             return <p>{ssn}</p>
@@ -110,11 +116,18 @@ var PCHSerialNumberCheckForPill = React.createClass({
             },
             success: function (response) {
                 console.log(response);
+                var pillSNs = response.data.trim().split("\n")
+                            .filter(function(t){
+                                return t != "\n" && t.trim() != "";
+                            });
                 that.setState({alert: response.error ?
                     <Alert bsStyle="danger">{response.error}</Alert> :
                     <Alert bsStyle="success">
-                        Missing pill serial numbers: <br/>
-                        {response.data.split("\n").map(function(psn){
+                        Summary:
+                        <p>{pillSNs.length} not found / {that.refs.sn.getDOMNode().value.trim().split("\n").length} submitted</p>
+                        <br/> Missing pill serial numbers: <br/>
+                        {pillSNs
+                            .map(function(psn){
                             return <p>{psn}</p>
                         })}
                     </Alert>
