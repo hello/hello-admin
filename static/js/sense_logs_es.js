@@ -26,6 +26,10 @@ var LuceneExampleModal = React.createClass({
     }
 });
 var SenseLogsESResultsTable = React.createClass({
+    getDefaultProps: function() {
+        return {chronosOrder: true};
+    },
+
     loadSurroundingLogs: function(senseId, epochMillis) {
         $("#sense-input").val(senseId);
         $("#start").val(formatUTCDateFromEpoch(epochMillis - 5*60*1000));
@@ -35,11 +39,16 @@ var SenseLogsESResultsTable = React.createClass({
         $("#middle-fw-input").val("");
         $("#submit").trigger("click");
     },
+
     render: function() {
+        var documents = this.props.documents;
+        var reversedDocuments = this.props.documents.slice().reverse();
+        var displayedDocuments = this.props.chronosOrder ? reversedDocuments : documents;
         return  <Table striped>
             {this.props.tableHeaders}
             <tbody>
-            {this.props.documents.map(function (r) {
+
+            {displayedDocuments.map(function (r) {
                 var lookUpAround = this.props.mode !== "basic" ? null :
                     <DropdownButton bsSize="xsmall" title="Action" id="bg-vertical-dropdown-1">
                         <MenuItem className="surrounding-logs" eventKey="1" onClick={this.loadSurroundingLogs.bind(this, r._source.sense_id, r._source.epoch_millis)}>Get surrounding logs</MenuItem>
@@ -71,7 +80,7 @@ var SenseLogsESResultsTable = React.createClass({
 
 var SenseLogsESMaster = React.createClass({
     getInitialState: function() {
-        return {mode: "basic", documents: [], error: "", total: 0, loading: false, oldestTimestamp: null, newestTimestamp: null};
+        return {mode: "basic", documents: [], error: "", total: 0, loading: false, oldestTimestamp: null, newestTimestamp: null, chronosOrder: true};
     },
 
     submitWithInputsFromURL: function() {
@@ -147,8 +156,7 @@ var SenseLogsESMaster = React.createClass({
         var middleFirmwareInput = this.refs.middleFirmwareInput.getDOMNode().value.trim();
         var sizeInput = this.refs.sizeInput.getDOMNode().value.trim();
 
-        var now = new Date();
-        var index = "sense-logs-" + now.getUTCFullYear() + "-" + (now.getUTCMonth() + 1) + "-" + now.getUTCDate();
+        var index = d3.time.format.utc("sense-logs-%Y-%m-%d")(new Date());
 
         if (isFwCrash) {
             index = SENSE_LOGS_INDEX_FW_CRASH;
@@ -228,6 +236,9 @@ var SenseLogsESMaster = React.createClass({
         $("#end").val("");
         this.handleBasicSearch();
     },
+    toggleChronosOrder: function() {
+        this.setState({chronosOrder: $('#chronos-order').is(':checked')});
+    },
 
     render: function() {
         var basicSearchForm = <Row id="row-basic-search" className={this.state.mode === "basic" ? "row-visible" : "row-invisible"}>
@@ -289,6 +300,7 @@ var SenseLogsESMaster = React.createClass({
                 <th>
                     <Pager>
                         <PageItem previous onClick={this.loadOlderLogs}>&larr; Older</PageItem>
+                        <span className="sort-wrapper">chronological order</span> <input ref="chronosOrder" onChange={this.toggleChronosOrder} id="chronos-order" type="checkbox" checked={this.state.chronosOrder}/>
                         <PageItem next onClick={this.loadNewerLogs}>Newer &rarr;</PageItem>
                     </Pager>
                 </th>
@@ -298,7 +310,7 @@ var SenseLogsESMaster = React.createClass({
             {basicSearchForm}
             {advanceSearchForm}
             <div className="es-summary">hits: {this.state.total}</div>
-            <SenseLogsESResultsTable documents={this.state.documents} tableHeaders={tableHeaders} mode={this.state.mode}/>
+            <SenseLogsESResultsTable chronosOrder={this.state.chronosOrder} documents={this.state.documents} tableHeaders={tableHeaders} mode={this.state.mode}/>
             {this.state.error ? <Alert>{this.state.error}</Alert> : null}
         </div>;
     }
