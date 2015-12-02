@@ -9,7 +9,7 @@ from core.handlers.base import ProtectedRequestHandler
 from core.utils.time_helpers import epoch_to_human
 
 
-THROTTLE_PERIOD = 2*60
+THROTTLE_PERIOD = 60
 PCH_SENSE_SN_KEY = {
     "sense": "pch_sense_sn",
     "pill": "pch_pill_sn",
