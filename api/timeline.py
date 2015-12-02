@@ -41,7 +41,6 @@ class TimelineV2API(ProtectedRequestHandler):
 
     def get(self):
         token = self.get_impersonatee_token()
-        print "TOKEN", token
         self.hello_request(
             api_url="timeline/{}".format(self.request.get("date")),
             type="GET",

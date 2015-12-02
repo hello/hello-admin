@@ -1,0 +1,72 @@
+.card {
+    box-shadow: 2px 2px 13px 0 rgba(1,1,0,.1);
+    -webkit-border-radius: 6px;
+    padding: 10px;
+    border-radius: 6px;
+    display: block;
+    line-height: 1.42857143;
+    border: 1px solid #ddd;
+    -webkit-transition: none;
+    -moz-transition: none;
+    -o-transition: none;
+    -ms-transition: none;
+    transition: none;
+    background-color: white;
+    margin: 0 0 20px 0;
+    /*max-width: 400px;*/
+    margin-bottom: 15px;
+}
+
+.card-name {font-size: 13px; text-transform: uppercase; margin-left: 15px;}
+.card-content {font-size: 14px; color: #666666;}
+.card-title {margin-top: 5px;}
+.not-ok {color: #FF794C;}
+.card-content {font-size: 90%;}
+.stress {font-weight: bold;}
+.card-icon {height: 18px; margin: 0 0 -3px 8px; opacity: 0.6;}
+.card-title {text-align: center;}
+.card-icon-wrapper {
+    text-align: left;
+}
+.splitter {margin: 8px 0;}
+.card-info-preview {
+    color: #009BFF;
+    font-weight: 300;
+}
+.card-message {
+    font-size: 16px;
+    font-weight: 200;
+}
+.glyphicon-preview {
+    font-size: 11px;
+    margin-left: 8px;
+}
+
+.modal-footer {text-align: center; margin-top: 0; padding: 10px 0;}
+.modal-title>button {right: 10px; position: absolute;}
+.modal-subtitle {color: #999999; font-size: 11px; margin-top: 5px;}
+.modal-col-title {text-transform: uppercase; color: #000000; font-weight: lighter; font-size: 10px;}
+.modal-fw-man {color: #41D7AB;}
+.modal-body {font-size: 16px; font-weight: 200;}
+.modal-img {height: 200px; width: 100%; margin-bottom: 15px;}
+
+.stress {font-weight: 500; color: black;}
+#submit {
+    left: inherit;
+    top: 5px;
+    right: 15px;
+    padding-right: 15px;
+}
+#submit>div.icon-addon {height: 48px;}
+#email-input {
+    font-size: 16px;
+    font-weight: lighter;
+    padding: 22px 0;
+    text-align: center;
+    margin-bottom: 15px;
+}
+.input-pre>span.glyphicon {
+    margin-left: 6px !important;
+    top: 5px !important ;
+    opacity: 0.5 !important;
+}
