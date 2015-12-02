@@ -110,6 +110,8 @@ var InsightsMaster = React.createClass({
                         </div>;
 
                     var content = <div>
+                            <div className="card-age">generated {millisecondsToHumanReadableString(new Date().getTime() - d.timestamp)} ago</div>
+                            <hr className="splitter"/>
                             <div className="card-message">{debunkMarkdown(d.message)}</div>
                             {infoPreview}
                         </div>;

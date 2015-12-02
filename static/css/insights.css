@@ -70,3 +70,8 @@
     top: 5px !important ;
     opacity: 0.5 !important;
 }
+.card-age {
+    color: #41D7AB;
+    font-size: 13px;
+    font-weight: 200;
+}
