@@ -3,6 +3,7 @@ from api.alarm import AlarmsAPI, AlarmsByEmailAPI, AlarmRingsHistoryAPI
 from api.calibration import DustCalibrationAPI, DustOffsetAPI, DustCalibrationLeftOverPairsAPI
 from api.elasticsearch import SenseLogsElasticSearchAPI, ElasticSearchStatusAPI, ElasticSearchAggregationAPI
 from api.feedback import FeedbackAPI
+from api.insights import InsightsAPI, InsightsGenericAPI
 from api.logs_level import LogsLevelAPI
 from api.namespace import NamespaceAPI
 from api.password import PasswordResetAPI, PasswordForceUpdateAPI
@@ -170,5 +171,7 @@ routes = [
     ('/api/es_status/?$', ElasticSearchStatusAPI),
     ('/api/es_aggregation/?$', ElasticSearchAggregationAPI),
     ('/api/feedback/?$', FeedbackAPI),
+    ('/api/insights/?$', InsightsAPI),
+    ('/api/insights_generic/?$', InsightsGenericAPI),
 ]
 

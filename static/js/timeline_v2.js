@@ -84,7 +84,7 @@ var TimelineContent = React.createClass({
                     <div id="sleep-summary">
                         <a>Sleep Summary</a>
                     </div>
-                    <hr/>
+                    <hr className="splitter"/>
                     <div className="summary-message">{hoursMessage}</div>
                     <div className="summary-message">{this.props.algorithm}</div>
                 </div>
