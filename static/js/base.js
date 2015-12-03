@@ -51,6 +51,13 @@ var Err = React.createClass({
         $.ajaxSetup({
             global: true,
             dataType: 'json',
+            beforeSend: function(jqXHR) {
+                var activeNamespaceHeader = $(".namespace-active");
+                if (getNamespace() !== activeNamespaceHeader.html()) {
+                    activeNamespaceHeader.removeClass("namespace-active");
+                    $('.header-namespace>span').filter(function () { return $(this).html() == getNamespace(); }).addClass("namespace-active");
+                }
+            }.bind(this),
             complete: function(jqXHR) {
                 this.setState({err: jqXHR.getResponseHeader("err")});
             }.bind(this)
@@ -193,4 +200,11 @@ function luminate(hex, lum) {
 		rgb += ("00"+c).substr(c.length);
 	}
 	return rgb;
+}
+
+function getNamespace() {
+    return document.cookie.split(';')
+        .map(function(x){return x.trim().split('=');})
+        .reduce(function(a,b){a[b[0]]=b[1];return a;},{})
+        .namespace;
 }
