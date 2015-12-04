@@ -516,6 +516,7 @@ var AccountProfile = React.createClass({
                 <Tile img="svg/sleep.svg" title="User Summary" img="svg/sleep.svg" content={<AccountTile account={this.state.account} partner={this.state.partner} zendeskResponse={this.state.zendeskResponse} zendeskStatus={this.state.zendeskStatus} />} />
                 <Tile img="svg/timeline.svg" title="Timeline" content={<TimelineTile email={this.state.email} response={this.state.timelineResponse} status={this.state.timelineStatus} />} />
                 <Tile img="svg/alarm.svg" title="Alarms" content={<AlarmsTile alarmsResponse={this.state.alarmsResponse} />} />
+                <Tile img="svg/wifi.svg" title="Sessions" content={<SessionsTile email={this.state.email} />} />
             </Col>,
             <Col xs={12} lg={4} className="paddingless-left">
                 <Tile img="image/sense-bw.png" title="Sense Summary" content={<SenseSummary senseResponse={this.state.senseResponse} senseKeyStoreResponse={this.state.senseKeyStoreResponse} timezoneResponse={this.state.timezoneResponse} senseColorResponse={this.state.senseColorResponse} />} />

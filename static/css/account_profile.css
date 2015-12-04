@@ -151,3 +151,5 @@ svg {
 .modal-subtitle {color: #999999; font-size: 11px; margin-top: 5px;}
 .modal-col-title {text-transform: uppercase; color: #000000; font-weight: lighter; font-size: 10px;}
 .modal-fw-man {color: #41D7AB;}
+
+.modal-body {width: 1200px !important;}
