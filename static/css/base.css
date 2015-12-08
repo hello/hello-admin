@@ -56,7 +56,7 @@ span.sidebar-group-last {padding-bottom: 20px;}
 table.table>tbody>tr>td {display: table-cell; vertical-align: middle;}
 table.table>thead>tr>th {display: table-cell; vertical-align: middle; text-align: center;}
 button.btn-circle {border-radius: 100%; width: 32px; height: 32px; margin: 10px auto; display: table; color: #ffffff; background-color: rgba(45, 193, 205, 0.34);}
-span.label {font: 75% lighter "Lucida Grande", Verdana, Arial, sans-serif}
+/*span.label {font: 75% lighter "Lucida Grande", Verdana, Arial, sans-serif}*/
 body h3 {text-align: center; font-size: 20px;}
 
 div.bootstrap-tagsinput {min-width: 100%;}
