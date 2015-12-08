@@ -1,4 +1,4 @@
-from core.handlers.base import ProtectedRequestHandler
+from core.handlers.base import ProtectedRequestHandler, SuperEngineerRequestHandler
 
 
 class SessionsAPI(ProtectedRequestHandler):
@@ -10,6 +10,8 @@ class SessionsAPI(ProtectedRequestHandler):
             type="GET",
         )
 
+
+class SessionsUpdateAPI(SuperEngineerRequestHandler):
     def put(self):
         self.hello_request(
             api_info=self.suripu_admin,

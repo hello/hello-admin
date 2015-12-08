@@ -37,6 +37,15 @@ class BaseRequestHandler(webapp2.RequestHandler):
         )
 
     @property
+    def groups_entity(self):
+        return UserGroup.query().order(-UserGroup.created).get()
+
+    def super_engineer(self):
+        if not self.groups_entity:
+            return []
+        return stripStringToList(self.groups_entity.super_engineer)
+
+    @property
     def namespace(self):
         return namespace_manager.get_namespace() or "production"
 
@@ -84,6 +93,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
         extras = {
             "logout_url": users.create_logout_url('/'),
             "user": self.current_user_email,
+            "is_super_engineer": self.current_user_email in self.super_engineer(),
             "version": os.environ['CURRENT_VERSION_ID'],
             "env": settings.ENVIRONMENT,
             "available_namespaces": LOCAL_AVAILABLE_NAMESPACES if settings.DEBUG is True else AVAILABLE_NAMESPACES,
@@ -311,12 +321,6 @@ class ProtectedRequestHandler(BaseRequestHandler):
         pass
 
     ## Retrieve groups grom DataStore
-    @property
-    def groups_entity(self):
-        return UserGroup.query().order(-UserGroup.created).get()
-
-    def super_engineer(self):
-        return stripStringToList(self.groups_entity.super_engineer)
 
     def customer_experience(self):
         return stripStringToList(self.groups_entity.customer_experience)

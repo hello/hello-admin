@@ -13,6 +13,7 @@ var SessionsTile = React.createClass({
             type: 'GET',
             data: {email: email},
             success: function (response) {
+                console.log("hehe");
                 console.log(response);
                 this.setState({sessions: response.data, error: response.error})
             }.bind(this)
@@ -31,7 +32,7 @@ var SessionsTile = React.createClass({
                 <tr><td>Expires In</td><td>{this.state.sessions[0].expires_in}</td></tr>,
                 <tr><td>Created At</td><td><span dangerouslySetInnerHTML={{__html:utcFormatter(new Date(this.state.sessions[0].created_at))}}/></td></tr>,
                 <tr><td>App ID</td><td>{this.state.sessions[0].app_id}</td></tr>,
-                <tr><td>Scopes</td><td>{this.state.sessions[0].scopes.join(", ")}</td></tr>
+                <tr><td>App Name</td><td>{this.state.sessions[0].app_name}</td></tr>,
             ];
         return <div><Table>
             <tbody>
@@ -51,7 +52,7 @@ var SessionsTile = React.createClass({
 var SessionsModal = React.createClass({
     revokeSession: function(id) {
         $.ajax({
-            url: "/api/sessions",
+            url: "/api/sessions_update",
             dataType: "json",
             type: 'PUT',
             data: {id: id},
@@ -78,16 +79,19 @@ var SessionsModal = React.createClass({
                             <td>Created At (Browser tz)</td>
                             <td>Expires In</td>
                             <td>App ID</td>
+                            <td>App Name</td>
                             <td>Scopes</td>
                             <td>Action</td>
                         </tr>
                         {this.props.sessions.map(function(s){
+                            var revokeButton = $("#viewer").val() === "true" ? <Button onClick={this.revokeSession.bind(this, s.id)}>Revoke</Button> : false;
                             return <tr>
                                 <td>{new Date(s.created_at).toLocaleString()}</td>
                                 <td>{s.expires_in}</td>
                                 <td>{s.app_id}</td>
+                                <td>{s.app_name}</td>
                                 <td>{s.scopes.join(", ")}</td>
-                                <td><Button onClick={this.revokeSession.bind(this, s.id)}>Revoke</Button></td>
+                                <td>{revokeButton}</td>
                             </tr>;
                         }.bind(this))}
                         <tr><td/><td/><td/><td/></tr>
