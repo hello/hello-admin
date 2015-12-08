@@ -106,7 +106,9 @@ var InsightsMaster = React.createClass({
 
     render: function() {
         var resultCards = this.state.ready === true && this.state.insights.length === 0 ?
-            <Alert>Not found! {this.state.error}</Alert> :
+            <Col xs={12} md={10} mdOffset={1} md={8} mdOffset={2} lg={6} lgOffset={3} xl={4} xlOffset={4}>
+                <Alert className="card-alert">Not found! {this.state.error}</Alert>
+            </Col>:
             <Col xs={12} md={10} mdOffset={1} md={8} mdOffset={2} lg={6} lgOffset={3} xl={4} xlOffset={4}>{
                 this.state.insights.map(function(d){
                     var infoPreview = !d.info_preview ? null: <div>
