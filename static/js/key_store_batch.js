@@ -29,6 +29,10 @@ var KeyStoreBatch = React.createClass({
     loadKeys: function() {
         this.setState(this.getInitialState());
         var ids = $("#" + this.props.deviceType + "-ids").val().split(",").map(function(id){return id.trim();});
+        if (ids.length > 100) {
+            ids = ids.slice(0, 100);
+            alert("Input length was greater than 100, only processing for the first 100 items");
+        }
         $.ajax({
             url: this.props.url,
             dataType: 'json',
@@ -43,7 +47,7 @@ var KeyStoreBatch = React.createClass({
         return false;
     },
     render: function() {
-        console.log(this.state.data);
+        var alert = this.state.error ? <Alert>{this.state.error}</Alert> : null;
         var keylessDevicesDisplay = this.state.keylessDevices.length === 0 ? null : <div className="keyless">Keyless {this.props.deviceType}s: {this.state.keylessDevices.join(", ")}</div>;
         return <Col xs={6}>
             <form onSubmit={this.loadKeys}>
@@ -56,6 +60,7 @@ var KeyStoreBatch = React.createClass({
             </form>
             <KeyStoreInfoTable data={this.state.data} deviceType={this.props.deviceType} />
             {keylessDevicesDisplay}
+            {alert}
         </Col>;
     }
 });
