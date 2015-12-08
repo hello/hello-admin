@@ -1,3 +1,5 @@
+var cachedInsightsGeneric = {};
+
 var Card = React.createClass({
     getDefaultProps: function() {
         return {img: "svg/sleep.svg"}
@@ -32,15 +34,23 @@ var InsightGenericCard = React.createClass({
     },
 
     getInsightsGeneric: function(category) {
-        $.ajax({
-            url: "/api/insights_generic",
-            data: {category: category, email: $("#email-input").val()},
-            dataType: 'json',
-            type: "GET",
-            success: function (response) {
-                this.setState({insightsGeneric: response.data});
-            }.bind(this)
-        });
+        if (cachedInsightsGeneric[category]) {
+            this.setState({insightsGeneric: cachedInsightsGeneric[category]});
+            console.log("use cache")
+        }
+        else {
+            console.log("load new");
+            $.ajax({
+                url: "/api/insights_generic",
+                data: {category: category, email: $("#email-input").val()},
+                dataType: 'json',
+                type: "GET",
+                success: function (response) {
+                    this.setState({insightsGeneric: response.data});
+                    cachedInsightsGeneric[category] = response.data;
+                }.bind(this)
+            });
+        }
         return false;
     },
 
@@ -55,7 +65,7 @@ var InsightGenericCard = React.createClass({
                 <div className="modal-subtitle">{genericContent.category}</div>
             </div>
             <div className='modal-body'>
-                {genericContent.image_url ? <img className="modal-img" src={genericContent.image_url}/> : null}
+                {this.props.image ? <img className="modal-img" src={this.props.image.phone_3x}/> : null}
                 {debunkMarkdown(genericContent.text)}
             </div>
             <div className='modal-footer'>
@@ -101,23 +111,27 @@ var InsightsMaster = React.createClass({
                 this.state.insights.map(function(d){
                     var infoPreview = !d.info_preview ? null: <div>
                         <hr className="splitter"/>
-                        <ModalTrigger modal={<InsightGenericCard category={d.category} />}>
-                            <Row className="cursor-hand card-info-preview">
-                                <Col xs={11}>{d.info_preview}</Col>
-                                <Col xs={1}><Glyphicon className="glyphicon-preview" bsSize="small" glyph="menu-right"/></Col>
-                            </Row>
-                        </ModalTrigger>
-                        </div>;
+                        <Row className="card-info-preview">
+                            <Col xs={11}>{d.info_preview}</Col>
+                            <Col xs={1}><Glyphicon className="glyphicon-preview" bsSize="small" glyph="menu-right"/></Col>
+                        </Row>
+                    </div>;
 
                     var content = <div>
+                            {d.image ? <img className="card-img" src={d.image.phone_3x}/> : null}
                             <div className="card-age">generated {millisecondsToHumanReadableString(new Date().getTime() - d.timestamp)} ago</div>
                             <hr className="splitter"/>
                             <div className="card-message">{debunkMarkdown(d.message)}</div>
                             {infoPreview}
                         </div>;
 
+                    var wrappedContent = !d.info_preview ? content :
+                        <ModalTrigger modal={<InsightGenericCard image={d.image} category={d.category} />}>
+                            <div className="cursor-hand">{content}</div>
+                        </ModalTrigger>;
+
                     return <Col xs={12}>
-                        <Card title={d.title} content={content} />
+                        <Card title={d.category} content={wrappedContent} />
                     </Col>;
                 }.bind(this))
             }</Col>;
