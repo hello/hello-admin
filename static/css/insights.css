@@ -48,7 +48,7 @@
 .modal-col-title {text-transform: uppercase; color: #000000; font-weight: lighter; font-size: 10px;}
 .modal-fw-man {color: #41D7AB;}
 .modal-body {font-size: 16px; font-weight: 200;}
-.modal-img {height: 200px; width: 100%; margin-bottom: 15px;}
+.modal-img {margin-bottom: 15px;}
 
 .stress {font-weight: 500; color: black;}
 #submit {
