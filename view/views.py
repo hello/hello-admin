@@ -291,7 +291,12 @@ class FeedbackView(ProtectedRequestHandler):
 class InsightsView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='insights.html',
-                                context={'title': "Feedback"})
+                                context={'title': "Insights"})
+
+class TrendsView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='trends.html',
+                                context={'title': "Trends"})
 
 class DropoutSensesView(ProtectedRequestHandler):
     def get(self):
