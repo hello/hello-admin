@@ -39,7 +39,7 @@ var TimelineLogHistoryChart = React.createClass({
                             text: "Count or Share",
                             position: 'outer-middle'
                         }
-                    },
+                    }
                 },
                 bar: {
                     width: {

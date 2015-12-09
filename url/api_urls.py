@@ -20,6 +20,7 @@ from api.device import SenseBlackListAPI
 from api.device import SenseColorAPI
 from api.pill import LastHeartbeatAPI, HeartbeatsAPI
 from api.sessions import SessionsAPI, SessionsUpdateAPI
+from api.trends import TrendsAPI
 from api.uptime import SenseUptimeAPI
 from api.event import SenseEventsAPI
 from api.firmware import FirmwareAPI
@@ -172,8 +173,10 @@ routes = [
     ('/api/es_status/?$', ElasticSearchStatusAPI),
     ('/api/es_aggregation/?$', ElasticSearchAggregationAPI),
     ('/api/feedback/?$', FeedbackAPI),
+    ('/api/feedback/?$', FeedbackAPI),
     ('/api/insights/?$', InsightsAPI),
     ('/api/insights_generic/?$', InsightsGenericAPI),
+    ('/api/trends/?$', TrendsAPI),
     ('/api/sessions/?$', SessionsAPI),
     ('/api/sessions_update/?$', SessionsUpdateAPI),
 ]
