@@ -13,8 +13,6 @@ var SessionsTile = React.createClass({
             type: 'GET',
             data: {email: email},
             success: function (response) {
-                console.log("hehe");
-                console.log(response);
                 this.setState({sessions: response.data, error: response.error})
             }.bind(this)
         });
@@ -68,7 +66,7 @@ var SessionsModal = React.createClass({
         return false;
     },
     render: function() {
-        return <Modal animation={true}>
+        return <Modal className="modal-sessions" animation={true}>
             <div className='modal-body'>
                 <div className="modal-title">All sessions <Button className="btn-round btn-borderless btn-fade" onClick={this.props.onRequestHide}>X</Button></div>
                 <div className="modal-subtitle">Sorted by row ID in descending order</div>
@@ -76,6 +74,7 @@ var SessionsModal = React.createClass({
                 <Table id="sessions">
                     <tbody>
                         <tr className="modal-col-title">
+                            <td>ID</td>
                             <td>Created At (Browser tz)</td>
                             <td>Expires In</td>
                             <td>App ID</td>
@@ -84,8 +83,12 @@ var SessionsModal = React.createClass({
                             <td>Action</td>
                         </tr>
                         {this.props.sessions.map(function(s){
-                            var revokeButton = $("#viewer").val() === "true" ? <Button onClick={this.revokeSession.bind(this, s.id)}>Revoke</Button> : false;
+                            var revokeButton = !($("#is-super-engineer").val() === "True") ? null :
+                                <Button onClick={this.revokeSession.bind(this, s.id)}>
+                                    <Glyphicon glyph="trash" />&nbsp;&nbsp;Revoke
+                                </Button>;
                             return <tr>
+                                <td>{s.id}</td>
                                 <td>{new Date(s.created_at).toLocaleString()}</td>
                                 <td>{s.expires_in}</td>
                                 <td>{s.app_id}</td>

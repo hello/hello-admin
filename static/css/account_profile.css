@@ -152,4 +152,4 @@ svg {
 .modal-col-title {text-transform: uppercase; color: #000000; font-weight: lighter; font-size: 10px;}
 .modal-fw-man {color: #41D7AB;}
 
-.modal-body {width: 1200px !important;}
+.modal-sessions>.modal-dialog {width: 1200px !important;}
