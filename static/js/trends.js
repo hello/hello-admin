@@ -9,61 +9,59 @@ var TrendsChart = React.createClass({
         }
     },
     render: function() {
-        if(this.props.data && this.props.data.data_points && this.props.data.data_points.length > 0) {
-            var that = this;
-            console.log(this.props.data);
+        var that = this;
 
-            c3.generate({
-                bindto: '#'.concat(that.props.id),
-                data: {
-                    columns: [
-                        [that.props.id.split("-").join(" ").toUpperCase()]
-                            .concat(that.props.data.data_points.map(function(p){
-                                return p.y_value / that.props.yRatio;
-                            }))
-                    ],
-                    type: that.props.chartType,
-                    color: function (color, d) {
-                        return that.props.color;
-                    }
-                },
-                axis: {
-                    x: {
-                        tick: {
-                            format: function (i) {
-                                var xCategories = that.props.data.data_points.map(function(p){return p.x_value;});
-                                return xCategories[i];
-                            }
-                        },
-                        label: {
-                            text: "Week days",
-                            position: 'outer-center'
+        var points = that.props.data ? that.props.data.data_points : [];
+        c3.generate({
+            bindto: '#'.concat(that.props.id),
+            data: {
+                columns: [
+                    [that.props.id.split("-").join(" ").toUpperCase()]
+                        .concat(points.map(function(p){
+                            return p.y_value / that.props.yRatio;
+                        }))
+                ],
+                type: that.props.chartType,
+                color: function (color, d) {
+                    return that.props.color;
+                }
+            },
+            axis: {
+                x: {
+                    tick: {
+                        format: function (i) {
+                            var xCategories = points.map(function(p){return p.x_value;});
+                            return xCategories[i];
                         }
                     },
-                    y: {
-                        label: {
-                            text: that.props.yAxisLabel,
-                            position: 'outer-middle'
-                        }
+                    label: {
+                        text: "Week days",
+                        position: 'outer-center'
                     }
                 },
-                tooltip: {
-                    format: {
-                        title: function (d) { return 'Data ' + d; },
-                        value: function (value, ratio, id) {
-                            var format = id === 'data1' ? d3.format(',') : d3.format('');
-                            return format(value.toFixed(2));
-                        }
+                y: {
+                    label: {
+                        text: that.props.yAxisLabel,
+                        position: 'outer-middle'
                     }
-                },
-                bar: {
-                    width: {
-                        ratio: 0.5 // this makes bar width 50% of length between ticks
+                }
+            },
+            tooltip: {
+                format: {
+                    title: function (d) { return 'Data ' + d; },
+                    value: function (value, ratio, id) {
+                        var format = id === 'data1' ? d3.format(',') : d3.format('');
+                        return format(value.toFixed(2));
                     }
-                },
-            });
-        }
-        var chartTitle = this.props.data && this.props.data.length > 0 ?
+                }
+            },
+            bar: {
+                width: {
+                    ratio: 0.5 // this makes bar width 50% of length between ticks
+                }
+            }
+        });
+        var chartTitle = this.props.data && this.props.data.data_points > 0 ?
             <div className="center-wrapper"><h5>{this.props.id}</h5></div> : null;
         return <div>
             <br/>
@@ -107,9 +105,6 @@ var TrendsMaster = React.createClass({
         var alert = this.state.error ? <Alert>{this.state.error}</Alert> : null;
         var that = this;
         return <div>
-            <Col xs={12} md={10} mdOffset={1} md={8} mdOffset={2} lg={6} lgOffset={3} xl={4} xlOffset={4}>
-                {alert}
-            </Col>
             <Col xs={12} md={10} mdOffset={1} md={8} mdOffset={2} lg={6} lgOffset={3} xl={4} xlOffset={4}><form onSubmit={this.getTrends}>
                 <Col xs={12}>
                     <div className="icon-addon addon-md">
@@ -119,6 +114,9 @@ var TrendsMaster = React.createClass({
                     </div>
                 </Col>
             </form></Col>
+            <Col xs={12} md={10} mdOffset={1} md={8} mdOffset={2} lg={6} lgOffset={3} xl={4} xlOffset={4}>
+                {alert}
+            </Col>
             <Col xs={12}>
                 <TrendsChart id="average-sleep-score" data={that.state.trends[0]} yAxisLabel="avgSleepScore" chartType="area-step" color="#009BFF"/>
             </Col>
