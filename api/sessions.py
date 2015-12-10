@@ -6,7 +6,10 @@ class SessionsAPI(ProtectedRequestHandler):
         self.hello_request(
             api_info=self.suripu_admin,
             api_url="token",
-            url_params={"email": self.request.get("email")},
+            url_params={
+                "email": self.request.get("email"),
+                "limit": 1000
+            },
             type="GET",
         )
 
@@ -15,6 +18,6 @@ class SessionsUpdateAPI(SuperEngineerRequestHandler):
     def put(self):
         self.hello_request(
             api_info=self.suripu_admin,
-            api_url="token/update_expiration/{}".format(self.request.get("id")),
+            api_url="token/invalidate/{}".format(self.request.get("id")),
             type="PUT",
         )
