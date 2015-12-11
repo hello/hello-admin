@@ -30,8 +30,7 @@ var TrendsChart = React.createClass({
                 x: {
                     tick: {
                         format: function (i) {
-                            var xCategories = points.map(function(p){return p.x_value;});
-                            return xCategories[i];
+                            return points[i].x_value;
                         }
                     },
                     label: {
@@ -48,7 +47,7 @@ var TrendsChart = React.createClass({
             },
             tooltip: {
                 format: {
-                    title: function (d) { return 'Data ' + d; },
+                    title: function (i) { return points[i].x_value; },
                     value: function (value, ratio, id) {
                         var format = id === 'data1' ? d3.format(',') : d3.format('');
                         return format(value.toFixed(2));
