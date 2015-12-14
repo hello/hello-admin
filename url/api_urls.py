@@ -8,7 +8,7 @@ from api.logs_level import LogsLevelAPI
 from api.namespace import NamespaceAPI
 from api.password import PasswordResetAPI, PasswordForceUpdateAPI
 from api.feature import FeaturesAPI
-from api.device import ActiveDevices15MinutesHistoryAPI, PillColorAPI
+from api.device import ActiveDevices15MinutesHistoryAPI, PillColorAPI, DropoutDevicesAPI
 from api.device import ActiveDevicesDailyHistoryAPI
 from api.device import ActiveDevicesMinuteHistoryAPI
 from api.device import DeviceAPI
@@ -179,5 +179,6 @@ routes = [
     ('/api/trends/?$', TrendsAPI),
     ('/api/sessions/?$', SessionsAPI),
     ('/api/sessions_update/?$', SessionsUpdateAPI),
+    ('/api/dropout_devices/?$', DropoutDevicesAPI),
 ]
 
