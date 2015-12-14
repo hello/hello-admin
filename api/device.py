@@ -240,3 +240,12 @@ class PillColorAPI(ProtectedRequestHandler):
             api_url="devices/pill_color/{}/{}".format(self.request.get("pill_id"), self.request.get("account_id")),
             type="GET",
         )
+
+
+class DropoutDevicesAPI(ProtectedRequestHandler):
+    def get(self):
+        self.hello_request(
+            api_url="tracking/active_devices_diff/{}".format(self.request.get("device_type")),
+            url_params={"before": self.request.get("before"), "after": self.request.get("after")},
+            type="GET",
+        )

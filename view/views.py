@@ -298,7 +298,7 @@ class TrendsView(ProtectedRequestHandler):
         self.render_to_response(template_file='trends.html',
                                 context={'title': "Trends"})
 
-class DropoutSensesView(ProtectedRequestHandler):
+class DropoutDevicesView(ProtectedRequestHandler):
     def get(self):
-        self.render_to_response(template_file='dropout_senses.html',
-                                context={'title': "Feedback"})
+        self.render_to_response(template_file='dropout_devices.html',
+                                context={'title': "Dropout Devices"})
