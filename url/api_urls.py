@@ -18,7 +18,7 @@ from api.device import DeviceKeyStoreAPI
 from api.device import DeviceOwnersAPI
 from api.device import SenseBlackListAPI
 from api.device import SenseColorAPI
-from api.pill import LastHeartbeatAPI, HeartbeatsAPI
+from api.pill import LastHeartbeatAPI, HeartbeatsAPI, LatestPillsAPI, LatestPillsDataAPI
 from api.sessions import SessionsAPI, SessionsUpdateAPI
 from api.trends import TrendsAPI
 from api.uptime import SenseUptimeAPI
@@ -180,5 +180,7 @@ routes = [
     ('/api/sessions/?$', SessionsAPI),
     ('/api/sessions_update/?$', SessionsUpdateAPI),
     ('/api/dropout_devices/?$', DropoutDevicesAPI),
+    ('/api/pill_latest/pair/?$', LatestPillsAPI),
+    ('/api/pill_latest/data/?$', LatestPillsDataAPI),
 ]
 

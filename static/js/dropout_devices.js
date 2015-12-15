@@ -8,8 +8,8 @@ var DropoutDevices= React.createClass({
             dataType: "json",
             data: {
                 device_type: this.props.deviceType,
-                before: reformatDate($("#before").val()),
-                after: reformatDate($("#after").val())
+                before: reformatDate($("#" + this.props.deviceType + "-before").val()),
+                after: reformatDate($("#" + this.props.deviceType + "-after").val())
             },
             type: "GET",
             success: function(response) {
