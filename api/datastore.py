@@ -16,15 +16,11 @@ class InitializeDataStore(BaseRequestHandler):
         pass
 
     def get(self):
-        if not self.request.get("all"):
-            self.init_per_namespace(self.namespace)  # init datastore for current active namespace
-        else:
-            for namespace in ["dev"] + AVAILABLE_NAMESPACES:
-                self.init_per_namespace(namespace)
+        self.init_per_namespace(self.request.get("namespace", "dev"))  # init datastore for current active namespace
 
     def init_per_namespace(self, namespace):
         namespace_manager.set_namespace(namespace)
-        with open("config.staging.yaml", "r") as stream:
+        with open("config.{}.yaml".format(namespace.lower()), "r") as stream:
             config_from_file = yaml.load(stream)
             namespace_manager.set_namespace(config_from_file.get("namespace"))
             ApiInfo(**config_from_file.get("api_info").get("admin")).put()
