@@ -32,9 +32,10 @@ var DropoutDevices= React.createClass({
                 }</ul>
             </Col>;
         return <div>
+            <Col xs={12}><div className="center-wrapper">{this.props.deviceType.capitalize()}</div></Col>
             <form onSubmit={this.handleSubmit}>
-                <LongDatetimePicker size={5} glyphicon="clock" placeHolder="before date" id={this.props.deviceType + "-before"}/>
-                <LongDatetimePicker size={5} glyphicon="clock" placeHolder="after date" id={this.props.deviceType + "-after"}/>
+                <LongDatetimePicker size={5} glyphicon="clock" placeHolder="before ts (UTC)" id={this.props.deviceType + "-before"}/>
+                <LongDatetimePicker size={5} glyphicon="clock" placeHolder="after ts (UTC)" id={this.props.deviceType + "-after"}/>
                 <Col xs={2}>
                     <Button type="submit"><Glyphicon glyph="search"/></Button>
                 </Col>
