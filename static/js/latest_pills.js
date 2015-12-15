@@ -52,7 +52,9 @@ var LatestPillsMaster = React.createClass({
                     return <tr>
                         <td>{d.device_account_pair.internal_device_id}</td>
                         <td>{d.device_account_pair.external_device_id}</td>
-                        <td>{d.device_account_pair.account_id}</td>
+                        <td><a target="_blank" href={"account_profile/?input=" + d.device_account_pair.account_id + "&type=account_id"}>
+                            {d.device_account_pair.account_id}
+                        </a></td>
                         {latestHeartbeat}
                     </tr>
                 }.bind(this))
