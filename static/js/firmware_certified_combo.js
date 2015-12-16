@@ -1,11 +1,14 @@
+var FW_SEPERATOR = "___";
+
 var NewComboModal = React.createClass({
     handleSubmit: function() {
         var topFw = this.refs.topFw.getDOMNode().value;
         var middleFw = this.refs.middleFw.getDOMNode().value;
 
         if (!topFw.isWhiteString() && !middleFw.isWhiteString()) {
-            var data = this.props.data.slice(0);
-            data.push(topFw + "|" + middleFw);
+            console.log("data", this.props.data);
+            var data = this.props.data;
+            data.push(topFw + FW_SEPERATOR + middleFw);
             console.log(data);
             this.props.putFWCertifiedCombo(data);
             this.props.getFWCertifiedCombo();
@@ -86,8 +89,8 @@ var FirmwareCertifiedCombo = React.createClass({
                 </tr></thead>
                 <tbody>{
                     this.state.data.map(function(d){
-                        var topFw = d.split("|")[0];
-                        var middleFw = d.split("|")[1];
+                        var topFw = d.split(FW_SEPERATOR)[0];
+                        var middleFw = d.split(FW_SEPERATOR)[1];
                         return <tr>
                             <td>{topFw}</td>
                             <td>{middleFw}</td>
