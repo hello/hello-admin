@@ -8,7 +8,7 @@ var FeedbackTableResults = React.createClass({
         $.ajax({
             url: "/api/feedback",
             type: "PUT",
-            data: JSON.stringify({created: created, email: $("#email-input").val()}),
+            data: JSON.stringify({night: created, email: $("#email-input").val()}),
             success: function(response) {
                 if (response.error.isWhiteString()){
                     this.props.getFeedback();
@@ -39,13 +39,13 @@ var FeedbackTableResults = React.createClass({
             <tbody>{
                 this.props.data.map(function(d){
                     return <tr>
-                        <td>{d.accountId}</td>
-                        <td>{d.dateOfNight}</td>
-                        <td className={d.oldTimeOfEvent == d.newTimeOfEvent ? "ok" : "not-ok"}>{d.oldTimeOfEvent}</td>
-                        <td className={d.oldTimeOfEvent == d.newTimeOfEvent ? "ok" : "not-ok"}>{d.newTimeOfEvent}</td>
-                        <td>{d.eventType}</td>
+                        <td>{d.account_id}</td>
+                        <td>{d.date_of_night}</td>
+                        <td className={d.old_time_event == d.new_time_event ? "ok" : "not-ok"}>{d.old_time_event}</td>
+                        <td className={d.old_time_event == d.new_time_event ? "ok" : "not-ok"}>{d.new_time_event}</td>
+                        <td>{d.event_type}</td>
                         <td>{d.created}</td>
-                        <td>{d.oldTimeOfEvent == d.newTimeOfEvent ? "not applicable" : <Button onClick={this.updateFeedback.bind(this, d.created)}>Undo update</Button>}</td>
+                        <td>{d.old_time_event == d.new_time_event ? "not applicable" : <Button onClick={this.updateFeedback.bind(this, d.created)}>Undo update</Button>}</td>
                     </tr>
                 }.bind(this))
             }</tbody>
@@ -60,9 +60,9 @@ var FeedbackMaster = React.createClass({
         $.ajax({
             url: "/api/feedback",
             type: "GET",
-            data: {date: reformatDate($("#date-input").val()), email: this.refs.emailInput.getDOMNode().value},
+            data: {night: reformatDate($("#date-input").val()), email: this.refs.emailInput.getDOMNode().value},
             success: function(response) {
-                console.log("get feedback");
+                console.log(response);
                 if (response.error.isWhiteString() && response.data.length > 0){
                     this.setState({data: response.data, error: null});
                 }
