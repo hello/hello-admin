@@ -307,3 +307,8 @@ class LatestPillsView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='latest_pills.html',
                                 context={'title': "Latest Pills"})
+
+class FirmwareCertifiedComboView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='firmware_certified_combo.html',
+                                context={'title': "Firmware Certified Combo"})

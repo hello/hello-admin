@@ -23,7 +23,7 @@ from api.sessions import SessionsAPI, SessionsUpdateAPI
 from api.trends import TrendsAPI
 from api.uptime import SenseUptimeAPI
 from api.event import SenseEventsAPI
-from api.firmware import FirmwareAPI
+from api.firmware import FirmwareAPI, FirmwareCertifiedComboAPI
 from api.firmware import FirmwareHistoryAPI
 from api.firmware import FirmwareInfoAPI
 from api.firmware import FirmwareUnhashAPI
@@ -182,5 +182,6 @@ routes = [
     ('/api/dropout_devices/?$', DropoutDevicesAPI),
     ('/api/pill_latest/pair/?$', LatestPillsAPI),
     ('/api/pill_latest/data/?$', LatestPillsDataAPI),
+    ('/api/firmware_certified_combo/?$', FirmwareCertifiedComboAPI),
 ]
 

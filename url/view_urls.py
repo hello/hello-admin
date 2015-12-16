@@ -1,7 +1,7 @@
 from view.views import AccountProfileView, RoomConditionsMinuteView, TimelineV2View, LogsFacetHistoryView, \
     TimelineLogsView, TimelineLogsHistoryView, DustCalibrationLeftOverView, HeartbeatView, KeyStoreBatchView, \
     LogsLevelView, ESStatusView, ESAggregationView, FeedbackView, DropoutDevicesView, InsightsView, TrendsView, \
-    LatestPillsView
+    LatestPillsView, FirmwareCertifiedComboView
 from view.views import ActiveDevicesHistoryView
 from view.views import AlarmRingsHistoryView
 from view.views import AlarmsView
@@ -107,4 +107,5 @@ routes = [
     ('/trends/?$', TrendsView),
     ('/dropout_devices/?$', DropoutDevicesView),
     ('/latest_pills/?$', LatestPillsView),
+    ('/firmware_certified_combo/?$', FirmwareCertifiedComboView),
 ]

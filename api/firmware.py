@@ -149,3 +149,17 @@ class FirmwareGroupPathAPI(SuperFirmwareRequestHandler):
             body.get("from_fw_version"))
         self.slack_pusher.send_to_deploys_channel(message_text)
 
+
+class FirmwareCertifiedComboAPI(ProtectedRequestHandler):
+    def get(self):
+        self.hello_request(
+            api_url="firmware/certified_combinations",
+            type="GET"
+        )
+
+    def put(self):
+        self.hello_request(
+            api_url="firmware/certified_combinations",
+            type="PUT",
+            body_data=self.request.body
+        )
