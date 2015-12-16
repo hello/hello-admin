@@ -63,7 +63,7 @@
 
                 <span class="sidebar-group list-group-item">Device</span>
                 <span {% if title == "Troubleshoot"%} class="list-group-item-active"{% endif %}><a href="/inactive_devices" class="list-group-item">Inactive List</a></span>
-                <span {% if title == "Latest pills"%} class="list-group-item-active"{% endif %}><a href="/latest_pills" class="list-group-item">Inactive List</a></span>
+                <span {% if title == "Latest pills"%} class="list-group-item-active"{% endif %}><a href="/latest_pills" class="list-group-item">Latest Pills</a></span>
                 <span {% if title == "Active Devices History"%} class="list-group-item-active"{% endif %}><a href="/active_devices_history" class="list-group-item">Count History</a></span>
                 <span {% if title == "Dropout Devices"%} class="list-group-item-active"{% endif %}><a href="/dropout_devices" class="list-group-item">Dropout Devices</a></span>
                 <span {% if title == "PCH Serial Number Check"%} class="list-group-item-active"{% endif %}><a href="/pch_serial_number_check" class="list-group-item">Serial Check</a></span>
@@ -79,54 +79,36 @@
                 <span {% if title == "Firmware Upgrade Path"%} class="list-group-item-active"{% endif %}><a href="/firmware_path" class="list-group-item">Upgrade Path</a></span>
                 <div class="list-group-separator list-group-item"><hr></div>
 
-                <span class="sidebar-group list-group-item">Metrics</span>
-                <span {% if title == "Inspector"%} class="list-group-item-active"{% endif %}><a href="/users_inspection" class="list-group-item">Inspector</a></span>
-                <span {% if title == "Sense Uptime"%} class="list-group-item-active"{% endif %}><a href="/sense_uptime" class="list-group-item">Sense Uptime</a></span>
-                <div class="list-group-separator list-group-item"><hr></div>
-
                 <span class="sidebar-group list-group-item">Data</span>
-                <span {% if title == "Timeline"%} class="list-group-item-active"{% endif %}><a href="/timeline" class="sidebar-group list-group-item list-group-item-deprecated">Timeline</a></span>
                 <span {% if title == "Timeline V2"%} class="list-group-item-active"{% endif %}><a href="/timeline_v2" class="sidebar-group list-group-item">Timeline V2</a></span>
                 <span {% if title == "Insights"%} class="list-group-item-active"{% endif %}><a href="/insights" class="sidebar-group list-group-item">Insights</a></span>
                 <span {% if title == "Trends"%} class="list-group-item-active"{% endif %}><a href="/trends" class="sidebar-group list-group-item">Trends</a></span>
                 <span {% if title == "Room Conditions"%} class="list-group-item-active"{% endif %}><a href="/room_conditions" class="list-group-item">Room Conditions</a></span>
-                <span {% if title == "Room Conditions Minute"%} class="list-group-item-active"{% endif %}><a href="/room_conditions_minute" class="list-group-item list-group-item-deprecated">Room Conditions Minute</a></span>
-                <span {% if title == "Battery"%} class="list-group-item-active"{% endif %}><a href="/battery" class="list-group-item list-group-item-deprecated">Pill Battery</a></span>
                 <span {% if title == "Heartbeat"%} class="list-group-item-active"{% endif %}><a href="/heartbeat" class="list-group-item">Pill Heartbeat</a></span>
                 <span {% if title == "Motion"%} class="list-group-item-active"{% endif %}><a href="/motion" class="list-group-item">Tracker Motion</a></span>
                 <span {% if title == "Sense Events"%} class="list-group-item-active"{% endif %}><a href="/sense_events" class="list-group-item">Sense Events</a></span>
-                <span {% if title == "Dust Statistics"%} class="list-group-item-active"{% endif %}><a href="/dust_stats" class="list-group-item list-group-item-deprecated">Dust Statistics</a></span>
                 <span {% if title == "Alarms, Ringtime & Timezone"%} class="list-group-item-active"{% endif %}><a href="/alarm_rings_history" class="list-group-item">Rings History</a></span>
                 <span {% if title == "Feedback"%} class="list-group-item-active"{% endif %}><a href="/feedback" class="list-group-item">Feedback</a></span>
-                <span {% if title == "Label"%} class="list-group-item-active"{% endif %}><a href="/label" class="list-group-item">Label</a></span>
                 <div class="list-group-separator list-group-item"><hr></div>
 
                 <span class="sidebar-group list-group-item">Logs</span>
-                <span {% if title == "Sense Logs"%} class="list-group-item-active"{% endif %}><a href="/sense_logs" class="list-group-item">Sense Logs</a></span>
-                <span {% if title == "Sense Logs ES"%} class="list-group-item-active"{% endif %}><a href="/sense_logs_es" class="list-group-item">Sense Logs Elasticsearch</a></span>
+                <span {% if title == "Sense Logs ES"%} class="list-group-item-active"{% endif %}><a href="/sense_logs_es" class="list-group-item">Sense Logs ES</a></span>
                 <span {% if title == "Logs Level"%} class="list-group-item-active"{% endif %}><a href="/logs_level" class="list-group-item">Logs Level</a></span>
                 <span {% if title == "Onboarding Logs"%} class="list-group-item-active"{% endif %}><a href="/onboarding_logs" class="list-group-item">Onboarding Logs</a></span>
                 <span {% if title == "Timeline Logs"%} class="list-group-item-active"{% endif %}><a href="/timeline_logs" class="list-group-item">Timeline Logs</a></span>
                 <span {% if title == "Timeline Logs History"%} class="list-group-item-active"{% endif %}><a href="/timeline_logs_history" class="list-group-item">Timeline Logs History</a></span>
                 <span {% if title == "Logs Facet"%} class="list-group-item-active"{% endif %}><a href="/logs_facet" class="list-group-item">Facets</a></span>
-                <span {% if title == "Sense Logs ES Aggregation"%} class="list-group-item-active"{% endif %}><a href="/es_aggregations" class="list-group-item">ES Logs Aggregations</a></span>
-                <span {% if title == "Logs Facet History"%} class="list-group-item-active"{% endif %}><a href="/logs_facet_history" class="list-group-item">Facets History</a></span>
-                <span {% if title == "Black List"%} class="list-group-item-active"{% endif %}><a href="/black_list" class="list-group-item">Black List</a></span>
+                <span {% if title == "Sense Logs ES Aggregation"%} class="list-group-item-active"{% endif %}><a href="/es_aggregation" class="list-group-item">ES Logs Aggregations</a></span>
                 <span {% if title == "ES Status"%} class="list-group-item-active"{% endif %}><a href="/es_status" class="list-group-item">ES Status</a></span>
-                <span {% if title == "Index Statistics"%} class="list-group-item-active"{% endif %}><a href="/searchify_stats" class="list-group-item">Index Statistics</a></span>
                 <div class="list-group-separator list-group-item"><hr></div>
 
                 <span class="sidebar-group list-group-item">Support</span>
-                <span {% if title == "Zendesk Now"%} class="list-group-item-active"{% endif %}><a href="/zendesk_now" class="list-group-item">Zendesk Now</a></span>
-                <span {% if title == "Zendesk History"%} class="list-group-item-active"{% endif %}><a href="/zendesk_history" class="list-group-item">Zendesk History</a></span>
                 <span {% if title == "Orders"%} class="list-group-item-active"{% endif %}><a href="/orders" class="list-group-item">Orders</a></span>
                 <div class="list-group-separator list-group-item"><hr></div>
 
                 <span class="sidebar-group list-group-item">Operation</span>
                 <span {% if title == "Features"%} class="list-group-item-active"{% endif %}><a href="/features" class="list-group-item">Features</a></span>
                 <span {% if title == "Teams"%} class="list-group-item-active"{% endif %}><a href="/teams" class="list-group-item">Teams</a></span>
-                <span {% if title == "Notification"%} class="list-group-item-active"{% endif %}><a href="/notification" class="list-group-item">Notification</a></span>
-                <span {% if title == "Alarms"%} class="list-group-item-active"{% endif %}><a href="/alarms" class="list-group-item list-group-item-deprecated">Alarms</a></span>
                 <div class="list-group-separator list-group-item"><hr></div>
 
                 <span class="sidebar-group list-group-item">Site Admin</span>
