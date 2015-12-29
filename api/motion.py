@@ -6,7 +6,7 @@ class MotionAPI(ProtectedRequestHandler):
         date = self.request.get('date')
 
         self.hello_request(
-            api_url="data/pill/{}/{}".format(email, date),
+            api_url="data/pill/last24/{}".format(email),
             type="GET",
         )
 
@@ -17,7 +17,7 @@ class LastMotionAPI(ProtectedRequestHandler):
         date = self.request.get('date')
 
         motion_raw_response = self.hello_request(
-            api_url="data/pill/{}/{}".format(email, date),
+            api_url="data/pill/last24/{}".format(email),
             type="GET",
             raw_output=True
         )
