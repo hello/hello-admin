@@ -65,10 +65,10 @@ var ConfigMaestro = React.createClass({
         });
     },
 
-    getTeams: function() {
+    getFWGroups: function() {
         var that = this;
         $.ajax({
-            url: '/api/teams',
+            url: '/api/fw_groups',
             dataType: 'json',
             contentType: 'application/json',
             type: 'GET',
@@ -88,11 +88,11 @@ var ConfigMaestro = React.createClass({
 
 
     handleModeChange: function() {
-        this.getTeams();
+        this.getFWGroups();
     },
 
     componentDidMount: function () {
-        this.getTeams();
+        this.getFWGroups();
     },
 
     handleSend: function(e) {
@@ -106,36 +106,36 @@ var ConfigMaestro = React.createClass({
         };
         console.log('sending', sendData);
         $.ajax({
-            url: '/api/teams',
+            url: '/api/fw_groups',
             dataType: 'json',
             contentType: 'application/json',
             data: JSON.stringify(sendData),
             type: 'PUT',
             success: function(response) {
                 console.log("raw GET response", response);
-                that.getTeams();
+                that.getFWGroups();
             }.bind(this),
             error: function(e) {
                 console.log(e);
-                that.getTeams();
+                that.getFWGroups();
             }.bind(this)
         });
     },
 
     render: function () {
         var currentMode = $('#mode-input').val();
-        var displayMode =  currentMode ? currentMode.capitalize(): null;
+        var displayMode =  currentMode ? currentMode.capitalize().substring(0, currentMode.length - 1): null;
         var inputTypeRemark = currentMode === "users" ? "int": "string";
         return (<div>
-            <Input id="mode-input" bsStyle="warning" type="select" defaultValue="devices" onChange={this.handleModeChange} addonBefore="Type">
-                <option value="devices">&#10148;&nbsp;Devices</option>
-                <option value="users">&#10148;&nbsp;Users</option>
+            <Input id="mode-input" bsStyle="warning" type="select" defaultValue="devices" onChange={this.handleModeChange} addonBefore="Group Type">
+                <option value="devices">&#10148;&nbsp;Device</option>
+                <option value="users">&#10148;&nbsp;User</option>
             </Input>
 
             <Col xs={6}>
-                <h4><span>{displayMode}</span> Group <em className="remark">Enter a <strong>string</strong> or click to select current &rarr;</em></h4>
+                <h4><span>{displayMode}</span> Firmware Group Name <em className="remark">Enter a <strong>string</strong> or click to select existing &rarr;</em></h4>
                 <Input id="group-input" type="text" placeholder="e.g alpha-dev" />
-                <h4><span>{displayMode}</span> IDs <em className="remark">Enter <strong>{inputTypeRemark}</strong>(s) or click to select current &rarr;</em></h4>
+                <h4><span>{displayMode}</span> ID(s) <em className="remark">Enter <strong>{inputTypeRemark}</strong>(s) or click to select existing &rarr;</em></h4>
                 <LongTagsInput id="ids-input" tagClass="label label-info" placeHolder="e.g 123, 666, 987" />
                 <h4>Change IDs of a Group</h4>
                 <Button className="col-xs-3 col-md-3 col-lg-3" action="add" bsStyle="success" onClick={this.handleSend}><Glyphicon glyph="plus"/> Add</Button>
@@ -147,12 +147,12 @@ var ConfigMaestro = React.createClass({
                 <Button className="col-xs-3 col-md-3 col-lg-3" action="delete-group" bsStyle="default" onClick={this.handleSend}><Glyphicon glyph="remove"/> Delete</Button>
             </Col>
             <Col xs={6}>
-                <h4>Current Teams</h4>
+                <h4>Current FW Groups</h4>
                 <FeaturesTable data={this.state.data} />
-                <button id="refresh" onClick={this.getTeams}/>
+                <button id="refresh" onClick={this.getFWGroups}/>
             </Col>
         </div>);
     }
 });
 
-React.renderComponent(<ConfigMaestro />, document.getElementById("teams"));
+React.renderComponent(<ConfigMaestro />, document.getElementById("fw_groups"));

@@ -32,7 +32,7 @@ from view.views import SenseLogsESView
 from view.views import SenseLogsView
 from view.views import SettingsView
 from view.views import SetupView
-from view.views import TeamsView
+from view.views import FWGroupsView
 from view.views import TimelineView
 from view.views import TokenGeneratorView
 from view.views import InactiveDevicesView
@@ -82,7 +82,7 @@ routes = [
     ('/sense_logs_es/?$', SenseLogsESView),
     ('/settings/?$', SettingsView),
     ('/setup/?$', SetupView),
-    ('/teams/?$', TeamsView),
+    ('/fw_groups/?$', FWGroupsView),
     ('/timeline/?$', TimelineView),
     ('/token_generator/?$', TokenGeneratorView),
     ('/troubleshoot/?$', InactiveDevicesView),

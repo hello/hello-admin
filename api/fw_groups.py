@@ -4,7 +4,7 @@ import logging as log
 from core.handlers.base import FirmwareRequestHandler
 
 
-class TeamsAPI(FirmwareRequestHandler):
+class FWGroupAPI(FirmwareRequestHandler):
     def get(self):
         mode = self.request.get('mode', default_value="")
         self.hello_request(
@@ -55,7 +55,7 @@ class TeamsAPI(FirmwareRequestHandler):
         self.response.write(teams_response.get_serialized_output())
 
         request_context = self._extra_context({})
-        message_text = "{} updated teams with request: {}, response status is {}".format(
+        message_text = "{} updated firmware groups with request: {}, response status is {}".format(
             request_context['user'],
             self.request.body,
             teams_response.status

@@ -93,7 +93,7 @@ var ConfigMaestro = React.createClass({
 
     getCurrentGroups: function() {
         $.ajax({
-            url: 'api/teams',
+            url: 'api/fw_groups',
             type: 'GET',
             dataType: 'json',
             contentType: 'application/json',
@@ -101,7 +101,7 @@ var ConfigMaestro = React.createClass({
             success: function(response) {
                 var usersGroups = response.data;
                 $.ajax({
-                    url: 'api/teams',
+                    url: 'api/fw_groups',
                     type: 'GET',
                     dataType: 'json',
                     contentType: 'application/json',
