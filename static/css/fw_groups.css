@@ -1,0 +1,12 @@
+#refresh {display: none;}
+#feature-input{max-width: 100%;}
+#groups-input {padding-bottom: 50px;}
+table.table td{text-align: center;}
+.remark {font-size: 11px; float: right; margin-top: 6px;}
+.ids-all {float: right;}
+.ids-val {display: none;}
+.superscript {font-size: 7px; margin-bottom: 5px;}
+button {margin-right: 10px; opacity: 0.9;}
+#mode-input {max-width: 200px;}
+.form-group:first-child {margin-left: 16px;}
+tbody {background-color: #F7F8FA;}

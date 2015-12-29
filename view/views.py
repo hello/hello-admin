@@ -48,11 +48,11 @@ class FeaturesView(FirmwareRequestHandler):
         self.render_to_response(template_file='features.html',
                                 context={'title': 'Features'})
 
-class TeamsView(FirmwareRequestHandler):
+class FWGroupsView(FirmwareRequestHandler):
     """Returns a panel for monitoring groups of devices & users"""
     def get(self):
-        self.render_to_response(template_file='teams.html',
-                                context={'title': 'Teams'})
+        self.render_to_response(template_file='fw_groups.html',
+                                context={'title': 'Firmware Groups'})
 
 class InactiveDevicesView(ProtectedRequestHandler):
     """Returns a panel for monitoring potential in-troube devices"""
