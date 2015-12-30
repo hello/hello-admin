@@ -3,8 +3,9 @@
 #groups-input {padding-bottom: 50px;}
 table.table td{text-align: center;}
 .remark {font-size: 11px; float: right; margin-top: 6px;}
-.ids-all {float: right;}
+.ids-all {float: right; width: 20px;}
 .ids-val {display: none;}
 .superscript {font-size: 7px; margin-bottom: 5px;}
 #configuration {font-size: 80%;}
 tbody {background-color: #F7F8FA;}
+.fw-group-ids {display:inline-block; overflow:auto; max-height: 200px;}

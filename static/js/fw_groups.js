@@ -13,13 +13,11 @@ var FeaturesTableBody = React.createClass({
                 var id_td = d.ids.indexOf(id) === d.ids.length - 1 ? id: id+", ";
                 idsSpans.push(<span className="ids-td cursor-custom">{id_td}</span>);
             });
-            idsSpans.push(<span className="ids-all cursor-hand">
-                <span className="ids-val">{d.ids.join(", ")}</span>
-                <img src="/static/image/copy.png"/><span className="superscript">all</span>
-            </span>);
             rows.push(<tr>
                 <td><span className="group-td cursor-custom">{d.name}</span></td>
-                <td>{idsSpans}</td>
+                <td><div className="fw-group-ids">{idsSpans}</div></td>
+                <td><span className="ids-all cursor-hand"><span className="ids-val">{d.ids.join(", ")}</span>
+                    <img src="/static/image/copy.png"/></span></td>
             </tr>);
         });
         return (<tbody>
@@ -36,6 +34,7 @@ var FeaturesTable = React.createClass({
                 <tr>
                     <th className="alert-info">Group</th>
                     <th className="alert-success">IDs</th>
+                    <th className="alert-info">All</th>
                 </tr>
             </thead>
             <FeaturesTableBody data={this.props.data} />
