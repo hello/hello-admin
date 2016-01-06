@@ -11,3 +11,5 @@ table.table-bordered>thead>tr>th, table.table-bordered>tbody>tr>td {border: 1px 
 table.table-bordered>tbody>tr>td{text-align: right;}
 #fw_seen { overflow-y: scroll; height: 300px;}
 #device_list { overflow-y: scroll; max-height: 500px;}
+.timestamp {font-size: 9em;}
+span.human-version {display: block; font-weight: bold;}

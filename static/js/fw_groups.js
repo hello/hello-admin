@@ -86,10 +86,28 @@ var ConfigMaestro = React.createClass({
     },
 
 
+    idExists: function(Ids) {
+        var exists = false;
+        var existingIds = [];
+        this.state.data.forEach(function(d){
+
+            d.ids.forEach(function(id){
+                console.log(Ids);
+                Ids.split(',').forEach(function(i){
+                    if(id == i) {
+                        exists = true;
+                        existingIds.push(i);
+                    }
+                });
+
+            });
+       });
+        return (existingIds)
+    },
+
     handleModeChange: function() {
         this.getFWGroups();
     },
-
     componentDidMount: function () {
         this.getFWGroups();
     },
@@ -97,6 +115,18 @@ var ConfigMaestro = React.createClass({
     handleSend: function(e) {
         var that = this;
         var action = $(e.target).attr('action') || $(e.target).parent('button').attr('action');
+        console.log("IDs", this.state.data);
+        if (action == "add") {
+            var exisitingIds = this.idExists($('#ids-input').val());
+            if (exisitingIds.length == 0) {
+                var checkIds = $('#ids-input').val();
+                this.setState({alert: null});
+            } else {
+                console.log("Exists", exisitingIds);
+                this.setState({alert: <Alert>{exisitingIds.length} device(s) already in a FW group. Not adding. <br/>Found: {exisitingIds.join(", ")}</Alert>});
+                return
+            }
+        }
         var sendData = {
             group: action !== 'delete-group' ? $('#group-input').val(): $('#group-del-input').val(),
             ids: $('#ids-input').val(),
@@ -136,7 +166,7 @@ var ConfigMaestro = React.createClass({
                 <Input id="group-input" type="text" placeholder="e.g alpha-dev" />
                 <h4><span>{displayMode}</span> ID(s) <em className="remark">Enter <strong>{inputTypeRemark}</strong>(s) or click to select existing &rarr;</em></h4>
                 <LongTagsInput id="ids-input" tagClass="label label-info" placeHolder="e.g 123, 666, 987" />
-                <h4>Change IDs of a Group</h4>
+                <div className="col-xs-12 col-md-12 col-lg-12">{this.state.alert}</div>
                 <Button className="col-xs-3 col-md-3 col-lg-3" action="add" bsStyle="success" onClick={this.handleSend}><Glyphicon glyph="plus"/> Add</Button>
                 <Button className="col-xs-3 col-md-3 col-lg-3" action="replace" bsStyle="primary" onClick={this.handleSend}><Glyphicon glyph="refresh"/> Replace</Button>
                 <Button className="col-xs-3 col-md-3 col-lg-3"action="remove" bsStyle="danger" onClick={this.handleSend}><Glyphicon glyph="minus"/> Remove</Button>

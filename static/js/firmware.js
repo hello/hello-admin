@@ -28,9 +28,9 @@ var LinkToFWSearch = React.createClass({
     },
     render: function() {
         return <span className="cursor-custom" onClick={this.populateFirmwareVersion}>
-            {this.props.firmware_version} |
-            {parseInt(this.props.firmware_version, 10).toString(16)} |
-            {!$.isEmptyObject(this.props.fwHexToHuman) ? (this.props.fwHexToHuman[parseInt(this.props.firmware_version, 10).toString(16)] || "unknown") : null}
+            <span className="human-version">{!$.isEmptyObject(this.props.fwHexToHuman) ? (this.props.fwHexToHuman[parseInt(this.props.firmware_version, 10).toString(16)] || "unknown") : null}</span>
+            {this.props.firmware_version}(
+            {parseInt(this.props.firmware_version, 10).toString(16)})
         </span>
     }
 });
@@ -125,7 +125,7 @@ var FirmwareListRows = React.createClass({
         var timestamp = new Date(Number(fw.timestamp));
             return(
                 <tr>
-                    <td>
+                    <td class="timestamp">
                         {timestamp.toLocaleString()}
                     </td>
                     <td>
@@ -633,4 +633,8 @@ function prettify_json(json_obj, title_field) {
 
 function timestampSort(a, b) {
  return b.timestamp-a.timestamp
+}
+
+function countSort(a, b) {
+    return b.count-a.count
 }
