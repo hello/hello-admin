@@ -147,7 +147,7 @@ var SenseUptimeMaster = React.createClass({
     },
     loadFirmwareGroups: function() {
         $.ajax({
-            url: '/api/teams',
+            url: '/api/fw_groups',
             dataType: 'json',
             contentType: 'application/json',
             data: {mode: "devices"},
