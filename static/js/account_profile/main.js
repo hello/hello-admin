@@ -213,6 +213,7 @@ var AccountProfile = React.createClass({
     getPlaceholder: function(searchType) {
         switch (searchType) {
             case "email": return "Enter Account Email"; break;
+            case "email_partial": return "Enter Partial Email"; break;
             case "name": return "Enter Name Partials"; break;
             case "account_id": return "Enter Account ID"; break;
             case "sense_id": return "Enter Sense ID"; break;
@@ -502,6 +503,7 @@ var AccountProfile = React.createClass({
                 <span className="glyphicon cursor-hand" onClick={this.showSearchType}><img id="search-type-icon-active" src={this.searchTypeIconMap(this.state.searchType)} /></span>
                 <DropdownButton title='Dropdown' id="search-type-toggle">
                     <MenuItem onClick={this.switchSearchType.bind(this, "email")}><img className="search-type-icon" src={this.searchTypeIconMap("email")} />Email</MenuItem>
+                    <MenuItem onClick={this.switchSearchType.bind(this, "email_partial")}><img className="search-type-icon" src={this.searchTypeIconMap("email")} />Partial Email</MenuItem>
                     <MenuItem onClick={this.switchSearchType.bind(this, "name")}><img className="search-type-icon" src={this.searchTypeIconMap("name")} />Name</MenuItem>
                     <MenuItem onClick={this.switchSearchType.bind(this, "account_id")}><img className="search-type-icon" src={this.searchTypeIconMap("account_id")} />Internal ID</MenuItem>
                     <MenuItem onClick={this.switchSearchType.bind(this, "sense_id")}><img className="search-type-icon" src={this.searchTypeIconMap("sense_id")} />External ID</MenuItem>

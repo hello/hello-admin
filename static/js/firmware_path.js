@@ -136,7 +136,7 @@ var FirmwareGroupStatus = React.createClass({
 var FirmwareGroupPath = React.createClass({
     mixins: [React.addons.LinkedStateMixin],
     getInitialState: function() {
-        return {group: "", groupPath: []}
+        return {group: "release", groupPath: []}
     },
     loadFirmwareGroupPath: function(group) {
         if (group.isWhiteString()) {
@@ -229,10 +229,10 @@ var FirmwarePathMaster = React.createClass({
     render: function() {
         return <Row>
             <Col xs={6}>
-                <Tile title="Firmware Status" content={<FirmwareGroupStatus groups={this.state.groups} />} />
+                <Tile title="Firmware Group Status" content={<FirmwareGroupStatus groups={this.state.groups} />} />
             </Col>
             <Col xs={6}>
-                <Tile title="Firmware Path" content={<FirmwareGroupPath groups={this.state.groups} />} />
+                <Tile title="Firmware Upgrade Paths" content={<FirmwareGroupPath groups={this.state.groups} />} />
             </Col>
         </Row>
     }

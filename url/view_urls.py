@@ -33,6 +33,7 @@ from view.views import SenseLogsView
 from view.views import SettingsView
 from view.views import SetupView
 from view.views import FWGroupsView
+from view.views import TagsView
 from view.views import TimelineView
 from view.views import TokenGeneratorView
 from view.views import InactiveDevicesView
@@ -93,6 +94,7 @@ routes = [
     ('/zendesk_history/?$', ZendeskHistoryView),
     ('/zendesk_now/?$', ZendeskNowView),
     ('/sense_uptime/?$', SenseUptimeView),
+    ('/tags/?$', TagsView),
     ('/timeline_v2/?$', TimelineV2View),
     ('/logs_facet_history/?$', LogsFacetHistoryView),
     ('/timeline_logs/?$', TimelineLogsView),
