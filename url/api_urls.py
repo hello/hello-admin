@@ -62,6 +62,7 @@ from api.setup import UpdateAdminAccessTokenAPI
 from api.setup import UpdateGeckoBoardCredentials
 from api.setup import ViewPermissionAPI
 from api.fw_groups import FWGroupAPI
+from api.tags import TagsAPI
 from api.timeline import TimelineAPI, TimelineV2API, TimelineLogsAPI, TimelineLogsHistoryAPI
 from api.timezone import TimezoneAPI
 from api.timezone import TimezoneHistoryAPI
@@ -128,6 +129,7 @@ routes = [
     ('/api/sense_key_provision/?$', SenseKeyProvision),
     ('/api/sense_logs/?$', SenseLogsAPI),
     ('/api/fw_groups/?$', FWGroupAPI),
+    ('/api/tags/?$', TagsAPI),
     ('/api/timeline/?$', TimelineAPI),
     ('/api/timeline_algorithm/?$', TimelineAlgorithmAPI),
     ('/api/timezone/?$', TimezoneAPI),

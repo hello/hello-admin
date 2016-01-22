@@ -54,6 +54,12 @@ class FWGroupsView(FirmwareRequestHandler):
         self.render_to_response(template_file='fw_groups.html',
                                 context={'title': 'Firmware Groups'})
 
+class TagsView(ProtectedRequestHandler):
+    """Returns a panel for monitoring groups of devices & users"""
+    def get(self):
+        self.render_to_response(template_file='tags.html',
+                                context={'title': 'Tags'})
+
 class InactiveDevicesView(ProtectedRequestHandler):
     """Returns a panel for monitoring potential in-troube devices"""
     def get(self):
