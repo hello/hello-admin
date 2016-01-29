@@ -18,9 +18,9 @@ var QueryOrdersById = React.createClass({
         this.submitWithInputsfromURL();
     },
 
-    pushHistory: function(order_id) {
-        history.pushState({}, '', '/orders/?order_id=' + order_id);
-    },
+    // pushHistory: function(order_id) {
+    //     history.pushState({}, '', '/orders/?order_id=' + order_id);
+    // },
 
     handleSubmit: function() {
         var that = this;
@@ -41,7 +41,6 @@ var QueryOrdersById = React.createClass({
                         that.setState({alert: response.error});
                     }
                     else {
-                        that.pushHistory(orderId);
                         that.setState({alert: response.data.order_link});
                     }
                 }.bind(that),
@@ -128,54 +127,43 @@ var QueryOrdersById = React.createClass({
 
 var QueryOrdersOmni = React.createClass({
     getInitialState: function() {
-        return {ordersMap: [], error: null, filteredResult: [], loading: true}
+        return {error: null, filteredResult: [], loading: false}
     },
-    submitWithInputsfromURL: function() {
-        var whoFromUrl = getParameterByName('who');
-        if (whoFromUrl.isWhiteString()) {
-            return false;
-        }
-        this.refs.omniInput.getDOMNode().value = whoFromUrl;
-        this.handleSubmit();
-    },
+    // submitWithInputsfromURL: function() {
+    //     var whoFromUrl = getParameterByName('who');
+    //     if (whoFromUrl.isWhiteString()) {
+    //         return false;
+    //     }
+    //     this.refs.omniInput.getDOMNode().value = whoFromUrl;
+    //     this.handleSubmit();
+    // },
 
-    pushHistory: function(who) {
-        history.pushState({}, '', '/orders/?who=' + who);
-    },
-    componentDidMount: function() {
-        $.ajax({
-            url: "/api/orders_map",
-            type: "GET",
-            dataType: 'json',
-            success: function (response) {
-                console.log(response);
-                this.setState({
-                    ordersMap: response.data,
-                    loading: false,
-                    error: response.error ? <Alert bsStyle="danger">{response.error}</Alert> : null
-                });
-                this.submitWithInputsfromURL();
-            }.bind(this)
-        });
-        return false;
-    },
     handleSubmit: function() {
         this.setState({error: null, filteredResult: []});
         $("#order-id-input").val("");
-        history.pushState({}, '', '/orders/');
         $("#order-specs").hide();
 
         var omniInput = this.refs.omniInput.getDOMNode().value.trim();
-        this.pushHistory(omniInput);
+
         if (omniInput.trim().length < 3) {
             this.setState({error: <Alert bsStyle="danger">Input string length must be at least 3 characters</Alert>});
             return false;
         }
-
-        var filteredResult = this.state.ordersMap.filter(function(d){
-            return d.name.toLowerCase().indexOf(omniInput.toLowerCase()) > -1 || d.email.toLowerCase().indexOf(omniInput.toLowerCase()) > -1;
+        
+        $.ajax({
+            url: "/api/store/search/",
+            type: "GET",
+            dataType: 'json',
+            data: {
+                'q' : omniInput,
+            },
+            success: function (response) {
+                console.log(response);
+                this.setState({filteredResult: response});
+            }.bind(this)
         });
-        this.setState({"filteredResult": filteredResult});
+        
+        
         return false;
     },
     getOrderById: function(orderId) {
@@ -185,12 +173,12 @@ var QueryOrdersOmni = React.createClass({
         return false;
     },
     render: function() {
-        var loadingOrSubmit = this.state.loading === true ?
-            <div className="center-wrapper">Loading order info <img src="/static/image/loading.gif" /></div>:
-            <Button bsStyle="info" bsSize="large" className="btn-circle" type="submit"><Glyphicon glyph="send"/></Button>;
-        var alert = this.state.error ? this.state.error:
-            this.state.filteredResult.length === 0  ? null:
-            <Table>
+        // var loadingOrSubmit = this.state.loading === true ?
+        //     <div className="center-wrapper">Loading order info <img src="/static/image/loading.gif" /></div>:
+        var loadingOrSubmit = <Button bsStyle="info" bsSize="large" className="btn-circle" type="submit"><Glyphicon glyph="send"/></Button>;
+        console.log("filteredResults", this.state.filteredResult);
+        
+        var table = <Table>
                 <thead><tr>
                     <th>Name</th>
                     <th>Email</th>
@@ -211,8 +199,8 @@ var QueryOrdersOmni = React.createClass({
             <h3>OrderID by Name Partials / Email</h3>
             <hr className="fancy-line" /><br/>
             <input className="form-control" ref="omniInput" type="text" placeholder="Enter name partials / email"/>
+            {table}
             {loadingOrSubmit}
-            {alert}
         </form></Col>)
     }
 });
@@ -225,7 +213,7 @@ var OrdersMaestro = React.createClass({
         </div>;
     }
 });
-React.renderComponent(<OrdersMaestro />, document.getElementById('orders'));
+React.renderComponent(<OrdersMaestro />, document.getElementById('store'));
 
 function isValidRequest(r) {
     return Object.keys(r).every(function(k){return r[k] && !r[k].isWhiteString()})

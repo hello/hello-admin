@@ -313,3 +313,8 @@ class LatestPillsView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='latest_pills.html',
                                 context={'title': "Latest Pills"})
+
+class StoreView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='store.html',
+                                context={'title': "Store"})
