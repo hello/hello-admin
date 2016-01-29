@@ -175,7 +175,7 @@ var QueryOrdersOmni = React.createClass({
         var filteredResult = this.state.ordersMap.filter(function(d){
             return d.name.toLowerCase().indexOf(omniInput.toLowerCase()) > -1 || d.email.toLowerCase().indexOf(omniInput.toLowerCase()) > -1;
         });
-        this.setState({"filteredResult": filteredResult});
+        this.setState({filteredResult: filteredResult});
         return false;
     },
     getOrderById: function(orderId) {

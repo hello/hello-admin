@@ -129,15 +129,6 @@ var QueryOrdersOmni = React.createClass({
     getInitialState: function() {
         return {error: null, filteredResult: [], loading: false}
     },
-    // submitWithInputsfromURL: function() {
-    //     var whoFromUrl = getParameterByName('who');
-    //     if (whoFromUrl.isWhiteString()) {
-    //         return false;
-    //     }
-    //     this.refs.omniInput.getDOMNode().value = whoFromUrl;
-    //     this.handleSubmit();
-    // },
-
     handleSubmit: function() {
         this.setState({error: null, filteredResult: []});
         $("#order-id-input").val("");
@@ -173,10 +164,7 @@ var QueryOrdersOmni = React.createClass({
         return false;
     },
     render: function() {
-        // var loadingOrSubmit = this.state.loading === true ?
-        //     <div className="center-wrapper">Loading order info <img src="/static/image/loading.gif" /></div>:
         var loadingOrSubmit = <Button bsStyle="info" bsSize="large" className="btn-circle" type="submit"><Glyphicon glyph="send"/></Button>;
-        console.log("filteredResults", this.state.filteredResult);
         
         var table = <Table>
                 <thead><tr>
