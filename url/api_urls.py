@@ -77,6 +77,7 @@ from api.device import ColorlessSensesAPI
 from api.clearbit import ClearbitAPI
 from api.setup import CreateBuggyFirmwareAPI
 from api.datastore import InitializeDataStore
+from api.store import StoreAPI
 
 routes = [
     ('/api/account_breakdown/?$', AccountCountsBreakdownByCreatedDateAPI),
@@ -184,5 +185,6 @@ routes = [
     ('/api/dropout_devices/?$', DropoutDevicesAPI),
     ('/api/pill_latest/pair/?$', LatestPillsAPI),
     ('/api/pill_latest/data/?$', LatestPillsDataAPI),
+    ('/api/store/search/?$', StoreAPI),
 ]
 
