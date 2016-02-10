@@ -1,7 +1,8 @@
 from api.account import RecentAccountsAPI, AccountSearchAPI, AccountCountsBreakdownByCreatedDateAPI
 from api.alarm import AlarmsAPI, AlarmsByEmailAPI, AlarmRingsHistoryAPI
 from api.calibration import DustCalibrationAPI, DustOffsetAPI, DustCalibrationLeftOverPairsAPI
-from api.elasticsearch import SenseLogsElasticSearchAPI, ElasticSearchStatusAPI, ElasticSearchAggregationAPI
+from api.elasticsearch import SenseLogsElasticSearchAPI, ElasticSearchStatusAPI
+from api.elasticsearch import ElasticSearchAggregationAPI, DustStatsAPI
 from api.feedback import FeedbackAPI
 from api.insights import InsightsAPI, InsightsGenericAPI
 from api.logs_level import LogsLevelAPI
@@ -46,7 +47,7 @@ from api.pch import PCHSerialNumberCheckAPI
 from api.battery import BatteryAPI
 from api.room_conditions import LastRoomConditionsAPI
 from api.room_conditions import RoomConditionsAPI
-from api.searchify import DustStatsAPI, LogsFacetHistoryAPI
+from api.searchify import LogsFacetHistoryAPI
 from api.searchify import LogsFacetAPI
 from api.searchify import SenseLogsAPI, SearchifyStatsAPI
 from api.searchify import WifiSignalStrengthAPI

@@ -154,50 +154,6 @@ class SearchifyStatsAPI(ProtectedRequestHandler):
         self.response.write(json.dumps(output))
 
 
-class DustStatsAPI(ProtectedRequestHandler):
-    def get(self):
-        urlfetch.set_default_fetch_deadline(20)
-        output = {"data": [], "error": ""}
-        now_date = datetime.datetime.now().strftime("%Y-%m-%d")
-
-        input_date = self.request.get("date", default_value=now_date)
-        index = ApiClient(self.searchify_credentials.api_client).get_index(settings.SENSE_LOGS_INDEX_PREFIX + input_date)
-        query = SearchifyQuery()
-
-        try:
-            query.set_query("text:dust")
-            query.set_category_filters({"device_id": self.request.get("device_id", "")})
-            query.set_length(min(700, int(self.request.get("length", 100))))
-
-            start_ts = self.request.get("start_ts", None)
-            if start_ts:
-                start_ts = int(start_ts)/1000
-            end_ts = self.request.get("end_ts", None)
-            if end_ts:
-                end_ts = int(end_ts)/1000
-            query.set_docvar_filters({0: [[start_ts, end_ts]]})
-
-            results = index.search(**query.mapping())['results']
-
-            regex_pattern = "collecting time (\d+)\\t.*?dust (\d+) (\d+) (\d+) (\d+)\\t"
-
-            matches = [re.findall(regex_pattern, r['text']) for r in results]
-
-            output['data'] = [{
-                'timestamp': int(item[0])*1000,
-                'average': int(item[1]),
-                'max': int(item[2]),
-                'min': int(item[3]),
-                'variance': int(item[4])
-            } for sublist in matches for item in sublist if all([i.isdigit() for i in item])]
-
-        except Exception as e:
-            output['error'] = display_error(e)
-            log.error('ERROR: {}'.format(display_error(e)))
-
-        self.response.write(json.dumps(output))
-
-
 class WifiSignalStrengthAPI(ProtectedRequestHandler):
     def get_wifi_from_index(self, index_name):
         urlfetch.set_default_fetch_deadline(30)

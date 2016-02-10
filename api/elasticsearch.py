@@ -4,6 +4,10 @@ from core.handlers.base import ProtectedRequestHandler
 from core.models.response import ResponseOutput
 import requests
 from google.appengine.api import urlfetch
+import datetime
+import re
+import logging as log
+from core.utils.common import display_error
 
 class ElasticSearchHandler(ProtectedRequestHandler):
     SENSE_LOGS_INDEX_PATTERN = "sense-logs-20*"
@@ -22,6 +26,10 @@ class ElasticSearchHandler(ProtectedRequestHandler):
     @property
     def token(self):
         return self.es_config.token
+
+    def getTime(self, item):
+        if len(item):
+                return item[0]
 
 class SenseLogsElasticSearchAPI(ElasticSearchHandler):
     def get(self):
@@ -89,3 +97,63 @@ class ElasticSearchAggregationAPI(ElasticSearchHandler):
         )
         response_output = ResponseOutput.fromPyRequestResponse(response, self.current_user_email)
         self.response.write(response_output.get_serialized_output())
+
+class DustStatsAPI(ElasticSearchHandler):
+    def get(self):
+        urlfetch.set_default_fetch_deadline(20)
+        output = {"data": [], "error": ""}
+        now_ts = int(datetime.datetime.now().strftime("%s")) * 1000
+
+        input_ts = self.request.get("start_time", default_value=now_ts)
+        index = self.request.get("index", default_value=self.SENSE_LOGS_INDEX_PATTERN)
+        device_id = self.request.get("device_id", "")
+        length = min(700, int(self.request.get("length", 100)))
+
+        try:
+            response = requests.post(
+                    url="{}/{}/_search".format(
+                            self.base_url,
+                            index),
+                    data=json.dumps({
+                        "query": {
+                            "filtered": {
+                                "query": {
+                                    "bool": {
+                                        "must": [
+                                            {"match": {"sense_id": device_id}},
+                                            {"match": {"has_dust": "true"}}
+                                        ]
+                                    }
+                                },
+                                "filter": {
+                                    "range": {"epoch_millis": {
+                                        "gte": input_ts
+                                    }}
+                                }
+                            }
+                        },
+                        "size": length,
+                        "sort": [
+                            {"epoch_millis": {"order": "asc"}}
+                        ]
+                    }),
+                    headers={"Authorization": self.token})
+            results = []
+            for hit in json.loads(response.content)["hits"]["hits"]:
+                results.append(hit["_source"])
+
+            regex_pattern = "collecting time (\\d+)\\t.*?dust (\\d+) (\\d+) (\\d+) (\\d+)\\t"
+            matches = [re.findall(regex_pattern, r['text']) for r in results]
+            output['data'] = [{
+                  'timestamp': int(item[0]) * 1000,
+                  'average': int(item[1]),
+                  'max': int(item[2]),
+                  'min': int(item[3]),
+                  'variance': int(item[4])
+              } for sublist in sorted(matches, key=self.getTime) for item in sublist if all([i.isdigit() for i in item])]
+
+        except Exception as e:
+            output['error'] = display_error(e)
+            log.error('ERROR: {}'.format(display_error(e)))
+
+        self.response.write(json.dumps(output))
