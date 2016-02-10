@@ -10,6 +10,7 @@ from view.views import BlackListView
 from view.views import FeaturesView
 from view.views import CreateProvisionKeyView
 from view.views import DustStatsView
+from view.views import HeapStatsView
 from view.views import ErrorView
 from view.views import FirmwarePathView
 from view.views import FirmwareView
@@ -60,6 +61,7 @@ routes = [
     ('/error/?$', ErrorView),
     ('/firmware/?$', FirmwareView),
     ('/firmware_path/?$', FirmwarePathView),
+    ('/heap_stats/?$', HeapStatsView),
     ('/key_store/?$', KeyStoreView),
     ('/keystore/?$', KeyStoreView),
     ('/keys/?$', ProvisionView),
