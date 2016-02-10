@@ -10,6 +10,7 @@ var c3Chart = React.createClass({
         if (that.props.data === {}) {
             return <div/>;
         }
+
         var graphs = Array.apply(null, {length: 3}).map(Number.call, Number).map(function(i){
             return <Row><div id={"graph" + i.toString()} className="c3-chart"></div></Row>;
         });
@@ -37,7 +38,7 @@ var c3Chart = React.createClass({
                 axis: {
                     x: {
                         tick: {
-                            format: function (x) { return d3.time.format('%b %d %H:%M')(new Date(x)); }
+                            format: function (x) { return d3.time.format('%b %d %H:%M')(new Date(x));}
                         },
                         label: {
                             text: "Time",
@@ -133,7 +134,7 @@ var DustStatsChart = React.createClass({
         deviceIds.forEach(function(deviceId){
             var requestData = {
                 device_id: deviceId.trim(),
-                date: reformatDate(date),
+                start_time: reformatDate(date),
                 length: length
             };
             $.ajax({
@@ -144,12 +145,10 @@ var DustStatsChart = React.createClass({
                 data: requestData,
                 success: function(response) {
                     aggData[deviceId.trim()] = response.data.sort(compareTimestamp);
-                    console.log("aggData", aggData);
                 }
             });
         });
         that.setState({data: aggData});
-        console.log('this.state.data', that.state.data);
         return false;
     },
 
@@ -168,7 +167,7 @@ var DustStatsChart = React.createClass({
                 </Col>
             </form>
             <p className="chart-remark">Notes: <br/>
-                &nbsp;&nbsp;- This chart relies on logging consistency, {'regex_pattern = "collecting time (\d+)\\t.*?dust (\d+) (\d+) (\d+) (\d+)\\t"'}<br/>
+                &nbsp;&nbsp;- This chart relies on logging consistency, {'regex_pattern = "collecting time (\\d+)\\t.*?dust (\\d+) (\\d+) (\\d+) (\\d+)\\t"'}<br/>
                 &nbsp;&nbsp;- Can display data for up to 3 senses at once.
                 &nbsp;&nbsp;- Always pull latest data first
             </p><br/>
@@ -184,13 +183,14 @@ var DustStatsChart = React.createClass({
 React.renderComponent(<DustStatsChart />, document.getElementById('dust-stats'));
 
 function compareTimestamp(log1, log2) {
-    return log1.timestamp - log2.timestamp;
+    return (log1.timestamp > log2.timestamp);
 }
 
 function reformatDate(dateString) {
     var dateComponents = dateString.split("-");
     var year = dateComponents[2];
     var month = dateComponents[0];
-    var date = dateComponents[1];
-    return [year, month, date].join("-");
+    var day = dateComponents[1];
+    var startEpochMillis = new Date([year, month, day].join("-") + " 00:00:00 GMT").getTime();
+    return startEpochMillis;
 }
