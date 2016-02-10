@@ -33,8 +33,11 @@ var c3Chart = React.createClass({
                 },
                 axis: {
                     x: {
+                        type: 'timeseries',
                         tick: {
-                            format: function (x) { return d3.time.format.utc('%b %d %H:%M')(new Date(x));}
+                            fit: true,
+                            format: function (x) { return d3.time.format.utc('%b %d %H:%M')(new Date(x));},
+                            count: 40
                         },
                         label: {
                             text: "Time",
@@ -73,7 +76,7 @@ var c3Chart = React.createClass({
                 .text("Sense " + deviceId);
             });
         return(<div>
-            <Button bsSize="small"><FileExporter fileContent={this.props.data} fileName="dust-statistic"/></Button>
+            <Button bsSize="small"><FileExporter fileContent={this.props.data} fileName="heap-statistics"/></Button>
             {graphs}
         </div>)
     }
@@ -147,7 +150,7 @@ var HeapStatsChart = React.createClass({
                 <Col xs={4} sm={4} md={4}>
                     <LongTagsInput id="device-id-input" tagClass="label label-info" placeHolder="SenseIDs" />
                 </Col>
-                <LongDatetimePicker size="3" placeHolder="Start DateTime" id="date" pickTime={true} format="MM-DD-YYYY HH:mm:ss" />
+                <LongDatetimePicker size="3" placeHolder={moment.utc().format("YYYY-MM-DD HH:mm:ss")} id="date" pickTime={true} format="MM-DD-YYYY HH:mm:ss" useSeconds={false} useCurrent={false} defaultDate={moment.utc().format("YYYY-MM-DD HH:mm:ss")} minDate={moment().subtract(14, 'd')} maxDate={moment().add(1, 'd')} />
                 <Col xs={2} sm={2} md={2}>
                     <Input id="length" type="text" placeholder="# data points"/>
                 </Col>
@@ -156,7 +159,7 @@ var HeapStatsChart = React.createClass({
                 </Col>
             </form>
             <p className="chart-remark">Notes: <br/>
-                &nbsp;&nbsp;- This chart relies on logging consistency, {'regex_pattern = "heap (\\d+) \\+: (\\d+) -: (\\d+)\\n"'}<br/>
+                &nbsp;&nbsp;- This chart relies on logging consistency, {'regex_pattern = "collecting time (\\d+).*\\nheap (\\d+) \\+: (\\d+) -: (\\d+)\\n"'}<br/>
                 &nbsp;&nbsp;- Can display data for up to 3 senses at once.<br/>
                 &nbsp;&nbsp;- All times UTC
             </p><br/>
