@@ -157,3 +157,63 @@ class DustStatsAPI(ElasticSearchHandler):
             log.error('ERROR: {}'.format(display_error(e)))
 
         self.response.write(json.dumps(output))
+
+#TODO: Fix this copy pasta and make this code more reusable
+class HeapStatsAPI(ElasticSearchHandler):
+    def get(self):
+        urlfetch.set_default_fetch_deadline(20)
+        output = {"data": [], "error": ""}
+        now_ts = int(datetime.datetime.now().strftime("%s")) * 1000
+
+        input_ts = self.request.get("start_time", default_value=now_ts)
+        index = self.request.get("index", default_value=self.SENSE_LOGS_INDEX_PATTERN)
+        device_id = self.request.get("device_id", "")
+        length = min(10000, int(self.request.get("length", 100)))
+
+        try:
+            response = requests.post(
+                    url="{}/{}/_search".format(
+                            self.base_url,
+                            index),
+                    data=json.dumps({
+                        "query": {
+                            "filtered": {
+                                "query": {
+                                    "bool": {
+                                        "must": [
+                                            {"match": {"sense_id": device_id}}
+                                        ]
+                                    }
+                                },
+                                "filter": {
+                                    "range": {"epoch_millis": {
+                                        "gte": input_ts
+                                    }}
+                                }
+                            }
+                        },
+                        "size": length,
+                        "sort": [
+                            {"epoch_millis": {"order": "asc"}}
+                        ]
+                    }),
+                    headers={"Authorization": self.token})
+            results = []
+            for hit in json.loads(response.content)["hits"]["hits"]:
+                results.append(hit["_source"])
+
+            regex_pattern = "collecting time (\\d+).*\\nheap (\\d+) \\+: (\\d+) -: (\\d+)\\n"
+            matches = [re.findall(regex_pattern, r['text']) for r in results]
+            print matches
+            output['data'] = [{
+                                  'timestamp': int(item[0]) * 1000,
+                                  'free': int(item[1]),
+                                  'max': int(item[2]),
+                                  'min': int(item[3])
+                              } for sublist in sorted(matches, key=self.getTime) for item in sublist if all([i.isdigit() for i in item])]
+
+        except Exception as e:
+            output['error'] = display_error(e)
+            log.error('ERROR: {}'.format(display_error(e)))
+
+        self.response.write(json.dumps(output))

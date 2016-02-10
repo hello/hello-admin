@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block extrastatic %}
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-tagsinput.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/bootstrap-datetimepicker.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/third-party/c3.min.css" />
+    <link rel="stylesheet" href="/static/css/battery.css">
+
+    <script type="text/javascript" src="/static/js/third-party/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/bootstrap-tagsinput.js"></script>
+    <script type="text/jsx" src="/static/js/third-party/long-tagsinput.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/moment.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/d3.min.js"></script>
+    <script type="text/javascript" src="/static/js/third-party/c3.min.js"></script>
+
+    <script type="text/jsx" src="/static/js/custom/file_exporter.js"></script>
+    <script type="text/jsx" src="/static/js/third-party/long-datetimepicker.js"></script>
+    <script type="text/jsx" src="/static/js/heap_stats.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="col-xs-12" id="heap-stats"></div>
+{% endblock %}
+

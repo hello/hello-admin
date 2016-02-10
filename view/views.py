@@ -184,6 +184,11 @@ class DustStatsView(ProtectedRequestHandler):
         self.render_to_response(template_file='dust_stats.html',
                                 context={'title': 'Dust Statistics'})
 
+class HeapStatsView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='heap_stats.html',
+                                context={'title': 'Heap Statistics'})
+
 class InspectorView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='inspector.html',
