@@ -23,6 +23,7 @@ from api.pill import LastHeartbeatAPI, HeartbeatsAPI, LatestPillsAPI, LatestPill
 from api.sessions import SessionsAPI, SessionsUpdateAPI
 from api.trends import TrendsAPI
 from api.uptime import SenseUptimeAPI
+from api.uptime import UptimeByFirmwareGroupAPI
 from api.event import SenseEventsAPI
 from api.firmware import FirmwareAPI
 from api.firmware import FirmwareHistoryAPI
@@ -99,6 +100,7 @@ routes = [
     ('/api/devices/key_store/?$', DeviceKeyStoreAPI),
     ('/api/devices/owners/?$', DeviceOwnersAPI),
     ('/api/sense_uptime/?$', SenseUptimeAPI),
+    ('/api/uptime/(\w+)', UptimeByFirmwareGroupAPI),
     ('/api/dust_stats/?$', DustStatsAPI),
     ('/api/heap_stats/?$', HeapStatsAPI),
     ('/api/features/?$', FeaturesAPI),

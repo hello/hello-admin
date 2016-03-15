@@ -14,3 +14,12 @@ class SenseUptimeAPI(ProtectedRequestHandler):
             type="GET",
             url_params={"padded": padded},
         )
+
+class UptimeByFirmwareGroupAPI(ProtectedRequestHandler):
+    def get(self, firmware_group):
+        ''' Get uptime by firmware group'''
+        
+        self.hello_request(
+            api_url="uptime/{}".format(firmware_group),
+            type="GET",
+        )

@@ -323,3 +323,8 @@ class StoreView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='store.html',
                                 context={'title': "Store"})
+
+class UptimeView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='uptime.html',
+                                context={'title':  'uptime'})
