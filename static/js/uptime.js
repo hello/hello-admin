@@ -28,14 +28,17 @@ var QueryUptime = React.createClass({
     },
     render: function() {
         var loadingOrSubmit = <Button bsStyle="info" bsSize="large" className="btn-circle" type="submit"><Glyphicon glyph="send"/></Button>;
-        
+        var uptimes = this.state.filteredResult;
+        uptimes.sort(function compareUptime(a, b) {
+                return a.uptime - b.uptime // sort by uptime
+        });
         var table = <Table>
                 <thead><tr>
                     <th>DeviceId</th>
                     <th>Uptime</th>
                 </tr></thead>
                 <tbody>{
-                    this.state.filteredResult.map(function(d){
+                    uptimes.map(function(d){
                         return <tr>
                             <td>{d.device_id}</td>
                             <td>{d.uptime}</td>
