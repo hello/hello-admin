@@ -44,7 +44,7 @@ from view.views import ZendeskNowView
 from view.views import ZendeskView
 from view.views import SenseUptimeView
 from view.views import StoreView
-
+from view.views import UptimeView
 
 routes = [
     ('/', AccountProfileView),
@@ -113,4 +113,5 @@ routes = [
     ('/dropout_devices/?$', DropoutDevicesView),
     ('/latest_pills/?$', LatestPillsView),
     ('/store/?$', StoreView),
+    ('/uptime/?$', UptimeView),
 ]
