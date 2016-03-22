@@ -118,7 +118,7 @@ class DeviceKeyStoreAPI(ProtectedRequestHandler):
         )
 
         if raw_output.error:
-            self.slack_pusher.send_to_admin_logs_channel("{} {} - {}".format(device_type, device_id, raw_output.error))
+            self.slack_pusher.send_to_admin_logs_channel("{} {} - {}. Query by {}".format(device_type, device_id, raw_output.error, self.current_user_email))
         elif not raw_output.data.get("key", None):
             self.slack_pusher.send_to_admin_logs_channel("{} {} has blank key".format(device_type, device_id))
         self.response.write(raw_output.get_serialized_output())
