@@ -77,8 +77,8 @@ var QueryOrdersById = React.createClass({
                 <p>Be careful, you are about to cancel an order</p><br/>
                 <p>There is no going back after you hit the following link</p><br/>
                 <p>
-                    <a href={"https://order.hello.is/cancel/" + this.state.alert} target="_blank">
-                    {"https://order.hello.is/cancel/" + this.state.alert}
+                    <a href={"https://store.hello.is/cancel/" + this.state.alert} target="_blank">
+                    {"https://store.hello.is/cancel/" + this.state.alert}
                     </a>
                 </p><br/>
                 <p><Button onClick={this.neverMindCancel}>Never mind <Glyphicon glyph="arrow-left"/></Button></p>
