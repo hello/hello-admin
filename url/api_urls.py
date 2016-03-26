@@ -25,6 +25,7 @@ from api.trends import TrendsAPI
 from api.uptime import SenseUptimeAPI
 from api.uptime import UptimeByFirmwareGroupAPI
 from api.event import SenseEventsAPI
+from api.filemanifest import FileManifestAPI
 from api.firmware import FirmwareAPI
 from api.firmware import FirmwareHistoryAPI
 from api.firmware import FirmwareInfoAPI
@@ -104,6 +105,7 @@ routes = [
     ('/api/dust_stats/?$', DustStatsAPI),
     ('/api/heap_stats/?$', HeapStatsAPI),
     ('/api/features/?$', FeaturesAPI),
+    ('/api/files/(\w+)', FileManifestAPI),
     ('/api/firmware/?$', FirmwareAPI),
     ('/api/firmware/history/?$', FirmwareHistoryAPI),
     ('/api/firmware/info/?$', FirmwareInfoAPI),

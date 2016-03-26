@@ -328,3 +328,8 @@ class UptimeView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='uptime.html',
                                 context={'title':  'uptime'})
+
+class FileManifestView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='filemanifest.html',
+                                context={'title':  'uptime'})
