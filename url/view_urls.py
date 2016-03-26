@@ -15,6 +15,7 @@ from view.views import ErrorView
 from view.views import FirmwarePathView
 from view.views import FirmwareView
 from view.views import KeyStoreView
+from view.views import FileManifestView
 from view.views import ProvisionView
 from view.views import LabelView
 from view.views import LogsFacetView
@@ -59,6 +60,7 @@ routes = [
     ('/configuration/?$', FeaturesView),
     ('/dust_stats/?$', DustStatsView),
     ('/error/?$', ErrorView),
+    ('/files/?$', FileManifestView),
     ('/firmware/?$', FirmwareView),
     ('/firmware_path/?$', FirmwarePathView),
     ('/heap_stats/?$', HeapStatsView),
