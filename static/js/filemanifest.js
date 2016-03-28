@@ -4,6 +4,17 @@ var QueryFileManifest = React.createClass({
     getInitialState: function() {
         return {error: null, filteredResult: [], loading: false}
     },
+    submitWithInputsfromURL: function() {
+        var senseIdFromUrl = getParameterByName('sense_id');
+        if (senseIdFromUrl.isWhiteString()) {
+            return false;
+        }
+        $('#filemanifest-input').val(senseIdFromUrl);
+        this.handleSubmit();
+    },
+    componentDidMount: function() {
+        this.submitWithInputsfromURL();
+    },
     handleSubmit: function() {
         this.setState({error: null, filteredResult: []});
 
