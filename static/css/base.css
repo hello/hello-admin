@@ -101,3 +101,8 @@ html {
 .btn-fade {opacity: 0.5;}
 
 #err {color: #FFA081;}
+
+
+.namespace-active{background-color: #42B5FF;margin-right:10px;color:#FFF;}
+.namespace-inactive{color: black;margin-right:10px;}
+

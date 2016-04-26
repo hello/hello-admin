@@ -1,6 +1,6 @@
 import logging as log
 import datetime
-
+import json
 from google.appengine.api import namespace_manager
 
 from core.handlers.base import ProtectedRequestHandler
@@ -16,3 +16,10 @@ class NamespaceAPI(ProtectedRequestHandler):
     def get(self):
         log.info("User {} set namespace to be {}".format(self.current_user_email, self.request.get("namespace")))
         self.redirect("/")
+
+
+class NamespaceAPIList(ProtectedRequestHandler):
+    def get(self):
+        context = self._extra_context({})
+        self.response.write(json.dumps(context['available_namespaces']))
+

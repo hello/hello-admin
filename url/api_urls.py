@@ -6,7 +6,7 @@ from api.elasticsearch import ElasticSearchAggregationAPI, DustStatsAPI, HeapSta
 from api.feedback import FeedbackAPI
 from api.insights import InsightsAPI, InsightsGenericAPI
 from api.logs_level import LogsLevelAPI
-from api.namespace import NamespaceAPI
+from api.namespace import NamespaceAPI, NamespaceAPIList
 from api.password import PasswordResetAPI, PasswordForceUpdateAPI
 from api.feature import FeaturesAPI
 from api.device import ActiveDevices15MinutesHistoryAPI, PillColorAPI, DropoutDevicesAPI
@@ -155,6 +155,7 @@ routes = [
     ('/api/clearbit/?$', ClearbitAPI),
     ('/api/create/buggy_firmware/?$', CreateBuggyFirmwareAPI),
     ("/api/init/?$", InitializeDataStore),
+    ("/api/namespace/list", NamespaceAPIList),
     ("/api/namespace/?$", NamespaceAPI),
     ('/update', UpdateAdminAccessTokenAPI),
     ('/pill_bin_upload', PillKeyDecryptAPI),

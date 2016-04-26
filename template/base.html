@@ -39,10 +39,8 @@
             <div class="header-name">Admin Panel</div>
         </div>
 
-        <div class="col-xs-11 header-namespace">
-            {% for nsp in available_namespaces %}
-                <span onclick="location.href='/api/namespace/?namespace={{nsp}}'" {% if nsp == namespace %} class="namespace-active" {% endif %}>{{nsp}}</span>&nbsp;&nbsp;
-            {% endfor %}
+
+        <div id="namespace-checker" class="col-xs-11 header-namespace">
         </div>
 
         <div class="col-xs-1 header-logout">

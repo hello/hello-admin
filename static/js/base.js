@@ -70,11 +70,52 @@ var Err = React.createClass({
     }
 });
 
+
+var NameSpaceChecker = React.createClass({
+  getInitialState: function() {
+    return {namespace: getNamespace(), availableNamespaces: []}
+  },
+  getNamespaceFromCookie: function() {
+    this.setState({namespace: getNamespace()})
+  },
+  getFromServer: function() {
+    $.ajax({
+      url: "/api/namespace/list",
+      dataType: 'json',
+      cache: false,
+      success: function(data) {
+        this.setState({availableNamespaces: data});
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });
+  },
+  componentDidMount: function() {
+    this.getFromServer();
+    setInterval(this.getNamespaceFromCookie, 5000);
+  },
+  render: function() {
+    var el = <span>{
+      this.state.availableNamespaces.map(function(ns){
+        var url = "/api/namespace/?namespace=" + ns;
+        var cName = (this.state.namespace == ns) ? "namespace-active" : "namespace-inactive";
+        return <a href={url} className={cName}>{ns}</a>
+      }.bind(this))
+    }</span>;
+
+    return el
+  }
+});
+
+
 if (React.render) {
     React.render(<Err/>, document.getElementById("err"));
+    React.render(<NameSpaceChecker/>, document.getElementById("namespace-checker"));
 }
 else {
     React.renderComponent(<Err/>, document.getElementById("err"));
+    React.renderComponent(<NameSpaceChecker/>, document.getElementById("namespace-checker"));
 }
 
 
