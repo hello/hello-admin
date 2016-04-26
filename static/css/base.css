@@ -103,6 +103,6 @@ html {
 #err {color: #FFA081;}
 
 
-.namespace-active{background-color: #42B5FF;margin-right:10px;color:#FFF;}
+.namespace-active{background-color: #42B5FF;margin-right:10px;color:#FFF;padding:0 5px;border-radius: 2px;}
 .namespace-inactive{color: black;margin-right:10px;}
 

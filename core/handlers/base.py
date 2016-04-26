@@ -1,6 +1,7 @@
 import os
 import logging as log
 from copy import copy
+import datetime
 
 from google.appengine.api.namespace_manager import namespace_manager
 import jinja2
@@ -52,6 +53,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
     def persist_namespace(self):
         namespace_from_cookies = self.request.cookies.get("namespace", None)
         namespace = namespace_from_cookies or "production"
+        self.response.set_cookie('namespace', namespace, expires=datetime.datetime.now() + datetime.timedelta(days=365))
         namespace_manager.set_namespace(namespace)
 
     @staticmethod

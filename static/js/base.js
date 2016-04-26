@@ -76,7 +76,9 @@ var NameSpaceChecker = React.createClass({
     return {namespace: getNamespace(), availableNamespaces: []}
   },
   getNamespaceFromCookie: function() {
-    this.setState({namespace: getNamespace()})
+    var ns = getNamespace();
+    console.log(ns);
+    this.setState({namespace: ns})
   },
   getFromServer: function() {
     $.ajax({
