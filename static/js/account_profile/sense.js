@@ -341,8 +341,9 @@ var SenseSummary = React.createClass({
                 <ul className="extra">
                     <li><a target="_blank" href={"/sense_logs_es/?text=&sense_id=" + senseId + "&top_fw=&middle_fw=&start=&end=&limit=&asc=false&crash_only=false"}>Logs</a></li>
                     <li><a target="_blank" href={"/sense_events/?account_input=" + senseId + "&start_ts=" + new Date().getTime()}>Events</a></li>
+                    <li><a target="_blank" href={"/files/?sense_id=" + senseId}>Files</a></li>
                     <li><ModalTrigger modal={<FirmwareModal senseId={senseId} />}>
-                        <a className="cursor-hand">Firmware-History</a>
+                        <a className="cursor-hand">FW-History</a>
                     </ModalTrigger></li>
                     <li><ModalTrigger modal={<BypassOTAModal senseId={senseId} />}>
                         <a className="cursor-hand">Bypass-OTA</a>
@@ -412,12 +413,14 @@ var SenseLimitedSummary = React.createClass({
             <ul className="extra">
                 <li><a target="_blank" href={"/sense_logs_es/?text=&sense_id=" + this.props.senseId + "&top_fw=&middle_fw=&start=&end=&limit=&asc=false&crash_only=false"}>Logs</a></li>
                 <li><a target="_blank" href={"/sense_events/?account_input=" + this.props.senseId + "&start_ts=" + new Date().getTime()}>Events</a></li>
+                <li><a target="_blank" href={"/files/?sense_id=" + this.props.senseId}>Files</a></li>
                 <li><ModalTrigger modal={<FirmwareModal senseId={this.props.senseId} />}>
-                    <a className="cursor-hand">Firmware-History</a>
+                    <a className="cursor-hand">FW-History</a>
                 </ModalTrigger></li>
                 <li><ModalTrigger modal={<BypassOTAModal senseId={this.props.senseId} />}>
                     <a className="cursor-hand">Bypass-OTA</a>
                 </ModalTrigger></li>
+                
             </ul>
         </div>;
     }
