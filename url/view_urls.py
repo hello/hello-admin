@@ -22,7 +22,6 @@ from view.views import LogsFacetView
 from view.views import MotionView
 from view.views import NotificationView
 from view.views import OnboardingLogsView
-from view.views import OrdersView
 from view.views import PairingView
 from view.views import PasswordResetView
 from view.views import PCHSerialNumberCheckView
@@ -74,7 +73,8 @@ routes = [
     ('/motion/?$', MotionView),
     ('/notification/?$', NotificationView),
     ('/onboarding_logs/?$', OnboardingLogsView),
-    ('/orders/?$', OrdersView),
+    ('/orders/?$', StoreView),
+    ('/store/?$', StoreView),
     ('/pairing/?$', PairingView),
     ('/password_reset/?$', PasswordResetView),
     ('/pch_serial_number_check/?$', PCHSerialNumberCheckView),
@@ -114,6 +114,5 @@ routes = [
     ('/trends/?$', TrendsView),
     ('/dropout_devices/?$', DropoutDevicesView),
     ('/latest_pills/?$', LatestPillsView),
-    ('/store/?$', StoreView),
     ('/uptime/?$', UptimeView),
 ]
