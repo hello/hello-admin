@@ -264,7 +264,7 @@ var SenseUptimeMaster = React.createClass({
             <Table>
                 <thead>
                     <th className="alert-success"></th>
-                    <th className="alert-success">Firmware</th>
+                    <th className="alert-success">Mid FW</th>
                     <th className="alert-success">Sense ID</th>
                     <th className="alert-success">Updated At</th>
                     <th className="alert-success">Account Email</th>
@@ -275,7 +275,7 @@ var SenseUptimeMaster = React.createClass({
                     this.state.groupStatus.map(function(gs){
                         return <tr>
                             <td className="center-wrapper"><Button onClick={this.individualDiagnose.bind(this, gs.device_id)}><Glyphicon glyph="search"/></Button></td>
-                            <td className="center-wrapper">{gs.version}</td>
+                            <td className="center-wrapper">{gs.middle_version}</td>
                             <td className="center-wrapper">{gs.device_id}</td>
                             <td className="center-wrapper">{new Date(gs.timestamp).toString()}</td>
                             <td className="center-wrapper">{this.state.emails[gs.device_id]}</td>
