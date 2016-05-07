@@ -122,7 +122,7 @@ var FirmwareGroupStatus = React.createClass({
                 <tbody>{
                     this.loadFirmwareGroupStatus(this.state.group).map(function(gs){
                         return <tr>
-                            <td><FirmwareName version={gs.version}/></td>
+                            <td><FirmwareName version={gs.middle_version}/></td>
                             <td>{gs.device_id}</td>
                             <td>{d3.time.format.utc("%b %d %H:%M")(new Date(gs.timestamp))}</td>
                         </tr>
