@@ -8,7 +8,7 @@ SURIPU_ADMIN_ID = "suripu-admin"
 
 DEFAULT_SURIPU_APP_DOMAIN = "http://localhost:9999/v1/"
 DEFAULT_SURIPU_APP_V2_DOMAIN = "http://localhost:9999/v2/"
-DEFAULT_SURIPU_ADMIN_DOMAIN = "http://localhost:3333/v1/"
+DEFAULT_SURIPU_ADMIN_DOMAIN = "http://localhost:6666/v1/"
 
 DEFAULT_CLIENT_ID = "gae_admin"
 DEFAULT_TOKEN = ""

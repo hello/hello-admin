@@ -8,7 +8,7 @@ from  collections import namedtuple
 DEBUG = False
 ENVIRONMENT = "prod"
 ADMIN_APP_INFO = AppInfo.get_by_id("admin")
-CANARY_APP_INFO_ID  = "canary"
+CANARY_APP_INFO_ID = "canary"
 
 DEFAULT_LOCAL_DEV_CLIENT_ID = "gae_admin"
 DEFAULT_LOCAL_AGAINST_PROD_API_URL = "http://localhost:9999/v1/"
