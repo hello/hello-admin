@@ -1,14 +1,10 @@
 var Tile = React.createClass({
     render: function() {
-        return <div className="tile">
-            <div className="tile-title">
-                {this.props.title}
-            </div>
-            <br/>
+        return <Panel header={this.props.title}>
             <div className="tile-content">
                 {this.props.content}
             </div>
-        </div>
+            </Panel>
     }
 });
 
@@ -66,7 +62,7 @@ var AddFirmwareUpgradeNodeModal = React.createClass({
                     Add a new firmware upgrade node
                 </div>
                 <div className='modal-body'>
-                    <input className="form-control" ref="groupName" type="text" placeholder="group name"/><br/>
+                    <input className="form-control" ref="groupName" type="text" placeholder="group name" value={this.props.group_name}/><br/>
                     <input className="form-control" ref="fromFWVersion" type="text" placeholder="from firmware version (int)"/><br/>
                     <input className="form-control" ref="toFWVersion" type="text" placeholder="to firmware version (int)"/><br/>
                     <input className="form-control" ref="rolloutPercent" type="text" placeholder="rollout percent"/>
@@ -79,8 +75,6 @@ var AddFirmwareUpgradeNodeModal = React.createClass({
         );
     }
 });
-
-
 
 
 var FirmwareGroupStatus = React.createClass({
@@ -166,7 +160,6 @@ var FirmwareGroupPath = React.createClass({
             type: 'POST',
             success: function(response) {
                 console.log(response);
-                this.loadFirmwareGroupPath(groupName);
             }.bind(this)
         });
     },
@@ -175,30 +168,32 @@ var FirmwareGroupPath = React.createClass({
 
             <Row>
                 <Col xs={2}>
-                    <ModalTrigger modal={<AddFirmwareUpgradeNodeModal />}>
+                    <ModalTrigger modal={<AddFirmwareUpgradeNodeModal group_name={this.state.group}/>}>
                         <Button><Glyphicon glyph="plus" /></Button>
                     </ModalTrigger>
                 </Col>
-                <Col xs={6} xsOffset={2}>
+                <Col xs={10} xsOffset={0}>
                     <select className="form-control" valueLink={this.linkState("group")}>
                         <option value="">Select a Group</option>
-                        <option value="release">Release</option>
+                        <option value="release">release</option>
                         {this.props.groups.map(function(g){return <option value={g.name}>{g.name}</option>;})}
                     </select>
                 </Col>
             </Row>
 
-            <Table>
+            <Table striped={true} hover={true}>
                 <thead>
-                    <th>From Firmware</th><th>To Firmware</th><th>Rollout Percentage</th>
+                    <th>From Firmware</th><th>To Firmware</th><th>%</th><th/>
                 </thead>
                 <tbody>{
                     this.loadFirmwareGroupPath(this.state.group).map(function(gp){
+                        var percentHighlight = "";
+                        if (gp.rolloutPercent < 100){ percentHighlight="rollout";}
                         return <tr>
-                            <td><FirmwareName version={gp.fromFWVersion}/></td>
-                            <td><FirmwareName version={gp.toFWVersion}/></td>
-                            <td>{gp.rolloutPercent}</td>
-                            <td><Button onClick={this.removeFirmwareUpgradeNode.bind(this, gp.groupName, gp.fromFWVersion)}><Glyphicon glyph="trash"/></Button></td>
+                            <td><span className={percentHighlight}><FirmwareName version={gp.fromFWVersion}/></span></td>
+                            <td><span className={percentHighlight}><FirmwareName version={gp.toFWVersion}/></span></td>
+                            <td><span className={percentHighlight}>{gp.rolloutPercent}</span></td>
+                            <td><Button bsSize="xsmall" onClick={this.removeFirmwareUpgradeNode.bind(this, gp.groupName, gp.fromFWVersion)}><Glyphicon glyph="trash"/></Button></td>
                         </tr>
                     }.bind(this))
                 }</tbody>
@@ -228,10 +223,7 @@ var FirmwarePathMaster = React.createClass({
     },
     render: function() {
         return <Row>
-            <Col xs={6}>
-                <Tile title="Firmware Group Status" content={<FirmwareGroupStatus groups={this.state.groups} />} />
-            </Col>
-            <Col xs={6}>
+            <Col xs={12}>
                 <Tile title="Firmware Upgrade Paths" content={<FirmwareGroupPath groups={this.state.groups} />} />
             </Col>
         </Row>
