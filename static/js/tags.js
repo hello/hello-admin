@@ -158,7 +158,7 @@ var ConfigMaestro = React.createClass({
 
             <Col xs={6}>
                 <h4><span>{displayMode}</span> Tag Name <em className="remark">Enter a <strong>string</strong> or click to select existing &rarr;</em></h4>
-                <Input id="group-input" type="text" placeholder="e.g vip-devices" />
+                <Input id="tag-input" type="text" placeholder="e.g vip-devices" />
                 <h4><span>{displayMode}</span> ID(s) <em className="remark">Enter <strong>{inputTypeRemark}</strong>(s) or click to select existing &rarr;</em></h4>
                 <LongTagsInput id="ids-input" tagClass="label label-info" placeHolder="e.g 123, 666, 987" />
                 <div className="col-xs-12 col-md-12 col-lg-12">{this.state.alert}</div>
