@@ -206,6 +206,7 @@ var SenseSummary = React.createClass({
 
         var accountId = senseResponse.data[0].device_account_pair ? senseResponse.data[0].device_account_pair.account_id : undefined;
         var senseId = senseResponse.data[0].device_account_pair ? senseResponse.data[0].device_account_pair.external_device_id : undefined;
+        this.getTags(senseId);
         var senseInternalId = senseResponse.data[0].device_account_pair ? senseResponse.data[0].device_account_pair.internal_device_id : undefined;
         this.getDustCalibration(senseId, accountId, senseInternalId);
     },
@@ -228,6 +229,35 @@ var SenseSummary = React.createClass({
                 }
             }.bind(this)
         });
+    },
+
+    getTags: function(device_id) {
+     var that = this;
+     $.ajax({
+        url: '/api/device_tags',
+        dataType: 'json',
+        contentType: 'application/json',
+        type: 'GET',
+        data: {device_id: device_id},
+        success: function(response) {
+            if (response.error.isWhiteString()) {
+                var tagLabels = [];
+                response.data.forEach(function(i) {
+                    tagLabels.push(<Label bsStyle="info" className="device-tag">{i.toUpperCase()}</Label>);
+                });
+                this.setState({deviceTags: <div>
+                    {tagLabels}
+                </div>
+              });
+            }
+            else {
+                this.setState({deviceTags: <span className="not-ok">--</span>});
+            }
+        }.bind(this),
+        error: function(e) {
+            console.error(e);
+        }.bind(this)
+    });
     },
 
     getDustCalibration: function(senseId, accountId, senseInternalId) {
@@ -335,6 +365,7 @@ var SenseSummary = React.createClass({
                         <tr><td>Color</td><td>{senseColor}</td></tr>
                         <tr><td>Last Seen</td><td>{lastSeen}</td></tr>
                         <tr><td>Last Pairing</td><td>{lastPairing}</td></tr>
+                        <tr><td>Tags</td><td>{this.state.deviceTags}</td></tr>
                         <tr><td/><td/></tr>
                     </tbody>
                 </Table>

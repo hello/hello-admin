@@ -62,8 +62,13 @@ var FirmwareName = React.createClass({
 
      render: function() {
          return <span>
-                {this.props.version} -- {this.state.unhashedVersion}
-            </span>
+                    <td>
+                    {this.props.version}
+                    </td>
+                    <td>
+                    {this.state.unhashedVersion}
+                    </td>
+                </span>
      }
  });
 var FirmwareGroupStatus = React.createClass({
@@ -98,14 +103,14 @@ var FirmwareGroupStatus = React.createClass({
                     {this.props.groups.map(function(g){return <option value={g.name}>{g.name}</option>;})}
                 </select>
             </Col>
-            <Table>
+            <Table striped={true} hover={true}>
                 <thead>
-                <th>Version</th><th>Device ID</th><th>Timestamp</th>
+                <th>FW Build</th><th>FW Ver</th><th>Device ID</th><th sortable={true}>Timestamp</th>
                 </thead>
                 <tbody>{
                     this.loadFirmwareGroupStatus(this.state.group).map(function(gs){
                         return <tr>
-                            <td><FirmwareName version={gs.middle_version}/></td>
+                            <FirmwareName version={gs.middle_version}/>
                             <td>{gs.device_id}</td>
                             <td>{d3.time.format.utc("%b %d %H:%M")(new Date(gs.timestamp))}</td>
                         </tr>

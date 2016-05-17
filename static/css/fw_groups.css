@@ -8,5 +8,4 @@ table.table td{text-align: center;}
 button {margin-right: 0; opacity: 0.9;}
 #mode-input {max-width: 150px;}
 .form-group:first-child {margin-left: 16px;}
-tbody {background-color: #F7F8FA;}
 .fw-group-ids {display:inline-block; overflow:auto; text-overflow: ellipsis; max-height: 100px;}
