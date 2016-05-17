@@ -42,11 +42,86 @@ var FeaturesTable = React.createClass({
     }
 });
 
+var FirmwareName = React.createClass({
+     getInitialState: function() {
+         return {unhashedVersion: ""}
+     },
+     unhashFirmwareName: function() {
+         $.ajax({
+                    url: '/api/firmware_unhash',
+                    type: 'GET',
+                    data: {version: parseInt(this.props.version, 10).toString(16)},
+                    success: function(response) {
+                        this.setState({unhashedVersion: response.data.join(",") || "unknown"});
+                    }.bind(this)
+                });
+     },
+     componentDidMount: function() {
+         this.unhashFirmwareName();
+     },
+
+     render: function() {
+         return <span>
+                {this.props.version} -- {this.state.unhashedVersion}
+            </span>
+     }
+ });
+var FirmwareGroupStatus = React.createClass({
+    mixins: [React.addons.LinkedStateMixin],
+    getInitialState: function() {
+        return {group: "", groupStatus: []}
+    },
+    loadFirmwareGroupStatus: function(group) {
+        if (group.isWhiteString()) {
+            return [];
+        }
+        var groupStatus = [];
+        $.ajax({
+                   url: '/api/firmware_group_status',
+                   dataType: 'json',
+                   contentType: 'application/json',
+                   data: {group: group.trim()},
+                   type: 'GET',
+                   async: false,
+                   success: function(response) {
+                       console.log("group status", response);
+                       groupStatus = response.data;
+                   }.bind(this)
+               });
+        return groupStatus;
+    },
+    render: function() {
+        return <div>
+            <Col xs={12} xsOffset={0}>
+                <select className="form-control" valueLink={this.linkState("group")}>
+                    <option value="">Select a Group</option>
+                    {this.props.groups.map(function(g){return <option value={g.name}>{g.name}</option>;})}
+                </select>
+            </Col>
+            <Table>
+                <thead>
+                <th>Version</th><th>Device ID</th><th>Timestamp</th>
+                </thead>
+                <tbody>{
+                    this.loadFirmwareGroupStatus(this.state.group).map(function(gs){
+                        return <tr>
+                            <td><FirmwareName version={gs.middle_version}/></td>
+                            <td>{gs.device_id}</td>
+                            <td>{d3.time.format.utc("%b %d %H:%M")(new Date(gs.timestamp))}</td>
+                        </tr>
+                    })
+                }</tbody>
+            </Table>
+        </div>
+    }
+});
+
 var ConfigMaestro = React.createClass({
     getInitialState: function () {
         return {
             ids: "",
-            data: []
+            data: [],
+            groups: []
         };
     },
 
@@ -77,6 +152,7 @@ var ConfigMaestro = React.createClass({
                 this.setState({
                     data: response.data
                 });
+                this.setState({groups: response.data});
                 this.populateInput();
             }.bind(this),
             error: function(e) {
@@ -128,7 +204,7 @@ var ConfigMaestro = React.createClass({
             }
         }
         var sendData = {
-            group: action !== 'delete-group' ? $('#group-input').val(): $('#group-del-input').val(),
+            group: $('#group-input').val(),
             ids: $('#ids-input').val(),
             mode: $('#mode-input').val(),
             action: action
@@ -143,6 +219,7 @@ var ConfigMaestro = React.createClass({
             success: function(response) {
                 console.log("raw GET response", response);
                 that.getFWGroups();
+                this.setState({alert: <Alert>{action.toUpperCase()} Request Succeeded</Alert>});
             }.bind(this),
             error: function(e) {
                 console.log(e);
@@ -155,32 +232,51 @@ var ConfigMaestro = React.createClass({
         var currentMode = $('#mode-input').val();
         var displayMode =  currentMode ? currentMode.capitalize().substring(0, currentMode.length - 1): null;
         var inputTypeRemark = currentMode === "users" ? "int": "string";
-        return (<div>
-            <Input id="mode-input" bsStyle="warning" type="select" defaultValue="devices" onChange={this.handleModeChange} addonBefore="Group Type">
-                <option value="devices">&#10148;&nbsp;Device</option>
-                <option value="users">&#10148;&nbsp;User</option>
-            </Input>
-
-            <Col xs={6}>
+        return (
+            <TabbedArea defaultActiveKey={1}>
+                <TabPane key={1} tab="Edit Groups">
+                    <Row>
+                        &nbsp;
+                    </Row>
+            <Col xs={4}>
+                <Panel header="Group Type Selection">
+                    <Input id="mode-input" bsStyle="warning" type="select" defaultValue="devices" onChange={this.handleModeChange} addonBefore="Group Type">
+                        <option value="devices">&#10148;&nbsp;Device</option>
+                        <option value="users">&#10148;&nbsp;User</option>
+                    </Input>
+                </Panel>
+                <Panel header="Group Editor">
                 <h4><span>{displayMode}</span> Firmware Group Name <em className="remark">Enter a <strong>string</strong> or click to select existing &rarr;</em></h4>
-                <Input id="group-input" type="text" placeholder="e.g alpha-dev" />
+                <Input id="group-input" type="text" placeholder="e.g alpha-dev" className="col-xs-3 col-md-3 col-lg-3"/>
+                <p>&nbsp;</p>
                 <h4><span>{displayMode}</span> ID(s) <em className="remark">Enter <strong>{inputTypeRemark}</strong>(s) or click to select existing &rarr;</em></h4>
                 <LongTagsInput id="ids-input" tagClass="label label-info" placeHolder="e.g 123, 666, 987" />
                 <div className="col-xs-12 col-md-12 col-lg-12">{this.state.alert}</div>
-                <Button className="col-xs-3 col-md-3 col-lg-3" action="add" bsStyle="success" onClick={this.handleSend}><Glyphicon glyph="plus"/> Add</Button>
-                <Button className="col-xs-3 col-md-3 col-lg-3" action="replace" bsStyle="primary" onClick={this.handleSend}><Glyphicon glyph="refresh"/> Replace</Button>
-                <Button className="col-xs-3 col-md-3 col-lg-3"action="remove" bsStyle="danger" onClick={this.handleSend}><Glyphicon glyph="minus"/> Remove</Button>
-                <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><hr className="fancy-line"/><p>&nbsp;</p>
-                <h4>Delete a Group</h4>
-                <Input id="group-del-input" type="text" placeholder="e.g gamma-dev" buttonBefore={<Button>Before</Button>}/>
-                <Button className="col-xs-3 col-md-3 col-lg-3" action="delete-group" bsStyle="default" onClick={this.handleSend}><Glyphicon glyph="remove"/> Delete</Button>
+                <Button className="col-xs-4 col-md-4 col-lg-4" action="add" bsStyle="success" onClick={this.handleSend}><Glyphicon glyph="plus"/> Add</Button>
+                <Button className="col-xs-4 col-md-4 col-lg-4" action="replace" bsStyle="primary" onClick={this.handleSend}><Glyphicon glyph="refresh"/> Replace</Button>
+                <Button className="col-xs-4 col-md-4 col-lg-4" action="remove" bsStyle="danger" onClick={this.handleSend}><Glyphicon glyph="minus"/> Remove</Button>
+                <p>&nbsp;</p><p>&nbsp;</p>
+                <Button className="col-xs-12 col-md-12 col-lg-12" action="delete-group" bsStyle="danger" onClick={this.handleSend}><Glyphicon glyph="remove"/> Delete Group</Button>
+                </Panel>
             </Col>
-            <Col xs={6}>
-                <h4>Current FW Groups</h4>
+            <Col xs={8}>
+                <Panel header="Current FW Groups">
+                    <div id="fw-groups-list">
                 <FeaturesTable data={this.state.data} />
+                    </div>
                 <button id="refresh" onClick={this.getFWGroups}/>
+                </Panel>
             </Col>
-        </div>);
+                </TabPane>
+                <TabPane key={2} tab="Group Status">
+                    <Col xs={6}>
+                        <Panel header="Firmware Group Status">
+                            <FirmwareGroupStatus groups={this.state.groups} />
+                        </Panel>
+                    </Col>
+                </TabPane>
+            </TabbedArea>
+        );
     }
 });
 
