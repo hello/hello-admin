@@ -45,7 +45,9 @@ class DevicesCountPush(GeckoboardPush):
 
         self.response.write(json.dumps({
             "sense": self.push_to_gecko(senses_count, "senses", self.geckoboard_credentials.senses_widget_id),
-            "pill": self.push_to_gecko(pills_count, "pills", self.geckoboard_credentials.pills_widget_id)
+            "pill": self.push_to_gecko(pills_count, "pills", self.geckoboard_credentials.pills_widget_id),
+            "sense_external": self.push_to_gecko(senses_count, "senses", self.geckoboard_credentials.senses_widget_id_external),
+            "pill_external": self.push_to_gecko(pills_count, "pills", self.geckoboard_credentials.pills_widget_id_external)
         }))
 
 
