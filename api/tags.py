@@ -62,3 +62,11 @@ class TagsAPI(FirmwareRequestHandler):
         )
 
         self.slack_pusher.send_to_deploys_channel(message_text)
+
+class DeviceTagsAPI(FirmwareRequestHandler):
+    def get(self):
+        device_id = self.request.get('device_id', default_value="")
+        self.hello_request(
+                api_url="tags/device_tags/{}".format(device_id),
+                type="GET",
+        )
