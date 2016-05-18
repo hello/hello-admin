@@ -123,7 +123,7 @@ var ConfigMaestro = React.createClass({
         //    this.setState({alert: null});
         //}
         var sendData = {
-            tag: action !== 'delete-tag' ? $('#group-input').val(): $('#tag-del-input').val(),
+            tag: action !== 'delete-tag' ? $('#tag-input').val(): $('#tag-del-input').val(),
             ids: $('#ids-input').val(),
             mode: $('#mode-input').val(),
             action: action
