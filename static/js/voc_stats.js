@@ -5,7 +5,7 @@ var c3Chart = React.createClass({
         return {id: "chart"}
     },
     render: function() {
-        var that = this, categories = ["free", "max", "min"], stackingGroups = [];
+        var that = this, categories = ["tvoc", "eco2", "current", "voltage", "temp", "humid"], stackingGroups = [];
 
         if (that.props.data === {}) {
             return <div/>;
@@ -26,9 +26,12 @@ var c3Chart = React.createClass({
                     },
                     groups: stackingGroups,
                     colors: {
-                        max: "orangered",
-                        min: "#0D98BA",
-                        free: "green"
+                        tvoc: "lightgreen",
+                        eco2: "grey",
+                        current: "green",
+                        voltage: "red",
+                        temp: "orange",
+                        humid: "blue"
                     }
                 },
                 axis: {
@@ -46,7 +49,7 @@ var c3Chart = React.createClass({
                     },
                     y: {
                         label: {
-                            text: "Bytes",
+                            text: "Units (whatever they are)",
                             position: 'outer-middle'
                         }
                     }
@@ -76,13 +79,13 @@ var c3Chart = React.createClass({
                 .text("Sense " + deviceId);
             });
         return(<div>
-            <Button bsSize="small"><FileExporter fileContent={this.props.data} fileName="heap-statistics"/></Button>
+            <Button bsSize="small"><FileExporter fileContent={this.props.data} fileName="voc-statistics"/></Button>
             {graphs}
         </div>)
     }
 });
 
-var HeapStatsChart = React.createClass({
+var VOCStatsChart = React.createClass({
     getInitialState: function() {
         return {
             data: {},
@@ -113,7 +116,7 @@ var HeapStatsChart = React.createClass({
     },
 
     pushHistory: function(deviceId, date, length) {
-        history.pushState({}, '', '/heap_stats/?device_id=' + deviceId  + "&date=" + date + "&length=" + length);
+        history.pushState({}, '', '/voc_stats/?device_id=' + deviceId  + "&date=" + date + "&length=" + length);
     },
 
     handleSubmit: function() {
@@ -128,7 +131,7 @@ var HeapStatsChart = React.createClass({
                 device_id: deviceId.trim(),
                 start_time: reformatDate(date),
                 length: length,
-                type: "heap"
+                type: "voc"
             };
             $.ajax({
                 url: "/api/device_stats",
@@ -137,11 +140,13 @@ var HeapStatsChart = React.createClass({
                 async: false,
                 data: requestData,
                 success: function(response) {
+                    console.log(response.data);
                     aggData[deviceId.trim()] = response.data.sort(compareTimestamp);
                 }
             });
         });
         that.setState({data: aggData});
+        console.log(aggData);
         return false;
     },
 
@@ -160,20 +165,20 @@ var HeapStatsChart = React.createClass({
                 </Col>
             </form>
             <p className="chart-remark">Notes: <br/>
-                &nbsp;&nbsp;- This chart relies on logging consistency, {'regex_pattern = "collecting time (\\d+).*\\nheap (\\d+) \\+: (\\d+) -: (\\d+)\\n"'}<br/>
+                &nbsp;&nbsp;- This chart relies on logging consistency, {'regex_pattern = "TVOC (\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+)"'}<br/>
                 &nbsp;&nbsp;- Can display data for up to 3 senses at once.<br/>
                 &nbsp;&nbsp;- All times UTC
             </p><br/>
             <Row>
                 <Col xs={12} sm={12} md={12}>
-                    <c3Chart id="heap-stats-chart" data={this.state.data} zoomable={this.state.zoomable} chartType={this.state.chartType}/>
+                    <c3Chart id="voc-stats-chart" data={this.state.data} zoomable={this.state.zoomable} chartType={this.state.chartType}/>
                 </Col>
             </Row>
         </div>)
     }
 });
 
-React.renderComponent(<HeapStatsChart />, document.getElementById('heap-stats'));
+React.renderComponent(<VOCStatsChart />, document.getElementById('voc-stats'));
 
 function compareTimestamp(log1, log2) {
     return (log1.timestamp > log2.timestamp);

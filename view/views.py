@@ -188,6 +188,10 @@ class HeapStatsView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='heap_stats.html',
                                 context={'title': 'Heap Statistics'})
+class VOCStatsView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='voc_stats.html',
+                                context={'title': 'VOC Statistics'})
 
 class InspectorView(ProtectedRequestHandler):
     def get(self):
