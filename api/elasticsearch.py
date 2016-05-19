@@ -158,13 +158,13 @@ class DustStatsAPI(ElasticSearchHandler):
 
         self.response.write(json.dumps(output))
 
-#TODO: Fix this copy pasta and make this code more reusable
-class HeapStatsAPI(ElasticSearchHandler):
+class DeviceStatsAPI(ElasticSearchHandler):
     def get(self):
         urlfetch.set_default_fetch_deadline(20)
         output = {"data": [], "error": ""}
         now_ts = int(datetime.datetime.now().strftime("%s")) * 1000
 
+        stats_type = self.request.get("type", default_value="heap")
         input_ts = self.request.get("start_time", default_value=now_ts)
         index = self.request.get("index", default_value=self.SENSE_LOGS_INDEX_PATTERN)
         device_id = self.request.get("device_id", "")
@@ -202,15 +202,29 @@ class HeapStatsAPI(ElasticSearchHandler):
             for hit in json.loads(response.content)["hits"]["hits"]:
                 results.append(hit["_source"])
 
-            regex_pattern = "collecting time (\\d+).*\\nheap (\\d+) \\+: (\\d+) -: (\\d+)\\n"
+            if stats_type == "voc":
+                regex_pattern = "TVOC (\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+),(\\d+)\\n"
+            else:
+                regex_pattern = "collecting time (\\d+).*\\nheap (\\d+) \\+: (\\d+) -: (\\d+)\\n"
+
             matches = [re.findall(regex_pattern, r['text']) for r in results]
-            print matches
-            output['data'] = [{
-                                  'timestamp': int(item[0]) * 1000,
-                                  'free': int(item[1]),
-                                  'max': int(item[2]),
-                                  'min': int(item[3])
-                              } for sublist in sorted(matches, key=self.getTime) for item in sublist if all([i.isdigit() for i in item])]
+            if stats_type == "voc":
+                output['data'] = [{
+                                      'timestamp': int(item[0]) * 1000,
+                                      'tvoc': int(item[1]),
+                                      'eco2': int(item[2]),
+                                      'current': int(item[3]),
+                                      'voltage': int(item[4]),
+                                      'temp': int(item[5]),
+                                      'humid': int(item[6])
+                                  } for sublist in sorted(matches, key=self.getTime) for item in sublist if all([i.isdigit() for i in item])]
+            else:
+                output['data'] = [{
+                                      'timestamp': int(item[0]) * 1000,
+                                      'free': int(item[1]),
+                                      'max': int(item[2]),
+                                      'min': int(item[3])
+                                  } for sublist in sorted(matches, key=self.getTime) for item in sublist if all([i.isdigit() for i in item])]
 
         except Exception as e:
             output['error'] = display_error(e)

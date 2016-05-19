@@ -2,7 +2,7 @@ from api.account import RecentAccountsAPI, AccountSearchAPI, AccountCountsBreakd
 from api.alarm import AlarmsAPI, AlarmsByEmailAPI, AlarmRingsHistoryAPI
 from api.calibration import DustCalibrationAPI, DustOffsetAPI, DustCalibrationLeftOverPairsAPI
 from api.elasticsearch import SenseLogsElasticSearchAPI, ElasticSearchStatusAPI
-from api.elasticsearch import ElasticSearchAggregationAPI, DustStatsAPI, HeapStatsAPI
+from api.elasticsearch import ElasticSearchAggregationAPI, DustStatsAPI, DeviceStatsAPI
 from api.feedback import FeedbackAPI
 from api.insights import InsightsAPI, InsightsGenericAPI
 from api.logs_level import LogsLevelAPI
@@ -104,7 +104,7 @@ routes = [
     ('/api/sense_uptime/?$', SenseUptimeAPI),
     ('/api/uptime/(\w+)', UptimeByFirmwareGroupAPI),
     ('/api/dust_stats/?$', DustStatsAPI),
-    ('/api/heap_stats/?$', HeapStatsAPI),
+    ('/api/device_stats/?$', DeviceStatsAPI),
     ('/api/features/?$', FeaturesAPI),
     ('/api/files/(\w+)', FileManifestAPI),
     ('/api/firmware/?$', FirmwareAPI),

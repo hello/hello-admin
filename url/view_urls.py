@@ -11,6 +11,7 @@ from view.views import FeaturesView
 from view.views import CreateProvisionKeyView
 from view.views import DustStatsView
 from view.views import HeapStatsView
+from view.views import VOCStatsView
 from view.views import ErrorView
 from view.views import FirmwarePathView
 from view.views import FirmwareView
@@ -63,6 +64,7 @@ routes = [
     ('/firmware/?$', FirmwareView),
     ('/firmware_path/?$', FirmwarePathView),
     ('/heap_stats/?$', HeapStatsView),
+    ('/voc_stats/?$', VOCStatsView),
     ('/key_store/?$', KeyStoreView),
     ('/keystore/?$', KeyStoreView),
     ('/keys/?$', ProvisionView),
