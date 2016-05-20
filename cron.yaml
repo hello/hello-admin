@@ -5,6 +5,9 @@ cron:
 - description: devices count push
   url: /cron/devices_count_push
   schedule: every 2 mins
+- description: device totals push
+  url: /cron/device_totals_push
+  schedule: every 2 mins
 - description: alarms count push
   url: /cron/alarms_count_push
   schedule: every 2 mins

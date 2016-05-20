@@ -50,6 +50,25 @@ class DevicesCountPush(GeckoboardPush):
             "pill_external": self.push_to_gecko(pills_count, "pills", self.geckoboard_credentials.pills_widget_id_external)
         }))
 
+class DeviceTotalsPush(GeckoboardPush):
+    def get(self):
+        device_totals = self.hello_request(
+                type="GET",
+                api_url="devices/totals",
+                raw_output=True
+        ).data
+
+        if self.geckoboard_credentials is None:
+            self.error("missing Geckoboard credentials!")
+        senses_count = device_totals.get('senses_count', -1)
+        pills_count = device_totals.get('pills_count', -1)
+
+        self.response.write(json.dumps({
+            "sense_total": self.push_to_gecko(senses_count, "senses", self.geckoboard_credentials.senses_widget_id),
+            "pill_total": self.push_to_gecko(pills_count, "pills", self.geckoboard_credentials.pills_widget_id),
+            "sense_total_external": self.push_to_gecko(senses_count, "senses", self.geckoboard_credentials.senses_widget_id_external),
+            "pill_total_external": self.push_to_gecko(pills_count, "pills", self.geckoboard_credentials.pills_widget_id_external)
+        }))
 
 class AlarmsCountPush(GeckoboardPush):
     def get(self):

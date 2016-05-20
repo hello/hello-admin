@@ -77,6 +77,10 @@ class GeckoboardCredentials(ndb.Model):
     pills_widget_id = ndb.StringProperty(required=True, default="125660-2078c76d-65da-4d78-9375-129e757b18ad")
     senses_widget_id_external = ndb.StringProperty(required=True, default="78789-56e6c450-fac6-0133-0738-22000bca46d2")
     pills_widget_id_external = ndb.StringProperty(required=True, default="78789-f62d3540-faca-0133-a0a9-22000b4908e7")
+    senses_total_widget_id = ndb.StringProperty(required=True, default="78789-5cb91470-003e-0134-1ccd-22000bf8a2ac")
+    pills_total_widget_id = ndb.StringProperty(required=True, default="78789-56f46960-003e-0134-9419-22000b5a09a4")
+    senses_total_widget_id_external = ndb.StringProperty(required=True, default="78789-46e7b900-003e-0134-a8d8-22000b4908e7")
+    pills_total_widget_id_external = ndb.StringProperty(required=True, default="78789-2eab18c0-003e-0134-14bb-22000b4a0396")
 
 
 class RecentlyActiveDevicesStats(ndb.Model):

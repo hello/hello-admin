@@ -5,7 +5,7 @@ from cron.dust_calibration_cron import DustCalibrationUpdateQueue, DustCalibrati
     DustCalibrationLeftOverUpdateQueue, DustCalibrationLeftOverUpdate
 from cron.elasticsearch_cron import FirmwareCrashElasticSearchAlert, ElasticSearchDropIndex, UnexpectedFirmwareAlert
 from cron.firmware_cron import FirmwareLogsAlert, StoreLogsFacet, StoreLogsFacetQueue
-from cron.geckoboard_cron import AlarmsCountPush, DevicesCountPush
+from cron.geckoboard_cron import AlarmsCountPush, DevicesCountPush, DeviceTotalsPush
 from cron.searchify_cron import DropOldSenseLogsSearchifyIndex
 from cron.sense_color_cron import SenseColorUpdate, SenseColorUpdateQueue
 from cron.timezone_cron import UpdateTimezoneByPartnerQueue, UpdateTimezoneByPartner
@@ -17,6 +17,7 @@ routes = [
     ('/cron/active_devices_history_purge', ActiveDevicesHistoryPurge),
     ('/cron/alarms_count_push', AlarmsCountPush),
     ('/cron/devices_count_push', DevicesCountPush),
+    ('/cron/device_totals_push', DeviceTotalsPush),
     ('/cron/drop_old_sense_logs_searchify_index', DropOldSenseLogsSearchifyIndex),
     ('/cron/store_recently_active_devices_stats_15_minutes', StoreRecentlyActiveDevicesStats15Minutes),
     ('/cron/store_recently_active_devices_stats_daily', StoreRecentlyActiveDevicesStatsDaily),
