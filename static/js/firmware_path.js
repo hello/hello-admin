@@ -277,11 +277,9 @@ var FirmwarePathMaster = React.createClass({
                 <Col xs={6}>
                    <Tile title="Add Firmware Version Map" content={<FirmwareMap />} />
                 </Col>
-            <Row>
                 <Col xs={12}>
                     <Tile title="Firmware Upgrade Paths" content={<FirmwareGroupPath groups={this.state.groups} />} />
                 </Col>
-            </Row>
             </Row>
     }
 });
