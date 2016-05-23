@@ -202,6 +202,57 @@ var FirmwareGroupPath = React.createClass({
     }
 });
 
+var FirmwareMap = React.createClass({
+  mixins: [React.addons.LinkedStateMixin],
+  getInitialState: function() {
+      return {fwHash: []}
+  },
+  addFWMap: function() {
+      var firmware_version = $('#firmware_version').val();
+      if (firmware_version.isWhiteString()) {
+          return [];
+      }
+      console.log(firmware_version);
+      var fwHash = [];
+      $.ajax({
+         url: '/api/fw_map',
+         dataType: 'json',
+         contentType: 'application/json',
+         data: JSON.stringify({fw_version: firmware_version}),
+         type: 'POST',
+         async: false,
+         success: function(response) {
+             console.log(response.data);
+             if (response.data.fw_hash != null) {
+                 fwHash = response.data.fw_hash;
+                 this.setState({alert: <Alert>{parseInt('0x' + fwHash, 16)} added as map of {firmware_version}</Alert>});
+             } else {
+                 this.setState({alert: <Alert>Map for {firmware_version} failed. Ensure FW is uploaded to S3.</Alert>});
+             }
+         }.bind(this),
+         error: function(xhr, status, err) {
+             console.error(status, err);
+         }.bind(this)
+     });
+      return fwHash;
+  },
+  render: function() {
+      return <div>
+          <Row>
+              <Col xs={4}>
+                  <Input id="firmware_version" type="text" placeholder="<FW Version>" hasFeedback />
+              </Col>
+              <Col xs={2}>
+                  <Button onClick={this.addFWMap}><Glyphicon glyph="plus"/></Button>
+              </Col>
+              <Col xs={6} xsOffset={0}>
+                  {this.state.alert}
+              </Col>
+          </Row>
+      </div>
+  }
+});
+
 var FirmwarePathMaster = React.createClass({
     getInitialState: function() {
         return {groups: [], selectedGroup: ""}
@@ -223,10 +274,15 @@ var FirmwarePathMaster = React.createClass({
     },
     render: function() {
         return <Row>
-            <Col xs={12}>
-                <Tile title="Firmware Upgrade Paths" content={<FirmwareGroupPath groups={this.state.groups} />} />
-            </Col>
-        </Row>
+                <Col xs={6}>
+                   <Tile title="Add Firmware Version Map" content={<FirmwareMap />} />
+                </Col>
+            <Row>
+                <Col xs={12}>
+                    <Tile title="Firmware Upgrade Paths" content={<FirmwareGroupPath groups={this.state.groups} />} />
+                </Col>
+            </Row>
+            </Row>
     }
 });
 
