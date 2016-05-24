@@ -32,6 +32,7 @@ from api.firmware import FirmwareInfoAPI
 from api.firmware import FirmwareUnhashAPI
 from api.firmware import FirmwareGroupStatusAPI
 from api.firmware import FirmwareGroupPathAPI
+from api.firmware import FirmwareVersionMapAPI
 from api.keystore import PillKeyDecryptAPI, SenseKeyStoreBatchAPI, PillKeyStoreBatchAPI
 from api.keystore import PillKeyProvision
 from api.keystore import PillProvisionAPI
@@ -137,6 +138,7 @@ routes = [
     ('/api/sense_key_provision/?$', SenseKeyProvision),
     ('/api/sense_logs/?$', SenseLogsAPI),
     ('/api/fw_groups/?$', FWGroupAPI),
+    ('/api/fw_map/?$', FirmwareVersionMapAPI),
     ('/api/tags/?$', TagsAPI),
     ('/api/device_tags/?$', DeviceTagsAPI),
     ('/api/timeline/?$', TimelineAPI),

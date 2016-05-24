@@ -149,3 +149,14 @@ class FirmwareGroupPathAPI(SuperFirmwareRequestHandler):
             body.get("from_fw_version"))
         self.slack_pusher.send_to_deploys_channel(message_text)
 
+
+class FirmwareVersionMapAPI(SuperFirmwareRequestHandler):
+
+    def post(self):
+        body = json.loads(self.request.body)
+        fw_version = body.get("fw_version")
+
+        self.hello_request(
+                api_url="firmware/names/add_map/{}".format(fw_version),
+                type="POST"
+        )
