@@ -155,7 +155,6 @@ class FirmwareVersionMapAPI(SuperFirmwareRequestHandler):
     def post(self):
         body = json.loads(self.request.body)
         fw_version = body.get("fw_version")
-        print(fw_version)
 
         self.hello_request(
                 api_url="firmware/names/add_map/{}".format(fw_version),

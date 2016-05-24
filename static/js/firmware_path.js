@@ -222,7 +222,6 @@ var FirmwareMap = React.createClass({
          type: 'POST',
          async: false,
          success: function(response) {
-             console.log(response.data);
              if (response.data.fw_hash != null) {
                  fwHash = response.data.fw_hash;
                  this.setState({alert: <Alert>{parseInt('0x' + fwHash, 16)} added as map of {firmware_version}</Alert>});
