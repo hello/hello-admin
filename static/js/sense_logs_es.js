@@ -53,6 +53,8 @@ var SenseLogsESResultsTable = React.createClass({
                     <DropdownButton bsSize="xsmall" title="Action" id="bg-vertical-dropdown-1">
                         <MenuItem className="surrounding-logs" eventKey="1" onClick={this.loadSurroundingLogs.bind(this, r._source.sense_id, r._source.epoch_millis)}>Get surrounding logs</MenuItem>
                     </DropdownButton>;
+                var intVersion = (parseInt(r._source.middle_firmware_version, 10) < 3000 || parseInt(r._source.middle_firmware_version, 16) > 40000) ? parseInt(r._source.middle_firmware_version, 16) : r._source.middle_firmware_version;
+
                 return <tr>
                     <td>
                         <div className="logs-meta">
@@ -63,7 +65,7 @@ var SenseLogsESResultsTable = React.createClass({
                                 &nbsp;
                                 | Top FW: {r._source.top_firmware_version}&nbsp;
                                 | Middle FW:
-                                <a target="_blank" href={"/firmware/?firmware_version=" + parseInt(r._source.middle_firmware_version, 16)}> {r._source.middle_firmware_version}</a>
+                                <a target="_blank" href={"/firmware/?firmware_version=" + intVersion}> {r._source.middle_firmware_version}</a>
                             </Col>
                             <Col xs={2}>{lookUpAround}</Col>
                         </div><hr className="splitter"/>
