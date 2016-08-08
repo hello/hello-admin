@@ -12,7 +12,7 @@ from models.ext  import OrdersMap
 
 
 ALPHABET="123456789abcdefghijkmnopqrstuvwxyz"
-CIPHER = 'YPrHmFNfCWMY,rH7ZdG4XueeAhxc+FnC' # never ever change this or we all die
+CIPHER = 'RBy9D2oWY?}7)PiNJEVaNKddkeup}8Pc' # never ever change this or we all die
 BLOCK_SIZE = 16
 PADDING = '{'
 
