@@ -8,7 +8,7 @@ class SessionsAPI(ProtectedRequestHandler):
             api_url="token",
             url_params={
                 "email": self.request.get("email"),
-                "limit": 1000
+                "limit": 10
             },
             type="GET",
         )

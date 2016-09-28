@@ -1,9 +1,13 @@
 import os
 import logging as log
 from copy import copy
+import urllib
 
 from google.appengine.api.namespace_manager import namespace_manager
+from google.appengine.api import urlfetch
+
 import jinja2
+import json
 import webapp2
 from google.appengine.api import users
 from google.appengine.api import memcache
@@ -168,20 +172,6 @@ class BaseRequestHandler(webapp2.RequestHandler):
         s = self.render(template_file, template_values=context)
         self.response.write(s)
 
-    def authorize_session(self, api_info, token):
-        """
-        :param token: token issued to user to use an specific app
-        :type token: str
-        """
-        if api_info is None:
-            log.error("Missing API Info")
-        hello = self.make_oauth2_service(api_info)
-
-        if token is None:
-            log.error("Missing Access Token")
-
-        return hello.get_session(token)
-
     def hello_request(self, api_url, body_data="", url_params={}, type="GET", raw_output=False, filter_fields=[]
                           , access_token=None, api_info=None, content_type='application/json'):
         """
@@ -209,41 +199,56 @@ class BaseRequestHandler(webapp2.RequestHandler):
         output = ResponseOutput()
         output.set_viewer(self.current_user_email if self.current_user is not None else "cron-bot")
 
-        session = self.authorize_session(api_info, access_token)
-
-        request_detail = {
-            "headers": {
-                "Content-Type": content_type,
-                "X-Hello-Admin": self.current_user_email,
-                "X-Appengine-Country": self.request.headers.get("X-Appengine-Country", ""),
-                "X-Appengine-Region": self.request.headers.get("X-Appengine-Region", ""),
-                "X-Appengine-City": self.request.headers.get("X-Appengine-City", ""),
-                "X-Appengine-CityLatLong": self.request.headers.get("X-Appengine-CityLatLong", ""),
-            },
+        headers = {
+            "Content-Type": content_type,
+            "X-Hello-Admin": self.current_user_email,
+            "X-Appengine-Country": self.request.headers.get("X-Appengine-Country", ""),
+            "X-Appengine-Region": self.request.headers.get("X-Appengine-Region", ""),
+            "X-Appengine-City": self.request.headers.get("X-Appengine-City", ""),
+            "X-Appengine-CityLatLong": self.request.headers.get("X-Appengine-CityLatLong", ""),
+            "Authorization" : "Bearer %s" % access_token
         }
 
-        if body_data and type in ['PUT', 'POST', 'PATCH']:
-            request_detail['data'] = body_data
-        if url_params:
-            request_detail['params'] = url_params
 
-        response = getattr(OAuth2Session, type.lower())(session, api_url, **request_detail)
+        verbs_to_methods = {
+            "GET": urlfetch.GET,
+            "POST": urlfetch.POST,
+            "PUT": urlfetch.PUT,
+            "PATCH": urlfetch.PATCH,
+        }
+        
+        method = verbs_to_methods[type]
+        query_params = urllib.urlencode(url_params)
+        url = api_info.domain + api_url
+        if query_params:
+            url = url +'?' + query_params
+        response = urlfetch.fetch(
+            url=url,
+            payload=body_data,
+            method=method,
+            headers=headers)
+
         output.set_status(response.status_code)
-        log.info("%s, %s", api_url,access_token)
-        log.info("%s", response.url)
-        log.info("%s", response.request.headers)
+        log.info("%s %s", response.status_code, url)
+
+        content = response.content.decode('utf-8', "replace")
+        try:
+            log.info("%s %s", url, content)
+        except Exception, e:
+            log.error("%s", e)
+
         if response.status_code == 200:
             if response.headers.get("content-type") == "text/plain":
                 output.set_data(response.content)
             else:
                 try:
-                    response_data = response.json()
+                    response_data = json.loads(response.content)
                     if filter_fields != []:
                         response_data = extract_dicts_by_fields(response_data, filter_fields)
                     output.set_data(response_data)
                 except ValueError:
                     output.set_data({})
-        if not response.ok:
+        else:
             output.set_error(response.content)
             self.response.headers.add_header("err", response.content)
 
@@ -279,21 +284,6 @@ class BaseRequestHandler(webapp2.RequestHandler):
     @property
     def slack_pusher(self):
         return Slack(self.namespace, settings.SLACK_WEBHOOK)
-
-    def make_oauth2_service(self, api_info):
-        """
-        :param app_info_model: an instance of AppInfo that store auth data for a certain app
-        :type app_info_model: :class:`AppInfo`
-        """
-        service = OAuth2Service(
-            client_id=api_info.client_id,
-            client_secret='',
-            name='hello',
-            authorize_url=self.suripu_app.domain + 'oauth2/authorize',
-            access_token_url=self.suripu_app.domain + 'oauth2/token',
-            base_url=api_info.domain
-        )
-        return service
 
 
 class ProtectedRequestHandler(BaseRequestHandler):

@@ -20,7 +20,7 @@ class InitializeDataStore(BaseRequestHandler):
 
     def init_per_namespace(self, namespace):
         namespace_manager.set_namespace(namespace)
-        with open("config.{}.yaml".format(namespace.lower()), "r") as stream:
+        with open("config.{}.yml".format(namespace.lower()), "r") as stream:
             config_from_file = yaml.load(stream)
             namespace_manager.set_namespace(config_from_file.get("namespace"))
             ApiInfo(**config_from_file.get("api_info").get("admin")).put()
