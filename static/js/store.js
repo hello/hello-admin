@@ -28,7 +28,6 @@ var QueryOrdersById = React.createClass({
         var requestData = {
             order_id: orderId
         };
-        console.log(requestData);
         if (isValidRequest(requestData)) {
             $.ajax({
                 url: "/api/orders",
@@ -36,7 +35,6 @@ var QueryOrdersById = React.createClass({
                 dataType: 'json',
                 data: requestData,
                 success: function (response) {
-                    console.log(response);
                     if (!response.error.isWhiteString()){
                         that.setState({alert: response.error});
                     }
@@ -119,11 +117,12 @@ var QueryOrdersById = React.createClass({
             <hr className="fancy-line" /><br/>
             <Input id="order-id-input" type="text" placeholder="Enter order ID"/>
             <Button id="order-id-submit" bsStyle="info" bsSize="large" className="btn-circle" type="submit"><Glyphicon glyph="send"/></Button>
-            {alert}
-        </form></Col>)
+
+        </form>
+        {alert}
+        </Col>)
     }
 });
-
 
 var QueryOrdersOmni = React.createClass({
     getInitialState: function() {
@@ -149,7 +148,6 @@ var QueryOrdersOmni = React.createClass({
                 'q' : omniInput,
             },
             success: function (response) {
-                console.log(response);
                 this.setState({filteredResult: response});
             }.bind(this)
         });
@@ -171,6 +169,7 @@ var QueryOrdersOmni = React.createClass({
                     <th>Name</th>
                     <th>Email</th>
                     <th>Order ID</th>
+                    <th>Link</th>
                 </tr></thead>
                 <tbody>{
                     this.state.filteredResult.map(function(d){
@@ -178,6 +177,12 @@ var QueryOrdersOmni = React.createClass({
                             <td>{d.name}</td>
                             <td>{d.email}</td>
                             <td><Button bsSize="small" bsStyle="success" onClick={this.getOrderById.bind(this, d.order_id)}>{d.order_id}</Button></td>
+                            <td>
+                                <form method="POST" action={"https://store.hello.is/details/" + d.link} target="_blank">
+                                    <input type="hidden" name="email" value={d.email} />
+                                    <input type="submit" class="btn btn-sm btn-success" value="View order" />
+                                </form>
+                            </td>
                         </tr>
                     }.bind(this))
                 }</tbody>
@@ -187,9 +192,8 @@ var QueryOrdersOmni = React.createClass({
             <h3>OrderID by Name Partials / Email</h3>
             <hr className="fancy-line" /><br/>
             <input className="form-control" ref="omniInput" type="text" placeholder="Enter name partials / email"/>
-            {table}
             {loadingOrSubmit}
-        </form></Col>)
+        </form>{table}</Col>)
     }
 });
 
