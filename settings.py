@@ -16,13 +16,10 @@ DEFAULT_LOCAL_AGAINST_DEV_API_URL = "http://localhost:3333/v1/"
 
 SERVER = os.environ.get("SERVER_NAME", "")
 
-if SERVER.startswith("dev"):
+if SERVER.startswith("localhost"):
+    DEBUG = True
     ENVIRONMENT = "dev"
     ADMIN_APP_INFO = AppInfo.get_by_id("admin-dev")
-
-if SERVER == "localhost":
-    DEBUG = True
-    ENVIRONMENT = "local-dev"
 
 ## Grab settings saved in GAE memcache and only query from Datastore if they are not available
 

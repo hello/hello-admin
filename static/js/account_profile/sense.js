@@ -323,6 +323,9 @@ var SenseSummary = React.createClass({
             keyStore = <span className="not-ok">unprovisioned</span>;
         }
 
+        var hardware_version = senseKeyStoreResponse.data.hw_version;
+
+
         if (senseResponse.data.length > 0) {
             var accountId = senseResponse.data[0].device_account_pair ? senseResponse.data[0].device_account_pair.account_id : undefined;
             var senseId = senseResponse.data[0].device_account_pair ? senseResponse.data[0].device_account_pair.external_device_id : undefined;
@@ -358,6 +361,7 @@ var SenseSummary = React.createClass({
                 <Table>
                     <tbody>
                         <tr><td>ID</td><td><span>{senseIdSpan}</span><span>{" (" + senseInternalId + ")"}</span></td></tr>
+                        <tr><td>Hardware:</td><td>{hardware_version}</td></tr>
                         <tr><td>Keystore</td><td>{keyStore}</td></tr>
                         <tr><td>Firmware</td><td>{this.state.unhashedFirmware}</td></tr>
                         <tr><td>Dust Calib.</td><td>{this.state.dustCalibration}</td></tr>
