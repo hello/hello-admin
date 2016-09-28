@@ -166,8 +166,12 @@ class PasswordResetView(ProtectedRequestHandler):
 class OrdersView(ShippingRequestHandler):
     """Search for order by order ID"""
     def get(self):
-        self.render_to_response(template_file='orders.html',
-                                context={'title': 'Orders'})
+
+
+        self.redirect('/store?who=' + self.request.get('who', ''))
+        return
+        # self.render_to_response(template_file='orders.html',
+        #                         context={'title': 'Orders'})
 
 class ActiveDevicesHistoryView(ProtectedRequestHandler):
     def get(self):

@@ -11,6 +11,8 @@ var QueryOrdersById = React.createClass({
             return false;
         }
         $('#order-id-input').val(orderIdInputFromUrl);
+
+
         this.handleSubmit();
     },
 
@@ -128,6 +130,19 @@ var QueryOrdersOmni = React.createClass({
     getInitialState: function() {
         return {error: null, filteredResult: [], loading: false}
     },
+
+    submitWithInputsfromURL: function() {
+        var who = getParameterByName('who');
+        if (who.isWhiteString()) {
+            return false;
+        }
+        $('#omni').val(who);
+        this.handleSubmit();
+    },
+
+    componentDidMount: function() {
+        this.submitWithInputsfromURL();
+    },
     handleSubmit: function() {
         this.setState({error: null, filteredResult: []});
         $("#order-id-input").val("");
@@ -191,7 +206,7 @@ var QueryOrdersOmni = React.createClass({
         return (<Col xs={6}><form onSubmit={this.handleSubmit}>
             <h3>OrderID by Name Partials / Email</h3>
             <hr className="fancy-line" /><br/>
-            <input className="form-control" ref="omniInput" type="text" placeholder="Enter name partials / email"/>
+            <input className="form-control" ref="omniInput" id="omni" type="text" placeholder="Enter name partials / email"/>
             {loadingOrSubmit}
         </form>{table}</Col>)
     }

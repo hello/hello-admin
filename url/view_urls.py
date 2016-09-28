@@ -45,6 +45,7 @@ from view.views import ZendeskNowView
 from view.views import ZendeskView
 from view.views import SenseUptimeView
 from view.views import StoreView
+from view.views import OrdersView #for redirect purposes
 from view.views import UptimeView
 
 routes = [
@@ -75,7 +76,7 @@ routes = [
     ('/motion/?$', MotionView),
     ('/notification/?$', NotificationView),
     ('/onboarding_logs/?$', OnboardingLogsView),
-    ('/orders/?$', StoreView),
+    ('/orders/?$', OrdersView),
     ('/store/?$', StoreView),
     ('/pairing/?$', PairingView),
     ('/password_reset/?$', PasswordResetView),
