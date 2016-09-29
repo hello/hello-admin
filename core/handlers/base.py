@@ -215,6 +215,7 @@ class BaseRequestHandler(webapp2.RequestHandler):
             "POST": urlfetch.POST,
             "PUT": urlfetch.PUT,
             "PATCH": urlfetch.PATCH,
+            "DELETE": urlfetch.DELETE,
         }
         
         method = verbs_to_methods[type]
