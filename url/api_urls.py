@@ -33,9 +33,7 @@ from api.firmware import FirmwareUnhashAPI
 from api.firmware import FirmwareGroupStatusAPI
 from api.firmware import FirmwareGroupPathAPI
 from api.firmware import FirmwareVersionMapAPI
-from api.keystore import PillKeyDecryptAPI, SenseKeyStoreBatchAPI, PillKeyStoreBatchAPI
-from api.keystore import PillKeyProvision
-from api.keystore import PillProvisionAPI
+from api.keystore import SenseKeyStoreBatchAPI, PillKeyStoreBatchAPI
 from api.keystore import SenseKeyProvision
 from api.label import LabelDataAPI
 from api.motion import MotionAPI, LastMotionAPI
@@ -128,7 +126,6 @@ routes = [
     ('/api/papertrail_systems/?$', PaperTrailSystemsAPI),
     ('/api/password_reset/?$', PasswordResetAPI),
     ('/api/pch_sn_check/?$', PCHSerialNumberCheckAPI),
-    ('/api/pill_key_provision/?$', PillKeyProvision),
     ('/api/recent_accounts/?$', RecentAccountsAPI),
     ('/api/room_conditions/?$', RoomConditionsAPI),
     ('/api/searchify_stats/?$', SearchifyStatsAPI),
@@ -161,8 +158,6 @@ routes = [
     ("/api/init/?$", InitializeDataStore),
     ("/api/namespace/?$", NamespaceAPI),
     ('/update', UpdateAdminAccessTokenAPI),
-    ('/pill_bin_upload', PillKeyDecryptAPI),
-    ('/pill_bin_upload/([^/]+)/([^/]+)', PillProvisionAPI),
     ('/proxy/(.*)', ProxyAPI),
     ('/register_pill', RegisterPillAPI),
     ('/api/setup', SetupAPI),
