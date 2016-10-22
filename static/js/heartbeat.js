@@ -6,7 +6,7 @@ var c3Chart = React.createClass({
     },
     render: function() {
         var that = this, categories = [], stackingGroups = [];
-        console.log(that.props.data);
+        console.log("props", that.props.data);
         var graphs = [];
         that.props.data.forEach(function(d, i){
             var sumBattery = 0, sumBatteryMod3Arr = [];
@@ -124,7 +124,7 @@ var c3Chart = React.createClass({
 var BatteryChart = React.createClass({
     getInitialState: function() {
         return {
-            data: [[], [], [], [], [], [], [], [], [], []],
+            data: [],
             zoomable: false,
             chartType: "line",
             alert: ""
