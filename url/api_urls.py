@@ -76,7 +76,6 @@ from api.zendesk import ZendeskNowAPI
 from api.zendesk import ZendeskStatsAPI
 from api.order import OrdersMapAPI
 from api.timeline import TimelineAlgorithmAPI
-from api.device import ColorlessSensesAPI
 from api.clearbit import ClearbitAPI
 from api.setup import CreateBuggyFirmwareAPI
 from api.datastore import InitializeDataStore
@@ -152,7 +151,6 @@ routes = [
     ('/api/zendesk_now/?$', ZendeskNowAPI),
     ('/api/zendesk_stats/?$', ZendeskStatsAPI),
     ('/api/orders_map/?$', OrdersMapAPI),
-    ('/api/colorless_senses/?$', ColorlessSensesAPI),
     ('/api/clearbit/?$', ClearbitAPI),
     ('/api/create/buggy_firmware/?$', CreateBuggyFirmwareAPI),
     ("/api/init/?$", InitializeDataStore),

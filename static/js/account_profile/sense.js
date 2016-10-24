@@ -349,13 +349,7 @@ var SenseSummary = React.createClass({
             var lastPairing = <span dangerouslySetInnerHTML={{__html: senseResponse.data[0].pairing_ts ? utcFormatter(new Date(senseResponse.data[0].pairing_ts)) + pairedByAdmin : null}}/>;
 
             var senseColor = senseColorResponse.error.isWhiteString() && senseColorResponse.data ?
-                <OverlayTrigger trigger="click" placement="right" overlay={
-                    <Popover title={<span>Update Color &nbsp;<Button id="popover-close" onClick={this.closePopoverManually} bsSize="xsmall">x</Button></span>}>
-                        <Button onClick={this.updateSenseColor.bind(this, senseId, "BLACK")} className="device-color" bsSize="xsmall">BLACK</Button>&nbsp;
-                        <Button onClick={this.updateSenseColor.bind(this, senseId, "WHITE")} className="device-color" bsSize="xsmall">WHITE</Button>
-                    </Popover>}>
-                    <Button id="popover-trigger" className="device-color" bsSize="xsmall">{senseColorResponse.data}</Button>
-                </OverlayTrigger> : null;
+               senseColorResponse.data : "?";
 
             result = <div>
                 <Table>
@@ -394,24 +388,6 @@ var SenseSummary = React.createClass({
 
 
 var SenseLimitedSummary = React.createClass({
-    updateSenseColor: function(senseId, color) {
-        this.closePopoverManually();
-        $.ajax({
-            url: "/api/sense_color",
-            dataType: 'json',
-            type: 'PUT',
-            data: {sense_id: senseId, color: color},
-            success: function(response) {
-                if (response.error.isWhiteString()){
-                    $("#popover-trigger").text(color);
-                }
-            }
-        });
-        return false;
-    },
-    closePopoverManually: function() {
-        $("#popover-trigger").trigger("click");
-    },
     render: function() {
         var keyStore = null;
         var senseKeyStoreResponse = this.props.senseKeyStoreResponse;
@@ -427,14 +403,7 @@ var SenseLimitedSummary = React.createClass({
         }
 
         var senseColor = senseColorResponse.error.isWhiteString() && senseColorResponse.data ?
-                <OverlayTrigger trigger="click" placement="right" overlay={
-                    <Popover title={<span>Update Color &nbsp;<Button id="popover-close" onClick={this.closePopoverManually} bsSize="xsmall">x</Button></span>}>
-                        <Button onClick={this.updateSenseColor.bind(this, this.props.senseId, "BLACK")} className="device-color" bsSize="xsmall">BLACK</Button>&nbsp;
-                        <Button onClick={this.updateSenseColor.bind(this, this.props.senseId, "WHITE")} className="device-color" bsSize="xsmall">WHITE</Button>
-                    </Popover>}>
-                    <Button id="popover-trigger" className="device-color" bsSize="xsmall">{senseColorResponse.data}</Button>
-                </OverlayTrigger> : null;
-
+        senseColorResponse.data : "?";
 
         return <div>
             <Table>

@@ -189,19 +189,6 @@ class SenseColorAPI(ProtectedRequestHandler):
             type="GET",
         )
 
-    def put(self):
-        self.hello_request(
-            api_url="devices/color/{}/{}".format(self.request.get("sense_id"), self.request.get("color")),
-            type="PUT",
-        )
-
-class ColorlessSensesAPI(ProtectedRequestHandler):
-    def get(self):
-        self.hello_request(
-            api_url="devices/color/missing",
-            type="GET",
-        )
-
 
 class SenseBlackListAPI(ProtectedRequestHandler):
     def get(self):
