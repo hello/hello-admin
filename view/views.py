@@ -341,3 +341,8 @@ class FileManifestView(ProtectedRequestHandler):
     def get(self):
         self.render_to_response(template_file='filemanifest.html',
                                 context={'title':  'uptime'})
+
+class RecentDevicesView(ProtectedRequestHandler):
+    def get(self):
+        self.render_to_response(template_file='recent_devices.html',
+                                context={'title':  'recent devices'})

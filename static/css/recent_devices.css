@@ -1,0 +1,11 @@
+#recent-devices table tr td, #recent-devices table tr th{
+  padding: 10px;
+}
+
+#recent-devices table {
+  background-color: #fff;
+}
+
+#recent-devices table tr{
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  }

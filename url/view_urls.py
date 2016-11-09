@@ -47,6 +47,7 @@ from view.views import SenseUptimeView
 from view.views import StoreView
 from view.views import OrdersView #for redirect purposes
 from view.views import UptimeView
+from view.views import RecentDevicesView
 
 routes = [
     ('/', AccountProfileView),
@@ -83,6 +84,7 @@ routes = [
     ('/pch_serial_number_check/?$', PCHSerialNumberCheckView),
     ('/create_provision_key/?$', CreateProvisionKeyView),
     ('/recent_accounts/?$', RecentAccountsView),
+    ('/recent_devices/?$', RecentDevicesView),
     ('/room_conditions/?$', RoomConditionsView),
     ('/room_conditions_minute/?$', RoomConditionsMinuteView),
     ('/searchify_stats/?$', SearchifyStatsView),

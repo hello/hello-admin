@@ -19,6 +19,7 @@ from api.device import DeviceKeyStoreAPI
 from api.device import DeviceOwnersAPI
 from api.device import SenseBlackListAPI
 from api.device import SenseColorAPI
+from api.device import RecentDevicesAPI
 from api.pill import LastHeartbeatAPI, HeartbeatsAPI, LatestPillsAPI, LatestPillsDataAPI
 from api.sessions import SessionsAPI, SessionsUpdateAPI
 from api.trends import TrendsAPI
@@ -100,6 +101,7 @@ routes = [
     ('/api/devices/inactive/?$', DeviceInactiveAPI),
     ('/api/devices/key_store/?$', DeviceKeyStoreAPI),
     ('/api/devices/owners/?$', DeviceOwnersAPI),
+    ('/api/devices/recent/?$', RecentDevicesAPI),
     ('/api/sense_uptime/?$', SenseUptimeAPI),
     ('/api/uptime/(\w+)', UptimeByFirmwareGroupAPI),
     ('/api/dust_stats/?$', DustStatsAPI),
