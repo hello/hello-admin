@@ -249,3 +249,10 @@ class DropoutDevicesAPI(ProtectedRequestHandler):
             url_params={"before": self.request.get("before"), "after": self.request.get("after")},
             type="GET",
         )
+
+class RecentDevicesAPI(ProtectedRequestHandler):
+    def get(self):
+        self.hello_request(
+            api_url="devices/recent",
+            type="GET",
+        )
