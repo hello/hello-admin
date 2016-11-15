@@ -191,7 +191,7 @@ var DustOffsetUpdateModal = React.createClass({
 
 var SenseSummary = React.createClass({
     getInitialState: function() {
-        return {dustOffset: null, unhashedFirmware: null, dustCalibration: null};
+        return {dustOffset: null, unhashedFirmware: null, dustCalibration: null, expansions: []};
     },
     componentDidUpdate: function(nextProps, nextState) {
         var currentSenseId = this.props.senseResponse.data && this.props.senseResponse.data.length > 0  ? this.props.senseResponse.data[0].device_account_pair.external_device_id : null;
@@ -209,6 +209,8 @@ var SenseSummary = React.createClass({
         this.getTags(senseId);
         var senseInternalId = senseResponse.data[0].device_account_pair ? senseResponse.data[0].device_account_pair.internal_device_id : undefined;
         this.getDustCalibration(senseId, accountId, senseInternalId);
+
+        this.getExpansions(senseId);
     },
 
     getUnhashedFirmware: function(firmwareVersion) {
@@ -284,6 +286,23 @@ var SenseSummary = React.createClass({
         });
     },
 
+    getExpansions: function(senseId) {
+        $.ajax({
+            url: "/api/expansions",
+            dataType: 'json',
+            type: 'GET',
+            data: {sense_id: senseId},
+            success: function(response) {
+                if (response.error.isWhiteString()) {
+                    this.setState({ expansions: response.data});
+                } else {
+                    state = {expansions: ['ERROR FETCHING EXPANSIONS']}
+                    this.setState(state)
+                }
+            }.bind(this)
+        });    
+    },
+
     closePopoverManually: function() {
         $("#popover-trigger").trigger("click");
     },
@@ -348,6 +367,7 @@ var SenseSummary = React.createClass({
             }
             var lastPairing = <span dangerouslySetInnerHTML={{__html: senseResponse.data[0].pairing_ts ? utcFormatter(new Date(senseResponse.data[0].pairing_ts)) + pairedByAdmin : null}}/>;
 
+            var expansions = this.state.expansions.join(",");
             var senseColor = senseColorResponse.error.isWhiteString() && senseColorResponse.data ?
                 <OverlayTrigger trigger="click" placement="right" overlay={
                     <Popover title={<span>Update Color &nbsp;<Button id="popover-close" onClick={this.closePopoverManually} bsSize="xsmall">x</Button></span>}>
@@ -362,6 +382,7 @@ var SenseSummary = React.createClass({
                     <tbody>
                         <tr><td>ID</td><td><span>{senseIdSpan}</span><span>{" (" + senseInternalId + ")"}</span></td></tr>
                         <tr><td>Hardware:</td><td>{hardware_version}</td></tr>
+                        <tr><td>Expansions:</td><td>{expansions}</td></tr>
                         <tr><td>Keystore</td><td>{keyStore}</td></tr>
                         <tr><td>Firmware</td><td>{this.state.unhashedFirmware}</td></tr>
                         <tr><td>Dust Calib.</td><td>{this.state.dustCalibration}</td></tr>
