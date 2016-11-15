@@ -82,6 +82,7 @@ from api.clearbit import ClearbitAPI
 from api.setup import CreateBuggyFirmwareAPI
 from api.datastore import InitializeDataStore
 from api.store import StoreAPI
+from api.expansions import ExpansionsAPI
 
 routes = [
     ('/api/account_breakdown/?$', AccountCountsBreakdownByCreatedDateAPI),
@@ -193,5 +194,6 @@ routes = [
     ('/api/pill_latest/pair/?$', LatestPillsAPI),
     ('/api/pill_latest/data/?$', LatestPillsDataAPI),
     ('/api/store/search/?$', StoreAPI),
+    ('/api/expansions/?$', ExpansionsAPI),
 ]
 
