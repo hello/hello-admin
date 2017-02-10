@@ -171,12 +171,9 @@ var BatteryChart = React.createClass({
         var requestData = {
             ts: ts.isWhiteString() ? new Date().getTime() : getUTCEpochFromLocalTime(ts)*1000
         };
-        if (searchInput.indexOf("@") > -1) {
-            requestData.email = searchInput;
-        }
-        else {
-            requestData.pill_id_partial = searchInput;
-        }
+        
+        requestData.pill_id = searchInput;
+
         $.ajax({
             url: "/api/heartbeats",
             type: "GET",
@@ -208,7 +205,7 @@ var BatteryChart = React.createClass({
         return (<div>
             <form className="row" onSubmit={this.handleSubmit}>
                 <Col xs={3} sm={3} md={3}>
-                    <Input id="search-input" type="text" placeholder="email / pill ID partial"/>
+                    <Input id="search-input" type="text" placeholder="pill ID"/>
                 </Col>
                 <LongDatetimePicker placeHolder="end timestamp (now)" id="end-ts" size="3" />
                 <Col xs={1} sm={1} md={1}>

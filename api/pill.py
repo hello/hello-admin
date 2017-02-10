@@ -11,13 +11,19 @@ class LastHeartbeatAPI(ProtectedRequestHandler):
 
 class HeartbeatsAPI(ProtectedRequestHandler):
     def get(self):
+        url_params={}
+            
+        start_ts =  self.request.get("ts", default_value=None)
+        pill_id = self.request.get("pill_id", default_value="")
+
+        if pill_id is not None:
+            url_params["pill_id"] = pill_id
+        if start_ts is not None:
+            url_params["start_ts"] = start_ts
+
         raw_pill_heartbeat_response = self.hello_request(
             api_url="pill/heartbeats",
-            url_params={
-                "email": self.request.get("email", default_value=None),
-                "pill_id_partial": self.request.get("pill_id_partial", default_value=None),
-                "start_ts": self.request.get("ts", default_value=None)
-            },
+            url_params=url_params,
             type="GET",
             raw_output=True
         )
