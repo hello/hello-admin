@@ -35,6 +35,7 @@ var AccountTile = React.createClass({
                 <thead></thead>
                 <tbody>
                     <tr><td>ID</td><td>{this.props.account.id}</td></tr>
+                    <tr><td>ExtID</td><td>{this.props.account.ext_id}</td></tr>
                     <tr><td>Name</td><td>{this.props.account.name}</td></tr>
                     <tr><td>Email</td><td>{this.props.account.email}</td></tr>
                     <tr><td>Gender</td><td>{this.props.account.gender}</td></tr>
