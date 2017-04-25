@@ -254,7 +254,7 @@ var TimelineMaestro = React.createClass({
 
         var requestData = {
             email: emailInput,
-            date: reformatDate(dateInput)
+            date: reformatDateTime(dateInput)
         };
         if (requestData.email.isWhiteString() || requestData.date.isWhiteString()) {
             return false;
@@ -373,6 +373,16 @@ function reformatDate(dateString) {
     var date = dateComponents[1];
     return [year, month, date].join("-");
 }
+
+function reformatDateTime(dateString) {
+    var dateComponents = dateString.split("-");
+    var year = dateComponents[2];
+    var month = dateComponents[0];
+    var date = dateComponents[1];
+    var timeString = "T00:00";
+    return  [year, month, date].join("-").concat(timeString);
+}
+
 
 function debunkMarkdown(md) {
     var partials = md.match(/(.*?)(\*\*)(.*?)(\*\*)(.*?),(.*)/);
